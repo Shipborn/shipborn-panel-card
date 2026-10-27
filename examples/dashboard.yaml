@@ -1,0 +1,238 @@
+# Besturingspagina TC90
+# Plak dit in: Dashboard > ⋮ > Edit dashboard > ⋮ > Raw configuration editor
+# Vervang de entity-id's (switch.xxx etc.) door je eigen entiteiten.
+title: Besturing
+views:
+  - title: Besturing
+    path: besturing
+    type: panel
+    background: "#ffffff"
+    cards:
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          # ───────────────────────── Links boven ─────────────────────────
+          - type: custom:shipborn-panel-card
+            shape: wedge-left
+            width: 650
+            height: 340
+            items:
+              - type: group
+                title: Dynamic Positioning
+                x: 85
+                y: 32
+                width: 230
+                columns: 5
+                buttons:
+                  - { label: "Joystick heading", entity: switch.dp_joystick_heading, led: green }
+                  - { label: "Joystick surge", entity: switch.dp_joystick_surge, led: green }
+                  - { label: "Joystick sway", entity: switch.dp_joystick_sway, led: green }
+                  - { label: "Joystick DP", entity: switch.dp_joystick_dp, led: green }
+                  - { label: "Alarm", entity: binary_sensor.dp_alarm, led: red, led_blink: true, tap_action: { action: more-info } }
+                  - { label: "Auto heading", entity: switch.dp_auto_heading, led: green }
+                  - { label: "Auto surge", entity: switch.dp_auto_surge, led: green }
+                  - { label: "Auto sway", entity: switch.dp_auto_sway, led: green }
+                  - { label: "Auto DP", entity: switch.dp_auto_dp, led: green }
+                  - { label: "Buzzer off", entity: button.dp_buzzer_off, led: red, led_entity: binary_sensor.dp_buzzer }
+              - { type: joystick, x: 87, y: 182, size: 96, entity: sensor.dp_joystick }
+              - { type: knob, x: 271, y: 152, size: 76, entity: number.dp_heading_setpoint, min: 0, max: 359, sweep: 300 }
+
+              # Hydraulische functies: hold-to-run (momentary)
+              - type: group
+                title: Boom vang
+                x: 400
+                y: 32
+                width: 93
+                columns: 2
+                buttons:
+                  - { label: "In", entity: switch.boom_vang_in, mode: momentary, led: green }
+                  - { label: "Out", entity: switch.boom_vang_out, mode: momentary, led: green }
+              - type: group
+                title: Boom furl
+                x: 400
+                y: 90
+                width: 93
+                columns: 2
+                buttons:
+                  - { label: "In", entity: switch.boom_furl_in, mode: momentary, led: green }
+                  - { label: "Out", entity: switch.boom_furl_out, mode: momentary, led: green }
+              - type: group
+                title: Backstay
+                x: 400
+                y: 149
+                width: 93
+                columns: 2
+                buttons:
+                  - { label: "In", entity: switch.backstay_in, mode: momentary, led: green }
+                  - { label: "Out", entity: switch.backstay_out, mode: momentary, led: green }
+              - type: group
+                title: Headsail furl
+                x: 517
+                y: 32
+                width: 93
+                columns: 2
+                buttons:
+                  - { label: "In", entity: switch.headsail_furl_in, mode: momentary, led: green }
+                  - { label: "Out", entity: switch.headsail_furl_out, mode: momentary, led: green }
+              - type: group
+                title: Staysail furl
+                x: 517
+                y: 90
+                width: 93
+                columns: 2
+                buttons:
+                  - { label: "In", entity: switch.staysail_furl_in, mode: momentary, led: green }
+                  - { label: "Out", entity: switch.staysail_furl_out, mode: momentary, led: green }
+
+          # ───────────────────────── Rechts boven ─────────────────────────
+          - type: custom:shipborn-panel-card
+            shape: wedge-right
+            width: 650
+            height: 340
+            items:
+              - type: group
+                title: Main propulsion
+                x: 55
+                y: 32
+                width: 205
+                buttons: []
+              - type: estop
+                x: 57
+                y: 80
+                entity: switch.estop_throttle
+                label: "EMERGENCY\nSTOP\nTHROTTLE"
+              - type: throttle
+                x: 115
+                y: 45
+                width: 145
+                height: 145
+                levers:
+                  - { entity: number.throttle_ps }
+                  - { entity: number.throttle_sb }
+
+              - type: group
+                title: Operation mode
+                x: 315
+                y: 32
+                width: 93
+                columns: 2
+                gap: [15, 12]
+                buttons:
+                  - { label: "Diesel", entity: input_boolean.mode_diesel, led: green }
+                  - { label: "Electric", entity: input_boolean.mode_electric, led: green }
+                  - { label: "Generator", entity: input_boolean.mode_generator, led: green }
+                  - { label: "Harbor", entity: input_boolean.mode_harbor, led: green }
+                  - { label: "Alarm", style: dashed, entity: binary_sensor.propulsion_alarm, led: red, led_blink: true, tap_action: { action: more-info } }
+                  - { label: "Accept\nalarm", entity: button.propulsion_accept_alarm }
+              - type: group
+                title: Panel lighting
+                x: 315
+                y: 185
+                width: 93
+                columns: 2
+                buttons:
+                  - { label: "Dimming", entity: light.panel_lighting, tap_action: { action: more-info } }
+                  - { label: "Ledtest", entity: switch.panel_ledtest, mode: momentary }
+
+              - type: group
+                title: Bow
+                x: 460
+                y: 32
+                width: 135
+                buttons: []
+              - { type: estop, x: 460, y: 59, entity: switch.estop_bow_thruster, label: "EMERGENCY\nSTOP\nBOW\nTHRUSTER" }
+              - { type: joystick, style: ring, x: 517, y: 52, size: 76, entity: sensor.bow_thruster }
+              - type: group
+                title: Stern
+                x: 460
+                y: 155
+                width: 135
+                buttons: []
+              - { type: estop, x: 460, y: 184, entity: switch.estop_stern_thruster, label: "EMERGENCY\nSTOP\nSTERN\nTHRUSTER" }
+              - { type: joystick, style: ring, x: 517, y: 177, size: 76, entity: sensor.stern_thruster }
+
+          # ───────────────────────── Links onder ─────────────────────────
+          - type: custom:shipborn-panel-card
+            shape: rect
+            width: 443
+            height: 485
+            items:
+              - type: group
+                title: General
+                x: 80
+                y: 42
+                width: 94
+                columns: 2
+                gap: [15, 12]
+                buttons:
+                  - { label: "System\non / off", entity: switch.system_power, led: green }
+                  - { label: "Alarm", style: dashed, entity: binary_sensor.general_alarm, led: red, led_blink: true, tap_action: { action: more-info } }
+                  - { label: "PTO\nmode", entity: switch.pto_mode, led: green }
+                  - { label: "DC\nmode", entity: switch.dc_mode, led: green }
+                  - { label: "Windlass\nenabled", entity: switch.windlass_enabled, led: green }
+                  - { label: "Horn", entity: switch.horn, mode: momentary }
+                  - { label: "Gangway\nenabled", entity: switch.gangway_enabled }
+                  - { label: "Platform\nenabled", entity: switch.platform_enabled }
+              - type: group
+                title: Passerelle
+                x: 80
+                y: 246
+                width: 94
+                columns: 2
+                buttons:
+                  - { label: "Unlock", entity: lock.passerelle, led: yellow, led_state: unlocked, tap_action: { action: perform-action, perform_action: lock.unlock, target: { entity_id: lock.passerelle } } }
+                  - { label: "Lock", entity: lock.passerelle, led: green, led_state: locked, tap_action: { action: perform-action, perform_action: lock.lock, target: { entity_id: lock.passerelle } } }
+              - type: group
+                title: Hatch
+                x: 80
+                y: 308
+                width: 94
+                columns: 2
+                buttons:
+                  - { label: "Open", entity: switch.hatch_open, mode: momentary, led: yellow, led_entity: binary_sensor.hatch_open }
+                  - { label: "Close", entity: switch.hatch_close, mode: momentary, led: green, led_entity: binary_sensor.hatch_closed }
+              - type: group
+                title: Gangway
+                x: 80
+                y: 370
+                width: 94
+                columns: 2
+                buttons:
+                  - { label: "Out", entity: switch.gangway_out, mode: momentary, led: yellow, led_entity: binary_sensor.gangway_out }
+                  - { label: "In", entity: switch.gangway_in, mode: momentary }
+              # Zet een foto van de marifoon in /config/www/shipborn/vhf.png
+              - { type: image, image: /local/shipborn/vhf.png, x: 295, y: 70, width: 100, height: 240 }
+
+          # ───────────────────────── Rechts onder ─────────────────────────
+          - type: custom:shipborn-panel-card
+            shape: rect
+            width: 443
+            height: 485
+            items:
+              - type: screen
+                x: 20
+                y: 29
+                width: 400
+                height: 313
+                label: MFD
+                # Elke HA-kaart kan in het scherm, bijv. een kaart of camera:
+                card:
+                  type: markdown
+                  content: "## Navigatie\nPlaats hier een map-, camera- of entities-kaart."
+              - { type: box, x: 158, y: 352, width: 125, height: 100 }
+              - { type: box, inset: true, x: 166, y: 360, width: 109, height: 84 }
+              - type: group
+                title: Volvo Penta
+                title_style: serif
+                x: 166
+                y: 368
+                width: 109
+                columns: 1
+                gap: 10
+                button_width: 36
+                button_height: 15
+                button_style: wide
+                buttons:
+                  - { label: "IGNITION", entity: switch.engine_ignition, led: green }
+                  - { label: "START/STOP", entity: switch.engine_start, mode: momentary }

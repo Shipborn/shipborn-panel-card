@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shipborn Panel Card demo</title>
+  <style>
+    body { margin: 0; padding: 24px; background: #fff; font-family: sans-serif; }
+    #grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 60px; max-width: 1600px; margin: 0 auto; }
+    #log { max-width: 1600px; margin: 20px auto 0; font: 12px monospace; color: #555; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="../dist/shipborn-panel-card.js"></script>
+</head>
+<body>
+  <div id="grid"></div>
+  <div id="log">Klik op knoppen; service calls verschijnen hier (mock, geen echte HA).</div>
+  <script>
+    // Renders examples/dashboard.yaml with a fake `hass` object so the look can be checked without Home Assistant.
+    (async () => {
+      const yaml = await (await fetch("../examples/dashboard.yaml")).text();
+      const cfgs = jsyaml.load(yaml).views[0].cards[0].cards;
+      const states = {};
+      const collect = (o) => {
+        if (Array.isArray(o)) return o.forEach(collect);
+        if (o && typeof o === "object") {
+          for (const [k, v] of Object.entries(o)) {
+            if (["entity", "led_entity"].includes(k) && typeof v === "string") {
+              const d = v.split(".")[0];
+              states[v] = { entity_id: v, state: ["number", "input_number"].includes(d) ? "0" : d === "lock" ? "locked" : "off", attributes: {} };
+            } else collect(v);
+          }
+        }
+      };
+      collect(cfgs);
+      states["switch.dp_joystick_dp"].state = "on";
+      states["input_boolean.mode_electric"].state = "on";
+      states["switch.system_power"].state = "on";
+      states["binary_sensor.general_alarm"].state = "on";
+      states["number.throttle_ps"].state = "35";
+      states["number.throttle_sb"].state = "-20";
+
+      const cards = [];
+      const log = document.getElementById("log");
+      const hass = {
+        states,
+        callService(domain, service, data = {}, target = {}) {
+          const id = data.entity_id || target.entity_id;
+          log.textContent = `${domain}.${service} ${JSON.stringify({ ...data, ...target })}`;
+          const s = states[id];
+          if (s) {
+            if (service === "toggle") s.state = s.state === "on" ? "off" : "on";
+            if (service === "turn_on") s.state = "on";
+            if (service === "turn_off") s.state = "off";
+            if (service === "set_value") s.state = String(data.value);
+            if (service === "lock") s.state = "locked";
+            if (service === "unlock") s.state = "unlocked";
+          }
+          const next = { ...hass, states: { ...states } };
+          cards.forEach((c) => (c.hass = next));
+        },
+      };
+      for (const cfg of cfgs) {
+        const el = document.createElement("shipborn-panel-card");
+        el.setConfig(cfg);
+        document.getElementById("grid").appendChild(el);
+        el.hass = hass;
+        cards.push(el);
+      }
+    })();
+  </script>
+</body>
+</html>

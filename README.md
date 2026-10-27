@@ -1,0 +1,101 @@
+# Shipborn Panel Card
+
+Een Home Assistant Lovelace-kaart die een fysiek bedieningspaneel nabootst: zwarte panelen (recht of schuin), knoppen met status-LED's, noodstoppen, throttle-hendels, draaiknoppen en een "scherm" waarin je elke andere HA-kaart kunt tonen.
+
+`examples/dashboard.yaml` bevat de complete besturingspagina van de TC90 (Dynamic Positioning, Main Propulsion, Bow/Stern, General, Passerelle, Hatch, Gangway, MFD + motorstart).
+
+## Installatie via HACS (vanuit GitHub)
+
+1. Push deze map naar een GitHub-repository (bijv. `shipborn/shipborn-panel-card`).
+2. In Home Assistant: **HACS → ⋮ → Custom repositories** → URL van de repo, type **Dashboard**.
+3. Zoek "Shipborn Panel Card" in HACS en installeer. HACS voegt de resource automatisch toe.
+4. Herlaad de browser (Ctrl/Cmd + Shift + R).
+
+Updates: push naar GitHub (liefst met een release/tag, bijv. `v0.1.1`) en klik in HACS op *Update*.
+
+### Handmatig (zonder HACS)
+
+Kopieer `dist/shipborn-panel-card.js` naar `/config/www/` en voeg toe onder **Instellingen → Dashboards → ⋮ → Resources**: `/local/shipborn-panel-card.js` (type *JavaScript module*).
+
+## Dashboard aanmaken
+
+**Instellingen → Dashboards → Dashboard toevoegen**, open het, **⋮ → Bewerken → ⋮ → Raw configuration editor** en plak `examples/dashboard.yaml`. Vervang daarna de entity-id's door je eigen entiteiten.
+
+## Configuratie
+
+```yaml
+type: custom:shipborn-panel-card
+shape: wedge-left        # rect | wedge-left | wedge-right
+width: 650               # ontwerpmaat in px; de kaart schaalt mee met de breedte
+height: 340
+background: "#1b1b1b"    # optioneel
+items:                   # alle items worden absoluut geplaatst met x / y (px)
+  - type: group
+    ...
+```
+
+### `group` – titel met lijnen + raster knoppen
+
+| optie | standaard | uitleg |
+|---|---|---|
+| `title` | – | kop, bijv. `Boom vang` |
+| `title_style` | `line` | `line`, `plain`, `serif`, `none` |
+| `x`, `y`, `width` | – | positie en breedte |
+| `columns` | aantal knoppen | knoppen per rij |
+| `gap` | `15` | ruimte tussen knoppen, of `[kolom, rij]` |
+| `button_size` / `button_width` / `button_height` | `30` | knopmaat |
+| `button_style` | – | `wide` voor platte rechthoekige knoppen |
+| `buttons` | – | lijst van knoppen (`{ spacer: true }` voor een leeg vak) |
+
+### Knop
+
+| optie | uitleg |
+|---|---|
+| `label` | tekst; `\n` voor een nieuwe regel |
+| `entity` | te bedienen entiteit |
+| `mode: momentary` | **hold-to-run**: aan zolang je drukt, uit bij loslaten (hydrauliek!) |
+| `tap_action` | `toggle` (standaard), `more-info`, `perform-action`, `navigate`, `url`, `none`; met `confirmation: true` voor een bevestiging |
+| `led` | `green`, `red`, `amber`, `yellow`, `blue`, `white` of een kleurcode |
+| `led_entity` | andere entiteit voor de LED (bijv. eindschakelaar) |
+| `led_state` | staat(en) die de LED laten branden, bijv. `locked` |
+| `led_blink` | knipperen als hij aan is (alarmen) |
+| `style: dashed` | hoekmarkering zoals de ALARM-knop |
+
+Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/input_button` → press, `script/scene` → turn_on, `lock` → lock/unlock, `cover` → toggle.
+
+### Overige items
+
+```yaml
+- { type: estop, x: 57, y: 80, entity: switch.estop_throttle, label: "EMERGENCY\nSTOP" }   # vraagt standaard bevestiging (confirmation: false om uit te zetten)
+- type: throttle            # sleep de hendel; dubbelklik = 0
+  x: 115
+  y: 45
+  width: 145
+  height: 145
+  levers:
+    - { entity: number.throttle_ps }        # number of input_number, min/max uit de entiteit
+- { type: knob, x: 271, y: 152, size: 76, entity: number.heading, min: 0, max: 359 }   # verticaal slepen = waarde, tikken = details
+- { type: joystick, x: 87, y: 182, size: 96, entity: sensor.dp_joystick }               # style: ring voor thruster-ring
+- type: screen              # bezel met een willekeurige HA-kaart erin
+  x: 20
+  y: 29
+  width: 400
+  height: 313
+  label: MFD
+  card: { type: picture-entity, entity: camera.achterdek }
+- { type: box, x: 158, y: 352, width: 125, height: 100, inset: false }
+- { type: label, x: 10, y: 10, text: "Tekst", font_size: 8 }
+- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }
+```
+
+## Demo zonder Home Assistant
+
+```bash
+python3 -m http.server 8765
+```
+
+Open daarna http://localhost:8765/demo/ — de demo laadt `examples/dashboard.yaml` met nep-entiteiten, zodat je de layout kunt aanpassen zonder HA.
+
+## Veiligheid
+
+Deze kaart is een bedieningsinterface, geen veiligheidssysteem. Noodstoppen en hold-to-run-functies moeten altijd ook hardwarematig (PLC/relais) geborgd zijn, inclusief een timeout als de verbinding met HA wegvalt.
