@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.7";
+const VERSION = "0.4.8";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -239,7 +239,11 @@ const STYLE = `
   }
 `;
 
-const SYMBOLS = ["pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke", "engine", "generator", "converter", "battery", "fan"];
+const SYMBOLS = [
+  "pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke", "engine", "generator", "converter", "battery", "fan",
+  "gate_valve", "ball_valve", "globe_valve", "butterfly_valve", "check_valve", "three_way_valve", "motor_valve", "solenoid_valve",
+  "relief_valve", "instrument", "vessel", "compressor", "heater", "sight_glass", "reducer", "motor",
+];
 const DESIGN_TYPES = ["panel", "gauge", "bar", "tank", "value", "indicator", "pushbutton", "nav", "alarm", "block", "line", "text", "pipe", "hull", ...SYMBOLS];
 // Pipe colours, loosely after ISO 14726 (sea water green-blue, fresh water blue, fuel brown, oil yellow).
 const MEDIA = {
@@ -354,9 +358,9 @@ const capture = (node, ev) => {
 };
 
 class ShipbornPanelCard extends HTMLElement {
-  // Colour tables, for the layout editor's pickers.
+  // Colour tables and symbol names, for the layout editor.
   static get palettes() {
-    return { design: DESIGN_COLORS, led: LED_COLORS, media: MEDIA };
+    return { design: DESIGN_COLORS, led: LED_COLORS, media: MEDIA, symbols: SYMBOLS };
   }
 
   static getStubConfig() {
@@ -1373,6 +1377,9 @@ class ShipbornPanelCard extends HTMLElement {
       pump: [48, 48], valve: [44, 26], hx: [100, 48], filter: [36, 48], strainer: [44, 70],
       propeller: [40, 130], outlet: [80, 30], smoke: [70, 40],
       engine: [100, 70], generator: [48, 48], converter: [48, 48], battery: [80, 44], fan: [70, 70],
+      gate_valve: [44, 26], ball_valve: [44, 26], globe_valve: [44, 26], butterfly_valve: [30, 34], check_valve: [40, 26],
+      three_way_valve: [44, 44], motor_valve: [44, 50], solenoid_valve: [44, 50], relief_valve: [36, 50], instrument: [40, 40],
+      vessel: [50, 100], compressor: [48, 48], heater: [70, 40], sight_glass: [40, 28], reducer: [30, 30], motor: [48, 48],
     }[kind];
     const n = this._place(h("div", "d d-sym"), s, dw, dh);
     const W = s.width ?? s.size ?? dw;
@@ -1383,12 +1390,58 @@ class ShipbornPanelCard extends HTMLElement {
     if (s.rotation) svg.style.transform = `rotate(${s.rotation}deg)`;
     const cx = W / 2;
     const cy = H / 2;
+    // Valve body (two triangles meeting in the middle) between heights y0 and y1.
+    const bow = (y0, y1) => `M2,${y0} L${cx},${(y0 + y1) / 2} L2,${y1} Z M${W - 2},${y0} L${cx},${(y0 + y1) / 2} L${W - 2},${y1} Z`;
+    // Valve with an actuator box on top (letter M = motor, S = solenoid).
+    const actuated = (letter) => {
+      const y0 = H * 0.48;
+      const yc = (y0 + H - 2) / 2;
+      return `<path class="ac" d="${bow(y0, H - 2)}"/><line class="ln" x1="${cx}" y1="${yc}" x2="${cx}" y2="${H * 0.36}"/>` +
+        `<rect class="bd" x="${W * 0.2}" y="1" width="${W * 0.6}" height="${H * 0.36 - 1}" rx="2"/>` +
+        `<text class="gl" x="${cx}" y="${H * 0.18 + 1}" text-anchor="middle" dominant-baseline="central" style="font-size:${H * 0.26}px">${letter}</text>`;
+    };
     const zig = Array.from({ length: 9 }, (_, i) => `${10 + (i * (W - 20)) / 8},${i % 2 ? H * 0.25 : H * 0.75}`).join(" ");
     svg.innerHTML = {
       pump:
         `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
         `<polygon class="ac" points="${cx - m * 0.18},${cy - m * 0.3} ${cx - m * 0.18},${cy + m * 0.3} ${cx + m * 0.34},${cy}"/>`,
-      valve: `<path class="ac" d="M2,2 L${cx},${cy} L2,${H - 2} Z M${W - 2},2 L${cx},${cy} L${W - 2},${H - 2} Z"/>`,
+      valve: `<path class="ac" d="${bow(2, H - 2)}"/>`,
+      gate_valve: `<path class="ac" d="${bow(2, H - 2)}"/>`,
+      ball_valve: `<path class="ac" d="${bow(2, H - 2)}"/><circle class="bd" cx="${cx}" cy="${cy}" r="${m * 0.3}"/>`,
+      globe_valve: `<path class="ac" d="${bow(2, H - 2)}"/><circle class="ac" cx="${cx}" cy="${cy}" r="${m * 0.2}"/>`,
+      butterfly_valve:
+        `<line class="ln" x1="3" y1="2" x2="3" y2="${H - 2}"/><line class="ln" x1="${W - 3}" y1="2" x2="${W - 3}" y2="${H - 2}"/>` +
+        `<ellipse class="ac" cx="${cx}" cy="${cy}" rx="${W * 0.14}" ry="${H * 0.42}" transform="rotate(35 ${cx} ${cy})"/>` +
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m * 0.08}"/>`,
+      check_valve: `<path class="ac" d="M2,2 L${W - 7},${cy} L2,${H - 2} Z"/><line class="ln" x1="${W - 4}" y1="2" x2="${W - 4}" y2="${H - 2}"/>`,
+      three_way_valve:
+        `<path class="ac" d="${bow(2, H * 0.6)} M${cx},${H * 0.31} L${cx - H * 0.3},${H - 2} L${cx + H * 0.3},${H - 2} Z"/>`,
+      motor_valve: actuated("M"),
+      solenoid_valve: actuated("S"),
+      // Inlet from below, outlet to the side, spring on top.
+      relief_valve: (() => {
+        const yb = H * 0.66;
+        const r = H - 2 - yb;
+        const top = yb - r - 3;
+        const spring = [0, 1, 2, 3, 4].map((i) => `${cx + (i % 2 ? -1 : 1) * W * 0.16},${top - (i * (top - 3)) / 4}`);
+        return `<path class="ac" d="M${cx - r},${H - 2} L${cx + r},${H - 2} L${cx},${yb} Z M${W - 2},${yb - r} L${W - 2},${yb + r} L${cx},${yb} Z"/>` +
+          `<polyline class="ln" points="${cx},${yb} ${cx},${top} ${spring.join(" ")}"/>`;
+      })(),
+      instrument:
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
+        `<text class="gl" x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" style="font-size:${m * 0.3}px">${s.letter || "PI"}</text>`,
+      vessel: `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="${W / 2 - 1}" ry="${Math.min(W / 2, H / 4)}"/>`,
+      compressor:
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
+        `<path class="ln" d="M${cx - m * 0.3},${cy - m * 0.4} L${cx + m * 0.36},${cy - m * 0.17} M${cx - m * 0.3},${cy + m * 0.4} L${cx + m * 0.36},${cy + m * 0.17}"/>`,
+      heater:
+        `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="4"/>` +
+        `<polyline class="ln" points="${[[6, cy], [W * 0.22, cy], ...Array.from({ length: 7 }, (_, i) => [W * 0.22 + ((i + 1) * W * 0.56) / 8, i % 2 ? cy + H * 0.2 : cy - H * 0.2]), [W * 0.78, cy], [W - 6, cy]].map((p) => p.join(",")).join(" ")}"/>`,
+      sight_glass:
+        `<line class="ln" x1="3" y1="2" x2="3" y2="${H - 2}"/><line class="ln" x1="${W - 3}" y1="2" x2="${W - 3}" y2="${H - 2}"/>` +
+        `<line class="ln" x1="3" y1="${cy}" x2="${cx - m * 0.4}" y2="${cy}"/><line class="ln" x1="${cx + m * 0.4}" y1="${cy}" x2="${W - 3}" y2="${cy}"/>` +
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m * 0.4}"/><circle class="ac" cx="${cx}" cy="${cy}" r="${m * 0.18}"/>`,
+      reducer: `<path class="bd" d="M2,2 L${W - 2},${H * 0.28} L${W - 2},${H * 0.72} L2,${H - 2} Z"/>`,
       hx: `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="6"/><polyline class="ln" points="${zig}"/>`,
       filter:
         `<polygon class="bd" points="${cx},2 ${W - 2},${cy} ${cx},${H - 2} 2,${cy}"/>` +
@@ -1411,6 +1464,9 @@ class ShipbornPanelCard extends HTMLElement {
       generator:
         `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
         `<text class="gl" x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" style="font-size:${m * 0.4}px">${s.letter || "G"}</text>`,
+      motor:
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
+        `<text class="gl" x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" style="font-size:${m * 0.4}px">${s.letter || "M"}</text>`,
       converter:
         `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="3"/>` +
         `<line class="ln" x1="${W - 4}" y1="4" x2="4" y2="${H - 4}"/>` +

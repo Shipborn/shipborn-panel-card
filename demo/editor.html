@@ -33,6 +33,10 @@
     .colors .def { color: var(--muted); font-size: 11px; }
     input[type=color] { width: 42px; height: 28px; padding: 2px; background: #232323; border: 1px solid #3a3a3a; border-radius: 6px; cursor: pointer; }
     .x { padding: 2px 7px; font-size: 12px; }
+    #palette h4 { margin: 8px 0 4px; font-size: 11px; font-weight: 600; color: var(--muted); }
+    #palette .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+    #palette button { overflow-wrap: anywhere; hyphens: auto; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 2px 4px; font-size: 10.5px; line-height: 1.15; text-align: center; }
+    #palette shipborn-panel-card { width: 100%; pointer-events: none; }
     dialog { background: var(--bar); color: var(--text); border: 1px solid #3a3a3a; border-radius: 10px; padding: 18px; width: 360px; }
     dialog::backdrop { background: rgba(0, 0, 0, .6); }
     dialog label { display: grid; gap: 4px; margin-bottom: 12px; }
@@ -69,7 +73,7 @@
     <h3>Kleuren</h3>
     <div id="colors" class="colors"></div>
     <h3>Toevoegen</h3>
-    <div class="row"><select id="newtype"></select><button id="add">+ Toevoegen</button></div>
+    <div id="palette"></div>
     <h3>Scherm</h3>
     <div class="colors">
       <span>Achtergrond</span><input type="color" id="bg"><span></span>
@@ -91,7 +95,7 @@
   <dialog id="viewdlg">
     <form method="dialog">
       <label>Titel <input type="text" id="v-title" required placeholder="bijv. Hydrauliek"></label>
-      <label>Pad (in de URL) <input type="text" id="v-path" required pattern="[a-z0-9-]+" placeholder="sys-hydrauliek"></label>
+      <label>Pad (in de URL) <input type="text" id="v-path" required pattern="[a-z0-9\-]+" placeholder="sys-hydrauliek"></label>
       <label>Soort
         <select id="v-kind">
           <option value="sys">Systeemschema (romp + systeemtabs)</option>
@@ -116,17 +120,57 @@
     import { parseDocument, isMap, isSeq, visit } from "https://cdn.jsdelivr.net/npm/yaml@2.5.1/browser/index.js";
 
     const FILE = "../examples/plc-dashboard.yaml";
-    const TEMPLATES = {
-      "leiding": { type: "pipe", medium: "seawater", points: [[0, 0], [120, 0]], thickness: 6, arrow: true },
-      "pomp": { type: "pump", size: 36 },
-      "klep": { type: "valve", size: 30 },
-      "warmtewisselaar": { type: "hx", width: 60, height: 40 },
-      "filter": { type: "filter", size: 36 },
-      "tekst": { type: "text", text: "Tekst", font_size: 14 },
-      "blok met tekst": { type: "text", width: 120, height: 60, text: "Blok", boxed: true },
-      "waarde": { type: "text", entity: "sensor.x", mono: true, font_size: 14 },
-      "lijn / vlak": { type: "line", width: 200, height: 2, color: "#2c2c2c" },
-      "tank": { type: "tank", width: 80, height: 200, entity: "sensor.x" },
+    // Add palette: [label, item to insert (x/y are added), preview size w×h (default symbol size)].
+    const PALETTE = {
+      "Leidingen": [
+        ["Leiding", { type: "pipe", medium: "seawater", points: [[0, 0], [120, 0]], thickness: 6, arrow: true }],
+        ["Leiding met bocht", { type: "pipe", medium: "seawater", points: [[0, 0], [80, 0], [80, 60]], thickness: 6, arrow: true }],
+        ["Verloopstuk", { type: "reducer" }, [30, 30]],
+        ["Overboord", { type: "outlet" }, [80, 30]],
+      ],
+      "Kleppen": [
+        ["Afsluiter", { type: "gate_valve" }, [44, 26]],
+        ["Kogelkraan", { type: "ball_valve" }, [44, 26]],
+        ["Regelklep", { type: "globe_valve" }, [44, 26]],
+        ["Vlinderklep", { type: "butterfly_valve" }, [30, 34]],
+        ["Terugslagklep", { type: "check_valve" }, [40, 26]],
+        ["3-wegklep", { type: "three_way_valve" }, [44, 44]],
+        ["Motorklep", { type: "motor_valve" }, [44, 50]],
+        ["Magneetklep", { type: "solenoid_valve" }, [44, 50]],
+        ["Veiligheidsklep", { type: "relief_valve" }, [36, 50]],
+      ],
+      "Pompen en machines": [
+        ["Pomp", { type: "pump" }, [48, 48]],
+        ["Compressor", { type: "compressor" }, [48, 48]],
+        ["Ventilator", { type: "fan" }, [70, 70]],
+        ["Dieselmotor", { type: "engine" }, [100, 70]],
+        ["Elektromotor", { type: "motor" }, [48, 48]],
+        ["Generator", { type: "generator" }, [48, 48]],
+        ["Schroef", { type: "propeller" }, [40, 130]],
+      ],
+      "Warmte en filters": [
+        ["Warmtewisselaar", { type: "hx" }, [100, 48]],
+        ["Verwarmer", { type: "heater" }, [70, 40]],
+        ["Filter", { type: "filter" }, [36, 48]],
+        ["Zeewaterinlaat", { type: "strainer" }, [44, 70]],
+        ["Kijkglas", { type: "sight_glass" }, [40, 28]],
+      ],
+      "Tanks en meters": [
+        ["Vat", { type: "vessel" }, [50, 100]],
+        ["Meter", { type: "instrument", letter: "PT" }, [40, 40]],
+        ["Tank (niveau)", { type: "tank", width: 80, height: 200, entity: "sensor.x" }],
+        ["Waarde", { type: "text", entity: "sensor.x", mono: true, font_size: 14 }],
+      ],
+      "Elektrisch": [
+        ["Omvormer", { type: "converter" }, [48, 48]],
+        ["Accu", { type: "battery" }, [80, 44]],
+      ],
+      "Tekst en vlakken": [
+        ["Tekst", { type: "text", text: "Tekst", font_size: 14 }],
+        ["Blok met tekst", { type: "text", width: 120, height: 60, text: "Blok", boxed: true }],
+        ["Lijn / vlak", { type: "line", width: 200, height: 2, color: "#2c2c2c" }],
+        ["Romp", { type: "hull", x: 20, y: 160, width: 1240, height: 600 }],
+      ],
     };
     const $ = (id) => document.getElementById(id);
     const stage = $("stage"), ov = $("ov");
@@ -494,10 +538,42 @@
     };
     $("front").onclick = () => reorder(1);
     $("back").onclick = () => reorder(-1);
-    $("newtype").innerHTML = Object.keys(TEMPLATES).map((k) => `<option>${k}</option>`).join("");
-    $("add").onclick = () => {
+    // Preview of a palette entry, drawn by the card itself in a 70×52 tile.
+    function preview(item, size) {
+      const TW = 70, TH = 52;
+      let it;
+      if (item.type === "pipe") it = { ...item, points: item.points.map(([x, y]) => [x * 0.45 + 10, y * 0.45 + 16]), thickness: 5, flow: true };
+      else if (size) {
+        const f = Math.min(56 / size[0], 40 / size[1], 1);
+        const [w, hh] = [size[0] * f, size[1] * f];
+        it = { ...item, x: (TW - w) / 2, y: (TH - hh) / 2, width: w, height: hh, active: true };
+      } else {
+        const label = { text: "Aa", tank: "▮", line: "—", hull: "⬭" }[item.type] || "Aa";
+        it = { type: "text", x: 0, y: 12, width: TW, text: item.entity ? "12,3" : label, font_size: 18, mono: !!item.entity, align: "center" };
+        if (item.boxed) Object.assign(it, { x: 10, y: 10, width: 50, height: 32, text: "", boxed: true });
+      }
+      const pc = document.createElement("shipborn-panel-card");
+      pc.setConfig({ width: TW, height: TH, background: "#121212", border: "#121212", corner_radius: 4, items: [it] });
+      pc.hass = { states: {}, locale: { language: "nl" } };
+      return pc;
+    }
+    for (const [group, entries] of Object.entries(PALETTE)) {
+      const h4 = document.createElement("h4");
+      h4.textContent = group;
+      const tiles = document.createElement("div");
+      tiles.className = "tiles";
+      for (const [label, item, size] of entries) {
+        const b = document.createElement("button");
+        b.title = item.type;
+        b.append(preview(item, size), label);
+        b.onclick = () => add(item);
+        tiles.appendChild(b);
+      }
+      $("palette").append(h4, tiles);
+    }
+    function add(template) {
       snapshot();
-      const t = structuredClone(TEMPLATES[$("newtype").value]);
+      const t = structuredClone(template);
       const cx = snap(W() / 2), cy = snap(H() / 2);
       if (t.points) t.points = t.points.map(([x, y]) => [x + cx, y + cy]);
       const ordered = t.points ? t : { type: t.type, x: cx, y: cy, ...t }; // x/y first, like the other items
@@ -506,12 +582,12 @@
       itemsSeq().items.push(node);
       sel = [itemsSeq().items.length - 1];
       changed();
-    };
+    }
 
     // ---------- colours ----------
     const PAL = customElements.get("shipborn-panel-card").palettes;
     const NAMED = { ...PAL.led, ...PAL.design };
-    const SYMBOLS = ["pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke", "engine", "generator", "converter", "battery", "fan"];
+    const SYMBOLS = PAL.symbols;
     const LABELS = { color: "Kleur", active_color: "Kleur actief", background: "Achtergrond", border: "Rand", flow_color: "Streepjes", casing: "Rand leiding" };
     // Colour options per item type, with the colour shown when the option is not set.
     function colorKeys(it) {

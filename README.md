@@ -138,7 +138,7 @@ Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml`
 | `flow: true` | altijd stromend (legenda) |
 | `radius`, `dash`, `flow_color`, `casing` | bochtstraal, streeppatroon `[lengte, gat]`, kleur streepjes, kleur rand |
 
-Symbolen: `pump`, `valve`, `hx` (warmtewisselaar), `filter`, `strainer` (zeewaterinlaat), `propeller` (draait), `outlet` (overboord), `smoke` (rook bij de uitlaat), `engine`, `generator` (cirkel met `letter`, standaard G; M voor een motor), `converter` (`glyphs: ["~", "="]`), `battery`, `fan` (draait). Ze lichten op (`color`, standaard groen) via `active_entity` of `entity` met dezelfde opties `active_above` / `active_below` / `active_abs` / `active_state`; `alarm_entity` maakt ze rood. Verder `label`, `label_position: above`, `rotation` (graden), `size` of `width`/`height`.
+Symbolen: `pump`, `valve` / `gate_valve` (afsluiter), `ball_valve` (kogelkraan), `globe_valve` (regelklep), `butterfly_valve` (vlinderklep), `check_valve` (terugslagklep), `three_way_valve`, `motor_valve`, `solenoid_valve` (magneetklep), `relief_valve` (veiligheidsklep), `instrument` (meter-bolletje met `letter`, standaard PI), `vessel` (vat), `compressor`, `heater`, `sight_glass` (kijkglas), `reducer` (verloopstuk), `motor` (cirkel met M), `hx` (warmtewisselaar), `filter`, `strainer` (zeewaterinlaat), `propeller` (draait), `outlet` (overboord), `smoke` (rook bij de uitlaat), `engine`, `generator` (cirkel met `letter`, standaard G; M voor een motor), `converter` (`glyphs: ["~", "="]`), `battery`, `fan` (draait). Ze lichten op (`color`, standaard groen) via `active_entity` of `entity` met dezelfde opties `active_above` / `active_below` / `active_abs` / `active_state`; `alarm_entity` maakt ze rood. Verder `label`, `label_position: above`, `rotation` (graden), `size` of `width`/`height`.
 
 `hull` tekent de romp van bovenaf (`bow: left` om te spiegelen). `text` met `boxed: true` krijgt `active_entity` (groen) en `alarm_entity` (rood) – gebruikt voor motor, gearbox en e-motor.
 
@@ -168,6 +168,7 @@ Open http://localhost:8770/demo/editor.html en kies een view.
 - Pijltjes verschuiven 1 px (`Shift` = 10 px); het raster (1–20 px) staat bovenin.
 - Leiding geselecteerd: sleep de bolletjes, dubbelklik op de leiding voegt een knikpunt toe, dubbelklik op een bolletje haalt het weg. Punten klikken recht op hun buurpunt.
 - Hoekje rechtsonder = groter/kleiner. Romp, panelen en brede balken verschuiven pas als je ze eerst aanklikt.
+- **Toevoegen**: kies een type uit de lijst met voorbeelden (leidingen, kleppen, pompen, warmte en filters, tanks en meters, elektrisch, tekst).
 - Rechts staan alle opties van het geselecteerde onderdeel (entiteit, kleur, label…) om te bewerken, plus dupliceren, verwijderen, voor/achter en nieuwe onderdelen.
 - `Cmd/Ctrl+Z` ongedaan maken, `Cmd/Ctrl+S` opslaan in `examples/plc-dashboard.yaml`. Opmerkingen en opmaak in het bestand blijven staan.
 - **Kopieer YAML** zet het hele dashboard op het klembord om in HA te plakken (Raw configuration editor).
