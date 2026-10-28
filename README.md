@@ -107,6 +107,8 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
 | `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed` |
 
+`gauge`, `bar`, `tank`, `value`, `block` en `text` met een entiteit kennen `factor` om ruwe waarden om te rekenen, bijv. `factor: 0.00001` voor een Wago-tankniveau (7894954 → 78,9 %) of `factor: 0.001` voor mbar → bar.
+
 ### Schema's met stromende leidingen
 
 Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (tab *Systemen*): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge en Accu's, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.

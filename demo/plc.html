@@ -31,22 +31,29 @@
         "binary_sensor.plc_lifebeat": st("on"),
         "sensor.plc_active_alarm": st("026 Jetvalve 3 won't move to starboard"),
         "binary_sensor.plc_alarm_active": st("on"),
-        "binary_sensor.plc_mode_harbor_active": st("on"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode": st("on"),
         "binary_sensor.plc_gear_neutral": st("on"),
-        "sensor.plc_diesel_speed": st(1450, { unit_of_measurement: "rpm" }),
+        "sensor.engine_room_main_engine_me_rpm": st(1450, { unit_of_measurement: "rpm" }),
         "sensor.plc_electric_speed": st(-1200, { unit_of_measurement: "rpm" }),
-        "sensor.plc_shaft_speed": st(180, { unit_of_measurement: "rpm" }),
-        "sensor.plc_battery_soc": st(72, { unit_of_measurement: "%" }),
+        "sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed": st(180, { unit_of_measurement: "rpm" }),
+        "sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge": st(72, { unit_of_measurement: "%" }),
         "binary_sensor.plc_battery_discharging": st("on"),
-        "sensor.plc_diesel_coolant_temperature": st(82, { unit_of_measurement: "°C" }),
-        "sensor.plc_tank_day": st(64, { unit_of_measurement: "%" }),
-        "sensor.plc_stern_seal_pressure": st(0.45),
-        "sensor.plc_stern_seal_temperature": st(21.4),
-        "sensor.plc_exhaust_temperature": st(48.2),
-        "sensor.plc_seawater_flow_engine": st(38.5),
-        "binary_sensor.plc_seawater_pump_running": st("on"),
+        "sensor.engine_room_main_engine_me_coolant_temp": st(82, { unit_of_measurement: "°C" }),
+        "sensor.wago_values_er_diesel_daytank_level_statistics": st(64, { unit_of_measurement: "%" }),
+        "sensor.al1590_er_prop_shaft_grease_pressure": st(0.45),
+        "sensor.al1590_er_prop_shaft_grease_temperature": st(21.4),
+        "sensor.al1590_er_volvo_exhaust_temperature": st(48.2),
+        "sensor.al1590_er_volvo_seawater_cooling_flow": st(38.5),
+        "switch.er_zeewaterpomp_cooling": st("on"),
+        // Raw Wago levels (÷ 100000 = %) and the compressor pressure in mbar, as in HA.
+        "sensor.wago_values_er_diesel_ps_level": st(7894954),
+        "sensor.wago_plc_er_diesel_sb_level": st(5123400),
+        "sensor.wago_values_aft_diesel_webasto_level_statistics": st(41, { unit_of_measurement: "%" }),
+        "sensor.wago_values_lr_fresh_water_level": st(6630000),
+        "sensor.wago_values_er_dirtywater_level": st(2210000),
+        "sensor.al1590_er_compressor_manifold_pressure": st(6475, { unit_of_measurement: "mbar" }),
       };
-      for (const id of ["button.plc_mode_diesel", "button.plc_mode_electric", "button.plc_mode_generator", "button.plc_mode_harbor", "button.plc_alarm_reset"])
+      for (const id of ["button.wago_hcs_controls_wago_controls_dieselmode", "button.wago_hcs_controls_wago_controls_electricmode", "button.plc_mode_generator", "button.wago_hcs_controls_wago_controls_harbormode", "button.wago_energy_controls_wago_energy_controls_reset_main_2"])
         states[id] = st("unknown");
       const el = document.createElement("shipborn-panel-card");
       const log = document.getElementById("log");
@@ -55,9 +62,9 @@
         locale: { language: "nl" },
         callService(domain, service, data = {}) {
           log.textContent = `${domain}.${service} ${JSON.stringify(data)}`;
-          const mode = /^button\.plc_mode_(\w+)$/.exec(data.entity_id || "");
+          const mode = /^button\.wago_hcs_controls_wago_controls_(diesel|electric|harbor)mode$/.exec(data.entity_id || "");
           if (mode) {
-            for (const m of ["diesel", "electric", "generator", "harbor"]) states[`binary_sensor.plc_mode_${m}_active`] = st(m === mode[1] ? "on" : "off");
+            for (const m of ["diesel", "electric", "harbor"]) states[`binary_sensor.wago_hcs_controls_wago_hcs_controls_${m}_mode`] = st(m === mode[1] ? "on" : "off");
             el.hass = { ...hass, states: { ...states } };
           }
         },

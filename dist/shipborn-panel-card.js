@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.1";
+const VERSION = "0.4.2";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -290,7 +290,9 @@ const isOn = (stateObj, onStates) =>
   (onStates ? [].concat(onStates).map(String).includes(stateObj.state) : ON_STATES.includes(stateObj.state));
 const unavailable = (stateObj) => !stateObj || stateObj.state === "unavailable";
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const num = (stateObj) => (stateObj && !isNaN(parseFloat(stateObj.state)) ? parseFloat(stateObj.state) : null);
+// `factor` converts raw values, e.g. 0.00001 for a Wago level of 7894954 → 78.9 %.
+const num = (stateObj, factor = 1) =>
+  stateObj && !isNaN(parseFloat(stateObj.state)) ? parseFloat(stateObj.state) * factor : null;
 const fmt = (v, decimals, hass) =>
   v == null
     ? "—"
@@ -883,7 +885,7 @@ class ShipbornPanelCard extends HTMLElement {
     }
     this._updaters.push((hass) => {
       const so = g.entity ? hass.states[g.entity] : null;
-      const v = num(so);
+      const v = num(so, g.factor);
       const z = min < 0 ? -min / (max - min) : 0;
       const f = v == null ? z : clamp((v - min) / (max - min || 1), 0, 1);
       arc.setAttribute("stroke-dasharray", `0 ${(Math.min(f, z) * 1000).toFixed(0)} ${(Math.abs(f - z) * 1000).toFixed(0)} 2000`);
@@ -933,7 +935,7 @@ class ShipbornPanelCard extends HTMLElement {
     }
     this._updaters.push((hass) => {
       const so = b.entity ? hass.states[b.entity] : null;
-      const v = num(so);
+      const v = num(so, b.factor);
       const z = min < 0 ? -min / (max - min) : 0;
       const f = v == null ? z : clamp((v - min) / (max - min || 1), 0, 1);
       fill.style.left = Math.min(f, z) * 100 + "%";
@@ -986,7 +988,7 @@ class ShipbornPanelCard extends HTMLElement {
     }
     this._updaters.push((hass) => {
       const so = t.entity ? hass.states[t.entity] : null;
-      const val = num(so);
+      const val = num(so, t.factor);
       const max = t.max ?? 100;
       fill.style.height = (val == null ? 0 : clamp(val / max, 0, 1) * 100) + "%";
       v.textContent = fmt(val, t.decimals ?? 0, hass);
@@ -1021,7 +1023,7 @@ class ShipbornPanelCard extends HTMLElement {
     if (item.entity) n.addEventListener("click", () => this._handleAction(item, item.tap_action || { action: "more-info" }, n));
     this._updaters.push((hass) => {
       const so = item.entity ? hass.states[item.entity] : null;
-      const val = num(so);
+      const val = num(so, item.factor);
       const unit = unitOf(item, so);
       const txt = val == null && so && !unavailable(so) ? so.state : fmt(val, item.decimals ?? 1, hass);
       v.textContent = unit ? `${txt} ${unit}` : txt;
@@ -1128,7 +1130,7 @@ class ShipbornPanelCard extends HTMLElement {
       led.classList.toggle("on", alarm || active);
       led.style.setProperty("--c", alarm ? DESIGN_COLORS.red : DESIGN_COLORS.green);
       const so = bk.entity ? hass.states[bk.entity] : null;
-      ft.textContent = `${fmt(num(so), bk.decimals ?? 1, hass)} ${unitOf({ unit: bk.unit }, so) || "kW"}`;
+      ft.textContent = `${fmt(num(so, bk.factor), bk.decimals ?? 1, hass)} ${unitOf({ unit: bk.unit }, so) || "kW"}`;
     });
     return n;
   }
@@ -1176,7 +1178,7 @@ class ShipbornPanelCard extends HTMLElement {
     }
     this._updaters.push((hass) => {
       const so = hass.states[item.entity];
-      const val = num(so);
+      const val = num(so, item.factor);
       const unit = unitOf(item, so);
       const txt = val == null ? (so?.state ?? "—") : fmt(val, item.decimals ?? 0, hass);
       n.textContent = `${item.text ? item.text + " " : ""}${txt}${unit ? " " + unit : ""}`;
