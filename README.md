@@ -92,6 +92,8 @@ Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/inpu
 
 Met `kiosk: true` op de kaart verbergt HA de bovenbalk en de zijbalk zolang die view open is. Blijf even met de muis (of een vinger) op de bovenste of linker schermrand staan om ze weer te tonen; terug op de kaart verdwijnen ze weer. `kiosk_delay` (ms, standaard 800) bepaalt hoe lang. In bewerkmodus blijven de balken zichtbaar.
 
+De pagina rond de kaart (naast of onder het scherm als de verhouding niet past) krijgt de `background` van de kaart, of `page_background` als je een andere kleur wilt.
+
 ### Schermpagina's (donker console-ontwerp)
 
 Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van het canvas-ontwerp; zie `examples/plc-dashboard.yaml`.

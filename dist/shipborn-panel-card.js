@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.6";
+const VERSION = "0.4.7";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -424,6 +424,13 @@ class ShipbornPanelCard extends HTMLElement {
       [main.shadowRoot, `:host { --mdc-drawer-width: 0px !important; } ha-sidebar { display: none !important; }`],
       [drawer, `.mdc-drawer { display: none !important; } .mdc-drawer-app-content { margin-left: 0 !important; }`],
     ].filter(([sr]) => sr);
+    // The page around the card (beside or below it on a screen with another aspect ratio) gets the
+    // card's background instead of the theme's, for as long as this view is open.
+    const bg = this._config.page_background ?? this._config.background ?? "#1b1b1b";
+    const page = document.createElement("style");
+    page.textContent = `:host { --lovelace-background: ${bg} !important; --primary-background-color: ${bg} !important; }
+      #view, hui-view-container, hui-view, hui-view-background { background: ${bg} !important; }`;
+    root.shadowRoot.appendChild(page);
     const styles = css.map(([sr, text]) => {
       const s = document.createElement("style");
       s.textContent = text;
@@ -472,6 +479,7 @@ class ShipbornPanelCard extends HTMLElement {
     this._kiosk = () => {
       cancel();
       show();
+      page.remove();
       for (const z of zones) z.remove();
       this.removeEventListener("pointerenter", onEnter);
       this.removeEventListener("pointerdown", onEnter);
