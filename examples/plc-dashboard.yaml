@@ -72,10 +72,13 @@ views:
 
   # ===== Systemschema's (omgezet uit Overszichtstekeningen/*.jpg) =====
   # Leidingen stromen (bewegende streepjes) zodra hun flow_entity actief is.
+  # Het zijn subviews: HA toont ze niet als losse tabbladen.
 
   - title: Diesel engine
     path: sys-diesel
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_compressor_running
     #   binary_sensor.plc_diesel_alarm
@@ -156,6 +159,8 @@ views:
   - title: Brandstof
     path: sys-fuel
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_fuel_transfer_ps_running
     #   binary_sensor.plc_fuel_transfer_sb_running
@@ -208,6 +213,8 @@ views:
   - title: Generator
     path: sys-generator
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_generator_alarm
     #   sensor.plc_generator_power
@@ -246,6 +253,8 @@ views:
   - title: DC-bus koeling
     path: sys-dcbus
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_glycol_pump_running
     cards:
@@ -335,6 +344,8 @@ views:
   - title: Boegschroef
     path: sys-bowthruster
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_glycol_pump_running
     cards:
@@ -381,6 +392,8 @@ views:
   - title: Zeewaterfilters
     path: sys-seawater
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_bilge_engine_room_running
     #   binary_sensor.plc_compressor_running
@@ -450,6 +463,8 @@ views:
   - title: Zoetwater
     path: sys-freshwater
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_boiler_on
     #   binary_sensor.plc_fresh_water_fill_valve_open
@@ -500,6 +515,8 @@ views:
   - title: Vuilwater
     path: sys-wastewater
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_compressor_running
     #   binary_sensor.plc_ecomar_running
@@ -538,6 +555,8 @@ views:
   - title: Bilgepompen
     path: sys-bilge
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_bilge_aft_peak_high
     #   binary_sensor.plc_bilge_aft_peak_running
@@ -611,6 +630,8 @@ views:
   - title: Accu's en voeding
     path: sys-power
     panel: true
+    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
+    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   sensor.plc_24v_battery_voltage
     #   sensor.plc_start_battery2_voltage
