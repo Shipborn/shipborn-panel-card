@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.2.1";
+const VERSION = "0.3.0";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -204,9 +204,52 @@ const STYLE = `
   .d-block.alarm .hd { background: #3a1512; color: #ffd9d6; }
   .d-block.active > div:not(.rt) { border-color: #34d27b; }
   .d-block.active .hd { background: #12261a; color: #34d27b; }
+  .d-box.active { border-color: #34d27b; color: #34d27b; background: #12261a; box-shadow: 0 0 12px rgba(52, 210, 123, .25); }
+  .d-box.alarm { border-color: #ff5b4f; color: #ffd9d6; background: #3a1512; }
+  svg.d-pipe { overflow: visible; pointer-events: none; }
+  .d-pipe .bs { transition: stroke-opacity .4s; }
+  .d-hull { pointer-events: none; }
+  .d-sym { cursor: default; }
+  .d-sym.click { cursor: pointer; }
+  .d-sym > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .d-sym .bd, .d-sym .ac { fill: #121212; stroke: #8f8e88; stroke-width: 2; stroke-linejoin: round; transition: fill .3s, stroke .3s; }
+  .d-sym .ln { fill: none; stroke: #8f8e88; stroke-width: 2; stroke-linecap: round; }
+  .d-sym.on .bd, .d-sym.on .ac, .d-sym.on .ln { stroke: var(--c); }
+  .d-sym.on .ac { fill: var(--c); }
+  .d-sym.on > svg { filter: drop-shadow(0 0 5px var(--c)); }
+  .d-sym .lb {
+    position: absolute; left: 50%; transform: translateX(-50%); white-space: pre; text-align: center; line-height: 1.1;
+    font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #a3a29c;
+  }
+  .d-sym .blades { transform-box: fill-box; transform-origin: center; }
+  .d-sym.on .blades { animation: prop var(--dur, .5s) linear infinite alternate; }
+  .d-sym .puff { opacity: 0; fill: #8f8e88; transform-box: fill-box; transform-origin: center; }
+  .d-sym.on .puff { animation: puff 2.4s ease-out infinite; }
+  .d-sym.on .puff:nth-child(2) { animation-delay: .8s; }
+  .d-sym.on .puff:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes prop { from { transform: scaleY(1); } to { transform: scaleY(-1); } }
+  @keyframes puff {
+    0% { opacity: .7; transform: translate(0, 0) scale(.4); }
+    100% { opacity: 0; transform: translate(-40px, -6px) scale(1.6); }
+  }
 `;
 
-const DESIGN_TYPES = ["panel", "gauge", "bar", "tank", "value", "indicator", "pushbutton", "nav", "alarm", "block", "line", "text"];
+const SYMBOLS = ["pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke"];
+const DESIGN_TYPES = ["panel", "gauge", "bar", "tank", "value", "indicator", "pushbutton", "nav", "alarm", "block", "line", "text", "pipe", "hull", ...SYMBOLS];
+// Pipe colours, loosely after ISO 14726 (sea water green-blue, fresh water blue, fuel brown, oil yellow).
+const MEDIA = {
+  seawater: "#3cc7d6",
+  freshwater: "#4aa3ff",
+  coolant: "#4aa3ff",
+  fuel: "#c0803f",
+  oil: "#e8c547",
+  grease: "#d9772b",
+  exhaust: "#7d7c78",
+  air: "#a6d84a",
+  hydraulic: "#f5a524",
+  shaft: "#2f8f5b",
+  bilge: "#6b6a66",
+};
 const DESIGN_FONTS =
   "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap";
 const DESIGN_COLORS = { amber: "#f5a524", blue: "#4aa3ff", green: "#34d27b", red: "#ff5b4f" };
@@ -244,6 +287,38 @@ const fmt = (v, decimals, hass) =>
     : v.toLocaleString(hass?.locale?.language || "nl", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 const unitOf = (item, stateObj) => item.unit ?? stateObj?.attributes?.unit_of_measurement ?? "";
 const color = (c, fallback) => DESIGN_COLORS[c] || LED_COLORS[c] || c || fallback;
+// True when any of the entities is on (or in `<key>_state`), or its value is above/below
+// `<key>_above` / `<key>_below` (with `<key>_abs: true` the sign is ignored, e.g. for reverse rpm).
+const activeOf = (hass, ids, cfg = {}, key = "active") =>
+  [].concat(ids || []).some((id) => {
+    const so = hass.states[id];
+    const above = cfg[key + "_above"];
+    const below = cfg[key + "_below"];
+    if (above == null && below == null) return isOn(so, cfg[key + "_state"]);
+    let v = num(so);
+    if (v != null && cfg[key + "_abs"]) v = Math.abs(v);
+    return v != null && (above == null || v > above) && (below == null || v < below);
+  });
+// SVG path through points with rounded corners.
+const roundedPath = (pts, r) => {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [px, py] = pts[i - 1];
+    const [cx, cy] = pts[i];
+    const [nx, ny] = pts[i + 1];
+    const l1 = Math.hypot(cx - px, cy - py);
+    const l2 = Math.hypot(nx - cx, ny - cy);
+    const rr = Math.min(r, l1 / 2, l2 / 2);
+    if (!rr) {
+      d += ` L${cx},${cy}`;
+      continue;
+    }
+    d += ` L${cx + ((px - cx) * rr) / l1},${cy + ((py - cy) * rr) / l1}`;
+    d += ` Q${cx},${cy} ${cx + ((nx - cx) * rr) / l2},${cy + ((ny - cy) * rr) / l2}`;
+  }
+  const [lx, ly] = pts[pts.length - 1];
+  return d + ` L${lx},${ly}`;
+};
 const pad2 = (n) => String(n).padStart(2, "0");
 const stamp = (iso) => {
   const d = new Date(iso);
@@ -409,7 +484,10 @@ class ShipbornPanelCard extends HTMLElement {
       case "block": return this._dBlock(item);
       case "line": return this._dLine(item);
       case "text": return this._dText(item);
+      case "pipe": return this._dPipe(item);
+      case "hull": return this._dHull(item);
       default:
+        if (SYMBOLS.includes(item.type)) return this._dSymbol(item);
         console.warn("shipborn-panel-card: unknown item type", item.type);
         return null;
     }
@@ -1064,6 +1142,19 @@ class ShipbornPanelCard extends HTMLElement {
     if (item.uppercase) Object.assign(s, { textTransform: "uppercase", letterSpacing: ".12em" });
     if (item.mono) n.classList.add("d-num");
     s.whiteSpace = "pre-line";
+    if (item.active_entity || item.alarm_entity) {
+      this._updaters.push((hass) => {
+        const alarm = activeOf(hass, item.alarm_entity);
+        n.classList.toggle("alarm", alarm);
+        n.classList.toggle("active", !alarm && activeOf(hass, item.active_entity, item));
+      });
+    }
+    if (item.tap_action || item.active_entity) {
+      n.style.cursor = "pointer";
+      n.addEventListener("click", () =>
+        this._handleAction(item, item.tap_action || { action: "more-info", entity: item.entity || [].concat(item.active_entity)[0] }, n)
+      );
+    }
     if (!item.entity) {
       n.textContent = item.text ?? "";
       return n;
@@ -1074,6 +1165,140 @@ class ShipbornPanelCard extends HTMLElement {
       const unit = unitOf(item, so);
       const txt = val == null ? (so?.state ?? "—") : fmt(val, item.decimals ?? 0, hass);
       n.textContent = `${item.text ? item.text + " " : ""}${txt}${unit ? " " + unit : ""}`;
+    });
+    return n;
+  }
+
+  // ---------- schematic items ----------
+
+  // Pipe through absolute points. While the medium flows, dashes run along it in point order.
+  _dPipe(p) {
+    const pts = p.points || [];
+    if (pts.length < 2) return null;
+    const t = p.thickness ?? 8;
+    const pad = t * 2 + 4;
+    const xs = pts.map((q) => q[0]);
+    const ys = pts.map((q) => q[1]);
+    const x0 = Math.min(...xs) - pad;
+    const y0 = Math.min(...ys) - pad;
+    const local = pts.map(([x, y]) => [x - x0, y - y0]);
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "item d-pipe");
+    svg.setAttribute("width", Math.max(...xs) - x0 + pad);
+    svg.setAttribute("height", Math.max(...ys) - y0 + pad);
+    Object.assign(svg.style, { left: x0 + "px", top: y0 + "px" });
+    const col = color(MEDIA[p.medium] || p.color, MEDIA.seawater);
+    const d = roundedPath(local, p.radius ?? t * 2);
+    const dash = p.dash || [t * 1.2, t * 1.8];
+    const period = dash[0] + dash[1];
+    let arrow = "";
+    if (p.arrow) {
+      const [ax, ay] = local[local.length - 1];
+      const [bx, by] = local[local.length - 2];
+      const a = Math.atan2(ay - by, ax - bx);
+      const L = t * 2.2;
+      const W = t * 1.4;
+      const pt = (dx, dy) => `${ax + dx * Math.cos(a) - dy * Math.sin(a)},${ay + dx * Math.sin(a) + dy * Math.cos(a)}`;
+      arrow = `<polygon class="bs" points="${pt(L * 0.6, 0)} ${pt(-L * 0.4, -W)} ${pt(-L * 0.4, W)}" fill="${col}"/>`;
+    }
+    svg.innerHTML =
+      `<path d="${d}" fill="none" stroke="${p.casing || "#0a0b0c"}" stroke-width="${t + 4}" stroke-linejoin="round" stroke-linecap="${p.cap || "butt"}"/>` +
+      `<path class="bs" d="${d}" fill="none" stroke="${col}" stroke-width="${t}" stroke-linejoin="round" stroke-linecap="${p.cap || "butt"}"/>` +
+      `<path class="fl" d="${d}" fill="none" stroke="${p.flow_color || "rgba(255,255,255,.75)"}" stroke-width="${Math.max(1.5, t * 0.45)}"` +
+      ` stroke-linecap="round" stroke-dasharray="${dash.join(" ")}" visibility="hidden"/>` +
+      arrow;
+    const base = svg.querySelectorAll(".bs");
+    const flow = svg.querySelector(".fl");
+    const dir = p.reverse ? 1 : -1;
+    const anim = flow.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: dir * period }], {
+      duration: (period / (p.speed || 40)) * 1000,
+      iterations: Infinity,
+    });
+    anim.pause();
+    const idle = p.idle_opacity ?? 0.3;
+    this._updaters.push((hass) => {
+      const on = p.flow_entity ? activeOf(hass, p.flow_entity, p, "flow") : p.flow === true;
+      base.forEach((b) => b.setAttribute(b.tagName === "path" ? "stroke-opacity" : "fill-opacity", on ? 1 : idle));
+      flow.setAttribute("visibility", on ? "visible" : "hidden");
+      if (on) anim.play();
+      else anim.pause();
+    });
+    return svg;
+  }
+
+  // Ship outline seen from above, bow to the right (bow: left to flip).
+  _dHull(item) {
+    const n = this._place(h("div", "d d-hull"), item, 1200, 360);
+    const fill = item.color || "#141516";
+    const line = item.border || "#3a3a3a";
+    n.innerHTML =
+      `<svg viewBox="0 0 1000 300" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible${item.bow === "left" ? ";transform:scaleX(-1)" : ""}">` +
+      `<path d="M14,34 C300,6 640,8 790,34 C900,56 975,110 996,150 C975,190 900,244 790,266 C640,292 300,294 14,266 Q4,150 14,34 Z"` +
+      ` fill="${fill}" stroke="${line}" stroke-width="2" vector-effect="non-scaling-stroke"/>` +
+      `<path d="M34,52 C300,26 630,28 775,52 C875,72 940,115 958,150 C940,185 875,228 775,248 C630,272 300,274 34,248 Q26,150 34,52 Z"` +
+      ` fill="none" stroke="${line}" stroke-width="1" stroke-dasharray="6 6" vector-effect="non-scaling-stroke" opacity=".6"/>` +
+      `</svg>`;
+    return n;
+  }
+
+  // P&ID-style symbols. They light up (colour `color`, default green) from active_entity / entity.
+  _dSymbol(s) {
+    const kind = s.type;
+    const [dw, dh] = {
+      pump: [48, 48], valve: [44, 26], hx: [100, 48], filter: [36, 48], strainer: [44, 70],
+      propeller: [40, 130], outlet: [80, 30], smoke: [70, 40],
+    }[kind];
+    const n = this._place(h("div", "d d-sym"), s, dw, dh);
+    const W = s.width ?? s.size ?? dw;
+    const H = s.height ?? s.size ?? dh;
+    const m = Math.min(W, H);
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    if (s.rotation) svg.style.transform = `rotate(${s.rotation}deg)`;
+    const cx = W / 2;
+    const cy = H / 2;
+    const zig = Array.from({ length: 9 }, (_, i) => `${10 + (i * (W - 20)) / 8},${i % 2 ? H * 0.25 : H * 0.75}`).join(" ");
+    svg.innerHTML = {
+      pump:
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
+        `<polygon class="ac" points="${cx - m * 0.18},${cy - m * 0.3} ${cx - m * 0.18},${cy + m * 0.3} ${cx + m * 0.34},${cy}"/>`,
+      valve: `<path class="ac" d="M2,2 L${cx},${cy} L2,${H - 2} Z M${W - 2},2 L${cx},${cy} L${W - 2},${H - 2} Z"/>`,
+      hx: `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="6"/><polyline class="ln" points="${zig}"/>`,
+      filter:
+        `<polygon class="bd" points="${cx},2 ${W - 2},${cy} ${cx},${H - 2} 2,${cy}"/>` +
+        `<line class="ln" x1="${cx}" y1="6" x2="${cx}" y2="${H - 6}" stroke-dasharray="4 4"/>`,
+      strainer:
+        `<rect class="bd" x="2" y="2" width="${W - 4}" height="${H * 0.45}" rx="${W * 0.2}"/>` +
+        [0.3, 0.5, 0.7].map((f) => `<line class="ln" x1="${W * f}" y1="${H * 0.1}" x2="${W * f}" y2="${H * 0.4}"/>`).join("") +
+        `<rect class="bd" x="${W * 0.22}" y="${H * 0.47}" width="${W * 0.56}" height="${H * 0.5}" rx="4"/>` +
+        `<path class="ac" d="M${W * 0.33},${H * 0.66} L${W * 0.5},${H * 0.6} L${W * 0.67},${H * 0.66} L${W * 0.5},${H * 0.88} Z"/>`,
+      propeller:
+        `<g class="blades"><ellipse class="ac" cx="${cx}" cy="${H * 0.26}" rx="${W * 0.32}" ry="${H * 0.23}"/>` +
+        `<ellipse class="ac" cx="${cx}" cy="${H * 0.74}" rx="${W * 0.32}" ry="${H * 0.23}"/></g>` +
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${W * 0.18}"/>`,
+      outlet: `<path class="ln" d="M2,${H * 0.4} q${W / 8},${H * 0.6} ${W / 4},0 t${W / 4},0 t${W / 4},0 t${W / 4},0"/>`,
+      smoke: [0, 1, 2].map(() => `<circle class="puff" cx="${W - 12}" cy="${cy}" r="${H * 0.3}"/>`).join(""),
+    }[kind];
+    n.appendChild(svg);
+    if (s.label) {
+      const lb = h("div", "lb");
+      lb.textContent = s.label;
+      if (s.label_position === "above") lb.style.bottom = "calc(100% + 4px)";
+      else lb.style.top = "calc(100% + 4px)";
+      n.appendChild(lb);
+    }
+    const stateIds = s.active_entity || s.entity;
+    if (s.entity || s.tap_action) {
+      n.classList.add("click");
+      n.addEventListener("click", () => this._handleAction(s, s.tap_action || { action: "more-info" }, n));
+    }
+    if (s.speed) n.style.setProperty("--dur", s.speed + "s");
+    const on = s.color ? color(s.color) : kind === "propeller" ? MEDIA.shaft : DESIGN_COLORS.green;
+    this._updaters.push((hass) => {
+      const alarm = activeOf(hass, s.alarm_entity);
+      const active = stateIds ? activeOf(hass, stateIds, s) : s.active === true;
+      n.classList.toggle("on", alarm || active);
+      n.style.setProperty("--c", alarm ? DESIGN_COLORS.red : on);
     });
     return n;
   }

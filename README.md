@@ -107,6 +107,32 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
 | `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed` |
 
+### Schema's met stromende leidingen
+
+Voor een systeemschema (koelwater, brandstof, uitlaat, as) – zie de view `schema` in `examples/plc-dashboard.yaml`.
+
+```yaml
+- type: pipe
+  medium: seawater            # seawater, coolant/freshwater, fuel, oil, grease, exhaust, air, hydraulic, shaft, bilge (of color: "#...")
+  points: [[1062, 560], [1062, 520], [1024, 520]]   # stroomrichting = volgorde van de punten
+  thickness: 7
+  arrow: true                 # pijlpunt aan het eind
+  flow_entity: sensor.plc_diesel_speed   # of binary_sensor (aan = stroomt), of een lijst (één actief = stroomt)
+  flow_above: 100             # optioneel: numerieke drempel (flow_below, flow_abs: true voor negatief toerental, flow_state)
+```
+
+| optie | uitleg |
+|---|---|
+| `speed` | snelheid van de streepjes in px/s (standaard 40) |
+| `reverse` | streepjes tegen de puntvolgorde in |
+| `idle_opacity` | helderheid als er niets stroomt (standaard 0.3) |
+| `flow: true` | altijd stromend (legenda) |
+| `radius`, `dash`, `flow_color`, `casing` | bochtstraal, streeppatroon `[lengte, gat]`, kleur streepjes, kleur rand |
+
+Symbolen: `pump`, `valve`, `hx` (warmtewisselaar), `filter`, `strainer` (zeewaterinlaat), `propeller` (draait), `outlet` (overboord), `smoke` (rook bij de uitlaat). Ze lichten op (`color`, standaard groen) via `active_entity` of `entity` met dezelfde opties `active_above` / `active_below` / `active_abs` / `active_state`; `alarm_entity` maakt ze rood. Verder `label`, `label_position: above`, `rotation` (graden), `size` of `width`/`height`.
+
+`hull` tekent de romp van bovenaf (`bow: left` om te spiegelen). `text` met `boxed: true` krijgt `active_entity` (groen) en `alarm_entity` (rood) – gebruikt voor motor, gearbox en e-motor.
+
 De lettertypes (Barlow Condensed, JetBrains Mono) komen van Google Fonts; zonder internet valt de kaart terug op Roboto Condensed / Arial Narrow. Zet `fonts: false` om ze niet te laden.
 
 ## Demo zonder Home Assistant
@@ -116,6 +142,8 @@ python3 -m http.server 8765
 ```
 
 Open daarna http://localhost:8765/demo/ — de demo laadt `examples/dashboard.yaml` met nep-entiteiten, zodat je de layout kunt aanpassen zonder HA.
+
+http://localhost:8765/demo/plc.html?view=schema toont het voortstuwingsschema, met knoppen om diesel, e-motor en zeewaterpomp aan/uit te zetten.
 
 ## Veiligheid
 

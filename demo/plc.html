@@ -8,18 +8,23 @@
     body { margin: 0; background: #0d0e10; font-family: sans-serif; }
     #view { max-width: 1280px; margin: 0 auto; }
     #log { max-width: 1280px; margin: 8px auto; font: 12px monospace; color: #8f8e88; }
+    #sim { max-width: 1280px; margin: 8px auto; display: flex; gap: 8px; }
+    #sim button { font: 13px sans-serif; padding: 6px 12px; background: #232323; color: #ecebe6; border: 1px solid #3a3a3a; border-radius: 6px; cursor: pointer; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script src="../dist/shipborn-panel-card.js"></script>
 </head>
 <body>
   <div id="view"></div>
+  <div id="sim"></div>
   <div id="log">Mock: service calls verschijnen hier (geen echte HA).</div>
   <script>
-    // Renders the first view of examples/plc-dashboard.yaml with fake entity states.
+    // Renders a view of examples/plc-dashboard.yaml (?view=<path>, default the first) with fake entity states.
     (async () => {
       const yaml = await (await fetch("../examples/plc-dashboard.yaml")).text();
-      const cfg = jsyaml.load(yaml).views[0].cards[0];
+      const views = jsyaml.load(yaml).views;
+      const wanted = new URLSearchParams(location.search).get("view");
+      const cfg = (views.find((v) => v.path === wanted) || views[0]).cards[0];
       const now = new Date().toISOString();
       const st = (state, attributes = {}) => ({ state: String(state), attributes, last_changed: now });
       const states = {
@@ -33,6 +38,13 @@
         "sensor.plc_shaft_speed": st(180, { unit_of_measurement: "rpm" }),
         "sensor.plc_battery_soc": st(72, { unit_of_measurement: "%" }),
         "binary_sensor.plc_battery_discharging": st("on"),
+        "sensor.plc_diesel_coolant_temperature": st(82, { unit_of_measurement: "°C" }),
+        "sensor.plc_tank_day": st(64, { unit_of_measurement: "%" }),
+        "sensor.plc_stern_seal_pressure": st(0.45),
+        "sensor.plc_stern_seal_temperature": st(21.4),
+        "sensor.plc_exhaust_temperature": st(48.2),
+        "sensor.plc_seawater_flow_engine": st(38.5),
+        "binary_sensor.plc_seawater_pump_running": st("on"),
       };
       for (const id of ["button.plc_mode_diesel", "button.plc_mode_electric", "button.plc_mode_generator", "button.plc_mode_harbor", "button.plc_alarm_reset"])
         states[id] = st("unknown");
@@ -53,6 +65,35 @@
       el.setConfig(cfg);
       document.getElementById("view").appendChild(el);
       el.hass = hass;
+
+      // Simulation buttons: switch the propulsion on/off to see the pipes flow.
+      const sim = {
+        "Diesel aan/uit": () => {
+          const on = num("sensor.plc_diesel_speed") > 0;
+          set("sensor.plc_diesel_speed", on ? 0 : 1450, "rpm");
+          set("sensor.plc_seawater_flow_engine", on ? 0 : 38.5, "L/min");
+        },
+        "E-motor aan/uit": () => {
+          const on = num("sensor.plc_electric_speed") !== 0;
+          set("sensor.plc_electric_speed", on ? 0 : -1200, "rpm");
+        },
+        "SW pomp aan/uit": () => {
+          const on = states["binary_sensor.plc_seawater_pump_running"].state === "on";
+          states["binary_sensor.plc_seawater_pump_running"] = st(on ? "off" : "on");
+        },
+      };
+      function num(id) { return parseFloat(states[id]?.state) || 0; }
+      function set(id, v, unit) { states[id] = st(v, { unit_of_measurement: unit }); }
+      for (const [label, fn] of Object.entries(sim)) {
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.onclick = () => {
+          fn();
+          set("sensor.plc_shaft_speed", num("sensor.plc_diesel_speed") || num("sensor.plc_electric_speed") ? 180 : 0, "rpm");
+          el.hass = { ...hass, states: { ...states } };
+        };
+        document.getElementById("sim").appendChild(b);
+      }
     })();
   </script>
 </body>

@@ -27,6 +27,7 @@ views:
               - { label: Electric, path: /shipborn-plc/emotor, match: [/shipborn-plc/bowthruster, /shipborn-plc/jetthrusters, /shipborn-plc/battery, /shipborn-plc/shore-gen] }
               - { label: PMS, path: /shipborn-plc/pms }
               - { label: Tanks, path: /shipborn-plc/tanks }
+              - { label: Schema, path: /shipborn-plc/schema }
               - { label: Alarms }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
@@ -68,3 +69,101 @@ views:
           - { type: tank, x: 1054, y: 160, width: 184, height: 540, frame: false, entity: sensor.plc_battery_soc, color: green, marker: 75, scale: [100, 75, 50, 25, 0], font_size: 40 }
           - { type: pushbutton, x: 1054, y: 712, width: 89, height: 48, label: Charging, tap_action: { action: none }, active_entity: binary_sensor.plc_battery_charging }
           - { type: pushbutton, x: 1149, y: 712, width: 89, height: 48, label: Discharging, tap_action: { action: none }, active_entity: binary_sensor.plc_battery_discharging }
+
+  # Schematische weergave voorstuwing: koelwater, brandstof, uitlaat en as.
+  # Leidingen "stromen" (bewegende streepjes) zodra hun flow_entity actief is.
+  # Entiteiten met "# nieuw" bestaan nog niet in de PLC-lijst: koppel ze of verwijder het item.
+  - title: Schema
+    path: schema
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        width: 1280
+        height: 800
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          # ---- kopbalk ----
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
+          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
+
+          # ---- romp (boeg rechts) ----
+          - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
+
+          # ---- as + schroef ----
+          - { type: pipe, medium: shaft, thickness: 10, points: [[100, 410], [560, 410]], flow_entity: sensor.plc_shaft_speed, flow_above: 5, flow_abs: true, speed: 60 }
+          - { type: propeller, x: 60, y: 345, entity: sensor.plc_shaft_speed, active_above: 5, active_abs: true }
+          - { type: text, x: 112, y: 425, entity: sensor.plc_shaft_speed, mono: true, font_size: 15, color: "#a3a29c" }
+
+          # ---- schroefaskoker: smeervet ----
+          - { type: text, x: 214, y: 216, text: "Seal grease", font_size: 13, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: grease, thickness: 5, arrow: true, idle_opacity: 0.8, points: [[260, 244], [260, 396]] }
+          - { type: text, x: 274, y: 270, entity: sensor.plc_stern_seal_pressure, unit: bar, decimals: 2, mono: true, font_size: 16 }   # nieuw
+          - { type: text, x: 274, y: 296, entity: sensor.plc_stern_seal_temperature, unit: "°C", decimals: 1, mono: true, font_size: 16 }   # nieuw
+
+          # ---- aandrijving: diesel → gearbox ← e-motor ----
+          - { type: pipe, medium: shaft, thickness: 10, points: [[758, 410], [682, 410]], flow_entity: sensor.plc_diesel_speed, flow_above: 100, speed: 60 }
+          - { type: pipe, medium: shaft, thickness: 10, points: [[620, 302], [620, 358]], flow_entity: sensor.plc_electric_speed, flow_above: 5, flow_abs: true, speed: 60 }
+          - { type: text, x: 560, y: 360, width: 120, height: 100, text: Gearbox, boxed: true, active_entity: sensor.plc_shaft_speed, active_above: 5, active_abs: true }
+          - { type: text, x: 560, y: 210, width: 120, height: 92, text: "E-motor", boxed: true, active_entity: sensor.plc_electric_speed, active_above: 5, active_abs: true }
+          - { type: text, x: 574, y: 272, entity: sensor.plc_electric_speed, mono: true, font_size: 14, color: "#a3a29c" }
+          - { type: text, x: 760, y: 330, width: 220, height: 160, text: "Diesel", boxed: true, font_size: 20, active_entity: sensor.plc_diesel_speed, active_above: 100, alarm_entity: binary_sensor.plc_diesel_alarm }   # alarm_entity: nieuw
+          - { type: text, x: 776, y: 446, entity: sensor.plc_diesel_speed, mono: true, font_size: 15, color: "#a3a29c" }
+          - { type: text, x: 880, y: 446, entity: sensor.plc_diesel_coolant_temperature, unit: "°C", mono: true, font_size: 15, color: "#a3a29c" }
+
+          # ---- brandstof: day tank → filter → motor, retour ----
+          - { type: text, x: 1012, y: 214, text: Day tank, font_size: 13, uppercase: true, color: "#a3a29c" }
+          - { type: tank, x: 1012, y: 238, width: 84, height: 190, frame: false, entity: sensor.plc_tank_day, color: "#c0803f", scale: false, font_size: 22 }
+          - &fuel { type: pipe, medium: fuel, thickness: 6, arrow: true, flow_entity: sensor.plc_diesel_speed, flow_above: 100, points: [[1008, 300], [958, 300]] }
+          - { type: filter, x: 920, y: 276, label: Filter, label_position: above, active_entity: sensor.plc_diesel_speed, active_above: 100, color: "#c0803f" }
+          - { <<: *fuel, points: [[918, 300], [900, 300], [900, 326]] }
+          - { <<: *fuel, points: [[820, 328], [820, 258], [1008, 258]] }
+
+          # ---- uitlaat: motor → exhaust drain (waterlock) → spiegel ----
+          - &exhaust { type: pipe, medium: exhaust, thickness: 12, arrow: true, flow_entity: sensor.plc_diesel_speed, flow_above: 100, speed: 70, points: [[790, 492], [790, 520], [450, 520]] }
+          - { type: text, x: 330, y: 480, width: 110, height: 100, text: "Exhaust\ndrain", boxed: true, active_entity: sensor.plc_diesel_speed, active_above: 100 }
+          - { <<: *exhaust, arrow: false, points: [[385, 582], [385, 612], [44, 612]] }
+          - { type: smoke, x: -6, y: 592, active_entity: sensor.plc_diesel_speed, active_above: 100 }
+          - { type: text, x: 460, y: 540, entity: sensor.plc_exhaust_temperature, unit: "°C", decimals: 1, mono: true, font_size: 15, color: "#a3a29c" }   # nieuw
+
+          # ---- zeewater motor: inlaat → strainer → impeller → warmtewisselaar → uitlaat ----
+          - &sw_engine { type: pipe, medium: seawater, thickness: 7, arrow: true, flow_entity: sensor.plc_diesel_speed, flow_above: 100, points: [[1062, 676], [1062, 634]] }
+          - { type: strainer, x: 1040, y: 562, active_entity: sensor.plc_diesel_speed, active_above: 100, color: "#3cc7d6" }
+          - { <<: *sw_engine, points: [[1062, 560], [1062, 520], [1024, 520]] }
+          - { type: pump, x: 980, y: 500, size: 40, rotation: 180, label: Impeller, active_entity: sensor.plc_diesel_speed, active_above: 100 }
+          - { <<: *sw_engine, points: [[978, 520], [960, 520], [960, 602], [944, 602]] }
+          - { type: hx, x: 800, y: 580, width: 140, height: 44, label: Warmtewisselaar, active_entity: sensor.plc_diesel_speed, active_above: 100, color: "#4aa3ff" }
+          - { <<: *sw_engine, points: [[798, 602], [730, 602], [730, 528]] }
+          - { type: text, x: 1090, y: 520, entity: sensor.plc_seawater_flow_engine, unit: L/min, decimals: 1, mono: true, font_size: 16 }   # nieuw
+
+          # ---- koelwater (zoetwater) motor ↔ warmtewisselaar ----
+          - &coolant { type: pipe, medium: coolant, thickness: 6, arrow: true, flow_entity: sensor.plc_diesel_speed, flow_above: 100, points: [[930, 492], [930, 576]] }
+          - { <<: *coolant, points: [[870, 576], [870, 494]] }
+
+          # ---- zeewater elektrisch: inlaat → strainer → SW-pomp → e-motor/VFD → overboord ----
+          - &sw_elec { type: pipe, medium: seawater, thickness: 7, arrow: true, flow_entity: binary_sensor.plc_seawater_pump_running, points: [[402, 402], [402, 374]] }
+          - { type: strainer, x: 380, y: 302, active_entity: binary_sensor.plc_seawater_pump_running, color: "#3cc7d6" }
+          - { <<: *sw_elec, points: [[402, 300], [402, 250], [434, 250]] }
+          - { type: pump, x: 438, y: 230, size: 40, label: SW pomp, label_position: above, entity: binary_sensor.plc_seawater_pump_running }
+          - { <<: *sw_elec, points: [[480, 250], [556, 250]] }
+          - { <<: *sw_elec, points: [[684, 240], [724, 240], [724, 196]] }
+          - { type: outlet, x: 690, y: 172, width: 70, height: 20, active_entity: binary_sensor.plc_seawater_pump_running, color: "#3cc7d6" }
+
+          # ---- legenda ----
+          - { type: pipe, medium: seawater, thickness: 7, flow: true, points: [[40, 756], [80, 756]] }
+          - { type: text, x: 90, y: 746, text: Zeewater, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: coolant, thickness: 7, flow: true, points: [[200, 756], [240, 756]] }
+          - { type: text, x: 250, y: 746, text: Koelwater, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: fuel, thickness: 7, flow: true, points: [[370, 756], [410, 756]] }
+          - { type: text, x: 420, y: 746, text: Brandstof, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: exhaust, thickness: 7, flow: true, points: [[540, 756], [580, 756]] }
+          - { type: text, x: 590, y: 746, text: Uitlaat, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: shaft, thickness: 7, flow: true, points: [[690, 756], [730, 756]] }
+          - { type: text, x: 740, y: 746, text: As, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: grease, thickness: 7, points: [[800, 756], [840, 756]], idle_opacity: 0.8 }
+          - { type: text, x: 850, y: 746, text: Smeervet, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: text, x: 1000, y: 746, text: "Stromende streepjes = medium stroomt", font_size: 14, color: "#6b6a66" }
