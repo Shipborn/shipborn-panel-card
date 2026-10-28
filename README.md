@@ -109,11 +109,12 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 
 ### Schema's met stromende leidingen
 
-Voor een systeemschema (koelwater, brandstof, uitlaat, as) – zie de view `schema` in `examples/plc-dashboard.yaml`.
+Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (tab *Systemen*): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge en Accu's, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.
 
 ```yaml
 - type: pipe
-  medium: seawater            # seawater, coolant/freshwater, fuel, oil, grease, exhaust, air, hydraulic, shaft, bilge (of color: "#...")
+  medium: seawater            # seawater, coolant/freshwater, fuel, oil, grease, exhaust, air, hydraulic, shaft, bilge,
+                              # glycol, glycol_return, hotwater, wastewater, power (of color: "#...")
   points: [[1062, 560], [1062, 520], [1024, 520]]   # stroomrichting = volgorde van de punten
   thickness: 7
   arrow: true                 # pijlpunt aan het eind
@@ -129,7 +130,7 @@ Voor een systeemschema (koelwater, brandstof, uitlaat, as) – zie de view `sche
 | `flow: true` | altijd stromend (legenda) |
 | `radius`, `dash`, `flow_color`, `casing` | bochtstraal, streeppatroon `[lengte, gat]`, kleur streepjes, kleur rand |
 
-Symbolen: `pump`, `valve`, `hx` (warmtewisselaar), `filter`, `strainer` (zeewaterinlaat), `propeller` (draait), `outlet` (overboord), `smoke` (rook bij de uitlaat). Ze lichten op (`color`, standaard groen) via `active_entity` of `entity` met dezelfde opties `active_above` / `active_below` / `active_abs` / `active_state`; `alarm_entity` maakt ze rood. Verder `label`, `label_position: above`, `rotation` (graden), `size` of `width`/`height`.
+Symbolen: `pump`, `valve`, `hx` (warmtewisselaar), `filter`, `strainer` (zeewaterinlaat), `propeller` (draait), `outlet` (overboord), `smoke` (rook bij de uitlaat), `engine`, `generator` (cirkel met `letter`, standaard G; M voor een motor), `converter` (`glyphs: ["~", "="]`), `battery`, `fan` (draait). Ze lichten op (`color`, standaard groen) via `active_entity` of `entity` met dezelfde opties `active_above` / `active_below` / `active_abs` / `active_state`; `alarm_entity` maakt ze rood. Verder `label`, `label_position: above`, `rotation` (graden), `size` of `width`/`height`.
 
 `hull` tekent de romp van bovenaf (`bow: left` om te spiegelen). `text` met `boxed: true` krijgt `active_entity` (groen) en `alarm_entity` (rood) – gebruikt voor motor, gearbox en e-motor.
 
@@ -143,7 +144,7 @@ python3 -m http.server 8765
 
 Open daarna http://localhost:8765/demo/ — de demo laadt `examples/dashboard.yaml` met nep-entiteiten, zodat je de layout kunt aanpassen zonder HA.
 
-http://localhost:8765/demo/plc.html?view=schema toont het voortstuwingsschema, met knoppen om diesel, e-motor en zeewaterpomp aan/uit te zetten.
+http://localhost:8765/demo/plc.html?view=sys-diesel (of een ander `sys-…`-pad) toont een systeemschema, met een vinkje per entiteit om leidingen te laten stromen.
 
 ## Veiligheid
 

@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -225,6 +225,11 @@ const STYLE = `
   .d-sym.on .blades { animation: prop var(--dur, .5s) linear infinite alternate; }
   .d-sym .puff { opacity: 0; fill: #8f8e88; transform-box: fill-box; transform-origin: center; }
   .d-sym.on .puff { animation: puff 2.4s ease-out infinite; }
+  .d-sym .gl { fill: #8f8e88; font: 600 14px "JetBrains Mono", monospace; transition: fill .3s; }
+  .d-sym.on .gl { fill: var(--c); }
+  .d-sym .rotor { transform-box: fill-box; transform-origin: center; }
+  .d-sym.on .rotor { animation: spin var(--dur, 1s) linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .d-sym.on .puff:nth-child(2) { animation-delay: .8s; }
   .d-sym.on .puff:nth-child(3) { animation-delay: 1.6s; }
   @keyframes prop { from { transform: scaleY(1); } to { transform: scaleY(-1); } }
@@ -234,7 +239,7 @@ const STYLE = `
   }
 `;
 
-const SYMBOLS = ["pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke"];
+const SYMBOLS = ["pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke", "engine", "generator", "converter", "battery", "fan"];
 const DESIGN_TYPES = ["panel", "gauge", "bar", "tank", "value", "indicator", "pushbutton", "nav", "alarm", "block", "line", "text", "pipe", "hull", ...SYMBOLS];
 // Pipe colours, loosely after ISO 14726 (sea water green-blue, fresh water blue, fuel brown, oil yellow).
 const MEDIA = {
@@ -249,6 +254,11 @@ const MEDIA = {
   hydraulic: "#f5a524",
   shaft: "#2f8f5b",
   bilge: "#6b6a66",
+  glycol: "#b57be0",
+  glycol_return: "#e06666",
+  hotwater: "#e0453a",
+  wastewater: "#9a7b5a",
+  power: "#ff9f1c",
 };
 const DESIGN_FONTS =
   "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap";
@@ -1054,6 +1064,7 @@ class ShipbornPanelCard extends HTMLElement {
     const tabs = (item.tabs || []).map((t) => {
       const b = h("button", "d-tab");
       b.textContent = t.label;
+      if (item.font_size) Object.assign(b.style, { fontSize: item.font_size + "px", height: (item.tab_height || 36) + "px", padding: "0 12px" });
       if (!t.path) b.disabled = true;
       else b.addEventListener("click", () => this._handleAction(t, { action: "navigate", navigation_path: t.path }, b));
       n.appendChild(b);
@@ -1247,6 +1258,7 @@ class ShipbornPanelCard extends HTMLElement {
     const [dw, dh] = {
       pump: [48, 48], valve: [44, 26], hx: [100, 48], filter: [36, 48], strainer: [44, 70],
       propeller: [40, 130], outlet: [80, 30], smoke: [70, 40],
+      engine: [100, 70], generator: [48, 48], converter: [48, 48], battery: [80, 44], fan: [70, 70],
     }[kind];
     const n = this._place(h("div", "d d-sym"), s, dw, dh);
     const W = s.width ?? s.size ?? dw;
@@ -1278,6 +1290,29 @@ class ShipbornPanelCard extends HTMLElement {
         `<circle class="bd" cx="${cx}" cy="${cy}" r="${W * 0.18}"/>`,
       outlet: `<path class="ln" d="M2,${H * 0.4} q${W / 8},${H * 0.6} ${W / 4},0 t${W / 4},0 t${W / 4},0 t${W / 4},0"/>`,
       smoke: [0, 1, 2].map(() => `<circle class="puff" cx="${W - 12}" cy="${cy}" r="${H * 0.3}"/>`).join(""),
+      // Engine outline drawn in a 100×70 box and stretched to the item size.
+      engine:
+        `<g transform="scale(${W / 100},${H / 70})"><path class="ln" vector-effect="non-scaling-stroke" stroke-width="3"` +
+        ` d="M6,18 V58 M6,38 H18 M18,22 H38 V12 H30 V6 H54 V12 H46 V22 H68 V30 H80 V22 H94 V60 H80 V52 H68 V64 H32 L18,52 Z"/></g>`,
+      generator:
+        `<circle class="bd" cx="${cx}" cy="${cy}" r="${m / 2 - 2}"/>` +
+        `<text class="gl" x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" style="font-size:${m * 0.4}px">${s.letter || "G"}</text>`,
+      converter:
+        `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="3"/>` +
+        `<line class="ln" x1="${W - 4}" y1="4" x2="4" y2="${H - 4}"/>` +
+        `<text class="gl" x="${W * 0.28}" y="${H * 0.3}" text-anchor="middle" dominant-baseline="central">${(s.glyphs || ["~", "="])[0]}</text>` +
+        `<text class="gl" x="${W * 0.72}" y="${H * 0.72}" text-anchor="middle" dominant-baseline="central">${(s.glyphs || ["~", "="])[1]}</text>`,
+      battery:
+        `<rect class="bd" x="${W * 0.15}" y="0" width="${W * 0.14}" height="${H * 0.18}"/>` +
+        `<rect class="bd" x="${W * 0.71}" y="0" width="${W * 0.14}" height="${H * 0.18}"/>` +
+        `<rect class="bd" x="1" y="${H * 0.18}" width="${W - 2}" height="${H * 0.82 - 1}" rx="3"/>` +
+        `<text class="gl" x="${W * 0.22}" y="${H * 0.55}" text-anchor="middle" dominant-baseline="central">+</text>` +
+        `<text class="gl" x="${W * 0.78}" y="${H * 0.55}" text-anchor="middle" dominant-baseline="central">−</text>`,
+      fan:
+        `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="4"/>` +
+        `<g class="rotor">${[0, 90, 180, 270]
+          .map((a) => `<ellipse class="ln" cx="${cx}" cy="${cy - m * 0.22}" rx="${m * 0.09}" ry="${m * 0.2}" transform="rotate(${a} ${cx} ${cy})"/>`)
+          .join("")}<circle class="ac" cx="${cx}" cy="${cy}" r="${m * 0.08}"/></g>`,
     }[kind];
     n.appendChild(svg);
     if (s.label) {

@@ -8,8 +8,8 @@
     body { margin: 0; background: #0d0e10; font-family: sans-serif; }
     #view { max-width: 1280px; margin: 0 auto; }
     #log { max-width: 1280px; margin: 8px auto; font: 12px monospace; color: #8f8e88; }
-    #sim { max-width: 1280px; margin: 8px auto; display: flex; gap: 8px; }
-    #sim button { font: 13px sans-serif; padding: 6px 12px; background: #232323; color: #ecebe6; border: 1px solid #3a3a3a; border-radius: 6px; cursor: pointer; }
+    #sim { max-width: 1280px; margin: 8px auto; display: flex; flex-wrap: wrap; gap: 6px 16px; font: 12px monospace; color: #cfcec8; }
+    #sim label { cursor: pointer; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script src="../dist/shipborn-panel-card.js"></script>
@@ -66,34 +66,30 @@
       document.getElementById("view").appendChild(el);
       el.hass = hass;
 
-      // Simulation buttons: switch the propulsion on/off to see the pipes flow.
-      const sim = {
-        "Diesel aan/uit": () => {
-          const on = num("sensor.plc_diesel_speed") > 0;
-          set("sensor.plc_diesel_speed", on ? 0 : 1450, "rpm");
-          set("sensor.plc_seawater_flow_engine", on ? 0 : 38.5, "L/min");
-        },
-        "E-motor aan/uit": () => {
-          const on = num("sensor.plc_electric_speed") !== 0;
-          set("sensor.plc_electric_speed", on ? 0 : -1200, "rpm");
-        },
-        "SW pomp aan/uit": () => {
-          const on = states["binary_sensor.plc_seawater_pump_running"].state === "on";
-          states["binary_sensor.plc_seawater_pump_running"] = st(on ? "off" : "on");
-        },
-      };
-      function num(id) { return parseFloat(states[id]?.state) || 0; }
-      function set(id, v, unit) { states[id] = st(v, { unit_of_measurement: unit }); }
-      for (const [label, fn] of Object.entries(sim)) {
-        const b = document.createElement("button");
-        b.textContent = label;
-        b.onclick = () => {
-          fn();
-          set("sensor.plc_shaft_speed", num("sensor.plc_diesel_speed") || num("sensor.plc_electric_speed") ? 180 : 0, "rpm");
+      // Simulation: one checkbox per entity that makes a pipe flow or a symbol light up.
+      const conds = new Map();
+      for (const it of cfg.items.filter((i) => i.type !== "alarm"))
+        for (const key of ["flow", "active"]) {
+          const ids = [].concat(it[key + "_entity"] || []);
+          for (const id of ids) if (!conds.has(id)) conds.set(id, { above: it[key + "_above"], abs: it[key + "_abs"] });
+        }
+      const sim = document.getElementById("sim");
+      for (const [id, c] of [...conds].sort()) {
+        const lbl = document.createElement("label");
+        const box = document.createElement("input");
+        box.type = "checkbox";
+        const on = () => (c.above == null ? "on" : String((c.abs ? -1 : 1) * (c.above < 10 ? c.above + 12.3 : c.above + 1350)));
+        const cur = states[id];
+        box.checked = cur ? (c.above != null ? Math.abs(parseFloat(cur.state)) > c.above : cur.state === "on") : true;
+        if (!cur || cur.state === "unknown") states[id] = st(box.checked ? on() : c.above != null ? 0 : "off");
+        box.onchange = () => {
+          states[id] = st(box.checked ? on() : c.above != null ? 0 : "off", states[id]?.attributes);
           el.hass = { ...hass, states: { ...states } };
         };
-        document.getElementById("sim").appendChild(b);
+        lbl.append(box, " " + id.replace(/^(binary_)?sensor\.plc_/, ""));
+        sim.appendChild(lbl);
       }
+      el.hass = { ...hass, states: { ...states } };
     })();
   </script>
 </body>
