@@ -1,0 +1,70 @@
+# PLC-besturingspagina's (ontwerp "PLC-pagina's" op de canvas).
+# Maak een dashboard aan met URL "shipborn-plc" en plak dit in de Raw configuration editor.
+# Vervang de entity-id's (sensor.plc_…, binary_sensor.plc_…, button.plc_…) door je eigen entiteiten.
+# Elke view is één kaart van 1280×800 die meeschaalt met de schermbreedte.
+title: PLC
+views:
+  - title: Main
+    path: main
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        width: 1280
+        height: 800
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          # ---- kopbalk: navigatie, lifebeat, alarm ----
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
+          - type: nav
+            x: 250
+            y: 10
+            tabs: &plc_tabs
+              - { label: Main, path: /shipborn-plc/main }
+              - { label: Diesel, path: /shipborn-plc/diesel }
+              - { label: Electric, path: /shipborn-plc/emotor, match: [/shipborn-plc/bowthruster, /shipborn-plc/jetthrusters, /shipborn-plc/battery, /shipborn-plc/shore-gen] }
+              - { label: PMS, path: /shipborn-plc/pms }
+              - { label: Tanks, path: /shipborn-plc/tanks }
+              - { label: Alarms }
+          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
+
+          # ---- links: bedrijfsmodus + alarm reset ----
+          - { type: panel, x: 24, y: 120, width: 260, height: 660, title: Mode }
+          - { type: pushbutton, x: 42, y: 160, width: 224, height: 56, label: Diesel, align: left, entity: button.plc_mode_diesel, led: green, led_entity: binary_sensor.plc_mode_diesel_active, active_entity: binary_sensor.plc_mode_diesel_active }
+          - { type: pushbutton, x: 42, y: 226, width: 224, height: 56, label: Electric, align: left, entity: button.plc_mode_electric, led: green, led_entity: binary_sensor.plc_mode_electric_active, active_entity: binary_sensor.plc_mode_electric_active }
+          - { type: pushbutton, x: 42, y: 292, width: 224, height: 56, label: Generator, align: left, entity: button.plc_mode_generator, led: green, led_entity: binary_sensor.plc_mode_generator_active, active_entity: binary_sensor.plc_mode_generator_active }
+          - { type: pushbutton, x: 42, y: 358, width: 224, height: 56, label: Harbor, align: left, entity: button.plc_mode_harbor, led: green, led_entity: binary_sensor.plc_mode_harbor_active, active_entity: binary_sensor.plc_mode_harbor_active }
+          - { type: line, x: 42, y: 640, width: 224, height: 1, color: "#2c2c2c" }
+          - { type: indicator, x: 42, y: 658, entity: binary_sensor.plc_alarm_active, label: Alarm, color: red, blink: true }
+          - { type: pushbutton, x: 42, y: 700, width: 224, height: 56, label: Reset, entity: button.plc_alarm_reset }
+
+          # ---- midden: aandrijflijn, toerentallen ----
+          - { type: panel, x: 300, y: 120, width: 720, height: 660 }
+          - { type: text, x: 318, y: 134, text: Drivetrain, font_size: 15, weight: 600, uppercase: true, color: "#a3a29c" }
+          - { type: line, x: 550, y: 121, width: 1, height: 658, color: "#2c2c2c" }
+          - { type: line, x: 356, y: 310, width: 4, height: 330 }
+          - { type: line, x: 444, y: 500, width: 4, height: 84 }
+          - { type: line, x: 403, y: 648, width: 4, height: 50 }
+          - { type: text, x: 330, y: 190, width: 96, height: 120, text: Diesel, boxed: true }
+          - { type: text, x: 398, y: 380, width: 96, height: 120, text: Emotor, boxed: true }
+          - { type: text, x: 330, y: 584, width: 150, height: 64, text: Gearbox, boxed: true }
+          - { type: line, x: 355, y: 696, width: 100, height: 20, color: transparent, border: "2px solid #8f8e88", radius: "50%" }
+          - { type: text, x: 384, y: 724, text: Shaft, font_size: 13, uppercase: true, color: "#8f8e88" }
+
+          - { type: indicator, x: 570, y: 180, entity: binary_sensor.plc_gear_forward, label: FWD, font_size: 18 }
+          - { type: indicator, x: 570, y: 222, entity: binary_sensor.plc_gear_neutral, label: NEUTRAL, font_size: 18 }
+          - { type: indicator, x: 570, y: 264, entity: binary_sensor.plc_gear_aft, label: AFT, font_size: 18 }
+          - { type: gauge, x: 700, y: 136, width: 300, label: Diesel Speed, entity: sensor.plc_diesel_speed, min: 0, max: 4000 }
+          - { type: line, x: 551, y: 380, width: 468, height: 1, color: "#2c2c2c" }
+          - { type: gauge, x: 700, y: 396, width: 300, label: Electric Speed, entity: sensor.plc_electric_speed, min: -4000, max: 4000 }
+          - { type: line, x: 551, y: 630, width: 468, height: 1, color: "#2c2c2c" }
+          - { type: bar, x: 570, y: 650, width: 430, label: Shaft Speed, entity: sensor.plc_shaft_speed, min: 0, max: 500, decimals: 0, color: amber, ticks: [0, 100, 200, 300, 400, 500] }
+
+          # ---- rechts: accu ----
+          - { type: panel, x: 1036, y: 120, width: 220, height: 660, title: Battery SoC }
+          - { type: tank, x: 1054, y: 160, width: 184, height: 540, frame: false, entity: sensor.plc_battery_soc, color: green, marker: 75, scale: [100, 75, 50, 25, 0], font_size: 40 }
+          - { type: pushbutton, x: 1054, y: 712, width: 89, height: 48, label: Charging, tap_action: { action: none }, active_entity: binary_sensor.plc_battery_charging }
+          - { type: pushbutton, x: 1149, y: 712, width: 89, height: 48, label: Discharging, tap_action: { action: none }, active_entity: binary_sensor.plc_battery_discharging }

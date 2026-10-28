@@ -88,6 +88,27 @@ Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/inpu
 - { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }
 ```
 
+### Schermpagina's (donker console-ontwerp)
+
+Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van het canvas-ontwerp; zie `examples/plc-dashboard.yaml`.
+
+| type | belangrijkste opties |
+|---|---|
+| `panel` | `title`, `led_entity` – donker vlak met kop |
+| `gauge` | `entity`, `min`, `max`, `label`, `unit`, `decimals`, `color`, `warn_above` / `warn_below` – halve cirkel, vanaf 0 bij een bereik rond nul |
+| `bar` | `entity`, `min`, `max`, `label`, `ticks`, `color` – liggende balk |
+| `tank` | `entity`, `label`, `kind`, `color`, `low` / `high`, `marker` of `marker_entity`, `scale`, `frame: false` |
+| `value` | `entity`, `label`, `unit`, `decimals`, `style: tile` |
+| `indicator` | `entity`, `label`, `color`, `blink`, `state_on` – LED met tekst |
+| `pushbutton` | `label`, `entity`, `tap_action`, `mode: momentary`, `variant: stop`, `led` + `led_entity`, `active_entity` (oranje rand), `align: left` |
+| `nav` | `tabs: [{label, path, match}]`, `style: side` – actieve tab volgt de URL |
+| `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text` |
+| `block` | PMS-blok: `name`, `kind`, `rating`, `entity` (kW), `alarm_entity`, `active_entity` |
+| `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
+| `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed` |
+
+De lettertypes (Barlow Condensed, JetBrains Mono) komen van Google Fonts; zonder internet valt de kaart terug op Roboto Condensed / Arial Narrow. Zet `fonts: false` om ze niet te laden.
+
 ## Demo zonder Home Assistant
 
 ```bash

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PLC dashboard demo</title>
+  <style>
+    body { margin: 0; background: #0d0e10; font-family: sans-serif; }
+    #view { max-width: 1280px; margin: 0 auto; }
+    #log { max-width: 1280px; margin: 8px auto; font: 12px monospace; color: #8f8e88; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="../dist/shipborn-panel-card.js"></script>
+</head>
+<body>
+  <div id="view"></div>
+  <div id="log">Mock: service calls verschijnen hier (geen echte HA).</div>
+  <script>
+    // Renders the first view of examples/plc-dashboard.yaml with fake entity states.
+    (async () => {
+      const yaml = await (await fetch("../examples/plc-dashboard.yaml")).text();
+      const cfg = jsyaml.load(yaml).views[0].cards[0];
+      const now = new Date().toISOString();
+      const st = (state, attributes = {}) => ({ state: String(state), attributes, last_changed: now });
+      const states = {
+        "binary_sensor.plc_lifebeat": st("on"),
+        "sensor.plc_active_alarm": st("026 Jetvalve 3 won't move to starboard"),
+        "binary_sensor.plc_alarm_active": st("on"),
+        "binary_sensor.plc_mode_harbor_active": st("on"),
+        "binary_sensor.plc_gear_neutral": st("on"),
+        "sensor.plc_diesel_speed": st(1450, { unit_of_measurement: "rpm" }),
+        "sensor.plc_electric_speed": st(-1200, { unit_of_measurement: "rpm" }),
+        "sensor.plc_shaft_speed": st(180, { unit_of_measurement: "rpm" }),
+        "sensor.plc_battery_soc": st(72, { unit_of_measurement: "%" }),
+        "binary_sensor.plc_battery_discharging": st("on"),
+      };
+      for (const id of ["button.plc_mode_diesel", "button.plc_mode_electric", "button.plc_mode_generator", "button.plc_mode_harbor", "button.plc_alarm_reset"])
+        states[id] = st("unknown");
+      const el = document.createElement("shipborn-panel-card");
+      const log = document.getElementById("log");
+      const hass = {
+        states,
+        locale: { language: "nl" },
+        callService(domain, service, data = {}) {
+          log.textContent = `${domain}.${service} ${JSON.stringify(data)}`;
+          const mode = /^button\.plc_mode_(\w+)$/.exec(data.entity_id || "");
+          if (mode) {
+            for (const m of ["diesel", "electric", "generator", "harbor"]) states[`binary_sensor.plc_mode_${m}_active`] = st(m === mode[1] ? "on" : "off");
+            el.hass = { ...hass, states: { ...states } };
+          }
+        },
+      };
+      el.setConfig(cfg);
+      document.getElementById("view").appendChild(el);
+      el.hass = hass;
+    })();
+  </script>
+</body>
+</html>

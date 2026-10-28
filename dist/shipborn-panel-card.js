@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -129,7 +129,97 @@ const STYLE = `
   .box.inset { background: #161616; border-color: #222; }
   .label { white-space: pre-line; font-weight: 700; text-transform: uppercase; }
   img.item { object-fit: contain; }
+
+  /* Screen-page items (dark console design: gauges, bars, tanks, values) */
+  .d { font-family: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", sans-serif; color: #ecebe6; }
+  .d-num, .d-valbox { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-weight: 600; color: #ecebe6; }
+  .d-lbl { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #8f8e88; }
+  .d-ph {
+    display: flex; align-items: center; gap: 10px; white-space: nowrap;
+    font-size: 15px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #a3a29c;
+  }
+  .d-led { width: 10px; height: 10px; border-radius: 50%; flex: none; background: #3a3a3a; }
+  .d-led.on { background: var(--c, #34d27b); box-shadow: 0 0 8px var(--c, #34d27b); }
+  .d-led.on.blink { animation: blink 1s steps(2, start) infinite; }
+  .d-panel { background: #1b1b1b; border: 1px solid #2c2c2c; border-radius: 10px; }
+  .d-panel > .d-ph { position: absolute; left: 18px; top: 14px; }
+  .d-valbox {
+    box-sizing: border-box; min-width: 70px; padding: 6px 12px; font-size: 18px; text-align: right; white-space: nowrap;
+    background: #121212; border: 1px solid #2c2c2c; border-radius: 6px;
+  }
+  .d-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .d-col { display: flex; flex-direction: column; gap: 4px; }
+  .d-gauge svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .d-track { position: relative; box-sizing: border-box; overflow: hidden; background: #121212; border: 1px solid #2c2c2c; }
+  .d-fill { position: absolute; transition: height .4s, width .4s, left .4s; }
+  .d-zero { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: #6b6a66; }
+  .d-mark { position: absolute; left: 0; right: 0; border-top: 2px dashed #ecebe6; }
+  .d-scale { display: flex; flex-direction: column; justify-content: space-between; }
+  .d-box {
+    box-sizing: border-box; display: flex; align-items: center; justify-content: center; text-align: center;
+    background: #121212; border: 1px solid #4a4a4a; border-radius: 6px;
+    font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #cfcec8;
+  }
+  .d-btn {
+    box-sizing: border-box; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 0 16px; border-radius: 8px; border: 1px solid #3a3a3a; background: #232323; color: #ecebe6;
+    font-family: inherit; font-size: var(--fs, 19px); font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  .d-btn:hover { background: #2a2a2a; }
+  .d-btn:active, .d-btn.pressed { background: #333; }
+  .d-btn.left { justify-content: flex-start; }
+  .d-btn.stop { background: #3a1512; border-color: #ff5b4f; color: #ffd9d6; }
+  .d-btn.active { border-color: #f5a524; color: #f5a524; background: #261f12; }
+  .d-btn.static { cursor: default; color: #a3a29c; font-size: var(--fs, 15px); }
+  .d-btn.static.active { color: #f5a524; }
+  .d-btn.unavailable { opacity: .4; cursor: not-allowed; }
+  .d-nav { display: flex; gap: 4px; }
+  .d-nav.side { flex-direction: column; gap: 10px; }
+  .d-tab {
+    display: flex; align-items: center; height: 44px; padding: 0 18px; border: 0; border-radius: 6px; background: none;
+    color: #a3a29c; font-family: inherit; font-size: 17px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .d-tab:hover { color: #ecebe6; background: #1f1f1f; }
+  .d-tab.on { color: #0d0e10; background: #f5a524; }
+  .d-tab[disabled] { color: #5f5e5a; background: none; cursor: default; }
+  .side .d-tab { height: 52px; padding: 0 16px; border: 1px solid #3a3a3a; border-radius: 8px; background: #232323; color: #cfcec8; font-size: 18px; font-weight: 700; }
+  .side .d-tab.on { border-color: #f5a524; color: #f5a524; background: #261f12; }
+  .side .d-tab[disabled] { color: #5f5e5a; border-style: dashed; background: #232323; }
+  .d-alarm {
+    box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 24px; cursor: pointer;
+    background: #141516; border-top: 1px solid #2c2c2c; border-bottom: 1px solid #2c2c2c;
+    color: #8f8e88; font-size: 17px; letter-spacing: .04em; white-space: nowrap; overflow: hidden;
+  }
+  .d-alarm.on { background: #3a1512; border-color: #ff5b4f; color: #ffd9d6; }
+  .d-alarm .d-num { font-size: 14px; font-weight: 400; color: inherit; }
+  .d-block { display: flex; flex-direction: column; }
+  .d-block > div { box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #3a3a3a; }
+  .d-block .hd { height: 30px; border-radius: 6px 6px 0 0; background: #232323; font-size: 17px; font-weight: 700; letter-spacing: .1em; }
+  .d-block .bd { height: 62px; border-top: 0; border-bottom: 0; background: #121212; color: #a3a29c; font-family: "JetBrains Mono", monospace; font-size: 15px; }
+  .d-block .ft { height: 34px; border-radius: 0 0 6px 6px; background: #1b1b1b; font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 16px; }
+  .d-block .rt { position: absolute; top: -30px; left: 0; right: 0; border: 0; color: #a3a29c; font-family: "JetBrains Mono", monospace; font-size: 14px; }
+  .d-block.alarm > div:not(.rt) { border-color: #ff5b4f; }
+  .d-block.alarm .hd { background: #3a1512; color: #ffd9d6; }
+  .d-block.active > div:not(.rt) { border-color: #34d27b; }
+  .d-block.active .hd { background: #12261a; color: #34d27b; }
 `;
+
+const DESIGN_TYPES = ["panel", "gauge", "bar", "tank", "value", "indicator", "pushbutton", "nav", "alarm", "block", "line", "text"];
+const DESIGN_FONTS =
+  "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap";
+const DESIGN_COLORS = { amber: "#f5a524", blue: "#4aa3ff", green: "#34d27b", red: "#ff5b4f" };
+
+// Web fonts can't be declared inside a shadow root, so they go in the document head (once).
+const ensureFonts = () => {
+  if (document.getElementById("sb-design-fonts")) return;
+  const l = document.createElement("link");
+  l.id = "sb-design-fonts";
+  l.rel = "stylesheet";
+  l.href = DESIGN_FONTS;
+  document.head.appendChild(l);
+};
 
 const fire = (node, type, detail) =>
   node.dispatchEvent(new CustomEvent(type, { detail, bubbles: true, composed: true }));
@@ -147,6 +237,19 @@ const isOn = (stateObj, onStates) =>
   (onStates ? [].concat(onStates).map(String).includes(stateObj.state) : ON_STATES.includes(stateObj.state));
 const unavailable = (stateObj) => !stateObj || stateObj.state === "unavailable";
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const num = (stateObj) => (stateObj && !isNaN(parseFloat(stateObj.state)) ? parseFloat(stateObj.state) : null);
+const fmt = (v, decimals, hass) =>
+  v == null
+    ? "—"
+    : v.toLocaleString(hass?.locale?.language || "nl", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+const unitOf = (item, stateObj) => item.unit ?? stateObj?.attributes?.unit_of_measurement ?? "";
+const color = (c, fallback) => DESIGN_COLORS[c] || LED_COLORS[c] || c || fallback;
+const pad2 = (n) => String(n).padStart(2, "0");
+const stamp = (iso) => {
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+};
 const capture = (node, ev) => {
   try {
     node.setPointerCapture(ev.pointerId);
@@ -218,6 +321,7 @@ class ShipbornPanelCard extends HTMLElement {
     this._outer.appendChild(this._panel);
     root.appendChild(this._outer);
 
+    if (c.fonts !== false && c.items.some((i) => DESIGN_TYPES.includes(i.type))) ensureFonts();
     this._panel.appendChild(this._shapeSvg(W, H));
     for (const item of c.items) {
       const node = this._renderItem(item);
@@ -292,6 +396,18 @@ class ShipbornPanelCard extends HTMLElement {
         n.onerror = () => (n.style.display = "none");
         return this._place(n, item);
       }
+      case "panel": return this._dPanel(item);
+      case "gauge": return this._dGauge(item);
+      case "bar": return this._dBar(item);
+      case "tank": return this._dTank(item);
+      case "value": return this._dValue(item);
+      case "indicator": return this._dIndicator(item);
+      case "pushbutton": return this._dButton(item);
+      case "nav": return this._dNav(item);
+      case "alarm": return this._dAlarm(item);
+      case "block": return this._dBlock(item);
+      case "line": return this._dLine(item);
+      case "text": return this._dText(item);
       default:
         console.warn("shipborn-panel-card: unknown item type", item.type);
         return null;
@@ -610,6 +726,355 @@ class ShipbornPanelCard extends HTMLElement {
       })();
     }
     return node;
+  }
+
+  // ---------- screen-page items ----------
+
+  _dLed(entity, ledColor, onStates, blink) {
+    const led = h("span", "d-led" + (blink ? " blink" : ""));
+    led.style.setProperty("--c", color(ledColor, DESIGN_COLORS.green));
+    this._updaters.push((hass) => led.classList.toggle("on", !!entity && isOn(hass.states[entity], onStates)));
+    return led;
+  }
+
+  _dTitle(item, cls = "d-ph") {
+    const t = h("div", cls);
+    if (item.led_entity) t.appendChild(this._dLed(item.led_entity, item.led, item.led_state, item.led_blink));
+    t.append(item.title ?? item.label ?? "");
+    return t;
+  }
+
+  _dPanel(item) {
+    const n = this._place(h("div", "d d-panel"), item);
+    if (item.title) n.appendChild(this._dTitle(item));
+    return n;
+  }
+
+  // Half-circle gauge; the arc grows from 0 when the range crosses zero (e.g. -4000..4000).
+  _dGauge(g) {
+    const n = this._place(h("div", "d d-gauge d-col"), g, 300, null);
+    n.style.height = "";
+    n.style.alignItems = "center";
+    const min = g.min ?? 0;
+    const max = g.max ?? 100;
+    const base = color(g.color, min < 0 ? DESIGN_COLORS.blue : DESIGN_COLORS.amber);
+    let box = null;
+    if (g.label) {
+      const row = h("div", "d-row", { alignSelf: "stretch" });
+      box = h("span", "d-valbox");
+      row.append(this._dTitle(g), box);
+      n.appendChild(row);
+    }
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 200 118");
+    svg.setAttribute("aria-hidden", "true");
+    const arcD = "M20 100 A80 80 0 0 1 180 100";
+    svg.innerHTML = `
+      <path d="${arcD}" fill="none" stroke="#2a2a2a" stroke-width="14" pathLength="1000"/>
+      <path class="arc" d="${arcD}" fill="none" stroke="${base}" stroke-width="14" pathLength="1000" stroke-dasharray="0 2000"/>
+      <line class="ndl" x1="100" y1="100" x2="100" y2="34" stroke="#ecebe6" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="6" fill="#ecebe6"/>
+      <g fill="#8f8e88" font-size="10" text-anchor="middle" font-family="JetBrains Mono, monospace">
+        <text x="20" y="116">${min}</text><text x="100" y="12">${g.mid ?? (min + max) / 2}</text><text x="180" y="116">${max}</text>
+      </g>`;
+    n.appendChild(svg);
+    const arc = svg.querySelector(".arc");
+    const ndl = svg.querySelector(".ndl");
+    let big = null;
+    let bigUnit = null;
+    if (!box) {
+      const row = h("div", "d-row", { justifyContent: "center", alignItems: "baseline", gap: "6px" });
+      big = h("span", "d-num", { fontSize: (g.font_size || 40) + "px" });
+      bigUnit = h("span", "d-lbl");
+      row.append(big, bigUnit);
+      n.appendChild(row);
+    }
+    this._updaters.push((hass) => {
+      const so = g.entity ? hass.states[g.entity] : null;
+      const v = num(so);
+      const z = min < 0 ? -min / (max - min) : 0;
+      const f = v == null ? z : clamp((v - min) / (max - min || 1), 0, 1);
+      arc.setAttribute("stroke-dasharray", `0 ${(Math.min(f, z) * 1000).toFixed(0)} ${(Math.abs(f - z) * 1000).toFixed(0)} 2000`);
+      ndl.setAttribute("transform", `rotate(${(-90 + f * 180).toFixed(1)} 100 100)`);
+      const warn = v != null && ((g.warn_above != null && v >= g.warn_above) || (g.warn_below != null && v <= g.warn_below));
+      arc.setAttribute("stroke", warn ? DESIGN_COLORS.red : base);
+      const txt = fmt(v, g.decimals ?? 0, hass);
+      const unit = unitOf(g, so);
+      if (box) box.textContent = unit ? `${txt} ${unit}` : txt;
+      else {
+        big.textContent = txt;
+        bigUnit.textContent = unit;
+      }
+    });
+    return n;
+  }
+
+  // Horizontal bar; filled from 0 when the range crosses zero.
+  _dBar(b) {
+    const n = this._place(h("div", "d d-col"), b, 400, null);
+    n.style.height = "";
+    const min = b.min ?? 0;
+    const max = b.max ?? 100;
+    const val = h("span", "d-num", { fontSize: "16px" });
+    if (b.label) {
+      const row = h("div", "d-row", { alignItems: "baseline" });
+      const t = this._dTitle(b);
+      t.style.fontSize = "14px";
+      row.append(t, val);
+      n.appendChild(row);
+    }
+    const th = b.thickness || 14;
+    const track = h("div", "d-track", { height: th + "px", borderRadius: th / 2 + "px" });
+    const fill = h("div", "d-fill", { top: 0, bottom: 0, background: color(b.color, DESIGN_COLORS.blue) });
+    track.appendChild(fill);
+    if (min < 0) track.appendChild(h("div", "d-zero"));
+    n.appendChild(track);
+    const ticks = b.ticks || (min < 0 ? [min, 0, max] : [min, (min + max) / 2, max]);
+    if (b.ticks !== false) {
+      const row = h("div", "d-row");
+      for (const t of ticks) {
+        const s = h("span", "d-lbl");
+        s.textContent = t;
+        row.appendChild(s);
+      }
+      n.appendChild(row);
+    }
+    this._updaters.push((hass) => {
+      const so = b.entity ? hass.states[b.entity] : null;
+      const v = num(so);
+      const z = min < 0 ? -min / (max - min) : 0;
+      const f = v == null ? z : clamp((v - min) / (max - min || 1), 0, 1);
+      fill.style.left = Math.min(f, z) * 100 + "%";
+      fill.style.width = Math.abs(f - z) * 100 + "%";
+      const unit = unitOf(b, so);
+      val.textContent = fmt(v, b.decimals ?? 1, hass) + (unit ? ` ${unit}` : "");
+    });
+    return n;
+  }
+
+  // Vertical level (tank or SoC), optional dashed marker line and scale.
+  _dTank(t) {
+    const framed = t.frame !== false;
+    const n = this._place(h("div", "d d-col" + (framed ? " d-panel" : "")), t, 140, 500);
+    Object.assign(n.style, { gap: "10px", padding: framed ? "14px" : "0" });
+    const fillColor = color(t.color, DESIGN_COLORS.blue);
+    let led = null;
+    if (t.label) {
+      const head = h("div", "d-ph", { fontSize: "15px", letterSpacing: ".08em", color: "#cfcec8", whiteSpace: "normal", lineHeight: "1.1", minHeight: "36px" });
+      led = h("span", "d-led");
+      head.append(led, t.label);
+      n.appendChild(head);
+    }
+    const body = h("div", "d-row", { flex: "1", minHeight: "0", alignItems: "stretch", gap: "6px" });
+    const track = h("div", "d-track", { flex: "1", borderRadius: "8px" });
+    const fill = h("div", "d-fill", { left: 0, right: 0, bottom: 0, background: fillColor });
+    track.appendChild(fill);
+    const mark = t.marker != null || t.marker_entity ? h("div", "d-mark") : null;
+    if (mark) track.appendChild(mark);
+    body.appendChild(track);
+    if (t.scale !== false) {
+      const sc = h("div", "d-scale d-lbl");
+      for (const s of t.scale || [100, 80, 60, 40, 20, 0]) {
+        const e = h("span");
+        e.textContent = s;
+        sc.appendChild(e);
+      }
+      body.appendChild(sc);
+    }
+    n.appendChild(body);
+    const vRow = h("div", "d-row", { justifyContent: "flex-start", alignItems: "baseline", gap: "4px" });
+    const v = h("span", "d-num", { fontSize: (t.font_size || 32) + "px", lineHeight: "1" });
+    const u = h("span", "d-lbl", { fontSize: "16px" });
+    vRow.append(v, u);
+    n.appendChild(vRow);
+    if (t.kind) {
+      const k = h("span", "d-lbl");
+      k.textContent = t.kind;
+      n.appendChild(k);
+    }
+    this._updaters.push((hass) => {
+      const so = t.entity ? hass.states[t.entity] : null;
+      const val = num(so);
+      const max = t.max ?? 100;
+      fill.style.height = (val == null ? 0 : clamp(val / max, 0, 1) * 100) + "%";
+      v.textContent = fmt(val, t.decimals ?? 0, hass);
+      u.textContent = t.unit ?? "%";
+      if (mark) {
+        const m = t.marker_entity ? num(hass.states[t.marker_entity]) : t.marker;
+        mark.style.display = m == null ? "none" : "";
+        mark.style.bottom = clamp((m ?? 0) / max, 0, 1) * 100 + "%";
+      }
+      if (led) {
+        const warn = val != null && ((t.low != null && val <= t.low) || (t.high != null && val >= t.high));
+        led.classList.toggle("on", val != null);
+        led.style.setProperty("--c", warn ? DESIGN_COLORS.amber : DESIGN_COLORS.green);
+      }
+    });
+    return n;
+  }
+
+  // Label + value box (style: row) or small label over a large number (style: tile).
+  _dValue(item) {
+    const tile = item.style === "tile";
+    const n = this._place(h("div", "d " + (tile ? "d-col d-panel" : "d-row")), item, 260, tile ? 80 : 40);
+    if (tile) Object.assign(n.style, { padding: "12px 16px", background: "#121212", boxSizing: "border-box" });
+    const l = h("span", tile ? "d-lbl" : null, tile ? {} : { fontSize: (item.font_size || 17) + "px", color: "#cfcec8" });
+    l.textContent = item.label ?? "";
+    const v = h(
+      "span",
+      tile ? "d-num" : "d-valbox",
+      tile ? { fontSize: (item.value_size || 30) + "px" } : { width: (item.box_width || 110) + "px" }
+    );
+    n.append(l, v);
+    if (item.entity) n.addEventListener("click", () => this._handleAction(item, item.tap_action || { action: "more-info" }, n));
+    this._updaters.push((hass) => {
+      const so = item.entity ? hass.states[item.entity] : null;
+      const val = num(so);
+      const unit = unitOf(item, so);
+      const txt = val == null && so && !unavailable(so) ? so.state : fmt(val, item.decimals ?? 1, hass);
+      v.textContent = unit ? `${txt} ${unit}` : txt;
+    });
+    return n;
+  }
+
+  _dIndicator(item) {
+    const n = this._place(h("div", "d d-row"), item, null, null);
+    Object.assign(n.style, { justifyContent: "flex-start", fontSize: (item.font_size || 17) + "px", color: "#cfcec8", whiteSpace: "nowrap" });
+    const led = this._dLed(item.entity, item.color || item.led, item.state_on, item.blink);
+    const s = item.led_size || 14;
+    Object.assign(led.style, { width: s + "px", height: s + "px" });
+    n.append(led, item.label ?? "");
+    return n;
+  }
+
+  _dButton(b) {
+    const n = this._place(h("div", "d"), b, 200, 56);
+    const btn = h(
+      "button",
+      "d-btn" + (b.variant === "stop" ? " stop" : "") + (b.align === "left" ? " left" : "") + (b.tap_action?.action === "none" ? " static" : "")
+    );
+    if (b.font_size) btn.style.setProperty("--fs", b.font_size + "px");
+    if (b.led) btn.appendChild(this._dLed(b.led_entity || b.entity, b.led, b.led_state, b.led_blink));
+    btn.append(b.label ?? "");
+    n.appendChild(btn);
+    if (b.mode === "momentary") this._momentary(btn, b);
+    else btn.addEventListener("click", () => this._handleAction(b, b.tap_action, btn));
+    this._updaters.push((hass) => {
+      const so = b.entity ? hass.states[b.entity] : null;
+      btn.classList.toggle("unavailable", !!b.entity && unavailable(so));
+      if (b.active_entity) btn.classList.toggle("active", isOn(hass.states[b.active_entity], b.active_state));
+    });
+    return n;
+  }
+
+  // Tabs; the tab whose path matches the current URL is highlighted.
+  _dNav(item) {
+    const side = item.style === "side";
+    const n = this._place(h("div", "d d-nav" + (side ? " side" : "")), item, side ? 200 : null, null);
+    n.style.height = "";
+    const tabs = (item.tabs || []).map((t) => {
+      const b = h("button", "d-tab");
+      b.textContent = t.label;
+      if (!t.path) b.disabled = true;
+      else b.addEventListener("click", () => this._handleAction(t, { action: "navigate", navigation_path: t.path }, b));
+      n.appendChild(b);
+      return [t, b];
+    });
+    this._updaters.push(() => {
+      const here = location.pathname;
+      for (const [t, b] of tabs) b.classList.toggle("on", !!t.path && (here === t.path || [].concat(t.match || []).includes(here) || item.active === t.label));
+    });
+    return n;
+  }
+
+  // Alarm banner: red with time + message while active, quiet otherwise.
+  _dAlarm(a) {
+    const n = this._place(h("div", "d d-alarm"), a, this._W, 40);
+    const led = h("span", "d-led");
+    led.style.setProperty("--c", DESIGN_COLORS.red);
+    const time = h("span", "d-num");
+    const msg = h("span");
+    n.append(led, time, msg);
+    n.addEventListener("click", () => this._handleAction(a, a.tap_action || { action: "more-info" }, n));
+    const quiet = ["", "unknown", "unavailable", "none", "ok", "off", "0", "false"];
+    this._updaters.push((hass) => {
+      const so = a.entity ? hass.states[a.entity] : null;
+      const text = so ? String(so.state) : "";
+      const active = a.active_entity ? isOn(hass.states[a.active_entity]) : !quiet.includes(text.trim().toLowerCase());
+      n.classList.toggle("on", active);
+      led.classList.toggle("on", active);
+      time.textContent = active && so ? stamp(so.last_changed) : "";
+      msg.textContent = active ? a.text || text : a.ok_text ?? "Geen actieve alarmen";
+    });
+    return n;
+  }
+
+  // PMS converter block: name, type, power; red on alarm, green when active.
+  _dBlock(bk) {
+    const n = this._place(h("div", "d d-block"), bk, 120, null);
+    n.style.height = "";
+    if (bk.rating) {
+      const r = h("div", "rt");
+      r.textContent = bk.rating;
+      n.appendChild(r);
+    }
+    const hd = h("div", "hd");
+    const led = h("span", "d-led");
+    hd.append(led, bk.name ?? "");
+    const bd = h("div", "bd");
+    bd.textContent = bk.kind ?? "";
+    const ft = h("div", "ft");
+    n.append(hd, bd, ft);
+    if (bk.entity) n.addEventListener("click", () => this._handleAction(bk, bk.tap_action || { action: "more-info" }, n));
+    this._updaters.push((hass) => {
+      const alarm = !!bk.alarm_entity && isOn(hass.states[bk.alarm_entity]);
+      const active = !alarm && !!bk.active_entity && isOn(hass.states[bk.active_entity]);
+      n.classList.toggle("alarm", alarm);
+      n.classList.toggle("active", active);
+      led.classList.toggle("on", alarm || active);
+      led.style.setProperty("--c", alarm ? DESIGN_COLORS.red : DESIGN_COLORS.green);
+      const so = bk.entity ? hass.states[bk.entity] : null;
+      ft.textContent = `${fmt(num(so), bk.decimals ?? 1, hass)} ${unitOf({ unit: bk.unit }, so) || "kW"}`;
+    });
+    return n;
+  }
+
+  // Plain rectangle for wiring lines, dividers and backgrounds; can light up from an entity.
+  _dLine(item) {
+    const n = this._place(h("div", "d"), item, 3, 3);
+    const off = item.color || "#4a4a4a";
+    Object.assign(n.style, { background: off, borderRadius: (item.radius ?? 0) + (typeof item.radius === "string" ? "" : "px") });
+    if (item.border) n.style.border = item.border;
+    if (item.active_entity) {
+      this._updaters.push((hass) => {
+        n.style.background = isOn(hass.states[item.active_entity], item.active_state) ? color(item.active_color, DESIGN_COLORS.amber) : off;
+      });
+    }
+    return n;
+  }
+
+  // Free text (or an entity value) in the screen font; boxed: true draws a labelled box.
+  _dText(item) {
+    const n = this._place(h("div", "d" + (item.boxed ? " d-box" : "")), item, null, null);
+    const s = n.style;
+    if (item.font_size) s.fontSize = item.font_size + "px";
+    if (item.color) s.color = item.color;
+    if (item.weight) s.fontWeight = item.weight;
+    if (item.uppercase) Object.assign(s, { textTransform: "uppercase", letterSpacing: ".12em" });
+    if (item.mono) n.classList.add("d-num");
+    s.whiteSpace = "pre-line";
+    if (!item.entity) {
+      n.textContent = item.text ?? "";
+      return n;
+    }
+    this._updaters.push((hass) => {
+      const so = hass.states[item.entity];
+      const val = num(so);
+      const unit = unitOf(item, so);
+      const txt = val == null ? (so?.state ?? "—") : fmt(val, item.decimals ?? 0, hass);
+      n.textContent = `${item.text ? item.text + " " : ""}${txt}${unit ? " " + unit : ""}`;
+    });
+    return n;
   }
 
   // ---------- actions ----------
