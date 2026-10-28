@@ -179,13 +179,13 @@ views:
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: text, x: 505, y: 235, width: 136, height: 100, text: Daytank Diesel ER, boxed: true, font_size: 14 }
+          - { type: text, x: 505, y: 235, width: 136, height: 100, text: Daytank Diesel ER, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_daytank_level_statistics, font_size: 14 }
           - { type: text, x: 552, y: 295, entity: sensor.wago_values_er_diesel_daytank_level_statistics, mono: true, font_size: 16, unit: "%" }
-          - { type: text, x: 743, y: 312, width: 193, height: 136, text: Diesel PS, boxed: true, font_size: 14 }
+          - { type: text, x: 743, y: 312, width: 193, height: 136, text: Diesel PS, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_ps_level, font_size: 14 }
           - { type: text, x: 815, y: 390, entity: sensor.wago_values_er_diesel_ps_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
-          - { type: text, x: 743, y: 485, width: 193, height: 135, text: Diesel SB, boxed: true, font_size: 14 }
+          - { type: text, x: 743, y: 485, width: 193, height: 135, text: Diesel SB, boxed: true, medium: fuel, level_entity: sensor.wago_plc_er_diesel_sb_level, font_size: 14 }
           - { type: text, x: 815, y: 563, entity: sensor.wago_plc_er_diesel_sb_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
-          - { type: text, x: 115, y: 312, width: 71, height: 148, text: "Daytank\nWebasto", boxed: true, font_size: 13 }
+          - { type: text, x: 115, y: 312, width: 71, height: 148, text: "Daytank\nWebasto", boxed: true, medium: fuel, level_entity: sensor.wago_values_aft_diesel_webasto_level_statistics, font_size: 13 }
           - { type: text, x: 124, y: 410, entity: sensor.wago_values_aft_diesel_webasto_level_statistics, mono: true, font_size: 14, unit: "%" }
           - { type: pipe, medium: fuel, points: [[742, 387], [725, 387]], thickness: 6, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
           - { type: pump, x: 688, y: 367, size: 40, rotation: 180, entity: switch.ifm_output_bakboord_diesel_pomp, active_entity: switch.ifm_output_bakboord_diesel_pomp }
@@ -489,7 +489,7 @@ views:
           - { type: pipe, medium: seawater, points: [[419, 247], [493, 247]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
           - { type: text, x: 497, y: 205, width: 60, height: 85, text: "Water\nmaker", boxed: true, font_size: 12, active_entity: switch.0xe4b063fffe7add34 }
           - { type: pipe, medium: freshwater, points: [[557, 247], [787, 247]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: text, x: 793, y: 225, width: 106, height: 257, text: "Fresh water\ntank", boxed: true, font_size: 14 }
+          - { type: text, x: 793, y: 225, width: 106, height: 257, text: "Fresh water\ntank", boxed: true, medium: freshwater, level_entity: sensor.wago_values_lr_fresh_water_level, font_size: 14 }
           - { type: text, x: 815, y: 420, entity: sensor.wago_values_lr_fresh_water_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
           - { type: pipe, medium: freshwater, points: [[594, 500], [594, 353], [692, 353]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
           - { type: valve, x: 690, y: 341, width: 40, height: 24, entity: valve.lr_dwp_wal_vulpunt, color: "#4aa3ff", label: M, label_position: above, active_entity: valve.lr_dwp_wal_vulpunt }
@@ -531,15 +531,15 @@ views:
           - { type: text, x: 227, y: 468, text: Inlet V4, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[323, 375], [353, 375]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
           - { type: text, x: 357, y: 282, width: 140, height: 136, text: "Ecomar\ncleaning tank", boxed: true, font_size: 14, active_entity: switch.0xe4b063fffe787644 }
-          - { type: pipe, medium: wastewater, points: [[497, 350], [570, 350]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: valve, x: 570, y: 336, width: 44, height: 28, color: "#9a7b5a", label: "3-weg", label_position: above, active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
-          - { type: pipe, medium: wastewater, points: [[614, 350], [628, 350], [628, 200], [592, 200], [592, 182]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
-          - { type: outlet, x: 557, y: 158, width: 70, height: 20, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
-          - { type: text, x: 694, y: 480, width: 133, height: 193, text: "Waste water\ntank", boxed: true, font_size: 14 }
+          - { type: pipe, medium: wastewater, points: [[497, 350], [565, 350]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: three_way_valve, x: 570, y: 336, width: 40, height: 40, color: "#9a7b5a", label: 3-weg, label_position: above, active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
+          - { type: pipe, medium: wastewater, points: [[614, 350], [628, 350], [628, 265], [628, 240], [628, 205]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
+          - { type: outlet, x: 592, y: 168, width: 70, height: 20, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
+          - { type: text, x: 694, y: 480, width: 133, height: 193, text: "Waste water\ntank", boxed: true, medium: wastewater, level_entity: sensor.wago_values_er_dirtywater_level, font_size: 14 }
           - { type: text, x: 718, y: 630, entity: sensor.wago_values_er_dirtywater_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
-          - { type: pipe, medium: wastewater, points: [[692, 530], [607, 530]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
-          - { type: pump, x: 563, y: 510, size: 40, rotation: 270, entity: switch.0x781c9dfffea18816, active_entity: switch.0x781c9dfffea18816 }
-          - { type: pipe, medium: wastewater, points: [[583, 502], [583, 382]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
+          - { type: pipe, medium: wastewater, points: [[690, 520], [615, 520]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
+          - { type: pump, x: 569, y: 501, size: 40, rotation: 270, entity: switch.0x781c9dfffea18816, active_entity: switch.0x781c9dfffea18816 }
+          - { type: pipe, medium: wastewater, points: [[590, 502], [590, 382]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
           - { type: text, x: 481, y: 648, width: 126, height: 52, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
           - { type: pipe, medium: air, points: [[481, 670], [258, 670], [258, 534], [281, 534]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
 

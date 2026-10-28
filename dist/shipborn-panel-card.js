@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.10";
+const VERSION = "0.4.11";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -1283,10 +1283,21 @@ class ShipbornPanelCard extends HTMLElement {
         n.classList.toggle("active", !alarm && activeOf(hass, item.active_entity, item));
       });
     }
-    if (item.tap_action || item.active_entity) {
+    // A tank: the box fills from the bottom to the level of level_entity, with a solid line on top.
+    if (item.level_entity) {
+      const col = color(item.level_color || this._media()[item.medium], MEDIA.freshwater);
+      this._updaters.push((hass) => {
+        const val = num(hass.states[item.level_entity], item.level_factor);
+        const pct = val == null ? 0 : clamp(val / (item.level_max ?? 100), 0, 1) * 100;
+        s.backgroundImage = pct
+          ? `linear-gradient(to top, color-mix(in srgb, ${col} 30%, transparent) calc(${pct}% - 2px), ${col} calc(${pct}% - 2px) ${pct}%, transparent ${pct}%)`
+          : "";
+      });
+    }
+    if (item.tap_action || item.active_entity || item.level_entity) {
       n.style.cursor = "pointer";
       n.addEventListener("click", () =>
-        this._handleAction(item, item.tap_action || { action: "more-info", entity: item.entity || [].concat(item.active_entity)[0] }, n)
+        this._handleAction(item, item.tap_action || { action: "more-info", entity: item.entity || [].concat(item.active_entity || item.level_entity)[0] }, n)
       );
     }
     if (!item.entity) {

@@ -115,6 +115,12 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 
 `gauge`, `bar`, `tank`, `value`, `block` en `text` met een entiteit kennen `factor` om ruwe waarden om te rekenen, bijv. `factor: 0.00001` voor een Wago-tankniveau (7894954 → 78,9 %) of `factor: 0.001` voor mbar → bar.
 
+Een `text` met `boxed: true` wordt een tank met `level_entity`: het vak vult zich van onder tot dat niveau (0–100, of tot `level_max`), in de kleur van `medium` of `level_color`. `level_factor` rekent een ruwe waarde om.
+
+```yaml
+- { type: text, x: 743, y: 312, width: 193, height: 136, text: Diesel PS, boxed: true, medium: fuel, level_entity: sensor.diesel_ps_level }
+```
+
 ### Schema's met stromende leidingen
 
 Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (tab *Systemen*): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge en Accu's, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.
