@@ -118,13 +118,13 @@ views:
           - { type: pipe, medium: grease, points: [[251, 315], [251, 442]], thickness: 5, arrow: true, idle_opacity: 0.8 }
           - { type: text, x: 265, y: 360, entity: sensor.al1590_er_prop_shaft_grease_pressure, mono: true, font_size: 16, unit: bar, decimals: 2 }
           - { type: text, x: 265, y: 386, entity: sensor.al1590_er_prop_shaft_grease_temperature, mono: true, font_size: 16, unit: "°C", decimals: 1 }
-          - { type: pipe, medium: seawater, points: [[549, 455], [549, 412]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[549, 470], [549, 412]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: strainer, x: 524, y: 190, width: 50, height: 220, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
           - { type: pipe, medium: seawater, points: [[576, 260], [620, 260]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: text, x: 623, y: 225, width: 103, height: 87, text: "Cooling\nElectric/Shaft\nGearbox", boxed: true, font_size: 13, active_entity: switch.er_zeewaterpomp_cooling }
           - { type: pipe, medium: seawater, points: [[685, 312], [685, 366]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: pipe, medium: seawater, points: [[654, 468], [407, 468], [407, 688]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[407, 458], [155, 458]], thickness: 5, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[405, 475], [155, 475]], thickness: 5, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: text, x: 654, y: 370, width: 72, height: 105, text: "Gear\nbox", boxed: true, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
           - { type: pipe, medium: shaft, points: [[736, 420], [728, 420]], thickness: 10, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: text, x: 737, y: 293, width: 201, height: 212, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
@@ -184,20 +184,20 @@ views:
           - { type: text, x: 124, y: 410, entity: sensor.wago_values_aft_diesel_webasto_level_statistics, mono: true, font_size: 14, unit: "%" }
           - { type: pipe, medium: fuel, points: [[742, 387], [725, 387]], thickness: 6, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
           - { type: pump, x: 688, y: 367, size: 40, rotation: 180, entity: switch.ifm_output_bakboord_diesel_pomp, active_entity: switch.ifm_output_bakboord_diesel_pomp }
-          - { type: pipe, medium: fuel, points: [[708, 358], [607, 358], [607, 340]], thickness: 6, arrow: true, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
+          - { type: pipe, medium: fuel, points: [[687, 385], [607, 385], [607, 340]], thickness: 6, arrow: true, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
           - { type: pipe, medium: fuel, points: [[742, 560], [725, 560]], thickness: 6, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
           - { type: pump, x: 688, y: 540, size: 40, rotation: 180, entity: switch.ifm_output_stuurboord_diesel_pomp, active_entity: switch.ifm_output_stuurboord_diesel_pomp }
-          - { type: pipe, medium: fuel, points: [[708, 531], [708, 458], [607, 458], [607, 362]], thickness: 6, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
+          - { type: pipe, medium: fuel, points: [[686, 559], [607, 559], [607, 458], [607, 362]], thickness: 6, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
           - { type: pipe, medium: fuel, points: [[505, 285], [490, 285], [490, 345], [469, 345]], thickness: 6, flow_entity: switch.0xe4b063fffe7ac868 }
           - { type: pump, x: 430, y: 325, size: 40, rotation: 180, entity: switch.0xe4b063fffe7ac868, active_entity: switch.0xe4b063fffe7ac868 }
-          - { type: pipe, medium: fuel, points: [[450, 316], [450, 306], [189, 306]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7ac868 }
+          - { type: pipe, medium: fuel, points: [[426, 343], [313, 343], [187, 343]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7ac868 }
           - { type: pipe, medium: fuel, points: [[151, 460], [151, 514]], thickness: 6, arrow: true, flow_entity: binary_sensor.plc_webasto_running }
           - { type: text, x: 117, y: 518, width: 69, height: 52, text: Webasto, boxed: true, font_size: 13, active_entity: binary_sensor.plc_webasto_running }
           - { type: pipe, medium: fuel, points: [[562, 335], [562, 423], [545, 423]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
           - { type: text, x: 350, y: 383, width: 190, height: 119, text: "", boxed: true, active_entity: binary_sensor.generatoron }
           - { type: engine, x: 359, y: 408, width: 90, height: 63, active_entity: binary_sensor.generatoron }
           - { type: generator, x: 472, y: 417, width: 50, height: 50, label: Generator, active_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: fuel, points: [[573, 335], [573, 577], [545, 577]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: fuel, points: [[582, 334], [582, 577], [545, 577]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: text, x: 349, y: 515, width: 191, height: 125, text: "", boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
           - { type: propeller, x: 351, y: 527, width: 26, height: 100, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
           - { type: pipe, medium: shaft, points: [[376, 577], [428, 577]], thickness: 4, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
@@ -274,7 +274,7 @@ views:
           - { type: pipe, medium: glycol, points: [[330, 330], [293, 330], [293, 265]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pipe, medium: glycol, points: [[265, 265], [265, 580], [291, 580]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pump, x: 295, y: 558, size: 44, entity: switch.0x781c9dfffea1854f, label: Glycol pump, active_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol, points: [[317, 552], [317, 440], [1032, 440]], thickness: 6, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol, points: [[317, 552], [317, 440], [965, 440]], thickness: 6, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pipe, medium: glycol_return, points: [[1067, 668], [1067, 255], [393, 255]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pipe, medium: glycol_return, points: [[452, 668], [1067, 668]], thickness: 6, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pipe, medium: glycol, points: [[466, 438], [466, 395]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
