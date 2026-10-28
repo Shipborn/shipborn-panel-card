@@ -182,9 +182,9 @@ views:
           - { type: text, x: 505, y: 235, width: 136, height: 100, text: Daytank Diesel ER, boxed: true, font_size: 14 }
           - { type: text, x: 552, y: 295, entity: sensor.wago_values_er_diesel_daytank_level_statistics, mono: true, font_size: 16, unit: "%" }
           - { type: text, x: 743, y: 312, width: 193, height: 136, text: Diesel PS, boxed: true, font_size: 14 }
-          - { type: text, x: 815, y: 390, entity: sensor.wago_values_er_diesel_ps_level, mono: true, font_size: 16, unit: "%", factor: 0.00001, decimals: 0 }
+          - { type: text, x: 815, y: 390, entity: sensor.wago_values_er_diesel_ps_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
           - { type: text, x: 743, y: 485, width: 193, height: 135, text: Diesel SB, boxed: true, font_size: 14 }
-          - { type: text, x: 815, y: 563, entity: sensor.wago_plc_er_diesel_sb_level, mono: true, font_size: 16, unit: "%", factor: 0.00001, decimals: 0 }
+          - { type: text, x: 815, y: 563, entity: sensor.wago_plc_er_diesel_sb_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
           - { type: text, x: 115, y: 312, width: 71, height: 148, text: "Daytank\nWebasto", boxed: true, font_size: 13 }
           - { type: text, x: 124, y: 410, entity: sensor.wago_values_aft_diesel_webasto_level_statistics, mono: true, font_size: 14, unit: "%" }
           - { type: pipe, medium: fuel, points: [[742, 387], [725, 387]], thickness: 6, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
