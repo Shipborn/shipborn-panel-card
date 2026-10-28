@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.2.0";
+const VERSION = "0.2.1";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -363,7 +363,8 @@ class ShipbornPanelCard extends HTMLElement {
   _place(node, item, defW, defH) {
     node.classList.add("item");
     node.style.left = (item.x || 0) + "px";
-    node.style.top = (item.y || 0) + "px";
+    // YAML 1.1 (HA's YAML-mode dashboards) reads the key `y` as boolean true, so it arrives as "true".
+    node.style.top = (item.y ?? item.true ?? 0) + "px";
     const w = item.width ?? item.size ?? defW;
     const hh = item.height ?? item.size ?? defH;
     if (w != null) node.style.width = w + "px";
