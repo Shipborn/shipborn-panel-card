@@ -87,6 +87,7 @@
       Pijltjes = 1 px, met <kbd>Shift</kbd> = 10 px.<br>
       Leiding: sleep de bolletjes; <b>dubbelklik</b> op de leiding = knikpunt erbij, dubbelklik op een bolletje = weg.<br>
       Hoekje rechtsonder = groter/kleiner.<br>
+      Het label onder een symbool (bijv. Inlet V3) kun je los verslepen; de tekst pas je rechts aan bij <code>label</code>.<br>
       <kbd>Alt</kbd>+klik = onderdeel eronder kiezen.<br>
       Daarna <b>Opslaan</b>, en in HA de YAML plakken (<b>Kopieer YAML</b>).
     </div>
@@ -212,7 +213,8 @@
       vi = Math.min(vi, views.length - 1);
       $("view").innerHTML = views.map((v, i) => `<option value="${i}">${v.get("title") || v.get("path")}</option>`).join("");
       $("view").value = vi;
-      history.replaceState(null, "", `?view=${views[vi].get("path")}`);
+      const q = `?view=${views[vi].get("path")}`;
+      if (location.search !== q) history.replaceState(null, "", q);
     }
 
     function simStates(its) {
@@ -247,12 +249,20 @@
       const { p, s } = frame();
       return [(e.clientX - p.left) / s, (e.clientY - p.top) / s];
     }
-    function rectOf(i) {
-      const n = card.shadowRoot.querySelector(`[data-i="${i}"]`);
+    function boxOf(n) {
       if (!n) return null;
       const { p, s } = frame();
       const r = n.getBoundingClientRect();
       return { x: (r.left - p.left) / s, y: (r.top - p.top) / s, w: r.width / s, h: r.height / s };
+    }
+    const rectOf = (i) => boxOf(card.shadowRoot.querySelector(`[data-i="${i}"]`));
+    // A symbol's label sits outside the symbol's box; it can be dragged on its own (label_offset).
+    const labelRectOf = (i) => boxOf(card.shadowRoot.querySelector(`[data-i="${i}"] > .lb`));
+    const inside = ([x, y], r) => !!r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+    function labelHit(pt) {
+      const its = items();
+      for (let i = its.length - 1; i >= 0; i--) if (its[i].label && inside(pt, labelRectOf(i))) return i;
+      return null;
     }
     const segDist = ([px, py], [ax, ay], [bx, by]) => {
       const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1;
@@ -274,8 +284,7 @@
           for (let k = 1; k < pts.length; k++) if (segDist([x, y], pts[k - 1], pts[k]) <= (it.thickness ?? 8) / 2 + tol) { out.push(i); break; }
           return;
         }
-        const r = rectOf(i);
-        if (r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) out.push(i);
+        if (inside([x, y], rectOf(i)) || (it.label && inside([x, y], labelRectOf(i)))) out.push(i);
       });
       return out.reverse();
     }
@@ -307,6 +316,8 @@
           const r = rectOf(i);
           if (!r) continue;
           g += box(r, `stroke="var(--sel)" stroke-width="2"`);
+          const lr = it.label && labelRectOf(i);
+          if (lr) g += box({ x: lr.x - 2, y: lr.y - 1, w: lr.w + 4, h: lr.h + 2 }, `stroke="var(--sel)" stroke-dasharray="3 2"`);
           if (sel.length === 1 && it.type !== "nav")
             g += `<rect data-rs="1" x="${r.x + r.w - 6 * k}" y="${r.y + r.h - 6 * k}" width="${12 * k}" height="${12 * k}" fill="var(--sel)" style="cursor:nwse-resize"/>`;
         }
@@ -367,6 +378,10 @@
         drag = { kind: "point", i: sel[0], n: +e.target.dataset.pt, orig: its[sel[0]], start: pt };
       } else if (e.target.dataset.rs) {
         drag = { kind: "resize", i: sel[0], orig: its[sel[0]], r: rectOf(sel[0]), start: pt };
+      } else if (!e.shiftKey && !e.altKey && labelHit(pt) != null) {
+        const i = labelHit(pt);
+        sel = [i];
+        drag = { kind: "label", i, orig: its[i].label_offset || [0, 0], start: pt };
       } else {
         const under = hits(pt);
         let i = under[0];
@@ -425,6 +440,14 @@
         }
         pts[drag.n] = [x, y];
         setPoints(drag.i, pts);
+      } else if (drag.kind === "label") {
+        const off = [Math.round(drag.orig[0] + snap(dx)), Math.round(drag.orig[1] + snap(dy))];
+        if (!off[0] && !off[1]) doc.deleteIn([...itemsPath(), drag.i, "label_offset"]);
+        else {
+          const node = doc.createNode(off);
+          node.flow = true;
+          setIn(drag.i, "label_offset", node);
+        }
       } else if (drag.kind === "resize") {
         const w = Math.max(4, snap(drag.r.w + dx)), h = Math.max(1, snap(drag.r.h + dy));
         const it = drag.orig;
