@@ -85,7 +85,7 @@ Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/inpu
   card: { type: picture-entity, entity: camera.achterdek }
 - { type: box, x: 158, y: 352, width: 125, height: 100, inset: false }
 - { type: label, x: 10, y: 10, text: "Tekst", font_size: 8 }
-- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }
+- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }   # of een ingebouwd beeld: image: shipborn-joal (logo)
 ```
 
 ### Schermpagina's (donker console-ontwerp)

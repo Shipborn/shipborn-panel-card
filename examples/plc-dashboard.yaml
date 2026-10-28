@@ -18,9 +18,9 @@ views:
         items:
           # ---- kopbalk: navigatie, lifebeat, alarm ----
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
           - type: nav
-            x: 250
+            x: 300
             y: 10
             tabs: &plc_tabs
               - { label: Main, path: main }
@@ -90,8 +90,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - type: nav
@@ -165,8 +165,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -215,8 +215,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -251,8 +251,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -339,8 +339,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -384,8 +384,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -448,8 +448,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -492,8 +492,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -530,8 +530,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
@@ -591,8 +591,8 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: text, x: 24, y: 20, text: "[SCHEEPSNAAM] · PLC", font_size: 20, weight: 700, uppercase: true }
-          - { type: nav, x: 250, y: 10, tabs: *plc_tabs }
+          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
+          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
