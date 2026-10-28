@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.11";
+const VERSION = "0.4.12";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -266,7 +266,7 @@ const MEDIA = {
 };
 const DESIGN_FONTS =
   "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap";
-const DESIGN_COLORS = { amber: "#f5a524", blue: "#4aa3ff", green: "#34d27b", red: "#ff5b4f" };
+const DESIGN_COLORS = { amber: "#f5a524", blue: "#4aa3ff", green: "#34d27b", red: "#ff5b4f", grey: "#8f8e88" };
 
 // Web fonts can't be declared inside a shadow root, so they go in the document head (once).
 const ensureFonts = () => {
@@ -321,6 +321,19 @@ const activeOf = (hass, ids, cfg = {}, key = "active") =>
     if (cfg[key + "_abs"]) v = Math.abs(v);
     return (above == null || v > above) && (below == null || v < below);
   });
+// First matching entry of `colors` ({above, below, state, entity, color}); an entry without conditions is the default.
+// An entry with its own `entity` tests that entity instead (e.g. grey while the pump has no pressure).
+const colorOf = (hass, so, val, list) => {
+  for (const c of list) {
+    const o = c.entity ? hass.states[c.entity] : so;
+    const v = c.entity ? num(o) : val;
+    if (c.state != null && ![].concat(c.state).map(String).includes(o?.state)) continue;
+    if (c.above != null && !(v != null && v > c.above)) continue;
+    if (c.below != null && !(v != null && v < c.below)) continue;
+    return c.color;
+  }
+  return null;
+};
 // SVG path through points with rounded corners.
 const roundedPath = (pts, r) => {
   let d = `M${pts[0][0]},${pts[0][1]}`;
@@ -1134,7 +1147,7 @@ class ShipbornPanelCard extends HTMLElement {
     const v = h(
       "span",
       tile ? "d-num" : "d-valbox",
-      tile ? { fontSize: (item.value_size || 30) + "px" } : { width: (item.box_width || 110) + "px" }
+      tile ? { fontSize: (item.value_size || 30) + "px", whiteSpace: "nowrap" } : { width: (item.box_width || 110) + "px" }
     );
     n.append(l, v);
     if (item.entity) n.addEventListener("click", () => this._handleAction(item, item.tap_action || { action: "more-info" }, n));
@@ -1144,17 +1157,34 @@ class ShipbornPanelCard extends HTMLElement {
       const unit = unitOf(item, so);
       const txt = val == null && so && !unavailable(so) ? so.state : fmt(val, item.decimals ?? 1, hass);
       v.textContent = unit ? `${txt} ${unit}` : txt;
+      if (item.colors) v.style.color = !so || unavailable(so) ? "" : color(colorOf(hass, so, val, item.colors), "");
     });
     return n;
   }
 
+  // LED with text. With active_above / active_below the LED follows a numeric limit;
+  // off_color lights it in that colour while not active (red cross on a checklist).
   _dIndicator(item) {
     const n = this._place(h("div", "d d-row"), item, null, null);
     Object.assign(n.style, { justifyContent: "flex-start", fontSize: (item.font_size || 17) + "px", color: "#cfcec8", whiteSpace: "nowrap" });
-    const led = this._dLed(item.entity, item.color || item.led, item.state_on, item.blink);
     const s = item.led_size || 14;
+    let led;
+    if (item.off_color || item.active_above != null || item.active_below != null) {
+      led = h("span", "d-led" + (item.blink ? " blink" : ""));
+      const cfg = { active_above: item.active_above, active_below: item.active_below, active_state: item.state_on, active_abs: item.active_abs };
+      this._updaters.push((hass) => {
+        const on = !!item.entity && activeOf(hass, item.entity, cfg);
+        const lit = on || (!!item.off_color && !!hass.states[item.entity]);
+        led.classList.toggle("on", lit);
+        led.style.setProperty("--c", on ? color(item.color || item.led, DESIGN_COLORS.green) : color(item.off_color, DESIGN_COLORS.red));
+      });
+    } else led = this._dLed(item.entity, item.color || item.led, item.state_on, item.blink);
     Object.assign(led.style, { width: s + "px", height: s + "px" });
     n.append(led, item.label ?? "");
+    if (item.tap_action) {
+      n.style.cursor = "pointer";
+      n.addEventListener("click", () => this._handleAction(item, item.tap_action, n));
+    }
     return n;
   }
 
@@ -1558,6 +1588,9 @@ class ShipbornPanelCard extends HTMLElement {
         hass.callService(domain, service, { ...(a.data || a.service_data || {}) }, a.target);
         return;
       }
+      case "fire-dom-event": // browser_mod and friends listen for ll-custom
+        fire(this, "ll-custom", a);
+        return;
       default:
         if (entity) this._toggle(entity);
     }

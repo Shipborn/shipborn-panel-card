@@ -104,8 +104,8 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `gauge` | `entity`, `min`, `max`, `label`, `unit`, `decimals`, `color`, `warn_above` / `warn_below` – halve cirkel, vanaf 0 bij een bereik rond nul |
 | `bar` | `entity`, `min`, `max`, `label`, `ticks`, `color` – liggende balk |
 | `tank` | `entity`, `label`, `kind`, `color`, `low` / `high`, `marker` of `marker_entity`, `scale`, `frame: false` |
-| `value` | `entity`, `label`, `unit`, `decimals`, `style: tile` |
-| `indicator` | `entity`, `label`, `color`, `blink`, `state_on` – LED met tekst |
+| `value` | `entity`, `label`, `unit`, `decimals`, `style: tile`, `colors` (zie onder) |
+| `indicator` | `entity`, `label`, `color`, `blink`, `state_on`, `active_above` / `active_below`, `off_color` – LED met tekst |
 | `pushbutton` | `label`, `entity`, `tap_action`, `mode: momentary`, `variant: stop`, `led` + `led_entity`, `active_entity` (oranje rand), `align: left` |
 | `nav` | `tabs: [{label, path, match}]`, `style: side` – actieve tab volgt de URL |
 | `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text` |
@@ -114,6 +114,20 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed` |
 
 `gauge`, `bar`, `tank`, `value`, `block` en `text` met een entiteit kennen `factor` om ruwe waarden om te rekenen, bijv. `factor: 0.00001` voor een Wago-tankniveau (7894954 → 78,9 %) of `factor: 0.001` voor mbar → bar.
+
+`colors` op een `value` kleurt het getal zoals de oude button-card-sjablonen; de eerste regel die klopt wint, een regel zonder voorwaarde is de standaard. Een regel met eigen `entity` test die entiteit (bijv. grijs zolang de pomp geen druk heeft):
+
+```yaml
+- type: value
+  style: tile
+  entity: sensor.engine_room_me_oil_press
+  label: Oil pressure
+  colors: [{ below: 1.5, color: red }, { below: 1.8, color: amber }, { color: green }]
+```
+
+Een checklist-regel is een `indicator` met `off_color: red`: groen als het klopt, rood als het niet klopt, met `state_on: open` voor kleppen of `active_above: 2.49` voor een minimale waarde.
+
+`tap_action` kent ook `fire-dom-event` (browser_mod), zoals de knop *Wierpot aft afsluiten voor legen*.
 
 Een `text` met `boxed: true` wordt een tank met `level_entity`: het vak vult zich van onder tot dat niveau (0–100, of tot `level_max`), in de kleur van `medium` of `level_color`. `level_factor` rekent een ruwe waarde om.
 
@@ -124,6 +138,8 @@ Een `text` met `boxed: true` wordt een tank met `level_entity`: het vak vult zic
 ### Schema's met stromende leidingen
 
 Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (tab *Systemen*): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge en Accu's, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.
+
+Onder elk schema (scrollen) staat de bediening uit het oude HA-dashboard: sensortegels met kleuren, start-checklists, *Prepare start*, schakelaars en automaten. *Webasto* en *Navigatie* zijn tabs zonder schema, alleen met bediening.
 
 ```yaml
 - type: pipe
