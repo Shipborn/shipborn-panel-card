@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PLC layout-editor</title>
+  <style>
+    :root { --bg: #0d0e10; --bar: #17181a; --line: #2c2c2c; --text: #ecebe6; --muted: #8f8e88; --accent: #f5a524; --sel: #4aa3ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 13px system-ui, sans-serif; display: grid; grid-template: auto 1fr / 1fr 330px; height: 100vh; }
+    header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 14px; background: var(--bar); border-bottom: 1px solid var(--line); }
+    header b { font-size: 14px; }
+    select, button, input[type=number] { font: inherit; color: var(--text); background: #232323; border: 1px solid #3a3a3a; border-radius: 6px; padding: 5px 9px; }
+    button { cursor: pointer; }
+    button:hover { background: #2c2c2c; }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
+    button:disabled { opacity: .4; cursor: default; }
+    #status { color: var(--muted); margin-left: auto; }
+    #status.dirty { color: var(--accent); }
+    main { overflow: auto; padding: 14px; }
+    #stage { position: relative; width: 100%; max-width: 1280px; margin: 0 auto; }
+    #ov { position: absolute; inset: 0; width: 100%; height: 100%; cursor: default; touch-action: none; }
+    #ov .hit { cursor: move; }
+    aside { border-left: 1px solid var(--line); background: var(--bar); padding: 12px; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+    aside h3 { margin: 4px 0 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    textarea { width: 100%; min-height: 170px; resize: vertical; font: 12px ui-monospace, Menlo, monospace; color: var(--text); background: #111; border: 1px solid #3a3a3a; border-radius: 6px; padding: 8px; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; }
+    #err { color: #ff6b5f; font-size: 12px; min-height: 1em; }
+    .help { color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .help kbd { font: 11px ui-monospace, monospace; background: #232323; border: 1px solid #3a3a3a; border-radius: 4px; padding: 0 4px; color: var(--text); }
+    #pos { font: 12px ui-monospace, monospace; color: var(--muted); }
+  </style>
+  <script src="../dist/shipborn-panel-card.js"></script>
+</head>
+<body>
+  <header>
+    <b>Layout-editor</b>
+    <select id="view" title="View"></select>
+    <label>Raster <select id="grid"><option>1</option><option selected>5</option><option>10</option><option>20</option></select></label>
+    <label><input type="checkbox" id="sim"> Stroming tonen</label>
+    <button id="undo" title="Ongedaan maken (Cmd/Ctrl+Z)">↶</button>
+    <button id="redo" title="Opnieuw (Shift+Cmd/Ctrl+Z)">↷</button>
+    <span id="pos"></span>
+    <span id="status">geladen</span>
+    <button id="copy" title="Hele YAML kopiëren om in HA te plakken">Kopieer YAML</button>
+    <button id="save" class="primary" title="Opslaan in examples/plc-dashboard.yaml (Cmd/Ctrl+S)">Opslaan</button>
+  </header>
+  <main><div id="stage"><svg id="ov"></svg></div></main>
+  <aside>
+    <h3>Geselecteerd</h3>
+    <div id="selinfo" class="help">Klik op een onderdeel.</div>
+    <textarea id="props" spellcheck="false" disabled></textarea>
+    <div class="row">
+      <button id="apply" disabled>Toepassen</button>
+      <button id="dup" disabled title="Cmd/Ctrl+D">Dupliceren</button>
+      <button id="del" disabled title="Delete">Verwijderen</button>
+      <button id="front" disabled title="Naar voren">▲</button>
+      <button id="back" disabled title="Naar achteren">▼</button>
+    </div>
+    <div id="err"></div>
+    <h3>Toevoegen</h3>
+    <div class="row"><select id="newtype"></select><button id="add">+ Toevoegen</button></div>
+    <h3>Bediening</h3>
+    <div class="help">
+      Sleep om te verschuiven, <kbd>Shift</kbd>+klik of een kader trekken om meer te selecteren.<br>
+      Pijltjes = 1 px, met <kbd>Shift</kbd> = 10 px.<br>
+      Leiding: sleep de bolletjes; <b>dubbelklik</b> op de leiding = knikpunt erbij, dubbelklik op een bolletje = weg.<br>
+      Hoekje rechtsonder = groter/kleiner.<br>
+      <kbd>Alt</kbd>+klik = onderdeel eronder kiezen.<br>
+      Daarna <b>Opslaan</b>, en in HA de YAML plakken (<b>Kopieer YAML</b>).
+    </div>
+  </aside>
+
+  <script type="module">
+    // Visual editor for examples/plc-dashboard.yaml. Edits go through the `yaml` Document API so
+    // comments, anchors and the one-line { … } item style survive. Saving needs demo/edit_server.py.
+    import { parseDocument, isMap, isSeq } from "https://cdn.jsdelivr.net/npm/yaml@2.5.1/browser/index.js";
+
+    const FILE = "../examples/plc-dashboard.yaml";
+    const TEMPLATES = {
+      "leiding": { type: "pipe", medium: "seawater", points: [[0, 0], [120, 0]], thickness: 6, arrow: true },
+      "pomp": { type: "pump", size: 36 },
+      "klep": { type: "valve", size: 30 },
+      "warmtewisselaar": { type: "hx", width: 60, height: 40 },
+      "filter": { type: "filter", size: 36 },
+      "tekst": { type: "text", text: "Tekst", font_size: 14 },
+      "blok met tekst": { type: "text", width: 120, height: 60, text: "Blok", boxed: true },
+      "waarde": { type: "text", entity: "sensor.x", mono: true, font_size: 14 },
+      "lijn / vlak": { type: "line", width: 200, height: 2, color: "#2c2c2c" },
+      "tank": { type: "tank", width: 80, height: 200, entity: "sensor.x" },
+    };
+    const $ = (id) => document.getElementById(id);
+    const stage = $("stage"), ov = $("ov");
+    const card = document.createElement("shipborn-panel-card");
+    stage.insertBefore(card, ov);
+
+    let doc, vi = 0, sel = [], hover = null, undo = [], redo = [], dirty = false, saved = "";
+    const itemsPath = () => ["views", vi, "cards", 0, "items"];
+    const itemsSeq = () => doc.getIn(itemsPath(), true);
+    const items = () => itemsSeq().items.map((n) => n.toJSON());
+    const cardCfg = () => doc.getIn(["views", vi, "cards", 0], true).toJSON();
+    const W = () => cardCfg().width || 650, H = () => cardCfg().height || 340;
+    const grid = () => +$("grid").value;
+    const snap = (v) => Math.round(v / grid()) * grid();
+    const yOf = (it) => it.y ?? it.true ?? 0;
+
+    // The library pads [ … ] and collapses aligned comments; lines that did not change keep their
+    // original text, the rest only lose the padding inside [ ].
+    let original = new Map();
+    const norm = (l) => l.replace(/\s+/g, " ").replace(/\[ /g, "[").replace(/ \]/g, "]").trimEnd();
+    const remember = (text) => (original = new Map(text.split("\n").map((l) => [norm(l), l])));
+    const serialize = () =>
+      doc.toString({ lineWidth: 0 }).split("\n").map((l) => original.get(norm(l)) ?? l.replace(/\[ /g, "[").replace(/ \]/g, "]")).join("\n");
+
+    // ---------- load / render ----------
+    async function load() {
+      const text = await (await fetch(FILE, { cache: "no-store" })).text();
+      saved = text;
+      remember(text);
+      doc = parseDocument(text);
+      if (serialize() !== text) console.warn("YAML round-trip is not byte-identical");
+      const views = doc.get("views").items.map((v) => v.get("title") || v.get("path"));
+      $("view").innerHTML = views.map((t, i) => `<option value="${i}">${t}</option>`).join("");
+      const want = new URLSearchParams(location.search).get("view");
+      const idx = doc.get("views").items.findIndex((v) => v.get("path") === want);
+      vi = idx < 0 ? 0 : idx;
+      $("view").value = vi;
+      render();
+    }
+
+    function simStates(its) {
+      const st = {};
+      if (!$("sim").checked) return st;
+      for (const it of its) for (const key of ["flow", "active"])
+        for (const id of [].concat(it[key + "_entity"] || [])) {
+          const a = it[key + "_above"];
+          st[id] = { state: a == null ? "on" : String(a < 10 ? a + 12.3 : a + 1350), attributes: {} };
+        }
+      return st;
+    }
+
+    let raf = 0;
+    function render() {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const cfg = { ...doc.toJS().views[vi].cards[0], kiosk: false };
+        card.setConfig(cfg);
+        card.hass = { states: simStates(cfg.items), locale: { language: "nl" }, callService() {} };
+        requestAnimationFrame(draw);
+      });
+    }
+
+    // ---------- geometry ----------
+    function frame() {
+      const p = card.shadowRoot.querySelector(".panel").getBoundingClientRect();
+      return { p, s: p.width / W() };
+    }
+    function toDesign(e) {
+      const { p, s } = frame();
+      return [(e.clientX - p.left) / s, (e.clientY - p.top) / s];
+    }
+    function rectOf(i) {
+      const n = card.shadowRoot.querySelector(`[data-i="${i}"]`);
+      if (!n) return null;
+      const { p, s } = frame();
+      const r = n.getBoundingClientRect();
+      return { x: (r.left - p.left) / s, y: (r.top - p.top) / s, w: r.width / s, h: r.height / s };
+    }
+    const segDist = ([px, py], [ax, ay], [bx, by]) => {
+      const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L));
+      return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+    };
+    const isBackground = (it, i) => {
+      if (["hull", "panel"].includes(it.type)) return true;
+      const r = it.type === "pipe" ? null : rectOf(i);
+      return !!r && r.w * r.h > W() * H() * 0.08;
+    };
+    // Items under a design point, topmost first.
+    function hits([x, y]) {
+      const out = [];
+      const tol = 6 / frame().s; // 6 screen pixels, whatever the zoom
+      items().forEach((it, i) => {
+        if (it.type === "pipe") {
+          const pts = it.points || [];
+          for (let k = 1; k < pts.length; k++) if (segDist([x, y], pts[k - 1], pts[k]) <= (it.thickness ?? 8) / 2 + tol) { out.push(i); break; }
+          return;
+        }
+        const r = rectOf(i);
+        if (r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) out.push(i);
+      });
+      return out.reverse();
+    }
+
+    // ---------- overlay ----------
+    function draw() {
+      if (!doc) return;
+      const w = W(), h = H();
+      ov.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      const { s } = frame();
+      const k = 1 / s; // keeps handles the same size on screen
+      const its = items();
+      let g = "";
+      const box = (r, style) => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="none" ${style} pointer-events="none" vector-effect="non-scaling-stroke"/>`;
+      if (hover != null && !sel.includes(hover) && its[hover]) {
+        const it = its[hover];
+        if (it.type === "pipe") g += `<polyline points="${it.points.join(" ")}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="${(it.thickness ?? 8) + 6}" stroke-linejoin="round" pointer-events="none"/>`;
+        else { const r = rectOf(hover); if (r) g += box(r, `stroke="#fff" stroke-opacity=".6" stroke-dasharray="4 3"`); }
+      }
+      for (const i of sel) {
+        const it = its[i];
+        if (!it) continue;
+        if (it.type === "pipe") {
+          g += `<polyline points="${it.points.join(" ")}" fill="none" stroke="var(--sel)" stroke-opacity=".55" stroke-width="${(it.thickness ?? 8) + 8}" stroke-linejoin="round" pointer-events="none"/>`;
+          if (sel.length === 1) it.points.forEach(([px, py], n) => {
+            g += `<circle data-pt="${n}" cx="${px}" cy="${py}" r="${7 * k}" fill="#fff" stroke="var(--sel)" stroke-width="${2 * k}" style="cursor:grab"/>`;
+          });
+        } else {
+          const r = rectOf(i);
+          if (!r) continue;
+          g += box(r, `stroke="var(--sel)" stroke-width="2"`);
+          if (sel.length === 1 && it.type !== "nav")
+            g += `<rect data-rs="1" x="${r.x + r.w - 6 * k}" y="${r.y + r.h - 6 * k}" width="${12 * k}" height="${12 * k}" fill="var(--sel)" style="cursor:nwse-resize"/>`;
+        }
+      }
+      if (band) g += `<rect x="${Math.min(band.x0, band.x1)}" y="${Math.min(band.y0, band.y1)}" width="${Math.abs(band.x1 - band.x0)}" height="${Math.abs(band.y1 - band.y0)}" fill="var(--sel)" fill-opacity=".12" stroke="var(--sel)" pointer-events="none" vector-effect="non-scaling-stroke"/>`;
+      ov.innerHTML = g;
+      showProps();
+    }
+
+    // ---------- editing ----------
+    function snapshot() {
+      undo.push(serialize());
+      if (undo.length > 200) undo.shift();
+      redo = [];
+    }
+    function changed() {
+      dirty = serialize() !== saved;
+      $("status").textContent = dirty ? "niet opgeslagen" : "opgeslagen";
+      $("status").classList.toggle("dirty", dirty);
+      render();
+    }
+    function restore(text) {
+      doc = parseDocument(text);
+      sel = sel.filter((i) => i < itemsSeq().items.length);
+      changed();
+    }
+    const flowSeqs = (node) => {
+      if (isSeq(node)) node.flow = true;
+      for (const c of node?.items || []) flowSeqs(c.value ?? c);
+      return node;
+    };
+    const setIn = (i, key, v) => doc.setIn([...itemsPath(), i, key], v);
+    function setPoints(i, pts) {
+      const node = doc.createNode(pts.map((p) => p.map(Math.round)));
+      node.flow = true;
+      doc.setIn([...itemsPath(), i, "points"], node);
+    }
+    function moveItem(i, it, dx, dy) {
+      if (it.type === "pipe") return setPoints(i, it.points.map(([x, y]) => [x + dx, y + dy]));
+      setIn(i, "x", Math.round((it.x || 0) + dx));
+      if (it.true != null && it.y == null) setIn(i, "true", Math.round(it.true + dy));
+      else setIn(i, "y", Math.round(yOf(it) + dy));
+    }
+
+    // ---------- pointer ----------
+    let drag = null, band = null;
+    let lastDown = { t: 0, x: 0, y: 0 };
+    ov.addEventListener("pointerdown", (e) => {
+      const pt = toDesign(e);
+      const dbl = e.timeStamp - lastDown.t < 400 && Math.hypot(e.clientX - lastDown.x, e.clientY - lastDown.y) < 6;
+      lastDown = { t: dbl ? 0 : e.timeStamp, x: e.clientX, y: e.clientY };
+      if (dbl && editPoints(e)) return;
+      const its = items();
+      ov.setPointerCapture(e.pointerId);
+      if (e.target.dataset.pt != null) {
+        drag = { kind: "point", i: sel[0], n: +e.target.dataset.pt, orig: its[sel[0]], start: pt };
+      } else if (e.target.dataset.rs) {
+        drag = { kind: "resize", i: sel[0], orig: its[sel[0]], r: rectOf(sel[0]), start: pt };
+      } else {
+        const under = hits(pt);
+        let i = under[0];
+        if (e.altKey && under.length > 1) i = under[(under.indexOf(sel[0]) + 1) % under.length];
+        // Backgrounds (hull, panels, wide bars) only move once selected; dragging on them draws a selection box.
+        const bg = i != null && !sel.includes(i) && !e.altKey && isBackground(its[i], i);
+        if (i == null || bg) {
+          if (bg && !e.shiftKey) { sel = [i]; }
+          else if (!e.shiftKey) sel = [];
+          band = { x0: pt[0], y0: pt[1], x1: pt[0], y1: pt[1], add: bg ? [] : [...sel], click: bg ? i : null };
+          draw();
+          return;
+        }
+        if (e.shiftKey) sel = sel.includes(i) ? sel.filter((j) => j !== i) : [...sel, i];
+        else if (!sel.includes(i) || e.altKey) sel = [i];
+        drag = { kind: "move", orig: sel.map((j) => [j, its[j]]), start: pt };
+      }
+      drag.snap = false;
+      draw();
+    });
+    ov.addEventListener("pointermove", (e) => {
+      const pt = toDesign(e);
+      $("pos").textContent = `x ${Math.round(pt[0])}  y ${Math.round(pt[1])}`;
+      if (band) {
+        band.x1 = pt[0]; band.y1 = pt[1];
+        const [x0, x1] = [Math.min(band.x0, band.x1), Math.max(band.x0, band.x1)];
+        const [y0, y1] = [Math.min(band.y0, band.y1), Math.max(band.y0, band.y1)];
+        const inside = items().map((it, i) => {
+          const r = it.type === "pipe" ? null : rectOf(i);
+          const pts = it.type === "pipe" ? it.points : r ? [[r.x, r.y], [r.x + r.w, r.y + r.h]] : [];
+          return pts.length && pts.every(([x, y]) => x >= x0 && x <= x1 && y >= y0 && y <= y1) ? i : -1;
+        }).filter((i) => i >= 0);
+        sel = [...new Set([...band.add, ...inside])];
+        if (!sel.length && band.click != null && Math.hypot(band.x1 - band.x0, band.y1 - band.y0) < 3) sel = [band.click];
+        return draw();
+      }
+      if (!drag) {
+        const h = hits(pt)[0] ?? null;
+        if (h !== hover) { hover = h; draw(); }
+        return;
+      }
+      const dx = pt[0] - drag.start[0], dy = pt[1] - drag.start[1];
+      if (!drag.snap) {
+        if (Math.hypot(dx, dy) < 2) return;
+        snapshot();
+        drag.snap = true;
+      }
+      if (drag.kind === "move") for (const [i, it] of drag.orig) moveItem(i, it, snap(dx), snap(dy));
+      else if (drag.kind === "point") {
+        const pts = drag.orig.points.map((p) => [...p]);
+        let [x, y] = [snap(pts[drag.n][0] + dx), snap(pts[drag.n][1] + dy)];
+        // Keep pipe runs straight: lock onto a neighbour's axis when close.
+        for (const nb of [pts[drag.n - 1], pts[drag.n + 1]]) if (nb) {
+          if (Math.abs(x - nb[0]) < 6) x = nb[0];
+          if (Math.abs(y - nb[1]) < 6) y = nb[1];
+        }
+        pts[drag.n] = [x, y];
+        setPoints(drag.i, pts);
+      } else if (drag.kind === "resize") {
+        const w = Math.max(4, snap(drag.r.w + dx)), h = Math.max(1, snap(drag.r.h + dy));
+        const it = drag.orig;
+        if (it.size != null && it.width == null && it.height == null) setIn(drag.i, "size", Math.max(w, h));
+        else { setIn(drag.i, "width", w); setIn(drag.i, "height", h); }
+      }
+      changed();
+    });
+    const end = () => {
+      drag = null;
+      if (band) { band = null; draw(); }
+    };
+    ov.addEventListener("pointerup", end);
+    ov.addEventListener("pointercancel", end);
+    ov.addEventListener("pointerleave", () => { if (!drag && hover != null) { hover = null; draw(); } });
+    // Double-click on a selected pipe: add a bend point, or remove the one under the pointer.
+    function editPoints(e) {
+      const it = items()[sel[0]];
+      if (sel.length !== 1 || it?.type !== "pipe") return false;
+      const pts = it.points.map((p) => [...p]);
+      if (e.target.dataset.pt != null) {
+        if (pts.length <= 2) return true;
+        pts.splice(+e.target.dataset.pt, 1);
+      } else {
+        const p = toDesign(e);
+        let best = 1, d = Infinity;
+        for (let k = 1; k < pts.length; k++) { const dd = segDist(p, pts[k - 1], pts[k]); if (dd < d) { d = dd; best = k; } }
+        if (d > (it.thickness ?? 8) / 2 + 6 / frame().s) return false;
+        pts.splice(best, 0, [snap(p[0]), snap(p[1])]);
+      }
+      snapshot();
+      setPoints(sel[0], pts);
+      changed();
+      return true;
+    }
+
+    // ---------- side panel ----------
+    let shown = null;
+    function showProps() {
+      const ta = $("props");
+      const one = sel.length === 1;
+      for (const b of ["apply", "dup", "del", "front", "back"]) $(b).disabled = !sel.length || (!one && ["apply", "front", "back"].includes(b));
+      ta.disabled = !one;
+      const key = one ? `${vi}:${sel[0]}:${String(itemsSeq().items[sel[0]])}` : `n${sel.length}`;
+      if (key === shown) return;
+      shown = key;
+      $("err").textContent = "";
+      if (!sel.length) { ta.value = ""; $("selinfo").textContent = "Klik op een onderdeel."; return; }
+      if (!one) { ta.value = ""; $("selinfo").textContent = `${sel.length} onderdelen geselecteerd`; return; }
+      const it = items()[sel[0]];
+      $("selinfo").textContent = `#${sel[0]} · ${it.type}${it.label ? " · " + it.label : it.text ? " · " + it.text : ""}`;
+      // One option per line is easier to edit than the long { … } line.
+      const d = parseDocument("x: 0");
+      d.contents = flowSeqs(d.createNode(it));
+      ta.value = d.toString({ lineWidth: 0 }).replace(/\n$/, "").replace(/\[ /g, "[").replace(/ \]/g, "]");
+    }
+    $("apply").onclick = () => {
+      try {
+        const d = parseDocument($("props").value);
+        if (d.errors.length) throw d.errors[0];
+        const obj = d.toJS();
+        if (!obj || typeof obj !== "object" || Array.isArray(obj)) throw new Error("Verwacht opties als  sleutel: waarde");
+        snapshot();
+        const node = doc.createNode(obj);
+        node.flow = true;
+        itemsSeq().items[sel[0]] = node;
+        shown = null;
+        changed();
+      } catch (err) {
+        $("err").textContent = err.message;
+      }
+    };
+    $("dup").onclick = () => {
+      snapshot();
+      const seq = itemsSeq();
+      const its = items();
+      const copies = sel.slice().sort((a, b) => a - b).map((i) => {
+        const node = doc.createNode(its[i]);
+        node.flow = true;
+        return node;
+      });
+      const start = seq.items.length;
+      seq.items.push(...copies);
+      sel = copies.map((_, k) => start + k);
+      sel.forEach((i, k) => moveItem(i, items()[i], 20, 20));
+      changed();
+    };
+    const remove = () => {
+      if (!sel.length) return;
+      snapshot();
+      const seq = itemsSeq();
+      for (const i of sel.slice().sort((a, b) => b - a)) seq.items.splice(i, 1);
+      sel = [];
+      changed();
+    };
+    $("del").onclick = remove;
+    const reorder = (d) => {
+      const seq = itemsSeq(), i = sel[0], j = i + d;
+      if (j < 0 || j >= seq.items.length) return;
+      snapshot();
+      [seq.items[i], seq.items[j]] = [seq.items[j], seq.items[i]];
+      sel = [j];
+      changed();
+    };
+    $("front").onclick = () => reorder(1);
+    $("back").onclick = () => reorder(-1);
+    $("newtype").innerHTML = Object.keys(TEMPLATES).map((k) => `<option>${k}</option>`).join("");
+    $("add").onclick = () => {
+      snapshot();
+      const t = structuredClone(TEMPLATES[$("newtype").value]);
+      const cx = snap(W() / 2), cy = snap(H() / 2);
+      if (t.points) t.points = t.points.map(([x, y]) => [x + cx, y + cy]);
+      const ordered = t.points ? t : { type: t.type, x: cx, y: cy, ...t }; // x/y first, like the other items
+      const node = doc.createNode(ordered);
+      node.flow = true;
+      itemsSeq().items.push(node);
+      sel = [itemsSeq().items.length - 1];
+      changed();
+    };
+
+    // ---------- toolbar / keys ----------
+    $("view").onchange = () => { vi = +$("view").value; sel = []; hover = null; history.replaceState(null, "", `?view=${doc.get("views").items[vi].get("path")}`); render(); };
+    $("sim").onchange = render;
+    $("undo").onclick = () => undo.length && (redo.push(serialize()), restore(undo.pop()));
+    $("redo").onclick = () => redo.length && (undo.push(serialize()), restore(redo.pop()));
+    async function save() {
+      const text = serialize();
+      try {
+        const r = await fetch(FILE, { method: "PUT", body: text });
+        if (!r.ok) throw new Error(r.status);
+        saved = text;
+        remember(text);
+        changed();
+      } catch {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([text], { type: "text/yaml" }));
+        a.download = "plc-dashboard.yaml";
+        a.click();
+        $("status").textContent = "gedownload (start demo/edit_server.py om direct op te slaan)";
+      }
+    }
+    $("save").onclick = save;
+    $("copy").onclick = async () => {
+      await navigator.clipboard.writeText(serialize());
+      $("status").textContent = "YAML gekopieerd – plak in HA: Raw configuration editor";
+    };
+    window.addEventListener("keydown", (e) => {
+      if (e.target.matches?.("textarea, input, select")) return;
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); $(e.shiftKey ? "redo" : "undo").click(); return; }
+      if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); save(); return; }
+      if (mod && e.key.toLowerCase() === "d") { e.preventDefault(); sel.length && $("dup").click(); return; }
+      if (e.key === "Escape") { sel = []; draw(); return; }
+      if ((e.key === "Delete" || e.key === "Backspace") && sel.length) { e.preventDefault(); remove(); return; }
+      const arrows = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      if (arrows[e.key] && sel.length) {
+        e.preventDefault();
+        const f = e.shiftKey ? 10 : 1, its = items();
+        snapshot();
+        for (const i of sel) moveItem(i, its[i], arrows[e.key][0] * f, arrows[e.key][1] * f);
+        changed();
+      }
+    });
+    window.addEventListener("beforeunload", (e) => { if (dirty) e.preventDefault(); });
+    new ResizeObserver(() => requestAnimationFrame(draw)).observe(stage);
+    load();
+  </script>
+</body>
+</html>

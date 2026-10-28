@@ -152,6 +152,24 @@ Open daarna http://localhost:8765/demo/ — de demo laadt `examples/dashboard.ya
 
 http://localhost:8765/demo/plc.html?view=sys-diesel (of een ander `sys-…`-pad) toont een systeemschema, met een vinkje per entiteit om leidingen te laten stromen.
 
+## Layout-editor
+
+Schermen aanpassen zonder YAML te typen:
+
+```bash
+python3 demo/edit_server.py
+```
+
+Open http://localhost:8770/demo/editor.html en kies een view.
+
+- Sleep blokjes, symbolen en leidingen; `Shift`+klik of een kader trekken selecteert meer tegelijk (een kader trekken kan ook óp de romp).
+- Pijltjes verschuiven 1 px (`Shift` = 10 px); het raster (1–20 px) staat bovenin.
+- Leiding geselecteerd: sleep de bolletjes, dubbelklik op de leiding voegt een knikpunt toe, dubbelklik op een bolletje haalt het weg. Punten klikken recht op hun buurpunt.
+- Hoekje rechtsonder = groter/kleiner. Romp, panelen en brede balken verschuiven pas als je ze eerst aanklikt.
+- Rechts staan alle opties van het geselecteerde onderdeel (entiteit, kleur, label…) om te bewerken, plus dupliceren, verwijderen, voor/achter en nieuwe onderdelen.
+- `Cmd/Ctrl+Z` ongedaan maken, `Cmd/Ctrl+S` opslaan in `examples/plc-dashboard.yaml`. Opmerkingen en opmaak in het bestand blijven staan.
+- **Kopieer YAML** zet het hele dashboard op het klembord om in HA te plakken (Raw configuration editor).
+
 ## Veiligheid
 
 Deze kaart is een bedieningsinterface, geen veiligheidssysteem. Noodstoppen en hold-to-run-functies moeten altijd ook hardwarematig (PLC/relais) geborgd zijn, inclusief een timeout als de verbinding met HA wegvalt.
