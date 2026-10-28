@@ -1,5 +1,6 @@
 # PLC-besturingspagina's (ontwerp "PLC-pagina's" op de canvas).
-# Maak een dashboard aan met URL "shipborn-plc" en plak dit in de Raw configuration editor.
+# Maak een dashboard aan (de URL maakt niet uit) en plak dit in de Raw configuration editor.
+# Tab-paden zonder "/" (bijv. "sys-diesel") verwijzen naar een view van hetzelfde dashboard.
 # Vervang de entity-id's (sensor.plc_…, binary_sensor.plc_…, button.plc_…) door je eigen entiteiten.
 # Elke view is één kaart van 1280×800 die meeschaalt met de schermbreedte.
 title: PLC
@@ -22,12 +23,12 @@ views:
             x: 250
             y: 10
             tabs: &plc_tabs
-              - { label: Main, path: /shipborn-plc/main }
-              - { label: Diesel, path: /shipborn-plc/diesel }
-              - { label: Electric, path: /shipborn-plc/emotor, match: [/shipborn-plc/bowthruster, /shipborn-plc/jetthrusters, /shipborn-plc/battery, /shipborn-plc/shore-gen] }
-              - { label: PMS, path: /shipborn-plc/pms }
-              - { label: Tanks, path: /shipborn-plc/tanks }
-              - { label: Systemen, path: /shipborn-plc/sys-diesel, match: [/shipborn-plc/sys-fuel, /shipborn-plc/sys-generator, /shipborn-plc/sys-dcbus, /shipborn-plc/sys-bowthruster, /shipborn-plc/sys-seawater, /shipborn-plc/sys-freshwater, /shipborn-plc/sys-wastewater, /shipborn-plc/sys-bilge, /shipborn-plc/sys-power] }
+              - { label: Main, path: main }
+              - { label: Diesel, path: diesel }
+              - { label: Electric, path: emotor, match: [bowthruster, jetthrusters, battery, shore-gen] }
+              - { label: PMS, path: pms }
+              - { label: Tanks, path: tanks }
+              - { label: Systemen, path: sys-diesel, match: [sys-fuel, sys-generator, sys-dcbus, sys-bowthruster, sys-seawater, sys-freshwater, sys-wastewater, sys-bilge, sys-power] }
               - { label: Alarms }
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
@@ -78,7 +79,6 @@ views:
     path: sys-diesel
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_compressor_running
     #   binary_sensor.plc_diesel_alarm
@@ -105,16 +105,16 @@ views:
             y: 112
             font_size: 14
             tabs: &sys_tabs
-              - { label: Diesel, path: /shipborn-plc/sys-diesel }
-              - { label: Fuel, path: /shipborn-plc/sys-fuel }
-              - { label: Generator, path: /shipborn-plc/sys-generator }
-              - { label: DC-bus, path: /shipborn-plc/sys-dcbus }
-              - { label: Bow thruster, path: /shipborn-plc/sys-bowthruster }
-              - { label: Zeewater, path: /shipborn-plc/sys-seawater }
-              - { label: Zoetwater, path: /shipborn-plc/sys-freshwater }
-              - { label: Vuilwater, path: /shipborn-plc/sys-wastewater }
-              - { label: Bilge, path: /shipborn-plc/sys-bilge }
-              - { label: Accu's, path: /shipborn-plc/sys-power }
+              - { label: Diesel, path: sys-diesel }
+              - { label: Fuel, path: sys-fuel }
+              - { label: Generator, path: sys-generator }
+              - { label: DC-bus, path: sys-dcbus }
+              - { label: Bow thruster, path: sys-bowthruster }
+              - { label: Zeewater, path: sys-seawater }
+              - { label: Zoetwater, path: sys-freshwater }
+              - { label: Vuilwater, path: sys-wastewater }
+              - { label: Bilge, path: sys-bilge }
+              - { label: Accu's, path: sys-power }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: pipe, medium: shaft, points: [[134, 450], [654, 450]], thickness: 10, speed: 60, flow_entity: sensor.plc_shaft_speed, flow_above: 5, flow_abs: true }
           - { type: propeller, x: 97, y: 370, width: 40, height: 170, active_entity: sensor.plc_shaft_speed, active_above: 5, active_abs: true }
@@ -160,7 +160,6 @@ views:
     path: sys-fuel
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_fuel_transfer_ps_running
     #   binary_sensor.plc_fuel_transfer_sb_running
@@ -214,7 +213,6 @@ views:
     path: sys-generator
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_generator_alarm
     #   sensor.plc_generator_power
@@ -254,7 +252,6 @@ views:
     path: sys-dcbus
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_glycol_pump_running
     cards:
@@ -345,7 +342,6 @@ views:
     path: sys-bowthruster
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_glycol_pump_running
     cards:
@@ -393,7 +389,6 @@ views:
     path: sys-seawater
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_bilge_engine_room_running
     #   binary_sensor.plc_compressor_running
@@ -464,7 +459,6 @@ views:
     path: sys-freshwater
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_boiler_on
     #   binary_sensor.plc_fresh_water_fill_valve_open
@@ -516,7 +510,6 @@ views:
     path: sys-wastewater
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_compressor_running
     #   binary_sensor.plc_ecomar_running
@@ -556,7 +549,6 @@ views:
     path: sys-bilge
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   binary_sensor.plc_bilge_aft_peak_high
     #   binary_sensor.plc_bilge_aft_peak_running
@@ -631,7 +623,6 @@ views:
     path: sys-power
     panel: true
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
-    back_path: /shipborn-plc/main
     # Nieuwe entiteiten (nog niet in de PLC-lijst):
     #   sensor.plc_24v_battery_voltage
     #   sensor.plc_start_battery2_voltage

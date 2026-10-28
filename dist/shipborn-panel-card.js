@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -306,8 +306,9 @@ const activeOf = (hass, ids, cfg = {}, key = "active") =>
     const below = cfg[key + "_below"];
     if (above == null && below == null) return isOn(so, cfg[key + "_state"]);
     let v = num(so);
-    if (v != null && cfg[key + "_abs"]) v = Math.abs(v);
-    return v != null && (above == null || v > above) && (below == null || v < below);
+    if (v == null) return isOn(so, cfg[key + "_state"]); // on/off entity mixed into a list with limits
+    if (cfg[key + "_abs"]) v = Math.abs(v);
+    return (above == null || v > above) && (below == null || v < below);
   });
 // SVG path through points with rounded corners.
 const roundedPath = (pts, r) => {
@@ -329,6 +330,8 @@ const roundedPath = (pts, r) => {
   const [lx, ly] = pts[pts.length - 1];
   return d + ` L${lx},${ly}`;
 };
+// A path without a leading slash is a view of the current dashboard: "sys-diesel" → "/<dashboard>/sys-diesel".
+const viewPath = (p) => (!p || p.startsWith("/") ? p : `/${location.pathname.split("/")[1]}/${p}`);
 const pad2 = (n) => String(n).padStart(2, "0");
 const stamp = (iso) => {
   const d = new Date(iso);
@@ -1072,7 +1075,8 @@ class ShipbornPanelCard extends HTMLElement {
     });
     this._updaters.push(() => {
       const here = location.pathname;
-      for (const [t, b] of tabs) b.classList.toggle("on", !!t.path && (here === t.path || [].concat(t.match || []).includes(here) || item.active === t.label));
+      for (const [t, b] of tabs)
+        b.classList.toggle("on", !!t.path && (here === viewPath(t.path) || [].concat(t.match || []).map(viewPath).includes(here) || item.active === t.label));
     });
     return n;
   }
@@ -1356,7 +1360,7 @@ class ShipbornPanelCard extends HTMLElement {
         if (entity) fire(this, "hass-more-info", { entityId: entity });
         return;
       case "navigate":
-        history.pushState(null, "", a.navigation_path);
+        history.pushState(null, "", viewPath(a.navigation_path));
         fire(window, "location-changed", { replace: false });
         return;
       case "url":
