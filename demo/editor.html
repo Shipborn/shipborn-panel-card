@@ -29,6 +29,14 @@
     .help { color: var(--muted); font-size: 12px; line-height: 1.55; }
     .help kbd { font: 11px ui-monospace, monospace; background: #232323; border: 1px solid #3a3a3a; border-radius: 4px; padding: 0 4px; color: var(--text); }
     #pos { font: 12px ui-monospace, monospace; color: var(--muted); }
+    .colors { display: grid; grid-template-columns: 1fr auto auto; gap: 6px 8px; align-items: center; }
+    .colors .def { color: var(--muted); font-size: 11px; }
+    input[type=color] { width: 42px; height: 28px; padding: 2px; background: #232323; border: 1px solid #3a3a3a; border-radius: 6px; cursor: pointer; }
+    .x { padding: 2px 7px; font-size: 12px; }
+    dialog { background: var(--bar); color: var(--text); border: 1px solid #3a3a3a; border-radius: 10px; padding: 18px; width: 360px; }
+    dialog::backdrop { background: rgba(0, 0, 0, .6); }
+    dialog label { display: grid; gap: 4px; margin-bottom: 12px; }
+    dialog input[type=text] { font: inherit; color: var(--text); background: #111; border: 1px solid #3a3a3a; border-radius: 6px; padding: 6px 8px; }
   </style>
   <script src="../dist/shipborn-panel-card.js"></script>
 </head>
@@ -58,8 +66,17 @@
       <button id="back" disabled title="Naar achteren">▼</button>
     </div>
     <div id="err"></div>
+    <h3>Kleuren</h3>
+    <div id="colors" class="colors"></div>
     <h3>Toevoegen</h3>
     <div class="row"><select id="newtype"></select><button id="add">+ Toevoegen</button></div>
+    <h3>Scherm</h3>
+    <div class="colors">
+      <span>Achtergrond</span><input type="color" id="bg"><span></span>
+    </div>
+    <div class="row"><button id="newview">+ Nieuw scherm</button><button id="delview">Scherm verwijderen</button></div>
+    <h3>Leidingkleuren (alle schermen)</h3>
+    <div id="media" class="colors"></div>
     <h3>Bediening</h3>
     <div class="help">
       Sleep om te verschuiven, <kbd>Shift</kbd>+klik of een kader trekken om meer te selecteren.<br>
@@ -71,10 +88,32 @@
     </div>
   </aside>
 
+  <dialog id="viewdlg">
+    <form method="dialog">
+      <label>Titel <input type="text" id="v-title" required placeholder="bijv. Hydrauliek"></label>
+      <label>Pad (in de URL) <input type="text" id="v-path" required pattern="[a-z0-9-]+" placeholder="sys-hydrauliek"></label>
+      <label>Soort
+        <select id="v-kind">
+          <option value="sys">Systeemschema (romp + systeemtabs)</option>
+          <option value="blank">Leeg (alleen kopbalk)</option>
+          <option value="copy">Kopie van huidig scherm</option>
+        </select>
+      </label>
+      <label>Tabblad
+        <select id="v-tab">
+          <option value="sys">In de systeemtabs (onder Systemen)</option>
+          <option value="main">In het hoofdmenu</option>
+          <option value="none">Geen tabblad</option>
+        </select>
+      </label>
+      <div class="row"><button value="ok" class="primary">Aanmaken</button><button value="cancel" formnovalidate>Annuleren</button></div>
+    </form>
+  </dialog>
+
   <script type="module">
     // Visual editor for examples/plc-dashboard.yaml. Edits go through the `yaml` Document API so
     // comments, anchors and the one-line { … } item style survive. Saving needs demo/edit_server.py.
-    import { parseDocument, isMap, isSeq } from "https://cdn.jsdelivr.net/npm/yaml@2.5.1/browser/index.js";
+    import { parseDocument, isMap, isSeq, visit } from "https://cdn.jsdelivr.net/npm/yaml@2.5.1/browser/index.js";
 
     const FILE = "../examples/plc-dashboard.yaml";
     const TEMPLATES = {
@@ -119,13 +158,17 @@
       remember(text);
       doc = parseDocument(text);
       if (serialize() !== text) console.warn("YAML round-trip is not byte-identical");
-      const views = doc.get("views").items.map((v) => v.get("title") || v.get("path"));
-      $("view").innerHTML = views.map((t, i) => `<option value="${i}">${t}</option>`).join("");
       const want = new URLSearchParams(location.search).get("view");
       const idx = doc.get("views").items.findIndex((v) => v.get("path") === want);
       vi = idx < 0 ? 0 : idx;
-      $("view").value = vi;
       render();
+    }
+    function fillViews() {
+      const views = doc.get("views").items;
+      vi = Math.min(vi, views.length - 1);
+      $("view").innerHTML = views.map((v, i) => `<option value="${i}">${v.get("title") || v.get("path")}</option>`).join("");
+      $("view").value = vi;
+      history.replaceState(null, "", `?view=${views[vi].get("path")}`);
     }
 
     function simStates(its) {
@@ -143,6 +186,7 @@
     function render() {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
+        fillViews();
         const cfg = { ...doc.toJS().views[vi].cards[0], kiosk: false };
         card.setConfig(cfg);
         card.hass = { states: simStates(cfg.items), locale: { language: "nl" }, callService() {} };
@@ -242,7 +286,9 @@
     }
     function restore(text) {
       doc = parseDocument(text);
+      vi = Math.min(vi, doc.get("views").items.length - 1);
       sel = sel.filter((i) => i < itemsSeq().items.length);
+      colorsShown = screenShown = null;
       changed();
     }
     const flowSeqs = (node) => {
@@ -373,7 +419,14 @@
 
     // ---------- side panel ----------
     let shown = null;
+    // Colour pickers are rebuilt only when the selection or screen changes (or a pick ends), so an
+    // open picker is not replaced while it is being dragged.
+    let colorsShown = null, screenShown = null;
     function showProps() {
+      const its0 = items();
+      const ck = `${vi}:${sel.join()}:${sel.map((i) => its0[i] && its0[i].type + (its0[i].medium || "")).join()}`;
+      if (ck !== colorsShown) { colorsShown = ck; showColors(); }
+      if (screenShown !== vi) { screenShown = vi; showScreenColors(); }
       const ta = $("props");
       const one = sel.length === 1;
       for (const b of ["apply", "dup", "del", "front", "back"]) $(b).disabled = !sel.length || (!one && ["apply", "front", "back"].includes(b));
@@ -455,8 +508,251 @@
       changed();
     };
 
+    // ---------- colours ----------
+    const PAL = customElements.get("shipborn-panel-card").palettes;
+    const NAMED = { ...PAL.led, ...PAL.design };
+    const SYMBOLS = ["pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke", "engine", "generator", "converter", "battery", "fan"];
+    const LABELS = { color: "Kleur", active_color: "Kleur actief", background: "Achtergrond", border: "Rand", flow_color: "Streepjes", casing: "Rand leiding" };
+    // Colour options per item type, with the colour shown when the option is not set.
+    function colorKeys(it) {
+      const k = {};
+      const media = { ...PAL.media, ...cardCfg().media_colors };
+      if (it.type === "pipe") k.color = media[it.medium] || media.seawater;
+      else if (it.type === "hull") Object.assign(k, { color: "#141516", border: "#3a3a3a" });
+      else if (it.type === "line") Object.assign(k, { color: "#2c2c2c", active_color: PAL.design.amber });
+      else if (SYMBOLS.includes(it.type)) k.color = it.type === "propeller" ? PAL.media.shaft : PAL.design.green;
+      else if (!["image", "nav", "alarm", "group"].includes(it.type)) k.color = "#ecebe6";
+      for (const key of ["active_color", "background", "flow_color", "casing"]) if (it[key] != null && !(key in k)) k[key] = "#ffffff";
+      return k;
+    }
+    const toHex = (v, fallback) => {
+      v = NAMED[v] || v;
+      if (/^#[0-9a-f]{6}$/i.test(v || "")) return v.toLowerCase();
+      if (/^#[0-9a-f]{3}$/i.test(v || "")) return "#" + [...v.slice(1)].map((c) => c + c).join("").toLowerCase();
+      return fallback;
+    };
+    // A colour picker that snapshots once per change (not on every drag of the picker).
+    function picker(value, onInput) {
+      const inp = document.createElement("input");
+      inp.type = "color";
+      inp.value = value;
+      let armed = true;
+      inp.addEventListener("input", () => {
+        if (armed) { snapshot(); armed = false; }
+        onInput(inp.value);
+      });
+      inp.addEventListener("change", () => {
+        armed = true;
+        colorsShown = screenShown = null; // refresh the "(standaard)" labels
+        showProps();
+      });
+      return inp;
+    }
+    function resetBtn(onClick) {
+      const b = document.createElement("button");
+      b.className = "x";
+      b.textContent = "×";
+      b.title = "Standaardkleur";
+      b.onclick = () => {
+        onClick();
+        colorsShown = screenShown = null;
+        showProps();
+      };
+      return b;
+    }
+    function showColors() {
+      const box = $("colors");
+      box.innerHTML = "";
+      const its = items();
+      const chosen = sel.map((i) => [i, its[i]]).filter(([, it]) => it);
+      if (!chosen.length) { box.innerHTML = `<span class="def">Selecteer een of meer onderdelen.</span>`; return; }
+      const pipes = chosen.filter(([, it]) => it.type === "pipe");
+      if (pipes.length) {
+        const s = document.createElement("select");
+        s.innerHTML = Object.keys(PAL.media).map((m) => `<option>${m}</option>`).join("");
+        s.value = pipes[0][1].medium || "seawater";
+        s.onchange = () => {
+          snapshot();
+          for (const [i] of pipes) { setIn(i, "medium", s.value); doc.deleteIn([...itemsPath(), i, "color"]); }
+          changed();
+        };
+        const l = document.createElement("span");
+        l.textContent = "Medium";
+        box.append(l, s, document.createElement("span"));
+      }
+      const keys = {};
+      for (const [, it] of chosen) for (const [k, def] of Object.entries(colorKeys(it))) keys[k] ??= toHex(it[k], toHex(def, "#ffffff"));
+      for (const [k, value] of Object.entries(keys)) {
+        const l = document.createElement("span");
+        const set = chosen.some(([, it]) => it[k] != null);
+        l.innerHTML = `${LABELS[k] || k}${set ? "" : ' <span class="def">(standaard)</span>'}`;
+        const targets = chosen.filter(([, it]) => k in colorKeys(it));
+        box.append(l, picker(value, (v) => { for (const [i] of targets) setIn(i, k, v); changed(); }), resetBtn(() => {
+          snapshot();
+          for (const [i] of targets) doc.deleteIn([...itemsPath(), i, k]);
+          changed();
+        }));
+      }
+    }
+    const cardPath = (v = vi) => ["views", v, "cards", 0];
+    function showScreenColors() {
+      const cfg = cardCfg();
+      $("bg").value = toHex(cfg.background, "#1b1b1b");
+      const box = $("media");
+      box.innerHTML = "";
+      const mine = cfg.media_colors || {};
+      for (const [m, def] of Object.entries(PAL.media)) {
+        const l = document.createElement("span");
+        l.innerHTML = `${m}${mine[m] ? "" : ' <span class="def">(standaard)</span>'}`;
+        box.append(l, picker(toHex(mine[m], def), (v) => setMedia(m, v)), resetBtn(() => { snapshot(); setMedia(m, null); }));
+      }
+    }
+    // Medium colours apply to every screen: each card gets the same media_colors.
+    function setMedia(m, v) {
+      doc.get("views").items.forEach((_, i) => {
+        const card = doc.getIn(cardPath(i), true);
+        if (!card || !String(card.get("type")).includes("shipborn-panel-card")) return;
+        if (v == null) {
+          doc.deleteIn([...cardPath(i), "media_colors", m]);
+          if (!doc.getIn([...cardPath(i), "media_colors"], true)?.items.length) doc.deleteIn([...cardPath(i), "media_colors"]);
+          return;
+        }
+        if (!doc.hasIn([...cardPath(i), "media_colors"])) {
+          const n = doc.createNode({});
+          n.flow = true;
+          doc.setIn([...cardPath(i), "media_colors"], n);
+        }
+        doc.setIn([...cardPath(i), "media_colors", m], v);
+      });
+      changed();
+    }
+    $("bg").addEventListener("input", (() => {
+      let armed = true;
+      $("bg").addEventListener("change", () => (armed = true));
+      return () => {
+        if (armed) { snapshot(); armed = false; }
+        doc.setIn([...cardPath(), "background"], $("bg").value);
+        doc.setIn([...cardPath(), "border"], $("bg").value);
+        changed();
+      };
+    })());
+
+    // ---------- screens ----------
+    function anchored(name) {
+      let found = null;
+      visit(doc, { Node(_, n) { if (n.anchor === name) { found = n; return visit.BREAK; } } });
+      return found;
+    }
+    const flowItem = (obj) => {
+      const n = doc.createNode(obj);
+      n.flow = true;
+      return flowSeqs(n);
+    };
+    // Header shared by all screens; tabs point at the &plc_tabs / &sys_tabs lists (YAML aliases).
+    function headerItems(kind) {
+      const nav = (obj, anchor) => {
+        const n = flowItem(obj);
+        const list = anchored(anchor);
+        if (list) n.set("tabs", doc.createAlias(list));
+        return n;
+      };
+      const out = [
+        flowItem({ type: "line", x: 0, y: 0, width: 1280, height: 64, color: "#141516" }),
+        flowItem({ type: "image", x: 24, y: 14, width: 256, height: 36, image: "shipborn-joal" }),
+        nav({ type: "nav", x: 300, y: 10 }, "plc_tabs"),
+        flowItem({ type: "indicator", x: 1110, y: 25, entity: "binary_sensor.plc_lifebeat", label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }),
+        flowItem({ type: "alarm", x: 0, y: 64, width: 1280, height: 40, entity: "sensor.plc_active_alarm", active_entity: "binary_sensor.plc_alarm_active" }),
+      ];
+      if (kind === "sys") out.push(
+        nav({ type: "nav", x: 20, y: 112, font_size: 14 }, "sys_tabs"),
+        flowItem({ type: "hull", x: 20, y: 160, width: 1240, height: 600 }),
+      );
+      return out;
+    }
+    function newCard(kind) {
+      if (kind === "copy") {
+        const c = doc.getIn(cardPath(), true).clone();
+        // A copy may not define the same anchor twice: turn definitions into aliases.
+        visit(c, { Node(_, n) { if (n.anchor) { const a = doc.createAlias(anchored(n.anchor)); return a; } } });
+        return c;
+      }
+      const c = doc.createNode({ type: "custom:shipborn-panel-card", kiosk: true, width: 1280, height: 800, background: "#0d0e10", border: "#0d0e10", corner_radius: 0 });
+      const its = doc.createNode([]);
+      its.items = headerItems(kind);
+      c.set("items", its);
+      const media = cardCfg().media_colors;
+      if (media) c.set("media_colors", flowItem(media));
+      return c;
+    }
+    function addTab(where, title, path) {
+      const tab = flowItem({ label: title, path });
+      if (where === "sys") {
+        anchored("sys_tabs")?.items.push(tab);
+        const sys = anchored("plc_tabs")?.items.find((n) => n.get("label") === "Systemen");
+        if (sys) {
+          if (!sys.has("match")) sys.set("match", flowItem([]));
+          sys.get("match").items.push(doc.createNode(path));
+        }
+      } else if (where === "main") {
+        const list = anchored("plc_tabs");
+        if (!list) return;
+        const alarms = list.items.findIndex((n) => !n.get("path"));
+        list.items.splice(alarms < 0 ? list.items.length : alarms, 0, tab);
+      }
+    }
+    function removeTabs(path) {
+      for (const name of ["plc_tabs", "sys_tabs"]) {
+        const list = anchored(name);
+        if (!list) continue;
+        list.items = list.items.filter((n) => n.get("path") !== path);
+        for (const n of list.items) {
+          const m = n.get("match");
+          if (isSeq(m)) m.items = m.items.filter((x) => String(x.value ?? x) !== path);
+        }
+      }
+    }
+    const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    $("v-title").addEventListener("input", () => {
+      if (!$("v-path").dataset.touched) $("v-path").value = ($("v-tab").value === "sys" ? "sys-" : "") + slug($("v-title").value);
+    });
+    $("v-path").addEventListener("input", () => ($("v-path").dataset.touched = "1"));
+    $("newview").onclick = () => {
+      $("v-title").value = "";
+      $("v-path").value = "";
+      delete $("v-path").dataset.touched;
+      $("viewdlg").showModal();
+    };
+    $("viewdlg").addEventListener("close", () => {
+      if ($("viewdlg").returnValue !== "ok") return;
+      const title = $("v-title").value.trim(), path = $("v-path").value.trim();
+      const views = doc.get("views");
+      if (views.items.some((v) => v.get("path") === path)) return alert(`Er is al een scherm met pad "${path}".`);
+      snapshot();
+      const view = doc.createNode({ title, path, panel: true, subview: true });
+      view.set("cards", doc.createNode([]));
+      view.get("cards").items.push(newCard($("v-kind").value));
+      views.items.push(view);
+      addTab($("v-tab").value, title, path);
+      vi = views.items.length - 1;
+      sel = [];
+      changed();
+    });
+    $("delview").onclick = () => {
+      const view = doc.get("views").items[vi];
+      let defines = null;
+      visit(view, { Node(_, n) { if (n.anchor) { defines = n.anchor; return visit.BREAK; } } });
+      if (defines) return alert(`Dit scherm bevat de tablijst "${defines}" die de andere schermen gebruiken; het kan niet verwijderd worden.`);
+      if (!confirm(`Scherm "${view.get("title")}" verwijderen?`)) return;
+      snapshot();
+      removeTabs(view.get("path"));
+      doc.get("views").items.splice(vi, 1);
+      vi = Math.max(0, vi - 1);
+      sel = [];
+      changed();
+    };
+
     // ---------- toolbar / keys ----------
-    $("view").onchange = () => { vi = +$("view").value; sel = []; hover = null; history.replaceState(null, "", `?view=${doc.get("views").items[vi].get("path")}`); render(); };
+    $("view").onchange = () => { vi = +$("view").value; sel = []; hover = null; render(); };
     $("sim").onchange = render;
     $("undo").onclick = () => undo.length && (redo.push(serialize()), restore(undo.pop()));
     $("redo").onclick = () => redo.length && (undo.push(serialize()), restore(redo.pop()));

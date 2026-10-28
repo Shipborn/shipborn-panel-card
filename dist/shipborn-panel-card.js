@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.5";
+const VERSION = "0.4.6";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -354,6 +354,11 @@ const capture = (node, ev) => {
 };
 
 class ShipbornPanelCard extends HTMLElement {
+  // Colour tables, for the layout editor's pickers.
+  static get palettes() {
+    return { design: DESIGN_COLORS, led: LED_COLORS, media: MEDIA };
+  }
+
   static getStubConfig() {
     return {
       shape: "rect",
@@ -477,6 +482,11 @@ class ShipbornPanelCard extends HTMLElement {
   _kioskOff() {
     this._kiosk?.();
     this._kiosk = null;
+  }
+
+  // Pipe colours per medium; `media_colors: { seawater: "#…" }` on the card overrides them.
+  _media() {
+    return { ...MEDIA, ...this._config.media_colors };
   }
 
   // ---------- layout ----------
@@ -1293,7 +1303,8 @@ class ShipbornPanelCard extends HTMLElement {
     svg.setAttribute("width", Math.max(...xs) - x0 + pad);
     svg.setAttribute("height", Math.max(...ys) - y0 + pad);
     Object.assign(svg.style, { left: x0 + "px", top: y0 + "px" });
-    const col = color(MEDIA[p.medium] || p.color, MEDIA.seawater);
+    const media = this._media();
+    const col = color(p.color || media[p.medium], media.seawater);
     const d = roundedPath(local, p.radius ?? t * 2);
     const dash = p.dash || [t * 1.2, t * 1.8];
     const period = dash[0] + dash[1];
@@ -1423,7 +1434,7 @@ class ShipbornPanelCard extends HTMLElement {
       n.addEventListener("click", () => this._handleAction(s, s.tap_action || { action: "more-info" }, n));
     }
     if (s.speed) n.style.setProperty("--dur", s.speed + "s");
-    const on = s.color ? color(s.color) : kind === "propeller" ? MEDIA.shaft : DESIGN_COLORS.green;
+    const on = s.color ? color(s.color) : kind === "propeller" ? this._media().shaft : DESIGN_COLORS.green;
     this._updaters.push((hass) => {
       const alarm = activeOf(hass, s.alarm_entity);
       const active = stateIds ? activeOf(hass, stateIds, s) : s.active === true;

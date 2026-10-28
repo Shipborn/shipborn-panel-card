@@ -169,6 +169,8 @@ Open http://localhost:8770/demo/editor.html en kies een view.
 - Rechts staan alle opties van het geselecteerde onderdeel (entiteit, kleur, label…) om te bewerken, plus dupliceren, verwijderen, voor/achter en nieuwe onderdelen.
 - `Cmd/Ctrl+Z` ongedaan maken, `Cmd/Ctrl+S` opslaan in `examples/plc-dashboard.yaml`. Opmerkingen en opmaak in het bestand blijven staan.
 - **Kopieer YAML** zet het hele dashboard op het klembord om in HA te plakken (Raw configuration editor).
+- **Kleuren**: kies voor de geselecteerde onderdelen een kleur (of medium bij leidingen); × zet de standaardkleur terug. Onder *Scherm* staat de achtergrond, onder *Leidingkleuren* de kleur per medium voor alle schermen (`media_colors` op de kaart).
+- **Nieuw scherm**: titel, pad en soort (systeemschema met romp, leeg, of kopie van het huidige scherm); het tabblad komt in de systeemtabs of het hoofdmenu. **Scherm verwijderen** haalt ook het tabblad weg.
 
 ## Veiligheid
 
