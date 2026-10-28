@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.3";
+const VERSION = "0.4.4";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -390,11 +390,93 @@ class ShipbornPanelCard extends HTMLElement {
       this._ro = new ResizeObserver(() => this._fit());
       this._ro.observe(this._outer);
     }
+    if (this._config?.kiosk && !this._kiosk) setTimeout(() => this.isConnected && !this._kiosk && this._kioskOn());
   }
 
   disconnectedCallback() {
     this._ro?.disconnect();
     this._ro = null;
+    this._kioskOff();
+  }
+
+  // ---------- kiosk: hide HA's top bar and sidebar ----------
+
+  // With `kiosk: true` the HA header and sidebar are hidden while this card is shown. Resting the
+  // pointer (or a finger) on the top or left screen edge for `kiosk_delay` ms shows them again;
+  // going back onto the card hides them. Not in edit mode or the card editor.
+  _kioskOn() {
+    const hosts = [];
+    for (let n = this.getRootNode().host; n; n = n.getRootNode().host) hosts.push(n);
+    const root = hosts.find((n) => n.localName === "hui-root");
+    const main = hosts.find((n) => n.localName === "home-assistant-main");
+    const editing = root?.lovelace?.editMode || hosts.some((n) => /^hui-(card-options|card-edit-mode|dialog-edit-card)$|^hui-card-preview$/.test(n.localName));
+    if (!root || !main || editing) return;
+    const drawer = main.shadowRoot.querySelector("ha-drawer")?.shadowRoot;
+    const css = [
+      [root.shadowRoot, `:host { --header-height: 0px !important; }
+        .header, app-header, app-toolbar { display: none !important; }
+        #view, hui-view-container { padding-top: env(safe-area-inset-top) !important; min-height: 100vh !important; }`],
+      [main.shadowRoot, `:host { --mdc-drawer-width: 0px !important; } ha-sidebar { display: none !important; }`],
+      [drawer, `.mdc-drawer { display: none !important; } .mdc-drawer-app-content { margin-left: 0 !important; }`],
+    ].filter(([sr]) => sr);
+    const styles = css.map(([sr, text]) => {
+      const s = document.createElement("style");
+      s.textContent = text;
+      return [sr, s];
+    });
+    const delay = this._config.kiosk_delay ?? 800;
+    let timer;
+    const hidden = () => styles[0][1].isConnected;
+    const hide = () => {
+      for (const [sr, s] of styles) sr.appendChild(s);
+      for (const z of zones) z.style.pointerEvents = "auto";
+    };
+    const show = () => {
+      for (const [, s] of styles) s.remove();
+      for (const z of zones) z.style.pointerEvents = "none";
+    };
+    const later = (fn) => {
+      clearTimeout(timer);
+      timer = setTimeout(fn, delay);
+    };
+    const cancel = () => clearTimeout(timer);
+    // Edge strips that reveal the bars; they only catch the pointer while the bars are hidden.
+    const zones = [
+      { top: 0, left: 0, right: 0, height: "8px" },
+      { top: 0, left: 0, bottom: 0, width: "8px" },
+    ].map((pos) => {
+      const z = document.createElement("div");
+      Object.assign(z.style, { position: "fixed", zIndex: 9999, ...Object.fromEntries(Object.entries(pos).map(([k, v]) => [k, typeof v === "number" ? v + "px" : v])) });
+      z.addEventListener("pointerenter", () => later(show));
+      z.addEventListener("pointerdown", () => later(show));
+      z.addEventListener("pointerleave", cancel);
+      z.addEventListener("pointercancel", cancel);
+      document.body.appendChild(z);
+      return z;
+    });
+    const onEnter = (e) => {
+      if (hidden()) return;
+      if (e.pointerType === "touch") hide();
+      else later(hide);
+    };
+    const onLeave = () => !hidden() && cancel();
+    this.addEventListener("pointerenter", onEnter);
+    this.addEventListener("pointerdown", onEnter);
+    this.addEventListener("pointerleave", onLeave);
+    hide();
+    this._kiosk = () => {
+      cancel();
+      show();
+      for (const z of zones) z.remove();
+      this.removeEventListener("pointerenter", onEnter);
+      this.removeEventListener("pointerdown", onEnter);
+      this.removeEventListener("pointerleave", onLeave);
+    };
+  }
+
+  _kioskOff() {
+    this._kiosk?.();
+    this._kiosk = null;
   }
 
   // ---------- layout ----------

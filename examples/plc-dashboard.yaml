@@ -10,6 +10,7 @@ views:
     panel: true
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -83,6 +84,7 @@ views:
     #   binary_sensor.plc_diesel_alarm
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -158,6 +160,7 @@ views:
     #   binary_sensor.plc_webasto_running
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -208,6 +211,7 @@ views:
     #   binary_sensor.plc_generator_alarm
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -244,6 +248,7 @@ views:
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -332,6 +337,7 @@ views:
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -377,6 +383,7 @@ views:
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -441,6 +448,7 @@ views:
     #   binary_sensor.plc_shore_water_valve_open
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -485,6 +493,7 @@ views:
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -523,6 +532,7 @@ views:
     #   binary_sensor.plc_bilge_anchor_box_running
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
@@ -584,6 +594,7 @@ views:
     subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
         background: "#0d0e10"
