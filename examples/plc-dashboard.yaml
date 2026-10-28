@@ -118,8 +118,10 @@ views:
           - { type: pipe, medium: grease, points: [[251, 315], [251, 442]], thickness: 5, arrow: true, idle_opacity: 0.8 }
           - { type: text, x: 265, y: 360, entity: sensor.al1590_er_prop_shaft_grease_pressure, mono: true, font_size: 16, unit: bar, decimals: 2 }
           - { type: text, x: 265, y: 386, entity: sensor.al1590_er_prop_shaft_grease_temperature, mono: true, font_size: 16, unit: "°C", decimals: 1 }
-          - { type: pipe, medium: seawater, points: [[549, 470], [549, 412]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 524, y: 190, width: 50, height: 220, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[549, 462], [549, 425]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 524, y: 190, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 534, y: 378, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 480, y: 328, text: Inlet V3, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[576, 260], [620, 260]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: text, x: 623, y: 225, width: 103, height: 87, text: "Cooling\nElectric/Shaft\nGearbox", boxed: true, font_size: 13, active_entity: switch.er_zeewaterpomp_cooling }
           - { type: pipe, medium: seawater, points: [[685, 312], [685, 366]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
@@ -132,13 +134,16 @@ views:
           - { type: text, x: 752, y: 455, text: Volvo D6 340, font_size: 15, uppercase: true, color: "#a3a29c" }
           - { type: text, x: 752, y: 478, entity: sensor.engine_room_main_engine_me_rpm, mono: true, font_size: 14 }
           - { type: text, x: 849, y: 478, entity: sensor.engine_room_main_engine_me_coolant_temp, mono: true, font_size: 14, unit: "°C" }
-          - { type: pipe, medium: seawater, points: [[1065, 620], [1065, 577]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: seawater, points: [[1065, 658], [1065, 615]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: strainer, x: 1040, y: 352, width: 50, height: 223, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: butterfly_valve, x: 1050, y: 568, active_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: text, x: 996, y: 518, text: Inlet V1, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[1039, 417], [942, 417]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: text, x: 984, y: 380, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 16, unit: L/min, decimals: 1 }
           - { type: pipe, medium: seawater, points: [[773, 505], [773, 556]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 759, y: 560, width: 28, height: 115, text: V2, boxed: true, font_size: 13, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[773, 675], [773, 722]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: butterfly_valve, x: 758, y: 560, active_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: text, x: 790, y: 570, text: Outlet V2, font_size: 12, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[773, 605], [773, 652]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: pipe, medium: exhaust, points: [[736, 493], [501, 493]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: text, x: 417, y: 475, width: 81, height: 180, text: "Exhaust\ndrain", boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
           - { type: text, x: 424, y: 610, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: "°C", decimals: 1 }
@@ -148,9 +153,9 @@ views:
           - { type: outlet, x: 388, y: 697, width: 80, height: 26, color: "#3cc7d6", label: Main outlet, active_entity: [sensor.engine_room_main_engine_me_rpm, switch.er_zeewaterpomp_cooling], active_above: 100 }
           - { type: text, x: 569, y: 640, width: 128, height: 55, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
           - { type: text, x: 614, y: 605, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 14, unit: bar, decimals: 2, factor: 0.001 }
-          - { type: pipe, medium: air, points: [[594, 638], [594, 372], [568, 372]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[697, 650], [711, 650], [711, 633], [757, 633]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[697, 662], [856, 662], [856, 540], [1048, 540]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
+          - { type: pipe, medium: air, points: [[594, 638], [594, 394], [564, 394]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: pipe, medium: air, points: [[697, 650], [711, 650], [711, 576], [758, 576]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: pipe, medium: air, points: [[697, 662], [856, 662], [856, 584], [1050, 584]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
 
   - title: Brandstof
     path: sys-fuel
@@ -225,8 +230,10 @@ views:
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[150, 645], [150, 602]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: seawater, points: [[150, 683], [150, 640]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
           - { type: strainer, x: 125, y: 370, width: 50, height: 230, color: "#3cc7d6", active_entity: binary_sensor.generatoron }
+          - { type: butterfly_valve, x: 135, y: 593, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: text, x: 81, y: 543, text: Inlet V4, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[175, 413], [274, 413], [274, 500], [580, 500]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
           - { type: text, x: 585, y: 433, width: 233, height: 139, text: "", boxed: true, alarm_entity: binary_sensor.plc_generator_alarm, active_entity: binary_sensor.generatoron }
           - { type: engine, x: 590, y: 462, width: 110, height: 77, active_entity: binary_sensor.generatoron }
@@ -262,8 +269,10 @@ views:
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[72, 565], [72, 522]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 47, y: 290, width: 50, height: 230, color: "#3cc7d6", label: Inlet V3, active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[72, 603], [72, 560]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 47, y: 290, width: 50, height: 230, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 57, y: 513, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 102, y: 463, text: Inlet V3, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[96, 355], [144, 355]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: pump, x: 153, y: 333, size: 44, entity: switch.er_zeewaterpomp_cooling, label: SW pump, active_entity: switch.er_zeewaterpomp_cooling }
           - { type: pipe, medium: seawater, points: [[175, 328], [175, 238], [240, 238]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
@@ -351,8 +360,10 @@ views:
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[189, 615], [189, 572]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 164, y: 340, width: 50, height: 230, color: "#3cc7d6", label: Inlet V3, active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[189, 653], [189, 610]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 164, y: 340, width: 50, height: 230, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 174, y: 563, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 120, y: 513, text: Inlet V3, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[213, 402], [265, 402]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: pump, x: 274, y: 380, size: 44, entity: switch.er_zeewaterpomp_cooling, label: SW pump, active_entity: switch.er_zeewaterpomp_cooling }
           - { type: pipe, medium: seawater, points: [[296, 374], [296, 327], [359, 327]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
@@ -396,49 +407,54 @@ views:
           - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
-          - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[218, 525], [218, 482]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0x781c9dfffea18853] }
-          - { type: strainer, x: 193, y: 220, width: 50, height: 260, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0x781c9dfffea18853] }
-          - { type: text, x: 196, y: 198, text: Inlet V4, font_size: 12, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[279, 685], [279, 642]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0x781c9dfffea18853] }
-          - { type: strainer, x: 254, y: 382, width: 50, height: 258, color: "#3cc7d6", label: Inlet V3, active_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0x781c9dfffea18853] }
-          - { type: pipe, medium: seawater, points: [[245, 255], [350, 255]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: hull, x: -15, y: 159, width: 1240, height: 600 }
+          - { type: pipe, medium: seawater, points: [[140, 525], [140, 482]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0x781c9dfffea18853] }
+          - { type: strainer, x: 115, y: 245, width: 50, height: 196, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0x781c9dfffea18853] }
+          - { type: text, x: 71, y: 383, text: Inlet V4, font_size: 12, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[279, 634], [279, 591]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0x781c9dfffea18853] }
+          - { type: strainer, x: 254, y: 356, width: 50, height: 195, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0x781c9dfffea18853] }
+          - { type: pipe, medium: seawater, points: [[167, 255], [350, 255]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
           - { type: text, x: 359, y: 245, text: Waste Water Ecomar, font_size: 14, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[514, 255], [620, 255]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: pipe, medium: seawater, points: [[245, 292], [350, 292]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
+          - { type: pipe, medium: seawater, points: [[167, 292], [350, 292]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
           - { type: text, x: 359, y: 282, text: HVAC Webasto, font_size: 14, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[514, 292], [620, 292]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
-          - { type: pipe, medium: seawater, points: [[245, 330], [350, 330]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: seawater, points: [[167, 330], [350, 330]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
           - { type: text, x: 359, y: 320, text: Generator NL, font_size: 14, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[514, 330], [620, 330]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: seawater, points: [[305, 416], [350, 416]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: text, x: 359, y: 406, text: Water maker HEM, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[514, 416], [620, 416]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: pipe, medium: seawater, points: [[305, 453], [350, 453]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: text, x: 359, y: 443, text: Cooling Electric/GB, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[514, 453], [620, 453]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[305, 490], [350, 490]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
-          - { type: text, x: 359, y: 480, text: Deck wash, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[514, 490], [620, 490]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
-          - { type: text, x: 623, y: 218, width: 38, height: 384, text: "Main\noutlet", boxed: true, font_size: 12, active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
-          - { type: valve, x: 629, y: 534, width: 26, height: 16, rotation: 90, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
-          - { type: pipe, medium: seawater, points: [[642, 605], [642, 652]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
-          - { type: pipe, medium: seawater, points: [[911, 613], [911, 570]], thickness: 7, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm, switch.0x781c9dfffea18853], flow_above: 100 }
-          - { type: strainer, x: 886, y: 320, width: 50, height: 248, color: "#3cc7d6", label: Inlet V1, active_entity: [sensor.engine_room_main_engine_me_rpm, switch.0x781c9dfffea18853], active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[885, 352], [844, 352], [844, 490]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: engine, x: 761, y: 482, width: 110, height: 77, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[801, 485], [801, 338], [734, 338], [734, 402]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 718, y: 408, width: 32, height: 140, text: "Outlet\nV2", boxed: true, font_size: 11, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[734, 548], [734, 582]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: pipe, medium: bilge, points: [[976, 630], [976, 527], [998, 527]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: pump, x: 1002, y: 507, size: 40, entity: switch.0xe4b063fffe6d51d8, label: ER bilge pump, active_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: pipe, medium: bilge, points: [[1022, 500], [1022, 295], [665, 295]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: text, x: 485, y: 632, width: 127, height: 54, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
-          - { type: text, x: 524, y: 602, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 13, unit: bar, decimals: 2, factor: 0.001 }
-          - { type: pipe, medium: air, points: [[504, 632], [504, 598], [412, 598], [412, 547], [298, 547]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[485, 665], [182, 665], [182, 408], [201, 408]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[612, 650], [687, 650], [687, 477], [714, 477]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[612, 675], [871, 675], [871, 500], [894, 500]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
+          - { type: pipe, medium: seawater, points: [[305, 365], [350, 365]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: text, x: 359, y: 355, text: Water maker HEM, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[514, 365], [620, 365]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: pipe, medium: seawater, points: [[305, 402], [350, 402]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: text, x: 359, y: 392, text: Cooling Electric/GB, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[514, 402], [620, 402]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[305, 439], [350, 439]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
+          - { type: text, x: 359, y: 429, text: Deck wash, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: text, x: 623, y: 218, width: 40, height: 270, text: "Main\noutlet", boxed: true, font_size: 12, active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
+          - { type: pipe, medium: seawater, points: [[642, 532], [642, 579]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
+          - { type: pipe, medium: seawater, points: [[967, 634], [967, 591]], thickness: 7, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm, switch.0x781c9dfffea18853], flow_above: 100 }
+          - { type: strainer, x: 941, y: 361, width: 50, height: 196, color: "#3cc7d6", active_entity: [sensor.engine_room_main_engine_me_rpm, switch.0x781c9dfffea18853], active_above: 100 }
+          - { type: pipe, medium: seawater, points: [[940, 369], [880, 369], [880, 417]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: engine, x: 791, y: 427, width: 110, height: 77, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: pipe, medium: seawater, points: [[801, 415], [801, 370], [734, 370], [734, 480]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: seawater, points: [[734, 535], [734, 582]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: bilge, points: [[1015, 630], [1015, 527], [1047, 527]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: pump, x: 1049, y: 507, size: 40, entity: switch.0xe4b063fffe6d51d8, label: ER bilge pump, active_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: pipe, medium: bilge, points: [[1069, 500], [1069, 295], [670, 295]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: text, x: 485, y: 632, width: 125, height: 80, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
+          - { type: text, x: 524, y: 687, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 13, unit: bar, decimals: 2 }
+          - { type: pipe, medium: air, points: [[504, 632], [504, 598], [504, 560], [410, 560], [295, 560]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: pipe, medium: air, points: [[485, 687], [182, 687], [182, 450], [155, 450]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: pipe, medium: air, points: [[612, 650], [687, 650], [687, 505], [715, 505]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: pipe, medium: air, points: [[610, 685], [921, 685], [921, 565], [950, 565]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: butterfly_valve, medium: air, x: 951, y: 546, active_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: butterfly_valve, x: 627, y: 490 }
+          - { type: butterfly_valve, x: 125, y: 435, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: text, x: 210, y: 494, text: INLET V3, font_size: 12, uppercase: true, color: "#a3a29c" }
+          - { type: butterfly_valve, x: 265, y: 544, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: butterfly_valve, x: 720, y: 490, active_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: text, x: 710, y: 594, text: OUTLET V2, font_size: 12, uppercase: true, color: "#a3a29c" }
+          - { type: text, x: 900, y: 534, text: INLET V1, font_size: 12, uppercase: true, color: "#a3a29c" }
 
   - title: Zoetwater
     path: sys-freshwater
@@ -466,8 +482,10 @@ views:
           - { type: valve, x: 95, y: 491, width: 30, height: 18, entity: binary_sensor.plc_shore_water_valve_open, color: "#4aa3ff", active_entity: binary_sensor.plc_shore_water_valve_open }
           - { type: pipe, medium: freshwater, points: [[124, 502], [974, 502]], thickness: 7, arrow: true, flow_entity: [switch.0x781c9dfffeb6cfcd, binary_sensor.plc_shore_water_valve_open] }
           - { type: text, x: 977, y: 335, width: 197, height: 170, text: Boiler, boxed: true, font_size: 18, active_entity: switch.0xa4c138dd3d53bb57 }
-          - { type: pipe, medium: seawater, points: [[395, 480], [395, 437]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: strainer, x: 370, y: 205, width: 50, height: 230, color: "#3cc7d6", label: Inlet V3, active_entity: switch.0xe4b063fffe7add34 }
+          - { type: pipe, medium: seawater, points: [[395, 483], [395, 440]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: strainer, x: 370, y: 205, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.0xe4b063fffe7add34 }
+          - { type: butterfly_valve, x: 380, y: 393, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 326, y: 343, text: Inlet V3, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[419, 247], [493, 247]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
           - { type: text, x: 497, y: 205, width: 60, height: 85, text: "Water\nmaker", boxed: true, font_size: 12, active_entity: switch.0xe4b063fffe7add34 }
           - { type: pipe, medium: freshwater, points: [[557, 247], [787, 247]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
@@ -507,8 +525,10 @@ views:
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[296, 570], [296, 527]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
+          - { type: pipe, medium: seawater, points: [[296, 608], [296, 565]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
           - { type: strainer, x: 271, y: 268, width: 50, height: 257, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
+          - { type: butterfly_valve, x: 281, y: 518, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: text, x: 227, y: 468, text: Inlet V4, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: seawater, points: [[323, 375], [353, 375]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
           - { type: text, x: 357, y: 282, width: 140, height: 136, text: "Ecomar\ncleaning tank", boxed: true, font_size: 14, active_entity: switch.0xe4b063fffe787644 }
           - { type: pipe, medium: wastewater, points: [[497, 350], [570, 350]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
@@ -521,7 +541,7 @@ views:
           - { type: pump, x: 563, y: 510, size: 40, rotation: 270, entity: switch.0x781c9dfffea18816, active_entity: switch.0x781c9dfffea18816 }
           - { type: pipe, medium: wastewater, points: [[583, 502], [583, 382]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
           - { type: text, x: 481, y: 648, width: 126, height: 52, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[481, 670], [258, 670], [258, 455], [276, 455]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea18853 }
+          - { type: pipe, medium: air, points: [[481, 670], [258, 670], [258, 534], [281, 534]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
 
   - title: Bilgepompen
     path: sys-bilge
