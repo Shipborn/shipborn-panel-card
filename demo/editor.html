@@ -220,11 +220,19 @@
     function simStates(its) {
       const st = {};
       if (!$("sim").checked) return st;
+      // One entity can drive several items with different limits (rpm > 1 and rpm > 100):
+      // pick a value above the highest limit so they all run.
+      const above = {};
       for (const it of its) for (const key of ["flow", "active"])
         for (const id of [].concat(it[key + "_entity"] || [])) {
           const a = it[key + "_above"];
-          st[id] = { state: a == null ? "on" : String(a < 10 ? a + 12.3 : a + 1350), attributes: {} };
+          const s = it[key + "_state"];
+          // Limits only apply to numeric entities; a switch in the same list stays on/off.
+          if (a != null && /^(sensor|number|input_number)\./.test(id)) above[id] = Math.max(above[id] ?? -Infinity, a);
+          else if (!(id in above)) st[id] = { state: s != null ? String([].concat(s)[0]) : "on", attributes: {} };
         }
+      for (const [id, a] of Object.entries(above))
+        st[id] = { state: String(a < 10 ? a + 12.3 : a + 1350), attributes: {} };
       return st;
     }
 

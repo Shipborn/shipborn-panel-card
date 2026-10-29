@@ -127,6 +127,12 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 
 Een checklist-regel is een `indicator` met `off_color: red`: groen als het klopt, rood als het niet klopt, met `state_on: open` voor kleppen of `active_above: 2.49` voor een minimale waarde.
 
+Een `pump` op een schakelaar (`switch`, `input_boolean`, `light`, `fan`) schakelt bij een tik, na de vraag *Wilt u de pomp aanzetten?* of *…uitzetten?*. Elke `confirmation` verschijnt als donker Ja/Nee-venster; met `text_on` / `text_off` hangt de vraag af van de huidige stand:
+
+```yaml
+tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } }
+```
+
 `tap_action` kent ook `fire-dom-event` (browser_mod), zoals de knop *Wierpot aft afsluiten voor legen*.
 
 Een `text` met `boxed: true` wordt een tank met `level_entity`: het vak vult zich van onder tot dat niveau (0–100, of tot `level_max`), in de kleur van `medium` of `level_color`. `level_factor` rekent een ruwe waarde om.

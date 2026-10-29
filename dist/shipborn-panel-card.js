@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.12";
+const VERSION = "0.4.13";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -167,6 +167,16 @@ const STYLE = `
     cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
   .d-btn:hover { background: #2a2a2a; }
+  .d-dlg { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .6); }
+  .d-dlg > div {
+    width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 22px; display: flex; flex-direction: column; gap: 18px;
+    background: #1b1b1b; border: 1px solid #3a3a3a; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .6);
+  }
+  .d-dlg .d-ph { white-space: normal; }
+  .d-dlg p { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.3; color: #ecebe6; }
+  .d-dlg .row { display: flex; gap: 12px; }
+  .d-dlg .d-btn { height: 52px; }
+  .d-dlg .d-btn.yes { border-color: #34d27b; color: #34d27b; background: #12261a; }
   .d-btn:active, .d-btn.pressed { background: #333; }
   .d-btn.left { justify-content: flex-start; }
   .d-btn.stop { background: #3a1512; border-color: #ff5b4f; color: #ffd9d6; }
@@ -1545,7 +1555,11 @@ class ShipbornPanelCard extends HTMLElement {
     const stateIds = s.active_entity || s.entity;
     if (s.entity || s.tap_action) {
       n.classList.add("click");
-      n.addEventListener("click", () => this._handleAction(s, s.tap_action || { action: "more-info" }, n));
+      const switchable = kind === "pump" && /^(switch|input_boolean|light|fan)\./.test(s.entity || "");
+      const tap = s.tap_action || (switchable
+        ? { action: "toggle", confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } }
+        : { action: "more-info" });
+      n.addEventListener("click", () => this._handleAction(s, tap, n));
     }
     if (s.speed) n.style.setProperty("--dur", s.speed + "s");
     const on = s.color ? color(s.color) : kind === "propeller" ? this._media().shaft : DESIGN_COLORS.green;
@@ -1560,15 +1574,19 @@ class ShipbornPanelCard extends HTMLElement {
 
   // ---------- actions ----------
 
-  _handleAction(cfg, action, node) {
+  async _handleAction(cfg, action, node) {
     const hass = this._hass;
     if (!hass) return;
     const a = action || { action: "default" };
     const entity = a.entity || cfg.entity;
     if (a.action === "none") return;
     if (a.confirmation) {
-      const text = a.confirmation.text || `${String(cfg.label || entity || "").replace(/\n/g, " ")}?`;
-      if (!window.confirm(text)) return;
+      // text_on / text_off: a different question depending on whether the entity is on now.
+      const c = a.confirmation;
+      const on = entity && isOn(hass.states[entity]);
+      const name = String(cfg.label || cfg.title || hass.states[entity]?.attributes?.friendly_name || entity || "").replace(/\n/g, " ");
+      const text = (on ? c.text_off : c.text_on) || c.text || `${name}?`;
+      if (!(await this._confirm(text, text === `${name}?` ? "" : name))) return;
     }
     fire(this, "haptic", "light");
     switch (a.action) {
@@ -1594,6 +1612,39 @@ class ShipbornPanelCard extends HTMLElement {
       default:
         if (entity) this._toggle(entity);
     }
+  }
+
+  // Dark yes/no dialog in the style of the screen pages; resolves true on "Ja".
+  _confirm(text, title) {
+    return new Promise((resolve) => {
+      const dlg = h("div", "d d-dlg");
+      const box = h("div");
+      if (title) {
+        const t = h("div", "d-ph");
+        t.textContent = title;
+        box.appendChild(t);
+      }
+      const p = h("p");
+      p.textContent = text;
+      const row = h("div", "row");
+      const no = h("button", "d-btn");
+      no.textContent = "Nee";
+      const yes = h("button", "d-btn yes");
+      yes.textContent = "Ja";
+      row.append(no, yes);
+      box.append(p, row);
+      dlg.appendChild(box);
+      const done = (ok) => (ev) => {
+        ev.stopPropagation();
+        dlg.remove();
+        resolve(ok);
+      };
+      yes.addEventListener("click", done(true));
+      no.addEventListener("click", done(false));
+      dlg.addEventListener("click", (ev) => ev.target === dlg && done(false)(ev));
+      this.shadowRoot.appendChild(dlg);
+      yes.focus();
+    });
   }
 
   _toggle(entityId) {
