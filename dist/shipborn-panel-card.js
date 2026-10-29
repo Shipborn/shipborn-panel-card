@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.13";
+const VERSION = "0.4.14";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -1553,12 +1553,18 @@ class ShipbornPanelCard extends HTMLElement {
       n.appendChild(lb);
     }
     const stateIds = s.active_entity || s.entity;
-    if (s.entity || s.tap_action) {
+    // A valve drawn with only active_entity: valve.x still opens and closes that valve.
+    const isValve = /valve$/.test(kind);
+    const valveEnt = isValve && !s.entity && typeof s.active_entity === "string" && /^valve\./.test(s.active_entity) ? s.active_entity : null;
+    if (s.entity || s.tap_action || valveEnt) {
       n.classList.add("click");
-      const switchable = kind === "pump" && /^(switch|input_boolean|light|fan)\./.test(s.entity || "");
-      const tap = s.tap_action || (switchable
-        ? { action: "toggle", confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } }
-        : { action: "more-info" });
+      const ent = s.entity || valveEnt;
+      const tap = s.tap_action
+        || (kind === "pump" && /^(switch|input_boolean|light|fan)\./.test(ent)
+          ? { action: "toggle", entity: ent, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } }
+          : isValve && /^(valve|switch|input_boolean)\./.test(ent)
+          ? { action: "toggle", entity: ent, confirmation: { text_on: "Wilt u de klep openen?", text_off: "Wilt u de klep sluiten?" } }
+          : { action: "more-info", entity: ent });
       n.addEventListener("click", () => this._handleAction(s, tap, n));
     }
     if (s.speed) n.style.setProperty("--dur", s.speed + "s");
@@ -1662,6 +1668,8 @@ class ShipbornPanelCard extends HTMLElement {
         return call("lock", state === "locked" ? "unlock" : "lock");
       case "cover":
         return call("cover", "toggle");
+      case "valve":
+        return call("valve", "toggle");
       default:
         return call("homeassistant", "toggle");
     }
