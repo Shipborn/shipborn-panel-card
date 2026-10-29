@@ -99,15 +99,14 @@
       <label>Pad (in de URL) <input type="text" id="v-path" required pattern="[a-z0-9\-]+" placeholder="sys-hydrauliek"></label>
       <label>Soort
         <select id="v-kind">
-          <option value="sys">Systeemschema (romp + systeemtabs)</option>
+          <option value="sys">Systeemschema (kopbalk + romp)</option>
           <option value="blank">Leeg (alleen kopbalk)</option>
           <option value="copy">Kopie van huidig scherm</option>
         </select>
       </label>
       <label>Tabblad
         <select id="v-tab">
-          <option value="sys">In de systeemtabs (onder Systemen)</option>
-          <option value="main">In het hoofdmenu</option>
+          <option value="sys">In de tabbalk</option>
           <option value="none">Geen tabblad</option>
         </select>
       </label>
@@ -756,7 +755,7 @@
       n.flow = true;
       return flowSeqs(n);
     };
-    // Header shared by all screens; tabs point at the &plc_tabs / &sys_tabs lists (YAML aliases).
+    // Header shared by all screens; the tabs point at the &sys_tabs list (YAML alias).
     function headerItems(kind) {
       const nav = (obj, anchor) => {
         const n = flowItem(obj);
@@ -766,15 +765,12 @@
       };
       const out = [
         flowItem({ type: "line", x: 0, y: 0, width: 1280, height: 64, color: "#141516" }),
-        flowItem({ type: "image", x: 24, y: 14, width: 256, height: 36, image: "shipborn-joal" }),
-        nav({ type: "nav", x: 300, y: 10 }, "plc_tabs"),
-        flowItem({ type: "indicator", x: 1110, y: 25, entity: "binary_sensor.plc_lifebeat", label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }),
+        flowItem({ type: "image", x: 24, y: 18, width: 200, height: 28, image: "shipborn-joal" }),
+        nav({ type: "nav", x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0 }, "sys_tabs"),
+        flowItem({ type: "indicator", x: 1144, y: 25, entity: "binary_sensor.plc_lifebeat", label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }),
         flowItem({ type: "alarm", x: 0, y: 64, width: 1280, height: 40, entity: "sensor.plc_active_alarm", active_entity: "binary_sensor.plc_alarm_active" }),
       ];
-      if (kind === "sys") out.push(
-        nav({ type: "nav", x: 20, y: 112, font_size: 14 }, "sys_tabs"),
-        flowItem({ type: "hull", x: 20, y: 160, width: 1240, height: 600 }),
-      );
+      if (kind === "sys") out.push(flowItem({ type: "hull", x: 20, y: 160, width: 1240, height: 600 }));
       return out;
     }
     function newCard(kind) {
@@ -794,22 +790,10 @@
     }
     function addTab(where, title, path) {
       const tab = flowItem({ label: title, path });
-      if (where === "sys") {
-        anchored("sys_tabs")?.items.push(tab);
-        const sys = anchored("plc_tabs")?.items.find((n) => n.get("label") === "Systemen");
-        if (sys) {
-          if (!sys.has("match")) sys.set("match", flowItem([]));
-          sys.get("match").items.push(doc.createNode(path));
-        }
-      } else if (where === "main") {
-        const list = anchored("plc_tabs");
-        if (!list) return;
-        const alarms = list.items.findIndex((n) => !n.get("path"));
-        list.items.splice(alarms < 0 ? list.items.length : alarms, 0, tab);
-      }
+      if (where === "sys") anchored("sys_tabs")?.items.push(tab);
     }
     function removeTabs(path) {
-      for (const name of ["plc_tabs", "sys_tabs"]) {
+      for (const name of ["sys_tabs"]) {
         const list = anchored(name);
         if (!list) continue;
         list.items = list.items.filter((n) => n.get("path") !== path);
@@ -836,7 +820,7 @@
       const views = doc.get("views");
       if (views.items.some((v) => v.get("path") === path)) return alert(`Er is al een scherm met pad "${path}".`);
       snapshot();
-      const view = doc.createNode({ title, path, panel: true, subview: true });
+      const view = doc.createNode({ title, path, panel: true });
       view.set("cards", doc.createNode([]));
       view.get("cards").items.push(newCard($("v-kind").value));
       views.items.push(view);

@@ -107,7 +107,7 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `value` | `entity`, `label`, `unit`, `decimals`, `style: tile`, `colors` (zie onder) |
 | `indicator` | `entity`, `label`, `color`, `blink`, `state_on`, `active_above` / `active_below`, `off_color` – LED met tekst |
 | `pushbutton` | `label`, `entity`, `tap_action`, `mode: momentary`, `variant: stop`, `led` + `led_entity`, `active_entity` (oranje rand), `align: left` |
-| `nav` | `tabs: [{label, path, match}]`, `style: side` – actieve tab volgt de URL |
+| `nav` | `tabs: [{label, path, match}]`, `style: side` – actieve tab volgt de URL; met `font_size` ook `tab_height`, `tab_padding` en `letter_spacing` |
 | `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text` |
 | `block` | PMS-blok: `name`, `kind`, `rating`, `entity` (kW), `alarm_entity`, `active_entity` |
 | `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
@@ -143,7 +143,7 @@ Een `text` met `boxed: true` wordt een tank met `level_entity`: het vak vult zic
 
 ### Schema's met stromende leidingen
 
-Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (tab *Systemen*): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge en Accu's, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.
+Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (de tabs bovenin): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge, Accu's, Webasto en Navigatie, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.
 
 Onder elk schema (scrollen) staat de bediening uit het oude HA-dashboard: sensortegels met kleuren, start-checklists, *Prepare start*, schakelaars en automaten. *Webasto* en *Navigatie* zijn tabs zonder schema, alleen met bediening.
 

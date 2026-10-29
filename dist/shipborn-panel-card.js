@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.15";
+const VERSION = "0.4.17";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -313,8 +313,11 @@ const isOn = (stateObj, onStates) =>
 const unavailable = (stateObj) => !stateObj || stateObj.state === "unavailable";
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 // `factor` converts raw values, e.g. 0.00001 for a Wago level of 7894954 → 78.9 %.
-const num = (stateObj, factor = 1) =>
-  stateObj && !isNaN(parseFloat(stateObj.state)) ? parseFloat(stateObj.state) * factor : null;
+// Only whole numeric states: "026 Jetvalve 3 …" is text, not 26.
+const num = (stateObj, factor = 1) => {
+  const s = String(stateObj?.state ?? "").trim();
+  return s !== "" && isFinite(Number(s)) ? Number(s) * factor : null;
+};
 const fmt = (v, decimals, hass) =>
   v == null
     ? "—"
@@ -1229,7 +1232,8 @@ class ShipbornPanelCard extends HTMLElement {
     const tabs = (item.tabs || []).map((t) => {
       const b = h("button", "d-tab");
       b.textContent = t.label;
-      if (item.font_size) Object.assign(b.style, { fontSize: item.font_size + "px", height: (item.tab_height || 36) + "px", padding: "0 12px" });
+      if (item.font_size) Object.assign(b.style, { fontSize: item.font_size + "px", height: (item.tab_height || 36) + "px", padding: `0 ${item.tab_padding ?? 12}px` });
+      if (item.letter_spacing != null) b.style.letterSpacing = item.letter_spacing;
       if (!t.path) b.disabled = true;
       else b.addEventListener("click", () => this._handleAction(t, { action: "navigate", navigation_path: t.path }, b));
       n.appendChild(b);

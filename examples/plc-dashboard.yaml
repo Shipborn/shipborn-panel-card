@@ -5,81 +5,13 @@
 # Elke view is één kaart van 1280×800 die meeschaalt met de schermbreedte.
 title: PLC
 views:
-  - title: Main
-    path: main
-    panel: true
-    cards:
-      - type: custom:shipborn-panel-card
-        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
-        width: 1280
-        height: 800
-        background: "#0d0e10"
-        border: "#0d0e10"
-        corner_radius: 0
-        items:
-          # ---- kopbalk: navigatie, lifebeat, alarm ----
-          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - type: nav
-            x: 300
-            y: 10
-            tabs: &plc_tabs
-              - { label: Main, path: main }
-              - { label: Diesel, path: diesel }
-              - { label: Electric, path: emotor, match: [bowthruster, jetthrusters, battery, shore-gen] }
-              - { label: PMS, path: pms }
-              - { label: Tanks, path: tanks }
-              - { label: Systemen, path: sys-diesel, match: [sys-fuel, sys-generator, sys-dcbus, sys-bowthruster, sys-seawater, sys-freshwater, sys-wastewater, sys-bilge, sys-power, sys-webasto, sys-navlights] }
-              - { label: Alarms }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
-          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-
-          # ---- links: bedrijfsmodus + alarm reset ----
-          - { type: panel, x: 24, y: 120, width: 260, height: 660, title: Mode }
-          - { type: pushbutton, x: 42, y: 160, width: 224, height: 56, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
-          - { type: pushbutton, x: 42, y: 226, width: 224, height: 56, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
-          - { type: pushbutton, x: 42, y: 292, width: 224, height: 56, label: Generator, align: left, entity: button.plc_mode_generator, led: green, led_entity: binary_sensor.plc_mode_generator_active, active_entity: binary_sensor.plc_mode_generator_active }
-          - { type: pushbutton, x: 42, y: 358, width: 224, height: 56, label: Harbor, align: left, entity: button.wago_hcs_controls_wago_controls_harbormode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode }
-          - { type: line, x: 42, y: 640, width: 224, height: 1, color: "#2c2c2c" }
-          - { type: indicator, x: 42, y: 658, entity: binary_sensor.plc_alarm_active, label: Alarm, color: red, blink: true }
-          - { type: pushbutton, x: 42, y: 700, width: 224, height: 56, label: Reset, entity: button.wago_energy_controls_wago_energy_controls_reset_main_2 }
-
-          # ---- midden: aandrijflijn, toerentallen ----
-          - { type: panel, x: 300, y: 120, width: 720, height: 660 }
-          - { type: text, x: 318, y: 134, text: Drivetrain, font_size: 15, weight: 600, uppercase: true, color: "#a3a29c" }
-          - { type: line, x: 550, y: 121, width: 1, height: 658, color: "#2c2c2c" }
-          - { type: line, x: 356, y: 310, width: 4, height: 330 }
-          - { type: line, x: 444, y: 500, width: 4, height: 84 }
-          - { type: line, x: 403, y: 648, width: 4, height: 50 }
-          - { type: text, x: 330, y: 190, width: 96, height: 120, text: Diesel, boxed: true }
-          - { type: text, x: 398, y: 380, width: 96, height: 120, text: Emotor, boxed: true }
-          - { type: text, x: 330, y: 584, width: 150, height: 64, text: Gearbox, boxed: true }
-          - { type: line, x: 355, y: 696, width: 100, height: 20, color: transparent, border: "2px solid #8f8e88", radius: "50%" }
-          - { type: text, x: 384, y: 724, text: Shaft, font_size: 13, uppercase: true, color: "#8f8e88" }
-
-          - { type: indicator, x: 570, y: 180, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, label: FWD, font_size: 18 }
-          - { type: indicator, x: 570, y: 222, entity: binary_sensor.plc_gear_neutral, label: NEUTRAL, font_size: 18 }
-          - { type: indicator, x: 570, y: 264, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, label: AFT, font_size: 18 }
-          - { type: gauge, x: 700, y: 136, width: 300, label: Diesel Speed, entity: sensor.engine_room_main_engine_me_rpm, min: 0, max: 4000 }
-          - { type: line, x: 551, y: 380, width: 468, height: 1, color: "#2c2c2c" }
-          - { type: gauge, x: 700, y: 396, width: 300, label: Electric Speed, entity: sensor.plc_electric_speed, min: -4000, max: 4000 }
-          - { type: line, x: 551, y: 630, width: 468, height: 1, color: "#2c2c2c" }
-          - { type: bar, x: 570, y: 650, width: 430, label: Shaft Speed, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: 0, max: 500, decimals: 0, color: amber, ticks: [0, 100, 200, 300, 400, 500] }
-
-          # ---- rechts: accu ----
-          - { type: panel, x: 1036, y: 120, width: 220, height: 660, title: Battery SoC }
-          - { type: tank, x: 1054, y: 160, width: 184, height: 540, frame: false, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, color: green, marker: 75, scale: [100, 75, 50, 25, 0], font_size: 40 }
-          - { type: pushbutton, x: 1054, y: 712, width: 89, height: 48, label: Charging, tap_action: { action: none }, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_bms_charging_mode }
-          - { type: pushbutton, x: 1149, y: 712, width: 89, height: 48, label: Discharging, tap_action: { action: none }, active_entity: binary_sensor.plc_battery_discharging }
-
   # ===== Systemschema's (omgezet uit Overszichtstekeningen/*.jpg) =====
   # Leidingen stromen (bewegende streepjes) zodra hun flow_entity actief is.
-  # Het zijn subviews: HA toont ze niet als losse tabbladen.
+  # De tabs bovenin wisselen tussen deze pagina's.
 
   - title: Diesel engine
     path: sys-diesel
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     # Nog te koppelen (niet gevonden in HA):
     #   binary_sensor.plc_diesel_alarm
     cards:
@@ -92,14 +24,13 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
-          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
           - type: nav
-            x: 20
-            y: 112
-            font_size: 14
+            x: 240
+            y: 14
+            font_size: 12
+            tab_padding: 8
+            letter_spacing: 0
             tabs: &sys_tabs
               - { label: Diesel, path: sys-diesel }
               - { label: Fuel, path: sys-fuel }
@@ -113,6 +44,9 @@ views:
               - { label: Accu's, path: sys-power }
               - { label: Webasto, path: sys-webasto }
               - { label: Navigatie, path: sys-navlights }
+              - { label: Alarms, path: alarms }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
           - { type: hull, x: 20, y: 158, width: 1240, height: 600 }
           - { type: pipe, medium: air, points: [[847, 655], [605, 655], [605, 355], [545, 355]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
           - { type: pipe, medium: shaft, points: [[630, 466], [134, 466]], thickness: 10, speed: 60, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
@@ -277,7 +211,6 @@ views:
   - title: Brandstof
     path: sys-fuel
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     # Nog te koppelen (niet gevonden in HA):
     #   binary_sensor.plc_webasto_running
     cards:
@@ -290,11 +223,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 28, y: 160, width: 1240, height: 600 }
           - { type: text, x: 505, y: 235, width: 160, height: 100, text: Daytank Diesel ER, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_daytank_level_statistics, font_size: 14 }
           - { type: text, x: 552, y: 295, entity: sensor.wago_values_er_diesel_daytank_level, mono: true, font_size: 16, unit: "%" }
@@ -347,7 +279,6 @@ views:
   - title: Generator
     path: sys-generator
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     # Nog te koppelen (niet gevonden in HA):
     #   binary_sensor.plc_generator_alarm
     cards:
@@ -360,11 +291,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[980, 633], [980, 590]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
           - { type: strainer, x: 955, y: 360, width: 50, height: 195, color: "#3cc7d6", active_entity: binary_sensor.generatoron }
@@ -432,7 +362,6 @@ views:
   - title: DC-bus koeling
     path: sys-dcbus
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -443,11 +372,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[77, 532], [77, 489]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: strainer, x: 52, y: 251, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
@@ -569,7 +497,6 @@ views:
   - title: Boegschroef
     path: sys-bowthruster
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -580,11 +507,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[159, 573], [159, 530]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - { type: strainer, x: 134, y: 295, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
@@ -624,7 +550,6 @@ views:
   - title: Zeewaterfilters
     path: sys-seawater
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -635,34 +560,33 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[255, 530], [255, 487]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
-          - { type: strainer, x: 230, y: 250, width: 50, height: 196, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
-          - { type: pipe, medium: seawater, points: [[394, 639], [394, 596]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
-          - { type: strainer, x: 369, y: 361, width: 50, height: 195, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
-          - { type: pipe, medium: seawater, points: [[282, 260], [465, 260]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: text, x: 474, y: 250, text: Water maker HEM, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[629, 260], [735, 260]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: pipe, medium: seawater, points: [[282, 297], [465, 297]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: text, x: 474, y: 287, text: Cooling Electric/GB, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[629, 297], [735, 297]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[282, 335], [465, 335]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
-          - { type: text, x: 474, y: 325, text: DECK WASH, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[629, 444], [735, 444]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: seawater, points: [[420, 370], [465, 370]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: text, x: 474, y: 360, text: Waste Water Ecomar, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: pipe, medium: seawater, points: [[629, 370], [735, 370]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: pipe, medium: seawater, points: [[420, 407], [465, 407]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
-          - { type: pipe, medium: seawater, points: [[629, 407], [735, 407]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
-          - { type: pipe, medium: seawater, points: [[420, 444], [465, 444]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: text, x: 474, y: 434, text: Generator NL, font_size: 14, uppercase: true, color: "#a3a29c" }
-          - { type: text, x: 738, y: 223, width: 40, height: 270, text: "Main\noutlet", boxed: true, font_size: 12, active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
-          - { type: pipe, medium: seawater, points: [[757, 537], [757, 584]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
+          - { type: pipe, medium: seawater, points: [[325, 530], [325, 487]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
+          - { type: strainer, x: 300, y: 250, width: 50, height: 196, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
+          - { type: pipe, medium: seawater, points: [[464, 639], [464, 596]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
+          - { type: strainer, x: 439, y: 361, width: 50, height: 195, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
+          - { type: pipe, medium: seawater, points: [[352, 260], [535, 260]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: text, x: 544, y: 250, text: Water maker HEM, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[700, 260], [735, 260]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: pipe, medium: seawater, points: [[352, 297], [535, 297]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: text, x: 544, y: 287, text: Cooling Electric/GB, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[700, 297], [735, 297]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[352, 335], [535, 335]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
+          - { type: text, x: 544, y: 325, text: DECK WASH, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[700, 444], [735, 444]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: seawater, points: [[490, 370], [535, 370]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: text, x: 544, y: 360, text: Waste Water Ecomar, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: pipe, medium: seawater, points: [[700, 370], [735, 370]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: pipe, medium: seawater, points: [[490, 407], [535, 407]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
+          - { type: pipe, medium: seawater, points: [[700, 407], [735, 407]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
+          - { type: pipe, medium: seawater, points: [[490, 444], [535, 444]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: text, x: 544, y: 434, text: Generator NL, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: text, x: 744, y: 223, width: 40, height: 270, text: "Main\noutlet", boxed: true, font_size: 12, active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
+          - { type: pipe, medium: seawater, points: [[764, 535], [764, 582]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
           - { type: pipe, medium: seawater, points: [[1082, 639], [1082, 596]], thickness: 7, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm], flow_above: 100 }
           - { type: strainer, x: 1056, y: 366, width: 50, height: 196, color: "#3cc7d6", active_entity: [sensor.engine_room_main_engine_me_rpm], active_above: 100 }
           - { type: pipe, medium: seawater, points: [[1055, 374], [995, 374], [995, 422]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
@@ -671,20 +595,20 @@ views:
           - { type: pipe, medium: seawater, points: [[849, 540], [849, 587]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: pipe, medium: bilge, points: [[1130, 615], [1130, 512], [1162, 512]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
           - { type: pump, x: 1164, y: 492, size: 40, entity: switch.0xe4b063fffe6d51d8, label: ER bilge pump, active_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: pipe, medium: bilge, points: [[1184, 485], [1184, 280], [785, 280]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: pipe, medium: bilge, points: [[1184, 485], [1184, 280], [792, 280]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
           - { type: text, x: 600, y: 637, width: 125, height: 80, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
           - { type: text, x: 639, y: 692, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 13, unit: bar, decimals: 2 }
-          - { type: pipe, medium: air, points: [[619, 637], [619, 603], [619, 565], [525, 565], [410, 565]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
-          - { type: pipe, medium: air, points: [[600, 692], [297, 692], [297, 455], [270, 455]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: pipe, medium: air, points: [[619, 637], [619, 603], [619, 565], [525, 565], [495, 565]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: pipe, medium: air, points: [[600, 655], [367, 655], [367, 455], [340, 455]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
           - { type: pipe, medium: air, points: [[727, 655], [802, 655], [802, 510], [830, 510]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
           - { type: pipe, medium: air, points: [[725, 690], [1036, 690], [1036, 570], [1065, 570]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
           - { type: butterfly_valve, medium: air, x: 1066, y: 551, active_entity: valve.er_ventielblok_1tm4_l4 }
-          - { type: butterfly_valve, x: 742, y: 495 }
-          - { type: butterfly_valve, x: 240, y: 440, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: butterfly_valve, x: 749, y: 493 }
+          - { type: butterfly_valve, x: 310, y: 440, active_entity: valve.er_ventielblok_1tm4_l2 }
           - {
               type: text,
-              x: 300,
-              y: 550,
+              x: 400,
+              y: 545,
               text: INLET V4
 
                 Wierpot FRONT,
@@ -694,25 +618,14 @@ views:
               width: 80,
               height: 30
             }
-          - { type: butterfly_valve, x: 380, y: 549, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: butterfly_valve, x: 450, y: 549, active_entity: valve.er_ventielblok_1tm4_l1 }
           - { type: butterfly_valve, x: 835, y: 495, active_entity: valve.er_ventielblok_1tm4_l3 }
           - { type: text, x: 825, y: 599, text: OUTLET V2, font_size: 12, uppercase: true, color: "#a3a29c" }
           - { type: text, x: 1015, y: 539, text: INLET V1, font_size: 12, uppercase: true, color: "#a3a29c" }
-
-          # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 780, width: 400, height: 520, title: Vlinderkleppen huiddoorvoeren }
-          - { type: pushbutton, x: 38, y: 832, width: 364, height: 44, label: Compressor, entity: switch.0x781c9dfffea18853, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 888, width: 364, height: 44, label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, led: green, align: left, font_size: 15, led_state: open }
-          - { type: pushbutton, x: 38, y: 944, width: 364, height: 44, label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, led: green, align: left, font_size: 15, led_state: open }
-          - { type: pushbutton, x: 38, y: 1000, width: 364, height: 44, label: "Wierpot aft (V3)", entity: valve.er_ventielblok_1tm4_l2, led: green, align: left, font_size: 15, led_state: open }
-          - { type: pushbutton, x: 38, y: 1056, width: 364, height: 44, label: "Wierpot front (V4)", entity: valve.er_ventielblok_1tm4_l1, led: green, align: left, font_size: 15, led_state: open }
-          - { type: pushbutton, x: 38, y: 1112, width: 364, height: 44, label: Jet 1, entity: valve.er_ventielblok_5tm7_l4, led: green, align: left, font_size: 15, led_state: open }
-          - { type: pushbutton, x: 38, y: 1168, width: 364, height: 44, label: Jet 2, entity: valve.er_ventielblok_5tm7_l3, led: green, align: left, font_size: 15, led_state: open }
-          - { type: pushbutton, x: 38, y: 1224, width: 364, height: 44, label: Jet 3, entity: valve.er_ventielblok_5tm7_l2, led: green, align: left, font_size: 15, led_state: open }
-          - { type: text, x: 474, y: 397, text: HVAC Webasto, font_size: 14, uppercase: true, color: "#a3a29c" }
+          - { type: text, x: 544, y: 397, text: HVAC Webasto, font_size: 14, uppercase: true, color: "#a3a29c" }
           - {
               type: text,
-              x: 160,
+              x: 230,
               y: 445,
               text: INLET V3
 
@@ -723,11 +636,61 @@ views:
               width: 80,
               height: 30
             }
+          - { type: jet_thruster, x: 65, y: 490, active_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: pipe, medium: seawater, points: [[90, 668], [90, 625]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: butterfly_valve, x: 75, y: 578, active_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: pipe, medium: air, points: [[600, 705], [115, 705], [115, 590], [105, 590]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l4 }
+          - {
+              type: text,
+              x: 28,
+              y: 585,
+              text: INLET V5
+
+                Jet 1,
+              font_size: 12,
+              uppercase: true,
+              color: "#a3a29c",
+              width: 50,
+              height: 30
+            }
+          - { type: jet_thruster, x: 160, y: 490, active_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: pipe, medium: seawater, points: [[185, 668], [185, 625]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: butterfly_valve, x: 170, y: 578, active_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: pipe, medium: air, points: [[600, 690], [210, 690], [210, 590], [200, 590]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l3 }
+          - {
+              type: text,
+              x: 123,
+              y: 585,
+              text: INLET V6
+
+                Jet 2,
+              font_size: 12,
+              uppercase: true,
+              color: "#a3a29c",
+              width: 50,
+              height: 30
+            }
+          - { type: jet_thruster, x: 255, y: 490, active_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: pipe, medium: seawater, points: [[280, 668], [280, 625]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: butterfly_valve, x: 265, y: 578, active_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: pipe, medium: air, points: [[600, 675], [305, 675], [305, 590], [295, 590]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l2 }
+          - {
+              type: text,
+              x: 218,
+              y: 585,
+              text: INLET V7
+
+                Jet 3,
+              font_size: 12,
+              uppercase: true,
+              color: "#a3a29c",
+              width: 50,
+              height: 30
+            }
 
   - title: Zoetwater
     path: sys-freshwater
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     # Nog te koppelen (niet gevonden in HA):
     #   binary_sensor.plc_shore_water_valve_open
     cards:
@@ -740,11 +703,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: text, x: 37, y: 458, width: 57, height: 79, text: "Shore\ntap", boxed: true, font_size: 12, active_entity: binary_sensor.plc_shore_water_valve_open }
           - { type: valve, x: 95, y: 491, width: 30, height: 18, entity: binary_sensor.plc_shore_water_valve_open, color: "#4aa3ff", active_entity: binary_sensor.plc_shore_water_valve_open }
@@ -794,7 +756,6 @@ views:
   - title: Vuilwater
     path: sys-wastewater
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -805,11 +766,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[296, 608], [296, 565]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
           - { type: strainer, x: 271, y: 268, width: 50, height: 257, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
@@ -853,7 +813,6 @@ views:
   - title: Bilgepompen
     path: sys-bilge
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     # Nog te koppelen (niet gevonden in HA):
     #   binary_sensor.plc_bilge_anchor_box_high
     #   binary_sensor.plc_bilge_anchor_box_running
@@ -867,11 +826,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: text, x: 117, y: 500, text: Aft peak, font_size: 14, uppercase: true, color: "#a3a29c" }
           - { type: pipe, medium: bilge, points: [[210, 615], [210, 473], [186, 473]], thickness: 5, arrow: true, flow_entity: switch.ap_bilgepumpcontrol_01 }
@@ -923,7 +881,6 @@ views:
   - title: Accu's en voeding
     path: sys-power
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -934,11 +891,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: hull, x: 20, y: 160, width: 1240, height: 600 }
           - { type: text, x: 110, y: 320, width: 191, height: 120, text: "", boxed: true, active_entity: binary_sensor.generatoron }
           - { type: engine, x: 120, y: 348, width: 90, height: 63, active_entity: binary_sensor.generatoron }
@@ -983,7 +939,6 @@ views:
   - title: Webasto
     path: sys-webasto
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -994,11 +949,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: panel, x: 20, y: 160, width: 298, height: 248, title: Crew cabin }
           - { type: value, style: tile, x: 38, y: 212, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_crew_cabin_temp, value_size: 24 }
           - { type: pushbutton, x: 38, y: 288, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_crew_cabin_ac, led: green, align: left, font_size: 15 }
@@ -1046,7 +1000,6 @@ views:
   - title: Navigatieverlichting
     path: sys-navlights
     panel: true
-    subview: true            # niet in de HA-tabbalk; bereikbaar via de tab Systemen
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -1057,11 +1010,10 @@ views:
         corner_radius: 0
         items:
           - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-          - { type: image, x: 24, y: 14, width: 256, height: 36, image: shipborn-joal }
-          - { type: nav, x: 300, y: 10, tabs: *plc_tabs }
-          - { type: indicator, x: 1110, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
-          - { type: nav, x: 20, y: 112, font_size: 14, tabs: *sys_tabs }
           - { type: panel, x: 20, y: 160, width: 400, height: 380, title: Navlights setting }
           - { type: pushbutton, x: 38, y: 212, width: 364, height: 52, label: Onder motor, entity: switch.navigatieverlichting_onder_motor, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 38, y: 274, width: 364, height: 52, label: Onder zeil, entity: switch.navigatieverlichting_onder_zeil, led: green, align: left, font_size: 15 }
@@ -1081,3 +1033,44 @@ views:
           - { type: pushbutton, x: 454, y: 401, width: 254, height: 52, label: Red nav SB, entity: switch.lopolight_navigation_lights_navlight_red_nav_sb, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 719, y: 401, width: 254, height: 52, label: Red nav PS, entity: switch.lopolight_navigation_lights_navlight_red_nav_ps, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 984, y: 401, width: 254, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
+
+  - title: Alarmen
+    path: alarms
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
+
+          # ---- links: actief alarm + reset ----
+          - { type: panel, x: 20, y: 120, width: 400, height: 660, title: Actief alarm }
+          - { type: indicator, x: 38, y: 176, entity: binary_sensor.plc_alarm_active, label: Alarm actief, color: red, blink: true, font_size: 18 }
+          - { type: text, x: 38, y: 222, width: 364, entity: sensor.plc_active_alarm, font_size: 17, color: "#ecebe6" }
+          - { type: line, x: 38, y: 680, width: 364, height: 1, color: "#2c2c2c" }
+          - { type: pushbutton, x: 38, y: 700, width: 364, height: 56, label: Reset, entity: button.wago_energy_controls_wago_energy_controls_reset_main_2 }
+
+          # ---- rechts: alle alarmmeldingen (tik = details) ----
+          - { type: panel, x: 436, y: 120, width: 824, height: 660, title: Alarmen }
+          - { type: text, x: 454, y: 170, text: Machines, font_size: 13, uppercase: true, color: "#a3a29c" }
+          - { type: text, x: 860, y: 170, text: Bilge hoog water, font_size: 13, uppercase: true, color: "#a3a29c" }
+          - { type: indicator, x: 454, y: 206, entity: binary_sensor.plc_diesel_alarm, label: Diesel, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 454, y: 256, entity: binary_sensor.plc_generator_alarm, label: Generator, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 454, y: 306, entity: binary_sensor.plc_jp1_alarm, label: Jetpomp 1, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 454, y: 356, entity: binary_sensor.plc_jp2_alarm, label: Jetpomp 2, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 454, y: 406, entity: binary_sensor.plc_jp3_alarm, label: Jetpomp 3, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 860, y: 206, entity: binary_sensor.0x8c65a3fffecea649_water_leak, label: Aft peak, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 860, y: 256, entity: binary_sensor.0x0ceff6fffe901b4e_water_leak, label: Engine room, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 860, y: 306, entity: binary_sensor.0x0ceff6fffe9009c8_water_leak, label: Dining, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 860, y: 356, entity: binary_sensor.plc_bilge_anchor_box_high, label: Anchor box, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 860, y: 406, entity: binary_sensor.0x8c65a3fffee0f85d_water_leak, label: Crew cabin, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
+          - { type: indicator, x: 860, y: 456, entity: binary_sensor.fp_waterleaksensor_hoog_water_leak, label: Front peak, color: red, blink: true, font_size: 17, tap_action: { action: more-info } }
