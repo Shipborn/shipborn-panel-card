@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.14";
+const VERSION = "0.4.15";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -240,6 +240,9 @@ const STYLE = `
   .d-sym .rotor { transform-box: fill-box; transform-origin: center; }
   .d-sym.on .rotor { animation: spin var(--dur, 1s) linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .d-sym .shaft { stroke-dasharray: 6 3; }
+  .d-sym.on .shaft { animation: shaft var(--dur, .5s) linear infinite; }
+  @keyframes shaft { to { stroke-dashoffset: -9; } }
   .d-sym.on .puff:nth-child(2) { animation-delay: .8s; }
   .d-sym.on .puff:nth-child(3) { animation-delay: 1.6s; }
   @keyframes prop { from { transform: scaleY(1); } to { transform: scaleY(-1); } }
@@ -252,7 +255,7 @@ const STYLE = `
 const SYMBOLS = [
   "pump", "valve", "hx", "filter", "strainer", "propeller", "outlet", "smoke", "engine", "generator", "converter", "battery", "fan",
   "gate_valve", "ball_valve", "globe_valve", "butterfly_valve", "check_valve", "three_way_valve", "motor_valve", "solenoid_valve",
-  "relief_valve", "instrument", "vessel", "compressor", "heater", "sight_glass", "reducer", "motor",
+  "relief_valve", "instrument", "vessel", "compressor", "heater", "sight_glass", "reducer", "motor", "jet_thruster",
 ];
 const DESIGN_TYPES = ["panel", "gauge", "bar", "tank", "value", "indicator", "pushbutton", "nav", "alarm", "block", "line", "text", "pipe", "hull", ...SYMBOLS];
 // Pipe colours, loosely after ISO 14726 (sea water green-blue, fresh water blue, fuel brown, oil yellow).
@@ -1437,6 +1440,7 @@ class ShipbornPanelCard extends HTMLElement {
       gate_valve: [44, 26], ball_valve: [44, 26], globe_valve: [44, 26], butterfly_valve: [30, 34], check_valve: [40, 26],
       three_way_valve: [44, 44], motor_valve: [44, 50], solenoid_valve: [44, 50], relief_valve: [36, 50], instrument: [40, 40],
       vessel: [50, 100], compressor: [48, 48], heater: [70, 40], sight_glass: [40, 28], reducer: [30, 30], motor: [48, 48],
+      jet_thruster: [50, 90],
     }[kind];
     const n = this._place(h("div", "d d-sym"), s, dw, dh);
     const W = s.width ?? s.size ?? dw;
@@ -1535,6 +1539,27 @@ class ShipbornPanelCard extends HTMLElement {
         `<rect class="bd" x="1" y="${H * 0.18}" width="${W - 2}" height="${H * 0.82 - 1}" rx="3"/>` +
         `<text class="gl" x="${W * 0.22}" y="${H * 0.55}" text-anchor="middle" dominant-baseline="central">+</text>` +
         `<text class="gl" x="${W * 0.78}" y="${H * 0.55}" text-anchor="middle" dominant-baseline="central">−</text>`,
+      // Vertical motor-pump set: finned motor with a domed top, lantern with the shaft,
+      // pump casing with a flange on the left, base below.
+      jet_thruster: (() => {
+        const x0 = W * 0.18;
+        const x1 = W * 0.82;
+        const my = H * 0.58;
+        const r = (x1 - x0) / 2;
+        const cy0 = H * 0.66;
+        const cy1 = H * 0.86;
+        const py = (cy0 + cy1) / 2;
+        const pipe = (xa, xb, xf) =>
+          `<rect class="bd" x="${Math.min(xa, xb)}" y="${py - H * 0.05}" width="${Math.abs(xb - xa)}" height="${H * 0.1}"/>` +
+          `<line class="ln" x1="${xf}" y1="${py - H * 0.08}" x2="${xf}" y2="${py + H * 0.08}"/>`;
+        return `<path class="bd" d="M${x0},${my} L${x0},${2 + r} A${r},${r} 0 0 1 ${x1},${2 + r} L${x1},${my} Z"/>` +
+          [0.32, 0.44, 0.56, 0.68].map((f) => `<line class="ln" x1="${W * f}" y1="${H * 0.16}" x2="${W * f}" y2="${my - H * 0.05}"/>`).join("") +
+          `<rect class="bd" x="${W * 0.28}" y="${my}" width="${W * 0.44}" height="${cy0 - my}"/>` +
+          `<line class="ln shaft" x1="${cx}" y1="${my}" x2="${cx}" y2="${py}" stroke-width="3"/>` +
+          pipe(2, x0, 3) +
+          `<rect class="ac" x="${x0}" y="${cy0}" width="${x1 - x0}" height="${cy1 - cy0}" rx="3"/>` +
+          `<rect class="bd" x="${W * 0.26}" y="${cy1}" width="${W * 0.48}" height="${H - 2 - cy1}"/>`;
+      })(),
       fan:
         `<rect class="bd" x="1" y="1" width="${W - 2}" height="${H - 2}" rx="4"/>` +
         `<g class="rotor">${[0, 90, 180, 270]
