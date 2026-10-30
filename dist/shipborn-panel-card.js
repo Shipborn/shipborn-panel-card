@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.18";
+const VERSION = "0.4.19";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -1247,7 +1247,8 @@ class ShipbornPanelCard extends HTMLElement {
     return n;
   }
 
-  // Alarm banner: red with time + message while active, quiet otherwise.
+  // Alarm banner: red with time + message while active, quiet otherwise. With `attribute` the
+  // messages come from a list attribute (e.g. alarms) and the banner is active while it is not empty.
   _dAlarm(a) {
     const n = this._place(h("div", "d d-alarm"), a, this._W, 40);
     const led = h("span", "d-led");
@@ -1259,11 +1260,14 @@ class ShipbornPanelCard extends HTMLElement {
     const quiet = ["", "unknown", "unavailable", "none", "ok", "off", "0", "false"];
     this._updaters.push((hass) => {
       const so = a.entity ? hass.states[a.entity] : null;
-      const text = so ? String(so.state) : "";
-      const active = a.active_entity ? isOn(hass.states[a.active_entity]) : !quiet.includes(text.trim().toLowerCase());
+      const list = a.attribute ? [].concat(so?.attributes?.[a.attribute] ?? []).filter((m) => m != null && m !== "") : null;
+      const text = list ? (list.length > 1 ? `(${list.length}) ` : "") + list.join("  ·  ") : so ? String(so.state) : "";
+      const active = a.active_entity
+        ? isOn(hass.states[a.active_entity])
+        : list ? list.length > 0 : !quiet.includes(text.trim().toLowerCase());
       n.classList.toggle("on", active);
       led.classList.toggle("on", active);
-      time.textContent = active && so ? stamp(so.last_changed) : "";
+      time.textContent = active && so ? stamp(list ? so.last_updated || so.last_changed : so.last_changed) : "";
       msg.textContent = active ? a.text || text : a.ok_text ?? "Geen actieve alarmen";
     });
     return n;

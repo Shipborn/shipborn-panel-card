@@ -1,7 +1,7 @@
 Pagina;Onderdeel;Soort;Voorbeeld-entiteit;Jouw entiteit;Zekerheid;Opmerking
 Alle pagina's;PLC lifebeat (LED rechtsboven);status;binary_sensor.plc_lifebeat;;geen gevonden;geen PLC-lifebeat in HA
-Alle pagina's;Alarmbalk: tekst actief alarm;tekst;sensor.plc_active_alarm;;geen gevonden;geen alarmtekst-sensor in HA
-Alle pagina's;Alarmbalk: alarm actief;status;binary_sensor.plc_alarm_active;;geen gevonden;
+Alle pagina's;Alarmbalk: tekst actief alarm;tekst;sensor.plc_active_alarm;sensor.er_alarm_status_active_alarms;zeker;attribuut alarms (lijst); balk is actief zolang de lijst niet leeg is
+Alle pagina's;Alarmbalk: alarm actief;status;binary_sensor.plc_alarm_active;sensor.er_alarm_status_active_alarms;zeker;niet meer nodig: afgeleid van de lijst alarms
 Main;Mode Diesel (knop);commando;button.plc_mode_diesel;button.wago_hcs_controls_wago_controls_dieselmode;zeker;nu unknown
 Main;Mode Diesel (actief);status;binary_sensor.plc_mode_diesel_active;binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode;zeker;
 Main;Mode Electric (knop);commando;button.plc_mode_electric;button.wago_hcs_controls_wago_controls_electricmode;zeker;nu unknown

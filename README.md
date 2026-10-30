@@ -110,7 +110,7 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `indicator` | `entity`, `label`, `color`, `blink`, `state_on`, `active_above` / `active_below`, `off_color` – LED met tekst |
 | `pushbutton` | `label`, `entity`, `tap_action`, `mode: momentary`, `variant: stop`, `led` + `led_entity`, `active_entity` (oranje rand), `align: left` |
 | `nav` | `tabs: [{label, path, match}]`, `style: side` – actieve tab volgt de URL; met `font_size` ook `tab_height`, `tab_padding` en `letter_spacing` |
-| `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text` |
+| `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text`; met `attribute` komen de meldingen uit een lijst-attribuut (actief zolang de lijst niet leeg is, meerdere als `(2) A · B`) |
 | `block` | PMS-blok: `name`, `kind`, `rating`, `entity` (kW), `alarm_entity`, `active_entity` |
 | `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
 | `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed`; `attribute` toont een attribuut (een lijst als regels met `- `, met `empty_text` als hij leeg is, scrollt binnen `height`) |

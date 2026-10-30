@@ -62,7 +62,7 @@ Een YAML met een nieuw item-type of nieuwe optie vóór de JS-update plakken gee
 
 De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities`, `button-card`, `markdown` met Jinja). Werkwijze:
 
-1. Bepaal de juiste view (`sys-…` of `alarms`) en zet de onderdelen in een `panel` onder het schema (de bediening begint rond `y: 780`; alles daaronder schuift mee). Verhoog `height` van de kaart zodat het past.
+1. Bepaal de juiste view (`sys-…` of `alarms`) en zet de onderdelen in een `panel` onder het schema (de bediening begint rond `y: 732`; alles daaronder schuift mee). Verhoog `height` van de kaart zodat het past.
 2. Vertaal: `tile` op een sensor → `value` met `style: tile`; aan/uit-sensor → `indicator`; `button.*` → `pushbutton`; `switch.*` → `pushbutton` met `led: green`; Jinja → er is géén template-engine in de kaart, dus de functie nabouwen (bijv. `text` met `attribute` voor een lijst-attribuut).
 3. Werk `examples/plc-entiteiten.csv` bij (placeholder vervangen of regel toevoegen, met zekerheid).
 4. Controleer in `demo/plc.html?view=…`; voeg zo nodig nep-states toe in `demo/plc.html`.
@@ -77,11 +77,11 @@ De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities
   - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
   - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
   - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
-  - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.plc_active_alarm, active_entity: binary_sensor.plc_alarm_active }
+  - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
   ```
   De tabs staan één keer als YAML-anker `&sys_tabs` in de eerste view (`sys-diesel`) en worden elders met `*sys_tabs` hergebruikt. Een nieuw scherm = view toevoegen én een regel in `&sys_tabs`.
 - Tab-paden zonder `/` (bijv. `sys-fuel`) verwijzen naar een view in hetzelfde dashboard, ongeacht de URL van het dashboard.
-- Schema: `hull` (romp) op `x: 20, y: 160, 1240×600`, met daarin `pipe`-items en symbolen; daaronder `panel`s met de bediening.
+- Schema: `hull` (romp) op **precies** `{ type: hull, x: 20, y: 112, width: 1240, height: 600 }` op elke schemapagina (de omtrek moet overal gelijk zijn), met daarin `pipe`-items en symbolen; daaronder vanaf `y: 732` de `panel`s met de bediening. Schuif je een schema, schuif dan alle coördinaten (ook `points`) mee en laat de romp staan.
 - Kiosk: elke kaart heeft `kiosk: true` (HA-balken verborgen; even op de boven-/linkerrand blijven toont ze).
 - Stijl: items op één regel in flow-stijl (`- { type: …, x: …, y: … }`), opmerkingen in het Nederlands, secties met `# ---- … ----`. De editor bewaart die opmaak.
 - Entiteiten met `.plc_` in de naam zijn **placeholders** die (nog) niet in HA bestaan; ze tonen "—" of niets.
@@ -127,12 +127,12 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots en de HA-export ontbreken dan.
 - Controleer of `python` werkt (anders `python3`) en pas `.claude/launch.json` daarop aan.
 
-## Stand van zaken en open punten (30-10-2026, v0.4.18)
+## Stand van zaken en open punten (30-10-2026, v0.4.19)
 
 - Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
-- **Nog niet gekoppelde placeholders** in het dashboard (bestaan niet in HA): `binary_sensor.plc_lifebeat`, `sensor.plc_active_alarm` en `binary_sensor.plc_alarm_active` (op elke pagina in de kop/alarmbalk), `binary_sensor.plc_diesel_alarm`, `binary_sensor.plc_generator_alarm`, `binary_sensor.plc_jp1/2/3_alarm`, `binary_sensor.plc_bilge_anchor_box_high` / `_running`, `binary_sensor.plc_shore_water_valve_open`, `binary_sensor.plc_webasto_running`, `sensor.plc_battery_current`, `sensor.plc_bowthruster_setpoint`, `sensor.plc_electric_speed`, `sensor.plc_emotor_rpm`. Zie de CSV voor details en kandidaten.
+- **Nog niet gekoppelde placeholders** in het dashboard (bestaan niet in HA): `binary_sensor.plc_lifebeat` (op elke pagina rechtsboven), `binary_sensor.plc_diesel_alarm`, `binary_sensor.plc_generator_alarm`, `binary_sensor.plc_jp1/2/3_alarm`, `binary_sensor.plc_bilge_anchor_box_high` / `_running`, `binary_sensor.plc_shore_water_valve_open`, `binary_sensor.plc_webasto_running`, `sensor.plc_battery_current`, `sensor.plc_bowthruster_setpoint`, `sensor.plc_electric_speed`, `sensor.plc_emotor_rpm`. Zie de CSV voor details en kandidaten.
 - **Te bevestigen door de gebruiker** (in de CSV als `controleer`): bowthruster-setpoint = `sensor.er_thruster_status_bow_thruster_lever`? JT input = `sensor.er_thruster_status_jet_lever`? Daarna ook in het schema koppelen.
-- De alarmbalk bovenaan kan mogelijk naar de ER-alarmstatus (`sensor.er_alarm_status_active_alarms`), net als het linkervak op de alarmpagina.
+- De alarmbalk bovenaan (alle pagina's) en het linkervak van de alarmpagina lezen beide de lijst `alarms` van `sensor.er_alarm_status_active_alarms`; tik op de balk = naar de alarmpagina.
 - Voor de walstroominstelling (knoppen *Shore current − / +* bij DC-bus) is nog geen sensor met de huidige waarde bekend.
 - Knoppen (`pushbutton`) vragen geen bevestiging, behalve waar `confirmation` is ingesteld; pompen en kleppen vragen wel Ja/Nee.
 - Veiligheid: de kaart is een bedieningsinterface, geen veiligheidssysteem. Noodstop en hold-to-run moeten in de PLC geborgd zijn.
