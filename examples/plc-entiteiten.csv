@@ -40,7 +40,7 @@ PMS;HP1 actief;status;binary_sensor.plc_hp1_active;;geen gevonden;of vermogen > 
 PMS;HP2 vermogen;meetwaarde;sensor.plc_hp2_power;sensor.wago_values_drivepower_hydraumotor2;waarschijnlijk;HP = hydrauliekpomp?
 PMS;HP2 actief;status;binary_sensor.plc_hp2_active;;geen gevonden;of vermogen > 0 van hydraumotor2
 PMS;BTC vermogen;meetwaarde;sensor.plc_btc_power;sensor.wago_values_drivepower_bowthruster;zeker;
-PMS;VDC (DC-bus);meetwaarde;sensor.plc_dc_bus_voltage;;geen gevonden;
+PMS;VDC (DC-bus);meetwaarde;sensor.plc_dc_bus_voltage;sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage;zeker;DC Bus Voltage (Wago)
 PMS;MGC vermogen;meetwaarde;sensor.plc_mgc_power;sensor.wago_values_drivepower_maingrit;waarschijnlijk;DrivePower_MainGrit = boardnet
 PMS;MGC spanning (1 V);meetwaarde;sensor.plc_mgc_voltage;;geen gevonden;
 PMS;BGC vermogen;meetwaarde;sensor.plc_bgc_power;sensor.wago_values_drivepower_battery;waarschijnlijk;DrivePower_Battery = accu
@@ -69,25 +69,25 @@ Electric / E-motor;Synch diff;meetwaarde;sensor.plc_synch_diff;;geen gevonden;
 Electric / Bowthruster;Manual SeaWater Pump Start;commando;button.plc_seawater_pump_start;switch.er_zeewaterpomp_cooling;waarschijnlijk;één switch voor start/stop
 Electric / Bowthruster;Manual SeaWater Pump Stop;commando;button.plc_seawater_pump_stop;switch.er_zeewaterpomp_cooling;waarschijnlijk;één switch voor start/stop
 Electric / Bowthruster;SeaWater Pump Running;status;binary_sensor.plc_seawater_pump_running;switch.er_zeewaterpomp_cooling;waarschijnlijk;switch: aan = ingeschakeld, niet per se draaiend (vermogenssensor is nauwkeuriger)
-Electric / Bowthruster;Bow Thruster On;commando;button.plc_bowthruster_on;;geen gevonden;
-Electric / Bowthruster;Bow Thruster Off;commando;button.plc_bowthruster_off;;geen gevonden;
-Electric / Bowthruster;Bow Thruster Enabled;status;binary_sensor.plc_bowthruster_enabled;;geen gevonden;
-Electric / Bowthruster;Bow Thruster Running;status;binary_sensor.plc_bowthruster_running;sensor.wago_values_drivepower_bowthruster;controleer;vermogen i.p.v. aan/uit: in YAML active_above: 0.1 nodig
-Electric / Bowthruster;Bowthruster setpoint;meetwaarde;sensor.plc_bowthruster_setpoint;;geen gevonden;
+Electric / Bowthruster;Bow Thruster On;commando;button.plc_bowthruster_on;button.wago_hcs_controls_wago_controls_bowthruster_on;zeker;
+Electric / Bowthruster;Bow Thruster Off;commando;button.plc_bowthruster_off;button.wago_hcs_controls_wago_controls_bowthruster_off;zeker;
+Electric / Bowthruster;Bow Thruster Enabled;status;binary_sensor.plc_bowthruster_enabled;binary_sensor.er_thruster_status_bow_thruster_enabled;zeker;ER_Thruster_Status
+Electric / Bowthruster;Bow Thruster Running;status;binary_sensor.plc_bowthruster_running;binary_sensor.er_thruster_status_bow_thruster_running;zeker;ER_Thruster_Status; schema gebruikt nog het vermogen (active_above: 0.1)
+Electric / Bowthruster;Bowthruster setpoint;meetwaarde;sensor.plc_bowthruster_setpoint;sensor.er_thruster_status_bow_thruster_lever;controleer;Bow Thruster Lever – setpoint? schema toont nog de placeholder
 Electric / Bowthruster;Bowthruster setpoint DP;meetwaarde;sensor.plc_bowthruster_setpoint_dp;;geen gevonden;
 Electric / Jetthrusters;JP input;meetwaarde;sensor.plc_jp_input;;geen gevonden;
 Electric / Jetthrusters;JP1;meetwaarde;sensor.plc_jp1;;geen gevonden;
 Electric / Jetthrusters;JP2;meetwaarde;sensor.plc_jp2;;geen gevonden;
 Electric / Jetthrusters;JP3;meetwaarde;sensor.plc_jp3;;geen gevonden;
 Electric / Jetthrusters;JP1-3 alarm (zelfde als PMS);status;binary_sensor.plc_jp1_alarm / _jp2_alarm / _jp3_alarm;;geen gevonden;
-Electric / Jetthrusters;JT input (Jetthruster setpoint);meetwaarde;sensor.plc_jt_input;;geen gevonden;
+Electric / Jetthrusters;JT input (Jetthruster setpoint);meetwaarde;sensor.plc_jt_input;sensor.er_thruster_status_jet_lever;controleer;Jet Lever – is dit het jetthruster-setpoint?
 Electric / Jetthrusters;JT input DP (Jetthruster setpoint DP);meetwaarde;sensor.plc_jt_input_dp;;geen gevonden;
 Electric / Battery;Battery Current (meter);meetwaarde;sensor.plc_battery_current;;geen gevonden;"geen stroom van de 552V-accu; Wago DrivePower_Battery (kW) is een alternatief"
 Electric / Battery;Battery Voltage;meetwaarde;sensor.plc_battery_voltage;;geen gevonden;
 Electric / Battery;Max. Charge Current;meetwaarde;sensor.plc_battery_max_charge_current;sensor.nmea_127491_max_charge_current;controleer;NMEA, nu unavailable
 Electric / Battery;Max. Discharge Current;meetwaarde;sensor.plc_battery_max_discharge_current;sensor.nmea_127491_max_discharge_current;controleer;NMEA, nu unavailable
 Electric / Battery;SoC (zelfde als Main);meetwaarde;sensor.plc_battery_soc;sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge;zeker;Wago Battery SoC
-Electric / Battery;Max SoC;meetwaarde;sensor.plc_battery_max_soc;sensor.nmea_127495_maximum_charge_soc;controleer;NMEA, nu unavailable
+Electric / Battery;Max SoC;meetwaarde;sensor.plc_battery_max_soc;sensor.er_pms_status2_bms_max_soc;waarschijnlijk;ER_PMS_Status2 BMS Max SoC (was NMEA, unavailable)
 Electric / Battery;SoH;meetwaarde;sensor.plc_battery_soh;sensor.wago_energy_controls_wago_energy_controls_bms_state_of_health;zeker;
 Electric / Shore-Gen;Shore Supply Switch In;commando;button.plc_shore_switch_in;switch.wago_energy_controls_wago_energy_controls_shore_supply_2;waarschijnlijk;één switch voor in/uit
 Electric / Shore-Gen;Shore Supply Switch Out;commando;button.plc_shore_switch_out;switch.wago_energy_controls_wago_energy_controls_shore_supply_2;waarschijnlijk;één switch voor in/uit
@@ -96,7 +96,7 @@ Electric / Shore-Gen;Shore Switched in;status;binary_sensor.plc_shore_switched_i
 Electric / Shore-Gen;Generator Switch In;commando;button.plc_generator_switch_in;switch.wago_energy_controls_wago_energy_controls_generator_2;waarschijnlijk;één switch voor in/uit
 Electric / Shore-Gen;Generator Switch Out;commando;button.plc_generator_switch_out;switch.wago_energy_controls_wago_energy_controls_generator_2;waarschijnlijk;één switch voor in/uit
 Electric / Shore-Gen;Generator Switched in;status;binary_sensor.plc_generator_switched_in;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected;zeker;
-Electric / Shore-Gen;Max Shore Current (− / +);instelwaarde;number.plc_max_shore_current;number.skylla_i_ac_input_current_limit;controleer;Skylla-lader ingangsstroom – is dit de walstroomlimiet?
+Electric / Shore-Gen;Max Shore Current (− / +);instelwaarde;number.plc_max_shore_current;button.wago_hcs_controls_wago_controls_shorecurrent_dn / _shorecurrent_up;zeker;twee knoppen − / +; geen sensor met de huidige waarde
 Electric / Shore-Gen;Charge Batteries On;commando;button.plc_charge_batteries_on;switch.wago_energy_controls_wago_energy_controls_charge_batteries_2;waarschijnlijk;één switch voor aan/uit
 Electric / Shore-Gen;Charge Batteries Off;commando;button.plc_charge_batteries_off;switch.wago_energy_controls_wago_energy_controls_charge_batteries_2;waarschijnlijk;één switch voor aan/uit
 Electric / Shore-Gen;Charge Batteries Active;status;binary_sensor.plc_charge_batteries_active;switch.wago_energy_controls_wago_energy_controls_charge_batteries_2;waarschijnlijk;
@@ -158,3 +158,19 @@ Systemen / Bilge;Bilgepomp Front peak draait;status;binary_sensor.plc_bilge_fron
 Systemen / Bilge;Bilge Front peak hoog water;status;binary_sensor.plc_bilge_front_peak_high;binary_sensor.fp_waterleaksensor_hoog_water_leak;zeker;FP_WaterLeakSensor_Hoog
 Systemen / Accu's;Startaccu 2 spanning (12V 180Ah);meetwaarde;sensor.plc_start_battery2_voltage;sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage;waarschijnlijk;SmartShunt 278 (180 Ah)
 Systemen / Accu's;24V accu spanning (24V 200Ah);meetwaarde;sensor.plc_24v_battery_voltage;sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage;zeker;24V Battery
+Alarmen;Actieve alarmen (lijst, attribuut alarms);tekst;;sensor.er_alarm_status_active_alarms;zeker;ER_Alarm_Status; linkervak van de alarmpagina
+Electric / Battery;Max SoC − / +;commando;;button.wago_hcs_controls_wago_controls_maxsoc_dn / _maxsoc_up;zeker;
+Systemen / DC-bus koeling;BGC stroom;meetwaarde;;sensor.er_pms_status2_bgc_current;zeker;ER_PMS_Status2
+Systemen / DC-bus koeling;BGC spanning;meetwaarde;;sensor.er_pms_status2_bgc_voltage;zeker;ER_PMS_Status2
+Systemen / DC-bus koeling;BMS stroom;meetwaarde;;sensor.er_pms_status2_bms_current;zeker;ER_PMS_Status2
+Systemen / DC-bus koeling;BMS laadstroom;meetwaarde;;sensor.er_pms_status2_bms_charge_current;zeker;ER_PMS_Status2
+Systemen / DC-bus koeling;BMS ontlaadstroom;meetwaarde;;sensor.er_pms_status2_bms_discharge_current;zeker;ER_PMS_Status2
+Systemen / DC-bus koeling;BMS spanning;meetwaarde;;sensor.er_pms_status2_bms_voltage;zeker;ER_PMS_Status2
+Systemen / Boegschroef;Bow thruster output;meetwaarde;;sensor.er_thruster_status_bow_thruster_output;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Bow thruster speed;meetwaarde;;sensor.er_thruster_status_bow_thruster_speed;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Jet pump 1 output;meetwaarde;;sensor.er_thruster_status_jet_pump_1_output;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Jet pump 1 speed;meetwaarde;;sensor.er_thruster_status_jet_pump_1_speed;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Jet pump 2 output;meetwaarde;;sensor.er_thruster_status_jet_pump_2_output;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Jet pump 2 speed;meetwaarde;;sensor.er_thruster_status_jet_pump_2_speed;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Jet pump 3 output;meetwaarde;;sensor.er_thruster_status_jet_pump_3_output;zeker;ER_Thruster_Status
+Systemen / Boegschroef;Jet pump 3 speed;meetwaarde;;sensor.er_thruster_status_jet_pump_3_speed;zeker;ER_Thruster_Status

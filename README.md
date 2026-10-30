@@ -2,6 +2,8 @@
 
 Een Home Assistant Lovelace-kaart die een fysiek bedieningspaneel nabootst: zwarte panelen (recht of schuin), knoppen met status-LED's, noodstoppen, throttle-hendels, draaiknoppen en een "scherm" waarin je elke andere HA-kaart kunt tonen.
 
+Verder ontwikkelen of overnemen: lees [CLAUDE.md](CLAUDE.md) (opbouw, workflow, open punten) en [docs/GESCHIEDENIS.md](docs/GESCHIEDENIS.md).
+
 `examples/dashboard.yaml` bevat de complete besturingspagina van de TC90 (Dynamic Positioning, Main Propulsion, Bow/Stern, General, Passerelle, Hatch, Gangway, MFD + motorstart).
 
 ## Installatie via HACS (vanuit GitHub)
