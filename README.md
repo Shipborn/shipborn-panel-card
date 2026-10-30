@@ -111,7 +111,7 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text` |
 | `block` | PMS-blok: `name`, `kind`, `rating`, `entity` (kW), `alarm_entity`, `active_entity` |
 | `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
-| `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed` |
+| `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed`; `attribute` toont een attribuut (een lijst als regels met `- `, met `empty_text` als hij leeg is, scrollt binnen `height`) |
 
 `gauge`, `bar`, `tank`, `value`, `block` en `text` met een entiteit kennen `factor` om ruwe waarden om te rekenen, bijv. `factor: 0.00001` voor een Wago-tankniveau (7894954 → 78,9 %) of `factor: 0.001` voor mbar → bar.
 

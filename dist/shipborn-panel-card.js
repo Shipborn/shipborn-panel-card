@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.4.17";
+const VERSION = "0.4.18";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -1349,6 +1349,16 @@ class ShipbornPanelCard extends HTMLElement {
     }
     if (!item.entity) {
       n.textContent = item.text ?? "";
+      return n;
+    }
+    // attribute: show that attribute instead of the state; a list becomes one "- " line per entry.
+    if (item.attribute) {
+      if (item.height) s.overflowY = "auto";
+      this._updaters.push((hass) => {
+        const v = hass.states[item.entity]?.attributes?.[item.attribute];
+        const list = Array.isArray(v) ? v : v == null || v === "" ? [] : [v];
+        n.textContent = list.length ? list.map((a) => (Array.isArray(v) ? "- " : "") + a).join("\n") : item.empty_text ?? "";
+      });
       return n;
     }
     this._updaters.push((hass) => {

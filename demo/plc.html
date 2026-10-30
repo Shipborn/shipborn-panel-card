@@ -31,6 +31,7 @@
         "binary_sensor.plc_lifebeat": st("on"),
         "sensor.plc_active_alarm": st("026 Jetvalve 3 won't move to starboard"),
         "binary_sensor.plc_alarm_active": st("on"),
+        "sensor.er_alarm_status_active_alarms": st(2, { alarms: ["Bilge engine room high", "Diesel PS level low"] }),
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode": st("on"),
         "binary_sensor.plc_gear_neutral": st("on"),
         "sensor.engine_room_main_engine_me_rpm": st(1450, { unit_of_measurement: "rpm" }),
