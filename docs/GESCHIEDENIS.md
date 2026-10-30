@@ -51,9 +51,9 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
   - alarmpagina: linkervak toont de lijst `alarms` van `sensor.er_alarm_status_active_alarms` (de Jinja-lus uit het oude dashboard, nagebouwd met de nieuwe `text`-optie `attribute`);
   - DC-bus: paneel *PMS status (BMS & BGC)* (`sensor.er_pms_status2_*`), knoppen Max SoC − / + en Shore current − / +; DC-busspanning overal op de Wago-entiteit;
   - boegschroef: paneel *Thruster status* (`*.er_thruster_status_*`) met aan/uit-knoppen.
-- Koppellijst (`plc-entiteiten.csv`) bijgewerkt met deze entiteiten; overdrachtsdocumentatie (`CLAUDE.md`, deze geschiedenis).
-- (v0.4.19) De alarmbalk op elke pagina las nog de placeholders `sensor.plc_active_alarm` / `binary_sensor.plc_alarm_active` en meldde daardoor altijd "Geen actieve alarmen". Hij leest nu ook de lijst `alarms` van de ER-alarmstatus (`alarm` met `attribute`) en gaat bij een tik naar de alarmpagina.
-- Minder loze ruimte: op alle tien schemapagina's staat de romp nu direct onder de alarmbalk (`y: 112` i.p.v. 160) en alles eronder schuift 48 px mee. De romp is op elke pagina exact gelijk gezet (Diesel stond op `y: 158`, Brandstof op `x: 28`).
+- `85d76c2` Koppellijst (`plc-entiteiten.csv`) bijgewerkt met deze entiteiten; overdrachtsdocumentatie (`CLAUDE.md`, deze geschiedenis).
+- `28e3ccb` (v0.4.19) De alarmbalk op elke pagina las nog de placeholders `sensor.plc_active_alarm` / `binary_sensor.plc_alarm_active` en meldde daardoor altijd "Geen actieve alarmen". Hij leest nu ook de lijst `alarms` van de ER-alarmstatus (`alarm` met `attribute`) en gaat bij een tik naar de alarmpagina.
+- `28e3ccb` Minder loze ruimte: op alle tien schemapagina's staat de romp nu direct onder de alarmbalk (`y: 112` i.p.v. 160) en alles eronder schuift 48 px mee. De romp is op elke pagina exact gelijk gezet (Diesel stond op `y: 158`, Brandstof op `x: 28`).
 
 ## Lessen en keuzes die je moet kennen
 

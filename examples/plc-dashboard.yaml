@@ -2,6 +2,7 @@
 # Maak een dashboard aan (de URL maakt niet uit) en plak dit in de Raw configuration editor.
 # Tab-paden zonder "/" (bijv. "sys-diesel") verwijzen naar een view van hetzelfde dashboard.
 # Entiteiten komen uit examples/plc-entiteiten.csv; de overgebleven *.plc_… zijn nog niet gevonden in HA.
+# Op elke pagina staat rechtsboven nog binary_sensor.plc_lifebeat (niet gevonden in HA).
 # Elke view is één kaart van 1280×800 die meeschaalt met de schermbreedte.
 title: PLC
 views:
@@ -362,6 +363,12 @@ views:
   - title: DC-bus koeling
     path: sys-dcbus
     panel: true
+    # Nog te koppelen (niet gevonden in HA):
+    #   binary_sensor.plc_jp1_alarm
+    #   binary_sensor.plc_jp2_alarm
+    #   binary_sensor.plc_jp3_alarm
+    #   sensor.plc_electric_speed
+    #   sensor.plc_emotor_rpm
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -512,6 +519,8 @@ views:
   - title: Boegschroef
     path: sys-bowthruster
     panel: true
+    # Nog te koppelen (niet gevonden in HA):
+    #   sensor.plc_bowthruster_setpoint   (kandidaat: sensor.er_thruster_status_bow_thruster_lever)
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -913,6 +922,8 @@ views:
   - title: Accu's en voeding
     path: sys-power
     panel: true
+    # Nog te koppelen (niet gevonden in HA):
+    #   sensor.plc_battery_current
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
@@ -1069,6 +1080,13 @@ views:
   - title: Alarmen
     path: alarms
     panel: true
+    # Nog te koppelen (niet gevonden in HA):
+    #   binary_sensor.plc_diesel_alarm
+    #   binary_sensor.plc_generator_alarm
+    #   binary_sensor.plc_jp1_alarm
+    #   binary_sensor.plc_jp2_alarm
+    #   binary_sensor.plc_jp3_alarm
+    #   binary_sensor.plc_bilge_anchor_box_high
     cards:
       - type: custom:shipborn-panel-card
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
