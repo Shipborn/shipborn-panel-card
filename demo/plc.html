@@ -19,6 +19,10 @@
   <div id="sim"></div>
   <div id="log">Mock: service calls verschijnen hier (geen echte HA).</div>
   <script>
+    // Tabs in the card navigate as in HA (/<dashboard>/<view>), which does not exist here: go to ?view=<view> instead.
+    window.addEventListener("location-changed", () => {
+      location.replace(`plc.html?view=${encodeURIComponent(location.pathname.split("/").pop())}`);
+    });
     // Renders a view of examples/plc-dashboard.yaml (?view=<path>, default the first) with fake entity states.
     (async () => {
       const yaml = await (await fetch("../examples/plc-dashboard.yaml")).text();

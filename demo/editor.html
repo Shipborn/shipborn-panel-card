@@ -190,9 +190,13 @@
     const yOf = (it) => it.y ?? it.true ?? 0;
 
     // The library pads [ … ] and collapses aligned comments; lines that did not change keep their
-    // original text, the rest only lose the padding inside [ ].
+    // original text, the rest only lose the padding inside [ ]. The indentation is part of the key: the same
+    // line (e.g. "items:") occurs at several depths since zones have their own items.
     let original = new Map();
-    const norm = (l) => l.replace(/\s+/g, " ").replace(/\[ /g, "[").replace(/ \]/g, "]").trimEnd();
+    const norm = (l) => {
+      const ind = l.match(/^\s*/)[0];
+      return ind + l.slice(ind.length).replace(/\s+/g, " ").replace(/\[ /g, "[").replace(/ \]/g, "]").trimEnd();
+    };
     const remember = (text) => (original = new Map(text.split("\n").map((l) => [norm(l), l])));
     const serialize = () =>
       doc.toString({ lineWidth: 0 }).split("\n").map((l) => original.get(norm(l)) ?? l.replace(/\[ /g, "[").replace(/ \]/g, "]")).join("\n");
