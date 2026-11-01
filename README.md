@@ -87,7 +87,7 @@ Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/inpu
   card: { type: picture-entity, entity: camera.achterdek }
 - { type: box, x: 158, y: 352, width: 125, height: 100, inset: false }
 - { type: label, x: 10, y: 10, text: "Tekst", font_size: 8 }
-- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }   # of een ingebouwd beeld: image: shipborn-joal (logo)
+- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }   # of een ingebouwd beeld: image: shipborn-joal (logo), tc90-zijaanzicht, tc90-dekplan, tc90-interieur
 ```
 
 ### Kiosk: HA-balken verbergen
@@ -114,6 +114,7 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `block` | PMS-blok: `name`, `kind`, `rating`, `entity` (kW), `alarm_entity`, `active_entity` |
 | `line` | lijn/vlak: `color`, `active_entity`, `active_color`, `border`, `radius` |
 | `text` | `text` of `entity`, `font_size`, `uppercase`, `mono`, `boxed`; `attribute` toont een attribuut (een lijst als regels met `- `, met `empty_text` als hij leeg is, scrollt binnen `height`) |
+| `zone` | tikbaar vlak op een tekening (een ruimte): `label`, `value_entity` (+ `unit`, `decimals`, `factor`), `active_entity` (oranje), `alarm_entity` (rood knipperend), `radius`; `zoom: { title, height, items, area, panel, max_scale }` zoomt in op de tekening onder de zone met rechts een (scrollend) paneel met eigen items; `popup: { title, width, height, items }` opent een venster; anders `tap_action` |
 
 `gauge`, `bar`, `tank`, `value`, `block` en `text` met een entiteit kennen `factor` om ruwe waarden om te rekenen, bijv. `factor: 0.00001` voor een Wago-tankniveau (7894954 → 78,9 %) of `factor: 0.001` voor mbar → bar.
 
@@ -142,6 +143,27 @@ Een `text` met `boxed: true` wordt een tank met `level_entity`: het vak vult zic
 ```yaml
 - { type: text, x: 743, y: 312, width: 193, height: 136, text: Diesel PS, boxed: true, medium: fuel, level_entity: sensor.diesel_ps_level }
 ```
+
+Een `zone` legt een tikbaar vlak over een plattegrond. Het venster (`popup`) heeft zijn eigen ontwerpmaat (`width` × `height`, in px vanaf linksboven) en schaalt mee met de kaart; de items erin zijn gewone items (knoppen, waarden, indicatoren). Een scène zet je zo op een knop:
+
+```yaml
+- type: zone
+  x: 729
+  y: 293
+  width: 172
+  height: 132
+  label: Main cabin
+  value_entity: sensor.temp_main_temperature
+  active_entity: [light.main_cabin_salon_rondom, light.main_cabin_plinten]
+  popup:
+    width: 760
+    height: 200
+    items:
+      - { type: pushbutton, x: 20, y: 44, width: 170, height: 52, label: Aan, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_main_cabin_aan } } }
+      - { type: pushbutton, x: 20, y: 106, width: 350, height: 46, label: Salon rondom, entity: light.main_cabin_salon_rondom, led: green, align: left }
+```
+
+Met `zoom` in plaats van `popup` zoomt een tik vloeiend in op de zone: de afbeelding waar de zone op ligt vult het vak `area` (standaard `[20, 120, 740, hoogte − 140]`, met een wit vel), met maximaal `max_scale` (standaard 3) zodat de omgeving zichtbaar blijft. Rechts schuift een paneel in (`panel`, standaard `[776, 120, 484, hoogte − 140]`) met een kop, een knop *← Terug* en de items; die staan in px vanaf linksboven in het paneel (breedte ±448 binnen de marges) en scrollen als `height` groter is dan het paneel. De ruimtes op het interieurplan worden gemaakt met `tools/interieur_zones.py` uit de HA-export.
 
 ### Schema's met stromende leidingen
 

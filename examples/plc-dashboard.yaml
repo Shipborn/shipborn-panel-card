@@ -45,6 +45,7 @@ views:
               - { label: Accu's, path: sys-power }
               - { label: Webasto, path: sys-webasto }
               - { label: Navigatie, path: sys-navlights }
+              - { label: Schip, path: ship-side, match: [ship-deck, ship-interior] }
               - { label: Alarms, path: alarms }
           - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
           - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
@@ -846,6 +847,7 @@ views:
               font_size: 13,
               color: "#a3a29c"
             }
+          - { type: pushbutton, x: 38, y: 1028, width: 584, height: 44, label: "Legen vuilwatertank nr001 (50% > 10%, max 30 s)", entity: input_boolean.vuilwatertank_automatisch_legen_aanuit, led: green, align: left, font_size: 15 }
           - { type: panel, x: 656, y: 732, width: 604, height: 360, title: Alarm level }
           - { type: pushbutton, x: 674, y: 784, width: 568, height: 44, label: Vuilwater tank level alarm, entity: automation.vuilwater_tank_level_alarm_notification, led: green, align: left, font_size: 15 }
           - { type: value, x: 674, y: 840, width: 568, height: 36, label: Alarm boven, entity: input_number.vuilwater_tank_hoog_level_alarm, font_size: 15, decimals: 0 }
@@ -1076,6 +1078,624 @@ views:
           - { type: pushbutton, x: 454, y: 401, width: 254, height: 52, label: Red nav SB, entity: switch.lopolight_navigation_lights_navlight_red_nav_sb, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 719, y: 401, width: 254, height: 52, label: Red nav PS, entity: switch.lopolight_navigation_lights_navlight_red_nav_ps, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 984, y: 401, width: 254, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
+
+  # ===== Aanzichten van het schip (canvas "TC 90 aanzichten") =====
+  # De tekeningen zitten in de kaart zelf (image: tc90-…), HA heeft geen extra bestanden nodig.
+
+  - title: Zijaanzicht
+    path: ship-side
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+
+          # ---- aanzichten: subnavigatie + tekening op een wit vel ----
+          - type: nav
+            x: 20
+            y: 120
+            tabs: &ship_tabs
+              - { label: Zijaanzicht, path: ship-side }
+              - { label: Dekplan, path: ship-deck }
+              - { label: Interieur, path: ship-interior }
+          - { type: line, x: 20, y: 176, width: 1240, height: 604, color: "#ffffff", radius: 10 }
+          - { type: image, x: 394, y: 188, width: 493, height: 580, image: tc90-zijaanzicht }
+
+  - title: Dekplan
+    path: ship-deck
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+
+          # ---- aanzichten: subnavigatie + tekening op een wit vel ----
+          - { type: nav, x: 20, y: 120, tabs: *ship_tabs }
+          - { type: line, x: 20, y: 176, width: 1240, height: 604, color: "#ffffff", radius: 10 }
+          - { type: image, x: 40, y: 328, width: 1200, height: 299, image: tc90-dekplan }
+
+          # ---- dek: zones (gegenereerd door tools/interieur_zones.py) ----
+          - type: zone
+            x: 57
+            y: 428
+            width: 83
+            height: 100
+            label: Loopplank
+            active_entity: [light.loopplank]
+            zoom:
+              height: 112
+              items:
+                - { type: text, x: 18, y: 12, text: Loopplank, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 44, label: Loopplank, entity: light.loopplank, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 145
+            y: 405
+            width: 337
+            height: 144
+            label: Bimini
+            value_entity: sensor.temp_buiten_temperature
+            active_entity: [light.bimini_14b_1tafel_d28, light.bimini14a_bank_d18_2_d22]
+            zoom:
+              height: 404
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Bimini aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_bimini_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Bimini uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_bimini_uit } } }
+                - { type: text, x: 18, y: 106, text: Bimini – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Bimini tafel, entity: light.bimini_14b_1tafel_d28, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Bimini bank, entity: light.bimini14a_bank_d18_2_d22, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 194, text: Buitentemperatuur, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: text, x: 18, y: 224, width: 448, text: Sensor ligt op de bimini., font_size: 13, color: "#8f8e88" }
+                - { type: value, x: 18, y: 254, width: 448, height: 36, label: Temperatuur, entity: sensor.temp_buiten_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 302, width: 448, height: 36, label: Temp-sensor batterij, entity: sensor.temp_buiten_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: value, x: 18, y: 344, width: 448, height: 36, label: Temp buiten lounge batterij, entity: sensor.buitenlounchetemp_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+          - type: zone
+            x: 659
+            y: 439
+            width: 133
+            height: 88
+            label: Mast en giek
+            active_entity: [light.mc_s_15a0_giek, light.mc_s_15b_spreader_1_d42, light.mc_s_15b_spreader_2_d43, light.mc_s_15b_spreader_3_d44, light.mc_s_15b_spreader_4_d45, light.mc_s_15c_windex_d46]
+            zoom:
+              height: 364
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Mast aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_mast_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Mast uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_mast_uit } } }
+                - { type: text, x: 18, y: 106, text: Mast en giek – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Spreader 3, entity: light.mc_s_15b_spreader_1_d42, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Spreader 2, entity: light.mc_s_15b_spreader_2_d43, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 188, width: 219, height: 44, label: Spreader 1, entity: light.mc_s_15b_spreader_3_d44, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 188, width: 219, height: 44, label: Spreader bovenin (alleen BB), entity: light.mc_s_15b_spreader_4_d45, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 240, width: 219, height: 44, label: Giek, entity: light.mc_s_15a0_giek, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 240, width: 219, height: 44, label: Windex, entity: light.mc_s_15c_windex_d46, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 298, width: 448, text: De mastverlichting en de giekspot gaan automatisch aan bij zonsondergang en uit bij zonsopgang., font_size: 13, color: "#8f8e88" }
+          - type: zone
+            x: 814
+            y: 394
+            width: 332
+            height: 166
+            label: Dekverlichting
+            active_entity: [light.mc_s_15a_deck_bb_d40, light.mc_s_15a_deck_sb_d41, light.decklight_bb]
+            zoom:
+              height: 258
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Deklicht aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_deck_licht_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Deklicht uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_deck_licht_uit } } }
+                - { type: text, x: 18, y: 106, text: Dekverlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Deklicht BB naar beneden, entity: light.mc_s_15a_deck_bb_d40, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Deklicht SB naar beneden, entity: light.mc_s_15a_deck_sb_d41, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 188, width: 219, height: 44, label: Decklight BB, entity: light.decklight_bb, led: green, align: left, font_size: 14 }
+          # ---- einde dek ----
+
+  - title: Interieur
+    path: ship-interior
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+
+          # ---- aanzichten: subnavigatie + tekening op een wit vel ----
+          - { type: nav, x: 20, y: 120, tabs: *ship_tabs }
+          - { type: line, x: 20, y: 176, width: 1240, height: 464, color: "#ffffff", radius: 10 }
+          - { type: image, x: 40, y: 276, width: 1200, height: 264, image: tc90-interieur }
+
+          # ---- ruimtes: tik = inzoomen, rechts alle lampen en apparaten van die ruimte ----
+          # Oranje = er brandt licht, rood knipperend = lekalarm. Plaats en maat per ruimte zijn een eerste schatting.
+          # Gegenereerd door tools/interieur_zones.py (indeling volgens het HA-dashboard van de bemanning); niet met de hand aanpassen.
+          - type: zone
+            x: 63
+            y: 305
+            width: 189
+            height: 206
+            label: Aft peak
+            alarm_entity: [binary_sensor.0x28dba7fffe752d09_water_leak, binary_sensor.0x8c65a3fffecea649_water_leak]
+            zoom:
+              height: 200
+              items:
+                - { type: text, x: 18, y: 12, text: Bilge, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: indicator, x: 18, y: 42, entity: binary_sensor.0x28dba7fffe752d09_water_leak, label: Water laag, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 42, entity: binary_sensor.0x8c65a3fffecea649_water_leak, label: Water hoog, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: pushbutton, x: 18, y: 86, width: 219, height: 44, label: Bilgepomp, entity: switch.ap_bilgepumpcontrol_01, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } } }
+                - { type: indicator, x: 18, y: 144, entity: binary_sensor.0x28dba7fffe752d09_battery_low, label: "Lek laag: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 144, entity: binary_sensor.0x8c65a3fffecea649_battery_low, label: "Lek hoog: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+          - type: zone
+            x: 258
+            y: 293
+            width: 247
+            height: 230
+            label: Owners cabin
+            value_entity: sensor.temp_ownerscabin_temperature
+            active_entity: [light.oc_1a1, light.oc_1a2, light.oc_1b1, light.oc_1b2, light.oc_1c1, light.oc_1c2, light.oc_1c3, light.oc_2a, light.oc_led, light.oc_s_1a_hoog_bba_d22, light.oc_s_1a_hoog_bbv_d23, light.oc_s_1a_hoog_ma_d27, light.oc_s_1a_hoog_mv_d24, light.oc_s_1a_hoog_sba_d26, light.oc_s_1a_hoog_sbv_d25, light.oc_s_1b2_led_bed_d12, light.oc_s_1b2_led_vloer_d8, light.oc_s_1b_kaptafel_d13, light.oc_s_1b_laag_bba_d11, light.oc_s_1b_laag_bbm_d10, light.oc_s_1b_laag_bbv_d9, light.oc_s_1b_laag_sba_d16, light.oc_s_1b_laag_sbm_d15, light.oc_s_1b_laag_sbv_d14, light.oc_s_1c1_bad_a_d19, light.oc_s_1c1_bad_v_d19b, light.oc_s_1c2_gang_a_d20, light.oc_s_1c2_gang_v_d21, light.oc_s_1c3_plint_bad_d23, light.oc_s_2a_douche_d18_1, light.oc_s_2a_wasbak_d17, light.oc_s_2a_wc_d18, light.owners_cabin_douche_ruimte, light.owners_cabin_plinten, light.owners_cabin_rondom_laag_plafond]
+            zoom:
+              height: 1972
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 142, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_owners_cabin_aan } } }
+                - { type: pushbutton, x: 170, y: 42, width: 142, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_owners_cabin_uit } } }
+                - { type: pushbutton, x: 322, y: 42, width: 142, height: 48, label: "50%", font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_50 } } }
+                - { type: pushbutton, x: 18, y: 100, width: 142, height: 48, label: Bed, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_bed } } }
+                - { type: pushbutton, x: 170, y: 100, width: 142, height: 48, label: Sanitair aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_sanitair_aan } } }
+                - { type: pushbutton, x: 322, y: 100, width: 142, height: 48, label: Sanitair uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_sanitair_uit } } }
+                - { type: text, x: 18, y: 164, text: Owners cabin – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Rondom laag plafond, entity: light.owners_cabin_rondom_laag_plafond, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Plinten, entity: light.owners_cabin_plinten, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 252, width: 219, height: 44, label: Laag plafond BBA (2 spots), entity: light.oc_s_1b_laag_bba_d11, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 252, width: 219, height: 44, label: Laag plafond BBM (2 spots), entity: light.oc_s_1b_laag_bbm_d10, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 304, width: 219, height: 44, label: Laag plafond BBV (2 spots), entity: light.oc_s_1b_laag_bbv_d9, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 304, width: 219, height: 44, label: Laag plafond SBA (2 spots), entity: light.oc_s_1b_laag_sba_d16, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 356, width: 219, height: 44, label: Laag plafond SBM (2 spots), entity: light.oc_s_1b_laag_sbm_d15, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 356, width: 219, height: 44, label: Laag plafond SBV (2 spots), entity: light.oc_s_1b_laag_sbv_d14, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 408, width: 219, height: 44, label: Plinten bed, entity: light.oc_s_1b2_led_bed_d12, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 408, width: 219, height: 44, label: Plinten trappen, entity: light.oc_s_1b2_led_vloer_d8, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 466, text: "Bad, toilet en douche – verlichting", font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 496, width: 219, height: 44, label: Douche ruimte, entity: light.owners_cabin_douche_ruimte, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 496, width: 219, height: 44, label: Douche (spot), entity: light.oc_s_2a_douche_d18_1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 548, width: 219, height: 44, label: Wasbak (spot), entity: light.oc_s_2a_wasbak_d17, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 548, width: 219, height: 44, label: WC (2 spots), entity: light.oc_s_2a_wc_d18, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 600, width: 219, height: 44, label: Ledstrip wastafel, entity: light.oc_s_1b_kaptafel_d13, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 600, width: 219, height: 44, label: Hal bad (6), entity: light.oc_1c2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 652, width: 219, height: 44, label: Plint badkamer, entity: light.oc_1c3, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 710, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 740, width: 219, height: 44, label: Webasto klimaat (bad), entity: switch.oc_e1_2_l1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 740, width: 219, height: 44, label: Sanibroyeur 1, entity: switch.oc_w_e3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 792, width: 219, height: 44, label: Sanibroyeur 2, entity: switch.oc_w_e4, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 792, width: 219, height: 44, label: Toilet, entity: switch.oc_w_e5, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 844, width: 219, height: 44, label: Wandcontactdozen (TV), entity: switch.oc_k1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 844, width: 219, height: 44, label: Stopcontact (plug), entity: switch.0xa4c138b105c39a71, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 902, text: Webasto owners cabin, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 932, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_owners_cabin_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 932, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 1006, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_owners_cabin, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 1006, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_owners_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 1058, text: Webasto owners cabin bad, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 1088, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 1088, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 1162, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_owners_cabin_bad, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 1162, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 1214, text: Beweging en temperatuur, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: text, x: 18, y: 1244, width: 448, text: Sensor ligt bij het kastje aan stuurboord., font_size: 13, color: "#8f8e88" }
+                - { type: value, x: 18, y: 1274, width: 448, height: 36, label: Temperatuur, entity: sensor.motion_sensor_ownerscabin_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: indicator, x: 18, y: 1322, entity: binary_sensor.motion_sensor_ownerscabin_occupancy, label: Beweging, color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: value, x: 18, y: 1366, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.motion_sensor_ownerscabin_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: value, x: 18, y: 1408, width: 448, height: 36, label: Temp-sensor batterij, entity: sensor.temp_ownerscabin_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: text, x: 18, y: 1456, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1486, width: 219, height: 44, label: Groep 1A1, entity: light.oc_1a1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1486, width: 219, height: 44, label: Groep 1A2, entity: light.oc_1a2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1538, width: 219, height: 44, label: Groep 1B1, entity: light.oc_1b1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1538, width: 219, height: 44, label: Groep 1B2, entity: light.oc_1b2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1590, width: 219, height: 44, label: Groep 1C1, entity: light.oc_1c1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1590, width: 219, height: 44, label: Groep 2A, entity: light.oc_2a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1642, width: 219, height: 44, label: Groep Led, entity: light.oc_led, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1642, width: 219, height: 44, label: Hoog Bba, entity: light.oc_s_1a_hoog_bba_d22, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1694, width: 219, height: 44, label: Hoog Bbv, entity: light.oc_s_1a_hoog_bbv_d23, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1694, width: 219, height: 44, label: Hoog Ma, entity: light.oc_s_1a_hoog_ma_d27, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1746, width: 219, height: 44, label: Hoog Mv, entity: light.oc_s_1a_hoog_mv_d24, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1746, width: 219, height: 44, label: Hoog Sba, entity: light.oc_s_1a_hoog_sba_d26, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1798, width: 219, height: 44, label: Hoog Sbv, entity: light.oc_s_1a_hoog_sbv_d25, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1798, width: 219, height: 44, label: Bad A, entity: light.oc_s_1c1_bad_a_d19, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1850, width: 219, height: 44, label: Bad V, entity: light.oc_s_1c1_bad_v_d19b, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1850, width: 219, height: 44, label: Gang A, entity: light.oc_s_1c2_gang_a_d20, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1902, width: 219, height: 44, label: Gang V, entity: light.oc_s_1c2_gang_v_d21, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1902, width: 219, height: 44, label: Plint Bad, entity: light.oc_s_1c3_plint_bad_d23, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 505
+            y: 293
+            width: 109
+            height: 115
+            label: Deck lounge
+            value_entity: sensor.0x001788010df593f4_temperature
+            active_entity: [light.main_cabin_salon_rondom, light.mc_s_3a_dl_bba_d11_1, light.mc_s_3a_dl_bbm_d11_2, light.mc_s_3a_dl_bbv_d11_3, light.mc_s_3a_dl_sba_d11_7, light.mc_s_3a_dl_sbm_d11_6, light.mc_s_3a_dl_sbv_d11_5, light.mc_s_3a_dl_v_d11_4, light.mc_s_3b_trap_d9, light.mc_s_3c_dl_gang_laag_d8, light.mc_s_3c_dl_trap_d7, light.mc_s_3c_dl_zitje_d6]
+            zoom:
+              height: 1132
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_decklounge_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_deck_lounge_uit } } }
+                - { type: text, x: 18, y: 106, text: Salon – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Salon rondom, entity: light.main_cabin_salon_rondom, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Plinten, entity: light.main_cabin_plinten, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Salon hoek BB achter (2 spots), entity: light.mc_s_3a_dl_bba_d11_1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Salon hoek BB midden (2 spots), entity: light.mc_s_3a_dl_bbm_d11_2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 246, width: 219, height: 44, label: Salon hoek BB voor (2 spots), entity: light.mc_s_3a_dl_bbv_d11_3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 246, width: 219, height: 44, label: Salon hoek SB achter (2 spots), entity: light.mc_s_3a_dl_sba_d11_7, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 298, width: 219, height: 44, label: Salon hoek SB midden (2 spots), entity: light.mc_s_3a_dl_sbm_d11_6, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 298, width: 219, height: 44, label: Salon hoek SB voor (2 spots), entity: light.mc_s_3a_dl_sbv_d11_5, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 350, width: 219, height: 44, label: Salon voor (2 spots), entity: light.mc_s_3a_dl_v_d11_4, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 350, width: 219, height: 44, label: Salon plinten, entity: light.mc_s_3b_trap_d9, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 408, text: Webasto deck lounge, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 438, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_deck_lounge_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 438, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_deck_lounge_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 512, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_deck_lounge, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 512, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_deck_lounge_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 564, text: Beweging en temperatuur, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 594, width: 448, height: 36, label: Temperatuur, entity: sensor.0x001788010df593f4_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: indicator, x: 18, y: 642, entity: binary_sensor.0x001788010df593f4_occupancy, label: Beweging, color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: value, x: 18, y: 686, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.0x001788010df593f4_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: text, x: 18, y: 734, text: Printer HP Smart Tank 5100, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 764, width: 448, height: 36, label: Status, entity: sensor.hp_smart_tank_5100_series, font_size: 15, box_width: 110 }
+                - { type: value, x: 18, y: 806, width: 448, height: 36, label: Zwart, entity: sensor.hp_smart_tank_5100_series_black_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: value, x: 18, y: 848, width: 448, height: 36, label: Cyaan, entity: sensor.hp_smart_tank_5100_series_cyan_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: value, x: 18, y: 890, width: 448, height: 36, label: Magenta, entity: sensor.hp_smart_tank_5100_series_magenta_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: value, x: 18, y: 932, width: 448, height: 36, label: Geel, entity: sensor.hp_smart_tank_5100_series_yellow_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: text, x: 18, y: 980, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1010, width: 219, height: 44, label: Dl Gang Laag, entity: light.mc_s_3c_dl_gang_laag_d8, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1010, width: 219, height: 44, label: Dl Trap, entity: light.mc_s_3c_dl_trap_d7, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1062, width: 219, height: 44, label: Dl Zitje, entity: light.mc_s_3c_dl_zitje_d6, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 505
+            y: 408
+            width: 109
+            height: 115
+            label: Engine room
+            value_entity: sensor.0x001788010cdae144_temperature
+            active_entity: [light.er_0a, light.er_0b, light.er_s_13a1]
+            alarm_entity: [binary_sensor.0x8c65a3fffeda603c_water_leak, binary_sensor.0x0ceff6fffe901b4e_water_leak, binary_sensor.engine_room_leak_schroefas_water_leak]
+            zoom:
+              height: 1344
+              items:
+                - { type: pushbutton, x: 18, y: 12, width: 448, height: 48, label: Naar Diesel, font_size: 15, tap_action: { action: navigate, navigation_path: sys-diesel } }
+                - { type: text, x: 18, y: 72, text: Verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 102, width: 219, height: 44, label: Engine room lights, entity: light.er_s_13a1, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 160, text: Lekdetectie, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: indicator, x: 18, y: 190, entity: binary_sensor.0x8c65a3fffeda603c_water_leak, label: Water laag, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 190, entity: binary_sensor.0x0ceff6fffe901b4e_water_leak, label: Water hoog, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: pushbutton, x: 18, y: 234, width: 219, height: 44, label: Bilgepomp, entity: switch.0xe4b063fffe6d51d8, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } } }
+                - { type: indicator, x: 18, y: 292, entity: binary_sensor.engine_room_leak_schroefas_water_leak, label: Lek schroefas, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: text, x: 18, y: 336, width: 448, text: De lekdetector bij de schroefas stuurt ook een melding naar de telefoon van Alber., font_size: 13, color: "#8f8e88" }
+                - { type: text, x: 18, y: 390, text: Temperatuur, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 420, width: 448, height: 36, label: Machinekamer, entity: sensor.0x001788010cdae144_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 462, width: 448, height: 36, label: Naast dagtank-vulsensoren, entity: sensor.engineroom_naast_dagtankvulsensoren_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 504, width: 448, height: 36, label: Buiten lounge, entity: sensor.buitenlounchetemp_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: text, x: 18, y: 552, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 582, width: 219, height: 44, label: Er 13A, entity: switch.er_13a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 582, width: 219, height: 44, label: Er S 13A2, entity: switch.er_s_13a2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 634, width: 219, height: 44, label: Ventilatie, entity: light.0xa4c138066737a09a, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 692, text: Generator – temperaturen, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 722, width: 448, height: 36, label: Zeewater in, entity: sensor.temp_generator_zeewater_in_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 764, width: 448, height: 36, label: Zeewater uit, entity: sensor.temp_generator_zeewater_uit_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 806, width: 448, height: 36, label: Blok generator, entity: sensor.temp_generator_blok_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 848, width: 448, height: 36, label: Koelvloeistof uit, entity: sensor.temp_generator_koelvloeistof_in_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 890, width: 448, height: 36, label: Koelvloeistof in, entity: sensor.temp_generator_koelvloeistof_uit_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 932, width: 448, height: 36, label: Temp-GEN-monitor, entity: input_number.temp_gen_monitor, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: text, x: 18, y: 980, text: Sensorbatterijen, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 1010, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.0x001788010cdae144_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: value, x: 18, y: 1052, width: 448, height: 36, label: Temp naast dagtank batterij, entity: sensor.engineroom_naast_dagtankvulsensoren_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: value, x: 18, y: 1094, width: 448, height: 36, label: Lek schroefas batterij, entity: sensor.engine_room_leak_schroefas_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: indicator, x: 18, y: 1142, entity: binary_sensor.0x8c65a3fffeda603c_battery_low, label: "Lek laag: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 1142, entity: binary_sensor.0x0ceff6fffe901b4e_battery_low, label: "Lek hoog: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: text, x: 18, y: 1186, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1216, width: 219, height: 44, label: Groep 0A, entity: light.er_0a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1216, width: 219, height: 44, label: Groep 0B, entity: light.er_0b, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1274, width: 219, height: 44, label: Groep K1, entity: switch.er_k1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1274, width: 219, height: 44, label: Stopcontact, entity: switch.socket_engine_room, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 614
+            y: 293
+            width: 115
+            height: 127
+            label: Dining
+            active_entity: [light.mc_5a, light.mc_5b, light.mc_s_5a_d_lr_d18, light.mc_s_5a_plafond_los_d15, light.mc_s_5a_tafel_bb_d16, light.mc_s_5a_tafel_mid_d17, light.mc_s_5b_kasten_d13_2, light.mc_s_5b_raam_kast_d13, light.mc_s_5c_plint_d14]
+            alarm_entity: [binary_sensor.0x0ceff6fffe76dcea_water_leak, binary_sensor.0x0ceff6fffe9009c8_water_leak]
+            zoom:
+              height: 626
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_dining_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_dining_uit } } }
+                - { type: text, x: 18, y: 106, text: Eetkamer – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Scheiding eetkamer – lounge (spot), entity: light.mc_s_5a_d_lr_d18, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Eetkamer kast + patrijspoort, entity: light.mc_s_5b_raam_kast_d13, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 188, width: 219, height: 44, label: Eetkamer plinten kast, entity: light.mc_s_5c_plint_d14, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 246, text: Bilge, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: indicator, x: 18, y: 276, entity: binary_sensor.0x0ceff6fffe76dcea_water_leak, label: Water laag, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 276, entity: binary_sensor.0x0ceff6fffe9009c8_water_leak, label: Water hoog, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: pushbutton, x: 18, y: 320, width: 219, height: 44, label: Bilgepomp, entity: switch.0xccba97fffeeb6ddc, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } } }
+                - { type: indicator, x: 18, y: 378, entity: binary_sensor.0x0ceff6fffe76dcea_battery_low, label: "Lek laag: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 378, entity: binary_sensor.0x0ceff6fffe9009c8_battery_low, label: "Lek hoog: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: text, x: 18, y: 422, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 452, width: 219, height: 44, label: Groep 5A, entity: light.mc_5a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 452, width: 219, height: 44, label: Groep 5B, entity: light.mc_5b, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 504, width: 219, height: 44, label: Plafond Los, entity: light.mc_s_5a_plafond_los_d15, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 504, width: 219, height: 44, label: Tafel Bb, entity: light.mc_s_5a_tafel_bb_d16, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 556, width: 219, height: 44, label: Tafel Mid, entity: light.mc_s_5a_tafel_mid_d17, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 556, width: 219, height: 44, label: Kasten, entity: light.mc_s_5b_kasten_d13_2, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 614
+            y: 420
+            width: 115
+            height: 103
+            label: Galley
+            active_entity: [light.g_s_4a_achter_d1, light.g_s_4a_kookplaat_d3, light.g_s_4a_raam_d2, light.g_s_4a_vaatw_d4, light.g_s_4b_led_kast_d5, light.g_s_4b_ledstrip, light.main_cabin_aanrecht_geheel, light.mc_4a_g]
+            zoom:
+              height: 1254
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_galley_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_galley_uit } } }
+                - { type: pushbutton, x: 18, y: 100, width: 219, height: 48, label: Apparatuur aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_keuken_apparatuur_aan } } }
+                - { type: pushbutton, x: 247, y: 100, width: 219, height: 48, label: Apparatuur uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_keuken_apparatuur_uit } } }
+                - { type: text, x: 18, y: 164, text: Verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Aanrecht, entity: light.main_cabin_aanrecht_geheel, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 252, width: 219, height: 44, label: Aanrecht achterzijde, entity: light.g_s_4a_achter_d1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 252, width: 219, height: 44, label: Aanrecht kookplaat, entity: light.g_s_4a_kookplaat_d3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 304, width: 219, height: 44, label: Patrijs (2), entity: light.g_s_4a_raam_d2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 304, width: 219, height: 44, label: Aanrecht vaatwasser, entity: light.g_s_4a_vaatw_d4, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 356, width: 219, height: 44, label: Aanrecht onder kastjes, entity: light.g_s_4b_led_kast_d5, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 414, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 444, width: 219, height: 44, label: Webasto klimaat, entity: switch.g_w_e1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 444, width: 219, height: 44, label: Sanibroyeur (wastafel), entity: switch.g_w_e3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 496, width: 219, height: 44, label: Sanibroyeur (was/droog), entity: switch.g_w_e4, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 496, width: 219, height: 44, label: Wandcontactdozen, entity: switch.g_k2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 548, width: 219, height: 44, label: Afzuigkap, entity: switch.g_k1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 548, width: 219, height: 44, label: Vaatwasser, entity: switch.g_k3, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+                - { type: pushbutton, x: 18, y: 600, width: 219, height: 44, label: Oven, entity: switch.g_k4, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 600, width: 219, height: 44, label: Koelkast, entity: switch.g_k5, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+                - { type: pushbutton, x: 18, y: 652, width: 219, height: 44, label: Vriezer, entity: switch.g_k6, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+                - { type: pushbutton, x: 247, y: 652, width: 219, height: 44, label: Was-droog, entity: switch.g_k7, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+                - { type: pushbutton, x: 18, y: 704, width: 219, height: 44, label: Smart plug keuken, entity: switch.socketgally, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 762, text: Webasto galley, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 792, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_galley_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 792, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_galley_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 866, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_galley, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 866, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_galley_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 918, text: Temperatuur omvormer schakelkast, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 948, width: 448, height: 36, label: Temperatuur, entity: sensor.boiler_water_temp_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 996, width: 448, height: 36, label: Temp-sensor batterij, entity: sensor.boiler_water_temp_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: text, x: 18, y: 1044, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1074, width: 219, height: 44, label: Ledstrip, entity: light.g_s_4b_ledstrip, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1074, width: 219, height: 44, label: Groep 4A (galley), entity: light.mc_4a_g, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1132, width: 219, height: 44, label: Groep K8, entity: switch.g_k8, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1132, width: 219, height: 44, label: Koelkast (relais), entity: switch.0xa4c1384510c26c59, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+                - { type: pushbutton, x: 18, y: 1184, width: 219, height: 44, label: Vriezer (relais), entity: switch.0xa4c1386689af54dc, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+          - type: zone
+            x: 729
+            y: 293
+            width: 172
+            height: 132
+            label: Main cabin
+            value_entity: sensor.temp_main_temperature
+            active_entity: [light.main_cabin_gangpad_geheel, light.main_cabin_lounge_bank_geheel, light.main_cabin_plinten, light.main_cabin_workplace_plafond, light.mc_6a, light.mc_7a, light.mc_7b, light.mc_led, light.mc_s_6a_gang1_d19, light.mc_s_6a_gang2_d21, light.mc_s_6a_gang3_d22, light.mc_s_6a_gang4_d23, light.mc_s_7a_tafel_d25, light.mc_s_7ab_bank_1_d31, light.mc_s_7ac_bank_2_d30, light.mc_s_7ad_bank_3_d29, light.mc_s_7ae_bank_4_d28, light.mc_s_7af_bank_5_d27, light.mc_s_7ag_bank_6_d26, light.mc_s_7ah_kast_d32, light.mc_s_7ai_raam_d33, light.mc_s_7aj_mast_d24, light.mc_s_7ak_plint_d34, light.mc_s_7b_gang_d36, light.mc_s_7b_kast_d35, light.mc_s_7b_plint_d37]
+            zoom:
+              height: 1750
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 142, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_main_cabin_aan } } }
+                - { type: pushbutton, x: 170, y: 42, width: 142, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_main_cabin_uit } } }
+                - { type: pushbutton, x: 322, y: 42, width: 142, height: 48, label: Nacht, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_living_room_nacht } } }
+                - { type: pushbutton, x: 18, y: 100, width: 142, height: 48, label: Werkplek aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_mc_workplace_aan } } }
+                - { type: pushbutton, x: 170, y: 100, width: 142, height: 48, label: Werkplek uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_mc_workplace_uit } } }
+                - { type: pushbutton, x: 322, y: 100, width: 142, height: 48, label: Patrijspoorten, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_patrijspoorten } } }
+                - { type: text, x: 18, y: 164, text: Zithoek – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Lounge bank, entity: light.main_cabin_lounge_bank_geheel, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Plinten, entity: light.main_cabin_plinten, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 252, width: 219, height: 44, label: Lounge tafel (2 spots), entity: light.mc_s_7a_tafel_d25, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 252, width: 219, height: 44, label: Lounge bank dwars 1 (2 spots), entity: light.mc_s_7ab_bank_1_d31, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 304, width: 219, height: 44, label: Lounge bank dwars 2 (spot), entity: light.mc_s_7ac_bank_2_d30, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 304, width: 219, height: 44, label: Lounge bank 1 (spot), entity: light.mc_s_7ad_bank_3_d29, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 356, width: 219, height: 44, label: Lounge bank 2 (spot), entity: light.mc_s_7ae_bank_4_d28, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 356, width: 219, height: 44, label: Lounge bank 3 (spot), entity: light.mc_s_7af_bank_5_d27, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 408, width: 219, height: 44, label: Lounge bank 4 (spot), entity: light.mc_s_7ag_bank_6_d26, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 408, width: 219, height: 44, label: Lounge patrijspoort, entity: light.mc_s_7ai_raam_d33, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 460, width: 219, height: 44, label: Lounge plinten, entity: light.mc_s_7ak_plint_d34, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 518, text: Werkkamer – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 548, width: 219, height: 44, label: Werkplek plafond, entity: light.main_cabin_workplace_plafond, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 548, width: 219, height: 44, label: Werkplek gang (2), entity: light.mc_s_7b_gang_d36, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 600, width: 219, height: 44, label: Werkplek kast (2), entity: light.mc_s_7b_kast_d35, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 600, width: 219, height: 44, label: Werkplek plinten, entity: light.mc_s_7b_plint_d37, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 658, text: Gang – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 688, width: 219, height: 44, label: Gangpad, entity: light.main_cabin_gangpad_geheel, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 688, width: 219, height: 44, label: Gang 1 (2), entity: light.mc_s_6a_gang1_d19, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 740, width: 219, height: 44, label: Gang 2 (2), entity: light.mc_s_6a_gang2_d21, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 740, width: 219, height: 44, label: Gang 3 (2), entity: light.mc_s_6a_gang3_d22, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 792, width: 219, height: 44, label: Gang 4, entity: light.mc_s_6a_gang4_d23, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 792, width: 219, height: 44, label: Mast, entity: light.mc_s_7aj_mast_d24, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 850, text: Webasto main cabin, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 880, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_main_cabin_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 880, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_main_cabin_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 954, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_main_cabin, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 954, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_main_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 1006, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1036, width: 219, height: 44, label: Webasto klimaat, entity: switch.mc_w_e1_2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1036, width: 219, height: 44, label: Wandcontactdozen, entity: switch.mc_k1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1088, width: 219, height: 44, label: Stopcontact (plug), entity: switch.0xa4c138269e44b698, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1088, width: 219, height: 44, label: Schoonwaterpomp, entity: switch.0x781c9dfffeb6cfcd, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1140, width: 219, height: 44, label: Watertank vullen via wal, entity: valve.lr_dwp_wal_vulpunt, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
+                - { type: pushbutton, x: 247, y: 1140, width: 219, height: 44, label: "Groep 5, 6, 7", entity: switch.main_cabin_mc_567, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1192, width: 219, height: 44, label: Wandcontactdozen W-E3, entity: switch.mc_w_e3, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 1250, text: Bilge, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1280, width: 219, height: 44, label: Bilgepomp salon, entity: switch.0xe4b063fffe78d1e0, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } } }
+                - { type: text, x: 18, y: 1338, text: Temperatuur, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: text, x: 18, y: 1368, width: 448, text: Sensor ligt bij de mast., font_size: 13, color: "#8f8e88" }
+                - { type: value, x: 18, y: 1398, width: 448, height: 36, label: Temperatuur, entity: sensor.temp_main_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: value, x: 18, y: 1446, width: 448, height: 36, label: Temp-sensor batterij, entity: sensor.temp_main_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: text, x: 18, y: 1494, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1524, width: 219, height: 44, label: Groep 3A, entity: light.mc_3a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1524, width: 219, height: 44, label: Groep 3B, entity: light.mc_3b, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1576, width: 219, height: 44, label: Groep 6A, entity: light.mc_6a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1576, width: 219, height: 44, label: Groep 7A, entity: light.mc_7a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1628, width: 219, height: 44, label: Groep 7B, entity: light.mc_7b, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1628, width: 219, height: 44, label: Groep Led, entity: light.mc_led, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1680, width: 219, height: 44, label: Kast, entity: light.mc_s_7ah_kast_d32, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 729
+            y: 425
+            width: 172
+            height: 98
+            label: Crew cabin
+            value_entity: sensor.motionsensorcrew_temperature
+            active_entity: [light.cc_11a, light.cc_11b, light.cc_12a, light.cc_s_11a_bed_d6, light.cc_s_11a_tafel_d7, light.cc_s_11a_zitje_d5, light.cc_s_11b_gang_d11, light.cc_s_11b_kasten_d12, light.cc_s_11b_plint_d8, light.cc_s_12a_sanitair_d10, light.crew_cabin_cc_s_12a_douche_d13, light.crew_cabin_cc_s_12a_toilet_d9, light.crew_cabin_hal_en_plinten, light.crew_cabin_plafond]
+            alarm_entity: [binary_sensor.0x44e2f8fffe0be6ed_water_leak, binary_sensor.0x8c65a3fffee0f85d_water_leak]
+            zoom:
+              height: 1364
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_crewcabin_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_crewcabin_uit } } }
+                - { type: pushbutton, x: 18, y: 100, width: 219, height: 48, label: "50%", font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_crew_cabin_50 } } }
+                - { type: pushbutton, x: 247, y: 100, width: 219, height: 48, label: Bed, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_crew_cabin_bed } } }
+                - { type: text, x: 18, y: 164, text: Verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Plafond, entity: light.crew_cabin_plafond, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Hal en plinten, entity: light.crew_cabin_hal_en_plinten, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 252, width: 219, height: 44, label: Plafond bed (2 spots), entity: light.cc_s_11a_bed_d6, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 252, width: 219, height: 44, label: Plafond zitjes (2 spots), entity: light.cc_s_11a_zitje_d5, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 304, width: 219, height: 44, label: Hal (2 spots), entity: light.cc_s_11b_gang_d11, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 304, width: 219, height: 44, label: Tafel (spot), entity: light.cc_s_11a_tafel_d7, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 356, width: 219, height: 44, label: Toilet (4 spots), entity: light.cc_12a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 356, width: 219, height: 44, label: Plinten, entity: light.cc_s_11b_plint_d8, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 408, width: 219, height: 44, label: Kasten ledstrip, entity: light.cc_s_11b_kasten_d12, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 466, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 496, width: 219, height: 44, label: Climate control, entity: fan.cc_w_e1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 496, width: 219, height: 44, label: Sanibroyeur, entity: switch.cc_w_e2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 548, width: 219, height: 44, label: Toilet, entity: switch.cc_w_e3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 548, width: 219, height: 44, label: Wandcontactdozen, entity: switch.cc_k1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 600, width: 219, height: 44, label: Stopcontact (plug), entity: switch.0xa4c138f65edc9815, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 658, text: Webasto crew cabin, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 688, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_crew_cabin_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 688, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_crew_cabin_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 762, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_crew_cabin, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 762, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_crew_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 814, text: Bilge, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: indicator, x: 18, y: 844, entity: binary_sensor.0x44e2f8fffe0be6ed_water_leak, label: Water laag, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 844, entity: binary_sensor.0x8c65a3fffee0f85d_water_leak, label: Water hoog, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: pushbutton, x: 18, y: 888, width: 219, height: 44, label: Bilgepomp, entity: switch.0xccba97fffeea6c90, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } } }
+                - { type: text, x: 18, y: 946, text: Beweging en temperatuur, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, x: 18, y: 976, width: 448, height: 36, label: Temperatuur, entity: sensor.motionsensorcrew_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: indicator, x: 18, y: 1024, entity: binary_sensor.motionsensorcrew_occupancy, label: Beweging, color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: value, x: 18, y: 1068, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.motionsensorcrew_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: indicator, x: 18, y: 1116, entity: binary_sensor.0x44e2f8fffe0be6ed_battery_low, label: "Lek laag: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 1116, entity: binary_sensor.0x8c65a3fffee0f85d_battery_low, label: "Lek hoog: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: text, x: 18, y: 1160, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 1190, width: 219, height: 44, label: Groep 11A, entity: light.cc_11a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1190, width: 219, height: 44, label: Groep 11B, entity: light.cc_11b, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1242, width: 219, height: 44, label: Sanitair, entity: light.cc_s_12a_sanitair_d10, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1242, width: 219, height: 44, label: Douche, entity: light.crew_cabin_cc_s_12a_douche_d13, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1294, width: 219, height: 44, label: Toilet, entity: light.crew_cabin_cc_s_12a_toilet_d9, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 901
+            y: 310
+            width: 132
+            height: 207
+            label: Guest cabin
+            active_entity: [light.gc_10a, light.gc_9a, light.gc_9b, light.gc_s_10a_wasbak_d6, light.gc_s_10a_wc_d7, light.gc_s_9a_gang_d5, light.gc_s_9b_bed_a_d9, light.gc_s_9b_bed_v_d8, light.gc_s_9b_plint_d10, light.guest_cabin_plafond, light.guest_cabin_toilet]
+            zoom:
+              height: 944
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_guestcabin_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_guestcabin_uit } } }
+                - { type: pushbutton, x: 18, y: 100, width: 219, height: 48, label: "50%", font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_guest_cabin_50 } } }
+                - { type: pushbutton, x: 247, y: 100, width: 219, height: 48, label: Bed, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_guest_cabin_bed } } }
+                - { type: text, x: 18, y: 164, text: Guest cabin – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Plafond, entity: light.guest_cabin_plafond, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Gang (2 spots), entity: light.gc_s_9a_gang_d5, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 246, width: 219, height: 44, label: Bed achterzijde (spot), entity: light.gc_s_9b_bed_a_d9, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 246, width: 219, height: 44, label: Bed voorzijde (2 spots), entity: light.gc_s_9b_bed_v_d8, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 298, width: 219, height: 44, label: Plint, entity: light.gc_s_9b_plint_d10, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 356, text: Toilet – verlichting, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 386, width: 219, height: 44, label: Toilet, entity: light.guest_cabin_toilet, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 386, width: 219, height: 44, label: Toilet (2 spots), entity: light.gc_s_10a_wc_d7, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 438, width: 219, height: 44, label: Wasbak (2 spots), entity: light.gc_s_10a_wasbak_d6, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 496, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 526, width: 219, height: 44, label: Climate control, entity: switch.gc_w_e1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 526, width: 219, height: 44, label: Sanibroyeur, entity: switch.gc_w_e2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 578, width: 219, height: 44, label: Toilet, entity: switch.gc_w_e3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 578, width: 219, height: 44, label: Wandcontactdozen, entity: switch.gc_k1, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 636, text: Webasto guest cabin, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: value, style: tile, x: 18, y: 666, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_guest_cabin_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 666, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_guest_cabin_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 740, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_guest_cabin, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 740, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_guest_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 792, text: Overig, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 822, width: 219, height: 44, label: Groep 10A, entity: light.gc_10a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 822, width: 219, height: 44, label: Groep 9A, entity: light.gc_9a, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 874, width: 219, height: 44, label: Groep 9B, entity: light.gc_9b, led: green, align: left, font_size: 14 }
+          - type: zone
+            x: 1039
+            y: 345
+            width: 172
+            height: 126
+            label: Front peak
+            active_entity: [switch.fp_boiler]
+            alarm_entity: [binary_sensor.fp_waterleaksensor_laag_water_leak, binary_sensor.fp_waterleaksensor_hoog_water_leak]
+            zoom:
+              height: 400
+              items:
+                - { type: text, x: 18, y: 12, text: Bilge, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: indicator, x: 18, y: 42, entity: binary_sensor.fp_waterleaksensor_laag_water_leak, label: Water laag, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: indicator, x: 247, y: 42, entity: binary_sensor.fp_waterleaksensor_hoog_water_leak, label: Water hoog, color: red, blink: true, font_size: 16, tap_action: { action: more-info } }
+                - { type: pushbutton, x: 18, y: 86, width: 219, height: 44, label: Bilgepomp, entity: switch.fp_bilgepumpcontrol_01, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } } }
+                - { type: value, x: 18, y: 144, width: 448, height: 36, label: Lek laag batterij, entity: sensor.fp_waterleaksensor_laag_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: indicator, x: 18, y: 192, entity: binary_sensor.fp_waterleaksensor_hoog_battery_low, label: "Lek hoog: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: text, x: 18, y: 236, text: Boiler, font_size: 13, uppercase: true, color: "#a3a29c" }
+                - { type: pushbutton, x: 18, y: 266, width: 219, height: 48, label: Boiler aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_boiler_aan } } }
+                - { type: pushbutton, x: 247, y: 266, width: 219, height: 48, label: Boiler uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_boiler_uit } } }
+                - { type: pushbutton, x: 18, y: 330, width: 219, height: 44, label: Boiler, entity: switch.fp_boiler, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 330, width: 219, height: 44, label: Boiler (relais), entity: switch.0xa4c138dd3d53bb57, led: green, align: left, font_size: 14 }
+
+          # ---- algemeen: scènes voor het hele schip ----
+          - { type: panel, x: 20, y: 656, width: 1240, height: 124, title: "Algemeen – tik op een ruimte voor de bediening per ruimte" }
+          # Alle lampen aan/uit gaat via het programma input_select.alle_verlichting (duurt enkele seconden); het vak ernaast toont de status.
+          - { type: pushbutton, x: 38, y: 700, width: 141, height: 56, label: Alle lampen aan, font_size: 14, tap_action: { action: perform-action, perform_action: input_select.select_option, data: { entity_id: input_select.alle_verlichting, option: turn on } } }
+          - { type: pushbutton, x: 189, y: 700, width: 141, height: 56, label: Alle lampen uit, font_size: 14, variant: stop, tap_action: { action: perform-action, perform_action: input_select.select_option, data: { entity_id: input_select.alle_verlichting, option: turn off }, confirmation: { text: "Alle verlichting in het interieur uitzetten?" } } }
+          - { type: text, x: 340, y: 700, width: 141, height: 56, entity: input_select.alle_verlichting, boxed: true, font_size: 14 }
+          - { type: pushbutton, x: 491, y: 700, width: 141, height: 56, label: Nacht 50%, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_night_alles_50 } } }
+          - { type: pushbutton, x: 642, y: 700, width: 141, height: 56, label: Plinten aan, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_plinten_aan } } }
+          - { type: pushbutton, x: 793, y: 700, width: 141, height: 56, label: Plinten uit, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_plinten_uit } } }
+          - { type: pushbutton, x: 944, y: 700, width: 141, height: 56, label: Webasto aan, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_hvac_webasto_aan } } }
+          - { type: pushbutton, x: 1095, y: 700, width: 141, height: 56, label: Webasto uit, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_hvac_webasto_uit } } }
 
   - title: Alarmen
     path: alarms

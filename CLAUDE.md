@@ -25,6 +25,7 @@ Lokaal staat het project in dagmappen `YYMMDD/` onder `…/32.Home Assistant/18.
 | `demo/index.html` | Demo van `examples/dashboard.yaml` (het eerste ontwerp). |
 | `Overszichtstekeningen/*.jpg` | De systeemtekeningen waarop de `sys-…`-schema's zijn gebaseerd. Niet in git. |
 | `Voorbeeld foto's plc/` | Screenshots van het oorspronkelijke PLC-scherm (ontwerpvoorbeeld). Niet in git. |
+| `tools/interieur_zones.py` | Genereert de ruimtes (`zone` met `zoom`) op het interieurplan uit `Entiteiten-HA.xlsx`. |
 | `hacs.json` | HACS-metadata (naam, bestandsnaam `shipborn-panel-card.js`); in HACS toegevoegd als custom repository van het type *Dashboard*. |
 
 ## Werken en uitrollen
@@ -127,9 +128,12 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots en de HA-export ontbreken dan.
 - Controleer of `python` werkt (anders `python3`) en pas `.claude/launch.json` daarop aan.
 
-## Stand van zaken en open punten (30-10-2026, v0.4.19)
+## Stand van zaken en open punten (01-11-2026, v0.4.22)
 
-- Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
+- Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `ship-side`, `ship-deck`, `ship-interior`, `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
+- De drie `ship-…`-pagina's (tab **Schip**, onderling gewisseld met `&ship_tabs`) tonen de aanzichten uit het canvas "TC 90 aanzichten"; de tekeningen staan als WebP in `IMAGES` (`tc90-zijaanzicht`, `tc90-dekplan`, `tc90-interieur`). Het interieurplan (`ship-interior`) heeft tikbare `zone`s per ruimte met `zoom`: inzoomen op de ruimte en rechts een paneel met alle lampen, groepen en apparaten (plus scènes, Webasto, lekdetectie, bilgepomp/boiler); onderaan scènes voor het hele schip. Die zones worden **gegenereerd** door `tools/interieur_zones.py` (uit `examples/Entiteiten-HA.xlsx`, vereist openpyxl); het script vervangt alles tussen `# ---- ruimtes:` en `# ---- algemeen:` in die view, dus handwerk daar gaat verloren bij opnieuw genereren — pas dan liever het script aan (kamerindeling, labels, volgorde). De zones zijn op het oog geplaatst (`room(...)`-regels in het script); de items in een `zoom`/`popup` toont de layout-editor niet. `popup` (een los venster) bestaat ook nog. De indeling per ruimte (secties en namen) volgt het HA-dashboard van de bemanning; wat daar niet in stond komt onder *Overig*. Het script maakt ook de zones op het **dekplan** (tussen `# ---- dek: zones` en `# ---- einde dek ----`). Het zijaanzicht heeft nog geen bediening (voorstel: mast- en navigatieverlichting op hoogte).
+- `binary_sensor.engine_room_leak_schroefas_water_leak` (lekdetector schroefas) staat in de Engine room, maar stond nog niet in `Entiteiten-HA.xlsx`; controleer of hij in HA bestaat.
+- Een `zone` kan in de demo alleen met de vinkjes oplichten; de temperatuur- en Webasto-waarden zijn daar "—".
 - **Nog niet gekoppelde placeholders** in het dashboard (bestaan niet in HA): `binary_sensor.plc_lifebeat` (op elke pagina rechtsboven), `binary_sensor.plc_diesel_alarm`, `binary_sensor.plc_generator_alarm`, `binary_sensor.plc_jp1/2/3_alarm`, `binary_sensor.plc_bilge_anchor_box_high` / `_running`, `binary_sensor.plc_shore_water_valve_open`, `binary_sensor.plc_webasto_running`, `sensor.plc_battery_current`, `sensor.plc_bowthruster_setpoint`, `sensor.plc_electric_speed`, `sensor.plc_emotor_rpm`. Zie de CSV voor details en kandidaten.
 - **Te bevestigen door de gebruiker** (in de CSV als `controleer`): bowthruster-setpoint = `sensor.er_thruster_status_bow_thruster_lever`? JT input = `sensor.er_thruster_status_jet_lever`? Daarna ook in het schema koppelen.
 - De alarmbalk bovenaan (alle pagina's) en het linkervak van de alarmpagina lezen beide de lijst `alarms` van `sensor.er_alarm_status_active_alarms`; tik op de balk = naar de alarmpagina.
