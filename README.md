@@ -87,7 +87,7 @@ Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/inpu
   card: { type: picture-entity, entity: camera.achterdek }
 - { type: box, x: 158, y: 352, width: 125, height: 100, inset: false }
 - { type: label, x: 10, y: 10, text: "Tekst", font_size: 8 }
-- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }   # of een ingebouwd beeld: image: shipborn-joal (logo), tc90-zijaanzicht, tc90-dekplan, tc90-interieur
+- { type: image, x: 295, y: 70, width: 100, height: 240, image: /local/shipborn/vhf.png }   # of een ingebouwd beeld: image: shipborn-joal (logo), tc90-zijaanzicht, tc90-dekplan, tc90-interieur, tc90-romp (alleen de romp, transparant)
 ```
 
 ### Kiosk: HA-balken verbergen
@@ -108,7 +108,7 @@ Voor volledige pagina's (1280×800, `panel: true`) zijn er items in de stijl van
 | `tank` | `entity`, `label`, `kind`, `color`, `low` / `high`, `marker` of `marker_entity`, `scale`, `frame: false` |
 | `value` | `entity`, `label`, `unit`, `decimals`, `style: tile`, `colors` (zie onder) |
 | `indicator` | `entity`, `label`, `color`, `blink`, `state_on`, `active_above` / `active_below`, `off_color` – LED met tekst |
-| `pushbutton` | `label`, `entity`, `tap_action`, `mode: momentary`, `variant: stop`, `led` + `led_entity`, `active_entity` (oranje rand), `align: left` |
+| `pushbutton` | `label`, `entity`, `tap_action`, `mode: momentary`, `variant: stop`, `led` + `led_entity`, `active_entity` (oranje rand), `align: left`. Met `style: tile` een vierkante icoontegel met het label eronder: `icon` (bijv. `mdi:engine`), `size` (tegel, standaard 72), `width` (ruimte voor het label); goud zolang `active_entity` aan is (ook met `active_above` / `active_below`) |
 | `nav` | `tabs: [{label, path, match}]`, `style: side` – actieve tab volgt de URL; met `font_size` ook `tab_height`, `tab_padding` en `letter_spacing` |
 | `alarm` | `entity` (tekst van het actieve alarm), `active_entity`, `ok_text`; met `attribute` komen de meldingen uit een lijst-attribuut (actief zolang de lijst niet leeg is, meerdere als `(2) A · B`) |
 | `block` | PMS-blok: `name`, `kind`, `rating`, `entity` (kW), `alarm_entity`, `active_entity` |

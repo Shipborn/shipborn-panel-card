@@ -45,6 +45,7 @@ views:
               - { label: Accu's, path: sys-power }
               - { label: Webasto, path: sys-webasto }
               - { label: Navigatie, path: sys-navlights }
+              - { label: Motor, path: sys-instruments, match: [sys-maintenance] }
               - { label: Schip, path: ship-side, match: [ship-deck, ship-interior] }
               - { label: Alarms, path: alarms }
           - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
@@ -1078,6 +1079,186 @@ views:
           - { type: pushbutton, x: 454, y: 401, width: 254, height: 52, label: Red nav SB, entity: switch.lopolight_navigation_lights_navlight_red_nav_sb, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 719, y: 401, width: 254, height: 52, label: Red nav PS, entity: switch.lopolight_navigation_lights_navlight_red_nav_ps, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 984, y: 401, width: 254, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
+
+  # ===== Motor: instrumentenpaneel en onderhoud (stijl jachtbediening: romp op donker, icoontegels) =====
+  # De tab "Motor" opent het instrumentenpaneel; de subnavigatie &motor_tabs wisselt naar onderhoud.
+
+  - title: Instrumenten
+    path: sys-instruments
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 1060
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+
+          # ---- subnavigatie + romp ----
+          - type: nav
+            x: 20
+            y: 120
+            tabs: &motor_tabs
+              - { label: Instrumenten, path: sys-instruments }
+              - { label: Onderhoud, path: sys-maintenance }
+          - { type: image, x: 240, y: 172, width: 800, height: 94, image: tc90-romp }
+
+          # ---- vaarmodus (knoppen) en status aandrijving ----
+          - { type: panel, x: 196, y: 284, width: 336, height: 160, title: Vaarmodus }
+          - { type: pushbutton, style: tile, x: 220, y: 328, size: 60, width: 96, icon: "mdi:engine", label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { text: "Overschakelen naar dieselmodus?" } } }
+          - { type: pushbutton, style: tile, x: 316, y: 328, size: 60, width: 96, icon: "mdi:lightning-bolt-circle", label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { text: "Overschakelen naar elektrische modus?" } } }
+          - { type: pushbutton, style: tile, x: 412, y: 328, size: 60, width: 96, icon: "mdi:home-city", label: Haven, entity: button.wago_hcs_controls_wago_controls_harbormode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, tap_action: { action: toggle, confirmation: { text: "Overschakelen naar havenmodus?" } } }
+          - { type: panel, x: 556, y: 284, width: 528, height: 160, title: Status aandrijving }
+          - { type: pushbutton, style: tile, x: 580, y: 328, size: 60, width: 96, icon: "mdi:engine-outline", label: "Diesel\nloopt", entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, tap_action: { action: more-info } }
+          - { type: pushbutton, style: tile, x: 676, y: 328, size: 60, width: 96, icon: "mdi:arrow-up-bold", label: "Koppeling\nvooruit", entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, tap_action: { action: more-info } }
+          - { type: pushbutton, style: tile, x: 772, y: 328, size: 60, width: 96, icon: "mdi:arrow-down-bold", label: "Koppeling\nachteruit", entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, tap_action: { action: more-info } }
+          - { type: pushbutton, style: tile, x: 868, y: 328, size: 60, width: 96, icon: "mdi:link-variant", label: "E-motor\ngekoppeld", entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, tap_action: { action: more-info } }
+          - { type: pushbutton, style: tile, x: 964, y: 328, size: 60, width: 96, icon: "mdi:lightning-bolt", label: "E-motor\nloopt", entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, tap_action: { action: more-info } }
+
+          # ---- Volvo Penta: meters (rood boven/onder de grens uit het oude dashboard) ----
+          - { type: panel, x: 20, y: 462, width: 1240, height: 330, title: Volvo Penta D6 }
+          - { type: gauge, x: 36, y: 506, width: 232, label: Toerental, entity: sensor.engine_room_main_engine_me_rpm, min: 0, max: 4000, unit: rpm, warn_above: 4000 }
+          - { type: gauge, x: 284, y: 506, width: 232, label: Oliedruk, entity: sensor.engine_room_me_oil_press, min: 0, max: 6, mid: 3, unit: bar, decimals: 2, warn_below: 1.5 }
+          - { type: gauge, x: 532, y: 506, width: 232, label: Olietemp, entity: sensor.main_engine_oil_temp, min: 0, max: 150, unit: "°C", warn_above: 110 }
+          - { type: gauge, x: 780, y: 506, width: 232, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, min: 0, max: 120, unit: "°C", warn_above: 100 }
+          - { type: gauge, x: 1028, y: 506, width: 216, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, unit: rpm, warn_above: 500, warn_below: -500 }
+          - { type: value, style: tile, x: 36, y: 692, width: 143, height: 84, label: Dynamo, entity: sensor.engine_room_main_engine_me_alt_v, value_size: 22, unit: V, colors: [{ below: 12, color: red }, { above: 15, color: red }, { below: 13.6, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 189, y: 692, width: 143, height: 84, label: Uitlaat, entity: sensor.al1590_er_volvo_exhaust_temperature, value_size: 22, unit: "°C", colors: [{ above: 89, color: red }, { above: 59, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 342, y: 692, width: 143, height: 84, label: Zeewaterflow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, value_size: 20, unit: L/min, colors: [{ below: 40, color: red }, { below: 49, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 495, y: 692, width: 143, height: 84, label: Schroefas flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 20, unit: L/min, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 648, y: 692, width: 143, height: 84, label: Schroefas temp, entity: sensor.al1590_er_prop_shaft_grease_temperature, value_size: 22, unit: "°C", colors: [{ above: 80, color: red }, { above: 50, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 801, y: 692, width: 143, height: 84, label: Schroefas druk, entity: sensor.al1590_er_prop_shaft_grease_pressure, value_size: 22, unit: bar, decimals: 2, colors: [{ above: 2, color: red }, { below: 0.1, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 954, y: 692, width: 143, height: 84, label: Manifold, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, factor: 0.001, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 1107, y: 692, width: 137, height: 84, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, value_size: 22, unit: "%", decimals: 0 }
+
+          # ---- generator ----
+          - { type: panel, x: 20, y: 808, width: 1240, height: 236, title: Generator }
+          - { type: gauge, x: 36, y: 852, width: 232, label: Toerental, entity: sensor.generator_gen_rpm, min: 0, max: 4000, unit: rpm, warn_above: 3800 }
+          - { type: gauge, x: 284, y: 852, width: 232, label: Oliedruk, entity: sensor.generator_gen_oil_pressure, min: 0, max: 6, mid: 3, unit: bar, decimals: 2, warn_below: 1 }
+          - { type: gauge, x: 532, y: 852, width: 232, label: Koelwater, entity: sensor.generator_gen_coolant_temp, min: 0, max: 120, unit: "°C", warn_above: 95 }
+          - { type: value, style: tile, x: 801, y: 856, width: 220, height: 84, label: Zeewaterflow, entity: sensor.al1590_er_generator_seawater_cooling_flow, value_size: 26, unit: L/min, colors: [{ below: 25, color: red }, { below: 28.01, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 1031, y: 856, width: 213, height: 84, label: Glycolflow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 26, unit: L/min, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
+          - { type: indicator, x: 801, y: 962, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, font_size: 15, off_color: red }
+          - { type: indicator, x: 1031, y: 962, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
+
+  - title: Onderhoud
+    path: sys-maintenance
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 930
+        background: "#0d0e10"
+        border: "#0d0e10"
+        corner_radius: 0
+        items:
+          - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
+          - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
+          - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
+          - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
+          - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+
+          - { type: nav, x: 20, y: 120, tabs: *motor_tabs }
+          - { type: image, x: 240, y: 172, width: 800, height: 94, image: tc90-romp }
+
+          # ---- onderhoudshandelingen (vragen allemaal eerst Ja/Nee) ----
+          - { type: panel, x: 392, y: 284, width: 496, height: 160, title: Onderhoud }
+          - type: pushbutton
+            style: tile
+            x: 416
+            y: 328
+            size: 60
+            width: 108
+            icon: "mdi:filter-cog-outline"
+            label: "Wierpot aft\nlegen"
+            tap_action:
+              action: fire-dom-event
+              confirmation: { text: "Wierpot aft afsluiten om te legen? Daarna leidt het script je stap voor stap verder." }
+              browser_mod: { service: script.wierpot_aft_schoonmaken, data: { stap: 1, browser_id: THIS } }
+          - type: pushbutton
+            style: tile
+            x: 528
+            y: 328
+            size: 60
+            width: 108
+            icon: "mdi:play-circle-outline"
+            label: "Volvo start\nklaarzetten"
+            tap_action:
+              action: perform-action
+              perform_action: automation.trigger
+              data: { entity_id: automation.prepvolvostart }
+              confirmation:
+                text: "Deze functie bedient de volgende aansturingen:\n\n- OPEN Volvo zeewatervalves, IN & OUT\n- OPEN wierpot valves, front & aft\n- Compressor AAN\n- Zeewaterpomp glycolsysteem AAN"
+          - type: pushbutton
+            style: tile
+            x: 640
+            y: 328
+            size: 60
+            width: 108
+            icon: "mdi:valve-closed"
+            label: "Volvo kleppen\ndicht"
+            tap_action:
+              action: perform-action
+              perform_action: automation.trigger
+              data: { entity_id: automation.closevolvovalves }
+              confirmation: { text: "Deze functie sluit de Volvo zeewatervalves, IN & OUT." }
+          - type: pushbutton
+            style: tile
+            x: 752
+            y: 328
+            size: 60
+            width: 108
+            icon: "mdi:generator-stationary"
+            label: "Generator\nklaarzetten"
+            tap_action:
+              action: perform-action
+              perform_action: automation.trigger
+              data: { entity_id: automation.prepgenstart }
+              confirmation:
+                text: "Deze functie bedient de volgende aansturingen:\n\n- OPEN wierpot front\n- Compressor AAN\n- Zeewaterpomp glycolsysteem AAN\n- Glycolpomp AAN"
+
+          # ---- controlelijsten (groen = in orde, rood = nog niet) ----
+          - { type: panel, x: 20, y: 462, width: 404, height: 300, title: Start Volvo }
+          - { type: indicator, x: 38, y: 512, label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 38, y: 542, label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 38, y: 572, label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 38, y: 602, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 38, y: 632, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
+          - { type: indicator, x: 38, y: 662, label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
+          - { type: indicator, x: 38, y: 692, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
+          - { type: indicator, x: 38, y: 722, label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 2999 }
+          - { type: panel, x: 438, y: 462, width: 404, height: 300, title: Start generator }
+          - { type: indicator, x: 456, y: 512, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 456, y: 542, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, font_size: 15, off_color: red }
+          - { type: indicator, x: 456, y: 572, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
+          - { type: indicator, x: 456, y: 602, label: "Flow zeewaterpomp glycol ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
+          - { type: indicator, x: 456, y: 632, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
+          - { type: indicator, x: 456, y: 662, label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 2999 }
+          - { type: panel, x: 856, y: 462, width: 404, height: 300, title: Vlinderkleppen (stand) }
+          - { type: indicator, x: 874, y: 512, label: Diesel inlaat, entity: cover.0xe4b063fffe6370e8, font_size: 15, state_on: open, tap_action: { action: more-info } }
+          - { type: indicator, x: 874, y: 542, label: Diesel uitlaat, entity: cover.0xccba97fffedd4780, font_size: 15, state_on: open, tap_action: { action: more-info } }
+          - { type: indicator, x: 874, y: 572, label: Wierpot aft, entity: cover.0xccba97fffedd76a0, font_size: 15, state_on: open, tap_action: { action: more-info } }
+          - { type: indicator, x: 874, y: 602, label: Wierpot front, entity: cover.0xccba97fffedcfc10, font_size: 15, state_on: open, tap_action: { action: more-info } }
+          - { type: indicator, x: 874, y: 632, label: Jet 1, entity: cover.0xccba97fffedd50bc, font_size: 15, state_on: open, tap_action: { action: more-info } }
+          - { type: indicator, x: 874, y: 662, label: Jet 2, entity: cover.er_vlinderklep_jet2, font_size: 15, state_on: open, tap_action: { action: more-info } }
+          - { type: indicator, x: 874, y: 692, label: Jet 3, entity: cover.0xe4b063fffe62e8f0, font_size: 15, state_on: open, tap_action: { action: more-info } }
+
+          # ---- draaiuren en accu's ----
+          - { type: panel, x: 20, y: 778, width: 620, height: 136, title: Draaiuren }
+          - { type: value, style: tile, x: 38, y: 818, width: 287, height: 80, label: Volvo Penta, entity: sensor.engine_room_main_engine_me_hours, value_size: 28, unit: uur, decimals: 0 }
+          - { type: value, style: tile, x: 335, y: 818, width: 287, height: 80, label: Generator, entity: sensor.generator_gen_hours, value_size: 28, unit: uur, decimals: 0 }
+          - { type: panel, x: 656, y: 778, width: 604, height: 136, title: Accu's }
+          - { type: value, style: tile, x: 674, y: 818, width: 184, height: 80, label: Startaccu 277, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, value_size: 28, unit: V, decimals: 2, colors: [{ below: 12, color: red }, { below: 12.4, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 868, y: 818, width: 184, height: 80, label: Startaccu 278, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, value_size: 28, unit: V, decimals: 2, colors: [{ below: 12, color: red }, { below: 12.4, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 1062, y: 818, width: 180, height: 80, label: 24V systeem, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, value_size: 28, unit: V, decimals: 2, colors: [{ below: 24, color: red }, { below: 24.8, color: amber }, { color: green }] }
 
   # ===== Aanzichten van het schip (canvas "TC 90 aanzichten") =====
   # De tekeningen zitten in de kaart zelf (image: tc90-…), HA heeft geen extra bestanden nodig.
