@@ -80,6 +80,8 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.7) Op verzoek is het **logo de knop voor het HA-menu**: in de kiosk-modus toont één tik op het Shipborn JOAL-logo de bovenbalk en zijbalk van HA, een tweede tik verbergt ze. De randstroken die de balken lieten verschijnen als je op de rand bleef staan, zijn op TC90-pagina's weg (per ongeluk openen kan niet meer); `kiosk_toggle: edge` zet ze terug.
 - De compressordruk is in bar, niet in mbar zoals in de koppellijst stond (de gebruiker zag de Diesel-pagina goed en Overzicht op 0,0 bar). `factor: 0.001` en de grens `2999` weggehaald op Voortstuwing en Generator; demo en koppellijst op bar gezet.
 
+- **Layout-editor voor de TC90-schermen.** Palet met tegel, schakelaar, hotspot, ronde meter, waardepaneel en romp, met voorbeelden in het nieuwe ontwerp. Statusbalk en icoonbalk zijn alleen nog te selecteren (niet te verslepen of dupliceren); gedeelde lijsten tonen als `*naam` en blijven na *Toepassen* gedeeld (eerder werd een gedeelde lijst bij *Toepassen* een losse kopie). Hotspot zonder formaathoekje, ronde meter alleen breedte. Themakeuze bovenin om Dag en Rood nacht te bekijken; geen kleurkiezers voor TC90-onderdelen en geen schermachtergrond op TC90-schermen. Nieuw scherm: als subtab onder een bestemming, als eigen knop in de icoonbalk of zonder navigatie.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

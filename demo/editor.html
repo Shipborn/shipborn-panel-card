@@ -7,6 +7,7 @@
   <style>
     :root { --bg: #0d0e10; --bar: #17181a; --line: #2c2c2c; --text: #ecebe6; --muted: #8f8e88; --accent: #f5a524; --sel: #4aa3ff; }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     body { margin: 0; background: var(--bg); color: var(--text); font: 13px system-ui, sans-serif; display: grid; grid-template: auto 1fr / 1fr 330px; height: 100vh; }
     header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 14px; background: var(--bar); border-bottom: 1px solid var(--line); }
     header b { font-size: 14px; }
@@ -50,6 +51,7 @@
     <select id="view" title="View"></select>
     <label>Raster <select id="grid"><option>1</option><option selected>5</option><option>10</option><option>20</option></select></label>
     <label><input type="checkbox" id="sim"> Stroming tonen</label>
+    <label title="Alleen voor het bekijken; aan boord kiest de bemanning het thema met de knop in de statusbalk">Thema <select id="theme"><option value="nacht">Nacht</option><option value="dag">Dag</option><option value="rood">Rood nacht</option></select></label>
     <button id="undo" title="Ongedaan maken (Cmd/Ctrl+Z)">↶</button>
     <button id="redo" title="Opnieuw (Shift+Cmd/Ctrl+Z)">↷</button>
     <span id="pos"></span>
@@ -75,9 +77,10 @@
     <h3>Toevoegen</h3>
     <div id="palette"></div>
     <h3>Scherm</h3>
-    <div class="colors">
+    <div class="colors" id="bgrow">
       <span>Achtergrond</span><input type="color" id="bg"><span></span>
     </div>
+    <div class="help" id="bgtheme" hidden>De kleuren van dit scherm volgen het thema (Nacht, Dag, Rood nacht).</div>
     <div class="row"><button id="newview">+ Nieuw scherm</button><button id="delview">Scherm verwijderen</button></div>
     <h3>Leidingkleuren (alle schermen)</h3>
     <div id="media" class="colors"></div>
@@ -89,6 +92,7 @@
       Hoekje rechtsonder = groter/kleiner.<br>
       Het label onder een symbool (bijv. Inlet V3) kun je los verslepen; de tekst pas je rechts aan bij <code>label</code>.<br>
       <kbd>Alt</kbd>+klik = onderdeel eronder kiezen.<br>
+      Statusbalk en icoonbalk liggen vast: klik erop om titel, subtabs of knoppen te wijzigen. Een hotspot sleep je aan het bolletje (dat is <code>x</code>/<code>y</code>); het label wijst ervan weg (<code>side: left</code> = naar links).<br>
       Daarna <b>Opslaan</b>, en in HA de YAML plakken (<b>Kopieer YAML</b>).
     </div>
   </aside>
@@ -99,16 +103,13 @@
       <label>Pad (in de URL) <input type="text" id="v-path" required pattern="[a-z0-9\-]+" placeholder="sys-hydrauliek"></label>
       <label>Soort
         <select id="v-kind">
-          <option value="sys">Systeemschema (kopbalk + romp)</option>
-          <option value="blank">Leeg (alleen kopbalk)</option>
+          <option value="sys">Systeemschema (statusbalk, icoonbalk + romp)</option>
+          <option value="blank">Leeg (alleen statusbalk en icoonbalk)</option>
           <option value="copy">Kopie van huidig scherm</option>
         </select>
       </label>
-      <label>Tabblad
-        <select id="v-tab">
-          <option value="sys">In de tabbalk</option>
-          <option value="none">Geen tabblad</option>
-        </select>
+      <label>Plaats in de navigatie
+        <select id="v-tab"></select>
       </label>
       <div class="row"><button value="ok" class="primary">Aanmaken</button><button value="cancel" formnovalidate>Annuleren</button></div>
     </form>
@@ -117,7 +118,7 @@
   <script type="module">
     // Visual editor for examples/plc-dashboard.yaml. Edits go through the `yaml` Document API so
     // comments, anchors and the one-line { … } item style survive. Saving needs demo/edit_server.py.
-    import { parseDocument, isMap, isSeq, visit } from "https://cdn.jsdelivr.net/npm/yaml@2.5.1/browser/index.js";
+    import { parseDocument, isMap, isSeq, isAlias, visit } from "https://cdn.jsdelivr.net/npm/yaml@2.5.1/browser/index.js";
 
     const FILE = "../examples/plc-dashboard.yaml";
     // Add palette: [label, item to insert (x/y are added), preview size w×h (default symbol size)].
@@ -174,11 +175,12 @@
         ["Zone (ruimte)", { type: "zone", width: 160, height: 120, label: "Ruimte" }],
       ],
       "TC90-ontwerp (design: tc90)": [
-        ["Tegel", { type: "tile", width: 203, height: 120, icon: "motor", label: "Waarde", entity: "sensor.x" }],
-        ["Schakelaar", { type: "switch", width: 112, height: 112, icon: "aan", label: "Schakelaar", entity: "switch.x" }],
-        ["Hotspot", { type: "hotspot", icon: "motor", label: "Punt", entity: "sensor.x" }],
-        ["Ronde meter", { type: "dial", width: 174, label: "Meter", entity: "sensor.x", min: 0, max: 100 }],
-        ["Romp (los)", { type: "image", width: 848, height: 100, image: "tc90-romp" }],
+        ["Tegel", { type: "tile", width: 203, height: 120, icon: "motor", label: "Waarde", entity: "sensor.x" }, [203, 120]],
+        ["Schakelaar", { type: "switch", width: 112, height: 112, icon: "aan", label: "Schakelaar", entity: "switch.x" }, [112, 112]],
+        ["Hotspot", { type: "hotspot", icon: "motor", label: "Punt", entity: "sensor.x" }, [150, 44]],
+        ["Ronde meter", { type: "dial", width: 174, label: "Meter", entity: "sensor.x", min: 0, max: 100 }, [174, 172]],
+        ["Waardepaneel", { type: "panel", width: 360, height: 212, title: "Groep" }, [360, 212]],
+        ["Romp (los)", { type: "image", width: 848, height: 100, image: "tc90-romp" }, [848, 100]],
       ],
     };
     const $ = (id) => document.getElementById(id);
@@ -195,6 +197,10 @@
     const grid = () => +$("grid").value;
     const snap = (v) => Math.round(v / grid()) * grid();
     const yOf = (it) => it.y ?? it.true ?? 0;
+    // TC90 design items; the frame (status and icon bar) is fixed in place, only its options are edited.
+    const TC = ["statusbar", "alarmbar", "navbar", "tile", "switch", "hotspot", "dial"];
+    const FRAME = ["statusbar", "alarmbar", "navbar"];
+    const isTc = () => cardCfg().design === "tc90";
 
     // The library pads [ … ] and collapses aligned comments; lines that did not change keep their
     // original text, the rest only lose the padding inside [ ]. The indentation is part of the key: the same
@@ -338,7 +344,7 @@
           g += box(r, `stroke="var(--sel)" stroke-width="2"`);
           const lr = it.label && labelRectOf(i);
           if (lr) g += box({ x: lr.x - 2, y: lr.y - 1, w: lr.w + 4, h: lr.h + 2 }, `stroke="var(--sel)" stroke-dasharray="3 2"`);
-          if (sel.length === 1 && it.type !== "nav")
+          if (sel.length === 1 && !["nav", "hotspot", ...FRAME].includes(it.type))
             g += `<rect data-rs="1" x="${r.x + r.w - 6 * k}" y="${r.y + r.h - 6 * k}" width="${12 * k}" height="${12 * k}" fill="var(--sel)" style="cursor:nwse-resize"/>`;
         }
       }
@@ -378,6 +384,7 @@
       doc.setIn([...itemsPath(), i, "points"], node);
     }
     function moveItem(i, it, dx, dy) {
+      if (FRAME.includes(it.type)) return;
       if (it.type === "pipe") return setPoints(i, it.points.map(([x, y]) => [x + dx, y + dy]));
       setIn(i, "x", Math.round((it.x || 0) + dx));
       if (it.true != null && it.y == null) setIn(i, "true", Math.round(it.true + dy));
@@ -417,6 +424,7 @@
         }
         if (e.shiftKey) sel = sel.includes(i) ? sel.filter((j) => j !== i) : [...sel, i];
         else if (!sel.includes(i) || e.altKey) sel = [i];
+        if (FRAME.includes(its[i].type)) { sel = [i]; draw(); return; } // fixed in place: select only
         drag = { kind: "move", orig: sel.map((j) => [j, its[j]]), start: pt };
       }
       drag.snap = false;
@@ -471,7 +479,8 @@
       } else if (drag.kind === "resize") {
         const w = Math.max(4, snap(drag.r.w + dx)), h = Math.max(1, snap(drag.r.h + dy));
         const it = drag.orig;
-        if (it.size != null && it.width == null && it.height == null) setIn(drag.i, "size", Math.max(w, h));
+        if (it.type === "dial") setIn(drag.i, "width", w); // its height follows the width
+        else if (it.size != null && it.width == null && it.height == null) setIn(drag.i, "size", Math.max(w, h));
         else { setIn(drag.i, "width", w); setIn(drag.i, "height", h); }
       }
       changed();
@@ -528,18 +537,30 @@
       $("selinfo").textContent = `#${sel[0]} · ${it.type}${it.label ? " · " + it.label : it.text ? " · " + it.text : ""}`;
       // One option per line is easier to edit than the long { … } line.
       const d = parseDocument("x: 0");
-      d.contents = flowSeqs(d.createNode(it));
-      ta.value = d.toString({ lineWidth: 0 }).replace(/\n$/, "").replace(/\[ /g, "[").replace(/ \]/g, "]");
+      d.contents = flowSeqs(d.createNode(propsOf(sel[0])));
+      ta.value = d.toString({ lineWidth: 0 }).replace(/\n$/, "").replace(/\[ /g, "[").replace(/ \]/g, "]").replace(/["']?@@alias:([\w-]+)@@["']?/g, "*$1");
+    }
+    // Shared lists (*tc_nav, *water_tabs, …) show as *name in the options box and stay shared on Toepassen;
+    // another *name moves the item to that list.
+    const ALIAS = (name) => `@@alias:${name}@@`;
+    function propsOf(i) {
+      const node = itemsSeq().items[i];
+      const obj = items()[i];
+      for (const pair of node.items || []) if (isAlias(pair.value)) obj[pair.key.value ?? pair.key] = ALIAS(pair.value.source);
+      return obj;
     }
     $("apply").onclick = () => {
       try {
-        const d = parseDocument($("props").value);
+        const d = parseDocument($("props").value.replace(/(:[ \t]*)\*([A-Za-z_][\w-]*)/g, (_, a, n) => `${a}"${ALIAS(n)}"`));
         if (d.errors.length) throw d.errors[0];
         const obj = d.toJS();
         if (!obj || typeof obj !== "object" || Array.isArray(obj)) throw new Error("Verwacht opties als  sleutel: waarde");
+        const shared = Object.entries(obj).filter(([, v]) => typeof v === "string" && /^@@alias:[\w-]+@@$/.test(v));
+        for (const [, v] of shared) if (!anchored(v.slice(8, -2))) throw new Error(`Onbekende lijst *${v.slice(8, -2)}`);
         snapshot();
         const node = doc.createNode(obj);
         node.flow = true;
+        for (const [key, v] of shared) node.set(key, doc.createAlias(anchored(v.slice(8, -2))));
         itemsSeq().items[sel[0]] = node;
         shown = null;
         changed();
@@ -548,9 +569,11 @@
       }
     };
     $("dup").onclick = () => {
+      const its = items();
+      sel = sel.filter((i) => !FRAME.includes(its[i]?.type));
+      if (!sel.length) return draw();
       snapshot();
       const seq = itemsSeq();
-      const its = items();
       const copies = sel.slice().sort((a, b) => a - b).map((i) => {
         const node = doc.createNode(its[i]);
         node.flow = true;
@@ -585,6 +608,14 @@
     function preview(item, size) {
       const TW = 70, TH = 52;
       let it;
+      if (TC.includes(item.type) || (size && size[0] > 300)) {
+        const [w, hh] = size;
+        const pc = document.createElement("shipborn-panel-card");
+        const x = item.type === "hotspot" ? 18 : 8;
+        pc.setConfig({ design: "tc90", dock: false, width: w + 16, height: hh + 16, items: [{ ...item, x, y: item.type === "hotspot" ? hh / 2 + 8 : 8, width: item.type === "hotspot" ? undefined : w, height: item.type === "hotspot" ? undefined : hh }] });
+        pc.hass = { states: {}, locale: { language: "nl" } };
+        return pc;
+      }
       if (item.type === "pipe") it = { ...item, points: item.points.map(([x, y]) => [x * 0.45 + 10, y * 0.45 + 16]), thickness: 5, flow: true };
       else if (size) {
         const f = Math.min(56 / size[0], 40 / size[1], 1);
@@ -636,6 +667,7 @@
     function colorKeys(it) {
       const k = {};
       const media = { ...PAL.media, ...cardCfg().media_colors };
+      if (TC.includes(it.type)) return k; // colours come from the theme
       if (it.type === "pipe") k.color = media[it.medium] || media.seawater;
       else if (it.type === "hull") Object.assign(k, { color: "#141516", border: "#3a3a3a" });
       else if (it.type === "line") Object.assign(k, { color: "#2c2c2c", active_color: PAL.design.amber });
@@ -716,6 +748,8 @@
     const cardPath = (v = vi) => ["views", v, "cards", 0];
     function showScreenColors() {
       const cfg = cardCfg();
+      $("bgrow").hidden = isTc();
+      $("bgtheme").hidden = !isTc();
       $("bg").value = toHex(cfg.background, "#1b1b1b");
       const box = $("media");
       box.innerHTML = "";
@@ -767,22 +801,42 @@
       n.flow = true;
       return flowSeqs(n);
     };
-    // Frame shared by all screens (design: tc90): status bar and icon bar (&tc_status, &tc_nav aliases).
-    function headerItems(kind, title) {
+    // Destination in the icon bar that a sub-tab list belongs to (the item whose path or match is in the list).
+    function navOfTabs(name) {
+      const nav = anchored("tc_nav"), tabs = anchored(name);
+      if (!nav || !tabs) return null;
+      const paths = tabs.items.map((n) => n.get("path"));
+      return nav.items.find((n) => paths.includes(n.get("path"))) || null;
+    }
+    const tabLists = () => ["voort_tabs", "energie_tabs", "water_tabs", "ship_tabs", ...(() => {
+      const out = [];
+      visit(doc, { Node(_, n) { if (n.anchor && /_tabs$/.test(n.anchor)) out.push(n.anchor); } });
+      return out;
+    })()].filter((v, i, a) => a.indexOf(v) === i && anchored(v));
+    function fillTabChoices() {
+      const nav = anchored("tc_nav");
+      const opts = tabLists().map((name) => `<option value="${name}">Subtab onder ${navOfTabs(name)?.get("label") || name}</option>`);
+      if (nav && nav.items.length < 8) opts.push(`<option value="nav">Eigen knop in de icoonbalk</option>`);
+      opts.push(`<option value="none">Niet in de navigatie</option>`);
+      $("v-tab").innerHTML = opts.join("");
+    }
+    // Frame shared by all screens (design: tc90): status bar and icon bar (&tc_status, &tc_nav aliases),
+    // with the sub-tabs of the chosen destination.
+    function headerItems(kind, title, where) {
       const withAlias = (obj, key, anchor) => {
         const n = flowItem(obj);
         const list = anchored(anchor);
         if (list) n.set(key, doc.createAlias(list));
         return n;
       };
-      const out = [
-        withAlias({ type: "statusbar", title: title || "" }, "status", "tc_status"),
-        withAlias({ type: "navbar" }, "items", "tc_nav"),
-      ];
+      const group = /_tabs$/.test(where || "") ? where : null;
+      const bar = withAlias({ type: "statusbar", title: (group && navOfTabs(group)?.get("label")) || title || "" }, "status", "tc_status");
+      if (group) bar.set("tabs", doc.createAlias(anchored(group)));
+      const out = [bar, withAlias({ type: "navbar" }, "items", "tc_nav")];
       if (kind === "sys") out.push(flowItem({ type: "hull", x: 20, y: 112, width: 1240, height: 600 }));
       return out;
     }
-    function newCard(kind, title) {
+    function newCard(kind, title, where) {
       if (kind === "copy") {
         const c = doc.getIn(cardPath(), true).clone();
         // A copy may not define the same anchor twice: turn definitions into aliases.
@@ -791,16 +845,22 @@
       }
       const c = doc.createNode({ type: "custom:shipborn-panel-card", design: "tc90", kiosk: true, width: 1280, height: 896 });
       const its = doc.createNode([]);
-      its.items = headerItems(kind, title);
+      its.items = headerItems(kind, title, where);
       c.set("items", its);
       const media = cardCfg().media_colors;
       if (media) c.set("media_colors", flowItem(media));
       return c;
     }
-    // The icon bar has eight fixed destinations; a new screen goes in as a destination only while there is room.
+    // A new screen becomes a sub-tab of a destination (and lights that icon up), or its own icon while there is room.
     function addTab(where, title, path) {
       const nav = anchored("tc_nav");
-      if (where === "sys" && nav && nav.items.length < 8) nav.items.push(flowItem({ icon: "schip", label: title, path }));
+      if (where === "nav" && nav && nav.items.length < 8) return nav.items.push(flowItem({ icon: "instellingen", label: title, path }));
+      if (!/_tabs$/.test(where)) return;
+      const owner = navOfTabs(where);
+      anchored(where).items.push(flowItem({ label: title, path }));
+      if (!owner) return;
+      if (!isSeq(owner.get("match"))) owner.set("match", flowItem([]));
+      owner.get("match").items.push(doc.createNode(path));
     }
     function removeTabs(path) {
       for (const name of ["tc_nav", "voort_tabs", "energie_tabs", "water_tabs", "ship_tabs"]) {
@@ -815,13 +875,14 @@
     }
     const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     $("v-title").addEventListener("input", () => {
-      if (!$("v-path").dataset.touched) $("v-path").value = ($("v-tab").value === "sys" ? "sys-" : "") + slug($("v-title").value);
+      if (!$("v-path").dataset.touched) $("v-path").value = ($("v-tab").value !== "none" ? "sys-" : "") + slug($("v-title").value);
     });
     $("v-path").addEventListener("input", () => ($("v-path").dataset.touched = "1"));
     $("newview").onclick = () => {
       $("v-title").value = "";
       $("v-path").value = "";
       delete $("v-path").dataset.touched;
+      fillTabChoices();
       $("viewdlg").showModal();
     };
     $("viewdlg").addEventListener("close", () => {
@@ -832,7 +893,7 @@
       snapshot();
       const view = doc.createNode({ title, path, panel: true });
       view.set("cards", doc.createNode([]));
-      view.get("cards").items.push(newCard($("v-kind").value, title));
+      view.get("cards").items.push(newCard($("v-kind").value, title, $("v-tab").value));
       views.items.push(view);
       addTab($("v-tab").value, title, path);
       vi = views.items.length - 1;
@@ -856,6 +917,13 @@
     // ---------- toolbar / keys ----------
     $("view").onchange = () => { vi = +$("view").value; sel = []; hover = null; render(); };
     $("sim").onchange = render;
+    // Preview a theme: the same stored choice and event the card's own theme button uses.
+    try { $("theme").value = localStorage.getItem("shipborn-tc-theme") || "nacht"; } catch (e) { /* private window */ }
+    $("theme").onchange = () => {
+      try { localStorage.setItem("shipborn-tc-theme", $("theme").value); } catch (e) { /* private window */ }
+      window.dispatchEvent(new CustomEvent("shipborn-tc-theme", { detail: $("theme").value }));
+      requestAnimationFrame(draw);
+    };
     $("undo").onclick = () => undo.length && (redo.push(serialize()), restore(undo.pop()));
     $("redo").onclick = () => redo.length && (undo.push(serialize()), restore(redo.pop()));
     async function save() {

@@ -108,6 +108,7 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - Werkt op `views[vi].cards[0].items`: selecteren, slepen (met raster), leidingpunten bewerken, labels los verslepen (`label_offset`), formaat wijzigen, eigenschappen rechts bewerken, items toevoegen uit een palet (`PALETTE`), kleuren en `media_colors`, schermen toevoegen/verwijderen (met de gedeelde kop en een tab).
 - Opslaan (`Ctrl+S`) doet een `PUT` naar `edit_server.py`, die alleen `examples/plc-dashboard.yaml` mag schrijven en alleen op `127.0.0.1` luistert.
 - Komt er een nieuw item-type of optie in de kaart, voeg het dan ook aan het palet en, waar zinvol, aan de eigenschappenlijst van de editor toe.
+- TC90 in de editor: de kaart wordt met `dock: false` getekend, dus statusbalk en icoonbalk staan in het werkvlak. Ze zijn alleen selecteerbaar (`FRAME`), niet te verslepen of te dupliceren. Gedeelde lijsten (aliassen) toont het eigenschappenvak als `*naam` en zet *Toepassen* terug als alias. Nieuwe schermen kunnen subtab worden van een `&…_tabs`-lijst (de bijbehorende knop in `&tc_nav` krijgt het pad in `match`). Bekend: het teruglezen van de YAML is niet helemaal gelijk (inspringing van het meerregelige `confirmation`-blok op Diesel en Generator), dus de status springt na elke wijziging op *niet opgeslagen*; de inhoud is gelijk.
 
 ## Git en conventies
 

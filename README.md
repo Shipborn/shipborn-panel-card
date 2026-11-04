@@ -239,12 +239,13 @@ Open http://localhost:8770/demo/editor.html en kies een view.
 - Leiding geselecteerd: sleep de bolletjes, dubbelklik op de leiding voegt een knikpunt toe, dubbelklik op een bolletje haalt het weg. Punten klikken recht op hun buurpunt.
 - Het label van een symbool (bijv. *Inlet V3* onder een zeewaterinlaat) is los te verslepen; de tekst staat rechts bij `label`.
 - Hoekje rechtsonder = groter/kleiner. Romp, panelen en brede balken verschuiven pas als je ze eerst aanklikt.
-- **Toevoegen**: kies een type uit de lijst met voorbeelden (leidingen, kleppen, pompen, warmte en filters, tanks en meters, elektrisch, tekst).
+- **Toevoegen**: kies een type uit de lijst met voorbeelden (leidingen, kleppen, pompen, warmte en filters, tanks en meters, elektrisch, tekst, en het TC90-ontwerp: tegel, schakelaar, hotspot, ronde meter, waardepaneel, romp).
+- **TC90-schermen**: statusbalk en icoonbalk liggen vast; klik erop om titel, subtabs of knoppen te wijzigen. Gedeelde lijsten staan rechts als `*naam` (bijv. `tabs: *water_tabs`) en blijven gedeeld na *Toepassen*; met een andere `*naam` hoort de pagina bij een andere groep. Een hotspot sleep je aan het bolletje (`x`/`y`); een ronde meter wordt alleen breder of smaller. **Thema** bovenin toont het scherm in Nacht, Dag of Rood nacht (alleen om te bekijken). De schermachtergrond volgt hier het thema.
 - Rechts staan alle opties van het geselecteerde onderdeel (entiteit, kleur, label…) om te bewerken, plus dupliceren, verwijderen, voor/achter en nieuwe onderdelen.
 - `Cmd/Ctrl+Z` ongedaan maken, `Cmd/Ctrl+S` opslaan in `examples/plc-dashboard.yaml`. Opmerkingen en opmaak in het bestand blijven staan.
 - **Kopieer YAML** zet het hele dashboard op het klembord om in HA te plakken (Raw configuration editor).
 - **Kleuren**: kies voor de geselecteerde onderdelen een kleur (of medium bij leidingen); × zet de standaardkleur terug. Onder *Scherm* staat de achtergrond, onder *Leidingkleuren* de kleur per medium voor alle schermen (`media_colors` op de kaart).
-- **Nieuw scherm**: titel, pad en soort (systeemschema met romp, leeg, of kopie van het huidige scherm); het tabblad komt in de systeemtabs of het hoofdmenu. **Scherm verwijderen** haalt ook het tabblad weg.
+- **Nieuw scherm**: titel, pad en soort (systeemschema met romp, leeg, of kopie van het huidige scherm), met statusbalk en icoonbalk. Kies de plaats: als subtab onder Voortstuwing, Energie, Water of Schip (de knop in de icoonbalk licht dan ook op), als eigen knop in de icoonbalk (alleen als er minder dan acht zijn), of niet in de navigatie. **Scherm verwijderen** haalt de pagina ook uit de subtabs en de icoonbalk.
 
 ## Veiligheid
 
