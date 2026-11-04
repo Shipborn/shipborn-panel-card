@@ -63,7 +63,7 @@ Een YAML met een nieuw item-type of nieuwe optie vóór de JS-update plakken gee
 
 De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities`, `button-card`, `markdown` met Jinja). Werkwijze:
 
-1. Bepaal de juiste view (`sys-…` of `alarms`) en zet de onderdelen in een `panel` onder het schema (de bediening begint rond `y: 732`; alles daaronder schuift mee). Verhoog `height` van de kaart zodat het past.
+1. Bepaal de juiste view (`sys-…` of `alarms`) en zet de onderdelen in een `panel` onder het schema (de bediening begint rond `y: 732`; alles daaronder schuift mee). Verhoog `height` van de kaart zodat het past, met 96 px vrij onderaan voor de icoonbalk. Nieuwe bediening liefst met de TC90-items (`tile`, `switch`).
 2. Vertaal: `tile` op een sensor → `value` met `style: tile`; aan/uit-sensor → `indicator`; `button.*` → `pushbutton`; `switch.*` → `pushbutton` met `led: green`; Jinja → er is géén template-engine in de kaart, dus de functie nabouwen (bijv. `text` met `attribute` voor een lijst-attribuut).
 3. Werk `examples/plc-entiteiten.csv` bij (placeholder vervangen of regel toevoegen, met zekerheid).
 4. Controleer in `demo/plc.html?view=…`; voeg zo nodig nep-states toe in `demo/plc.html`.
@@ -72,15 +72,14 @@ De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities
 ## Opbouw van het dashboard (`plc-dashboard.yaml`)
 
 - Eén view per scherm, `panel: true`, met precies één `custom:shipborn-panel-card` erin. Ontwerpbreedte altijd **1280 px**; de kaart schaalt mee met de schermbreedte. `height` verschilt per view (800 voor alleen een scherm, langer als er bediening onder het schema staat; de pagina scrolt dan).
-- Elke view begint met dezelfde kop:
+- Elke kaart heeft `design: tc90` (ontwerp *TC90 JOAL Bediening*) en begint met hetzelfde kader:
   ```yaml
-  - { type: line, x: 0, y: 0, width: 1280, height: 64, color: "#141516" }
-  - { type: image, x: 24, y: 18, width: 200, height: 28, image: shipborn-joal }
-  - { type: nav, x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0, tabs: *sys_tabs }
-  - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
-  - { type: alarm, x: 0, y: 64, width: 1280, height: 40, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+  - { type: statusbar, title: Water, tabs: *water_tabs, status: *tc_status }
+  - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+  - { type: navbar, items: *tc_nav }
   ```
-  De tabs staan één keer als YAML-anker `&sys_tabs` in de eerste view (`sys-diesel`) en worden elders met `*sys_tabs` hergebruikt. Een nieuw scherm = view toevoegen én een regel in `&sys_tabs`.
+  De icoonbalk onderin (`&tc_nav`, acht bestemmingen: Schip, Energie, Voortstuwing, Water, Klimaat, Verlichting, Bilge, Alarmen) en de status rechtsboven (`&tc_status`) staan als anker in de eerste view (`sys-diesel`). Een bestemming met meer pagina's heeft subtabs in de statusbalk: `&voort_tabs` (Overzicht `voortstuwing`, Diesel, Generator, Boegschroef, Brandstof), `&energie_tabs` (Accu's `sys-power`, DC-bus), `&water_tabs` (Zeewater, Zoetwater, Vuilwater), `&ship_tabs` (Zijaanzicht, Dekplan, Interieur); het anker staat in de eerste view van die groep. Een nieuwe pagina = view toevoegen, een regel in de juiste `&…_tabs` en het pad in `match` van die bestemming in `&tc_nav`.
+- De icoonbalk staat vast onderaan het scherm; houd de laatste 96 px van elke kaart vrij (`height` = inhoud + 96).
 - Tab-paden zonder `/` (bijv. `sys-fuel`) verwijzen naar een view in hetzelfde dashboard, ongeacht de URL van het dashboard.
 - Schema: `hull` (romp) op **precies** `{ type: hull, x: 20, y: 112, width: 1240, height: 600 }` op elke schemapagina (de omtrek moet overal gelijk zijn), met daarin `pipe`-items en symbolen; daaronder vanaf `y: 732` de `panel`s met de bediening. Schuif je een schema, schuif dan alle coördinaten (ook `points`) mee en laat de romp staan.
 - Kiosk: elke kaart heeft `kiosk: true` (HA-balken verborgen; even op de boven-/linkerrand blijven toont ze).
@@ -130,7 +129,7 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 
 ## Stand van zaken en open punten (04-11-2026, v0.5.0)
 
-- **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `alarmbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`; zie README). Eerst één voorbeeldpagina, `voortstuwing`; na goedkeuring de andere pagina's omzetten naar het kader met de icoonbalk (8 bestemmingen: Schip, Energie, Voortstuwing, Water, Klimaat, Verlichting, Bilge, Alarmen; de systeemschema's worden subpagina's). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
+- **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `alarmbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`; zie README). Alle pagina's staan in het nieuwe kader (statusbalk met subtabs, alarmbalk, icoonbalk); de systeemschema's en hun bediening zijn verder nog de oude onderdelen, die nu wel de themakleuren volgen. Alleen `voortstuwing` is helemaal in de nieuwe stijl (schip met hotspots, tegels, schakelaars); de andere bestemmingen kunnen zo'n overzichtspagina nog krijgen. Brandstof staat onder Voortstuwing (keuze van Claude, niet van de gebruiker). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
 - Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `voortstuwing`, `ship-side`, `ship-deck`, `ship-interior`, `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
 - De drie `ship-…`-pagina's (tab **Schip**, onderling gewisseld met `&ship_tabs`) tonen de aanzichten uit het canvas "TC 90 aanzichten"; de tekeningen staan als WebP in `IMAGES` (`tc90-zijaanzicht`, `tc90-dekplan`, `tc90-interieur`). Het interieurplan (`ship-interior`) heeft tikbare `zone`s per ruimte met `zoom`: inzoomen op de ruimte en rechts een paneel met alle lampen, groepen en apparaten (plus scènes, Webasto, lekdetectie, bilgepomp/boiler); onderaan scènes voor het hele schip. Die zones worden **gegenereerd** door `tools/interieur_zones.py` (uit `examples/Entiteiten-HA.xlsx`, vereist openpyxl); het script vervangt alles tussen `# ---- ruimtes:` en `# ---- algemeen:` in die view, dus handwerk daar gaat verloren bij opnieuw genereren — pas dan liever het script aan (kamerindeling, labels, volgorde). De zones zijn op het oog geplaatst (`room(...)`-regels in het script); de items in een `zoom`/`popup` toont de layout-editor niet. `popup` (een los venster) bestaat ook nog. De indeling per ruimte (secties en namen) volgt het HA-dashboard van de bemanning; wat daar niet in stond komt onder *Overig*. Het script maakt ook de zones op het **dekplan** (tussen `# ---- dek: zones` en `# ---- einde dek ----`). Het zijaanzicht heeft nog geen bediening (voorstel: mast- en navigatieverlichting op hoogte).
 - De compressordruk (`sensor.al1590_er_compressor_manifold_pressure`) is in mbar. Generator en Voortstuwing rekenen om (`factor: 0.001`); op `sys-diesel` nog niet (toont 6.475 bar, checklistregel altijd groen).

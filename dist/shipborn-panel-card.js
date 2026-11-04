@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.0";
+const VERSION = "0.5.1";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -131,148 +131,148 @@ const STYLE = `
   img.item { object-fit: contain; }
 
   /* Screen-page items (dark console design: gauges, bars, tanks, values) */
-  .d { font-family: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", sans-serif; color: #ecebe6; }
-  .d-num, .d-valbox { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-weight: 600; color: #ecebe6; }
-  .d-lbl { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #8f8e88; }
+  .d { font-family: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", sans-serif; color: var(--ink, #ecebe6); }
+  .d-num, .d-valbox { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-weight: 600; color: var(--ink, #ecebe6); }
+  .d-lbl { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted, #8f8e88); }
   .d-ph {
     display: flex; align-items: center; gap: 10px; white-space: nowrap;
-    font-size: 15px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #a3a29c;
+    font-size: 15px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted, #a3a29c);
   }
-  .d-led { width: 10px; height: 10px; border-radius: 50%; flex: none; background: #3a3a3a; }
-  .d-led.on { background: var(--c, #34d27b); box-shadow: 0 0 8px var(--c, #34d27b); }
+  .d-led { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--line-strong, #3a3a3a); }
+  .d-led.on { background: var(--c, var(--ok, #34d27b)); box-shadow: 0 0 8px var(--c, var(--ok, #34d27b)); }
   .d-led.on.blink { animation: blink 1s steps(2, start) infinite; }
-  .d-panel { background: #1b1b1b; border: 1px solid #2c2c2c; border-radius: 10px; }
+  .d-panel { background: var(--surface, #1b1b1b); border: 1px solid var(--line, #2c2c2c); border-radius: 10px; }
   .d-panel > .d-ph { position: absolute; left: 18px; top: 14px; }
   .d-valbox {
     box-sizing: border-box; min-width: 70px; padding: 6px 12px; font-size: 18px; text-align: right; white-space: nowrap;
-    background: #121212; border: 1px solid #2c2c2c; border-radius: 6px;
+    background: var(--surface-raised, #121212); border: 1px solid var(--line, #2c2c2c); border-radius: 6px;
   }
   .d-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .d-col { display: flex; flex-direction: column; gap: 4px; }
   .d-gauge svg { width: 100%; height: auto; display: block; overflow: visible; }
-  .d-track { position: relative; box-sizing: border-box; overflow: hidden; background: #121212; border: 1px solid #2c2c2c; }
+  .d-track { position: relative; box-sizing: border-box; overflow: hidden; background: var(--surface-raised, #121212); border: 1px solid var(--line, #2c2c2c); }
   .d-fill { position: absolute; transition: height .4s, width .4s, left .4s; }
-  .d-zero { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: #6b6a66; }
-  .d-mark { position: absolute; left: 0; right: 0; border-top: 2px dashed #ecebe6; }
+  .d-zero { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: var(--line-strong, #6b6a66); }
+  .d-mark { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--ink, #ecebe6); }
   .d-scale { display: flex; flex-direction: column; justify-content: space-between; }
   .d-box {
     box-sizing: border-box; display: flex; align-items: center; justify-content: center; text-align: center;
-    background: #121212; border: 1px solid #4a4a4a; border-radius: 6px;
-    font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #cfcec8;
+    background: var(--surface-raised, #121212); border: 1px solid var(--line-strong, #4a4a4a); border-radius: 6px;
+    font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink, #cfcec8);
   }
   .d-btn {
     box-sizing: border-box; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
-    padding: 0 16px; border-radius: 8px; border: 1px solid #3a3a3a; background: #232323; color: #ecebe6;
+    padding: 0 16px; border-radius: 8px; border: 1px solid var(--line-strong, #3a3a3a); background: var(--surface, #232323); color: var(--ink, #ecebe6);
     font-family: inherit; font-size: var(--fs, 19px); font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
     cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
-  .d-btn:hover { background: #2a2a2a; }
+  .d-btn:hover { background: var(--surface-raised, #2a2a2a); }
   .d-dlg { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .6); }
   .d-dlg > div {
     width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 22px; display: flex; flex-direction: column; gap: 18px;
-    background: #1b1b1b; border: 1px solid #3a3a3a; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .6);
+    background: var(--surface, #1b1b1b); border: 1px solid var(--line-strong, #3a3a3a); border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .6);
   }
   .d-dlg .d-ph { white-space: normal; }
-  .d-dlg p { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.3; color: #ecebe6; white-space: pre-line; }
+  .d-dlg p { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.3; color: var(--ink, #ecebe6); white-space: pre-line; }
   .d-dlg .row { display: flex; gap: 12px; }
   .d-dlg .d-btn { height: 52px; }
-  .d-dlg .d-btn.yes { border-color: #34d27b; color: #34d27b; background: #12261a; }
+  .d-dlg .d-btn.yes { border-color: var(--ok, #34d27b); color: var(--ok, #34d27b); background: var(--ok-soft, #12261a); }
   .d-zone {
     box-sizing: border-box; border: 2px dashed rgba(20, 21, 22, .35); border-radius: 8px; cursor: pointer;
     transition: background .3s, border-color .3s; -webkit-tap-highlight-color: transparent;
   }
   .d-zone:hover { background: rgba(20, 21, 22, .06); }
-  .d-zone.on { border: 2px solid #f5a524; background: rgba(245, 165, 36, .16); }
-  .d-zone.alarm { border: 2px solid #ff5b4f; background: rgba(255, 91, 79, .3); animation: zalarm 1s steps(2, start) infinite; }
+  .d-zone.on { border: 2px solid var(--accent, #f5a524); background: rgba(245, 165, 36, .16); }
+  .d-zone.alarm { border: 2px solid var(--alarm, #ff5b4f); background: rgba(255, 91, 79, .3); animation: zalarm 1s steps(2, start) infinite; }
   @keyframes zalarm { to { background: rgba(255, 91, 79, .08); } }
   .d-zone .chip {
     position: absolute; left: 6px; top: 6px; display: flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 5px;
-    background: #141516; color: #ecebe6; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+    background: var(--surface, #141516); color: var(--ink, #ecebe6); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
   }
   .d-zone .chip .d-led { width: 8px; height: 8px; }
-  .d-zone .chip .v { font-family: "JetBrains Mono", monospace; letter-spacing: 0; color: #cfcec8; }
+  .d-zone .chip .v { font-family: "JetBrains Mono", monospace; letter-spacing: 0; color: var(--ink, #cfcec8); }
   .d-pop { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; background: rgba(0, 0, 0, .6); }
   .d-pop.open { display: flex; }
-  .d-pop > .box { background: #1b1b1b; border: 1px solid #3a3a3a; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .6); overflow: hidden; }
-  .d-pop .hd { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 6px 0 20px; border-bottom: 1px solid #2c2c2c; }
-  .d-pop .hd .d-ph { font-size: 17px; color: #ecebe6; }
-  .d-pop .x { width: 44px; height: 44px; border: 0; border-radius: 8px; background: none; color: #a3a29c; font-size: 22px; cursor: pointer; }
-  .d-pop .x:hover { background: #2a2a2a; color: #ecebe6; }
+  .d-pop > .box { background: var(--surface, #1b1b1b); border: 1px solid var(--line-strong, #3a3a3a); border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .6); overflow: hidden; }
+  .d-pop .hd { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 6px 0 20px; border-bottom: 1px solid var(--line, #2c2c2c); }
+  .d-pop .hd .d-ph { font-size: 17px; color: var(--ink, #ecebe6); }
+  .d-pop .x { width: 44px; height: 44px; border: 0; border-radius: 8px; background: none; color: var(--ink-muted, #a3a29c); font-size: 22px; cursor: pointer; }
+  .d-pop .x:hover { background: var(--surface-raised, #2a2a2a); color: var(--ink, #ecebe6); }
   .d-pop .body { position: relative; }
   .d-zoom { display: none; z-index: 50; background: rgba(13, 14, 16, 0); transition: background .45s; }
-  .d-zoom.in { background: #0d0e10; }
+  .d-zoom.in { background: var(--bg, #0d0e10); }
   .d-zoom .zv { position: absolute; inset: 0; overflow: hidden; transition: clip-path .45s ease; }
   .d-zoom .zi { position: absolute; left: 0; transform-origin: 0 0; transition: transform .45s ease; }
-  .d-zoom .zm { position: absolute; box-sizing: border-box; border: 3px solid #f5a524; border-radius: 8px; }
+  .d-zoom .zm { position: absolute; box-sizing: border-box; border: 3px solid var(--accent, #f5a524); border-radius: 8px; }
   .d-zoom .zp {
     position: absolute; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;
     opacity: 0; transform: translateX(40px); transition: opacity .35s .1s, transform .35s .1s;
   }
   .d-zoom.in .zp { opacity: 1; transform: none; }
-  .d-zoom .zh { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 18px; border-bottom: 1px solid #2c2c2c; }
-  .d-zoom .zh .d-ph { font-size: 17px; color: #ecebe6; }
+  .d-zoom .zh { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 18px; border-bottom: 1px solid var(--line, #2c2c2c); }
+  .d-zoom .zh .d-ph { font-size: 17px; color: var(--ink, #ecebe6); }
   .d-zoom .zh .d-btn { width: auto; height: 44px; font-size: 15px; }
   .d-zoom .zb { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
   .d-zoom .zc { position: relative; }
   .d-btn:active, .d-btn.pressed { background: #333; }
   .d-btn.left { justify-content: flex-start; }
-  .d-btn.stop { background: #3a1512; border-color: #ff5b4f; color: #ffd9d6; }
-  .d-btn.active { border-color: #f5a524; color: #f5a524; background: #261f12; }
-  .d-btn.static { cursor: default; color: #a3a29c; font-size: var(--fs, 15px); }
-  .d-btn.static.active { color: #f5a524; }
+  .d-btn.stop { background: var(--alarm-soft, #3a1512); border-color: var(--alarm, #ff5b4f); color: var(--ink, #ffd9d6); }
+  .d-btn.active { border-color: var(--accent, #f5a524); color: var(--accent, #f5a524); background: var(--accent-soft, #261f12); }
+  .d-btn.static { cursor: default; color: var(--ink-muted, #a3a29c); font-size: var(--fs, 15px); }
+  .d-btn.static.active { color: var(--accent, #f5a524); }
   .d-btn.unavailable { opacity: .4; cursor: not-allowed; }
   .d-nav { display: flex; gap: 4px; }
   .d-nav.side { flex-direction: column; gap: 10px; }
   .d-tab {
     display: flex; align-items: center; height: 44px; padding: 0 18px; border: 0; border-radius: 6px; background: none;
-    color: #a3a29c; font-family: inherit; font-size: 17px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-muted, #a3a29c); font-family: inherit; font-size: 17px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
     cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  .d-tab:hover { color: #ecebe6; background: #1f1f1f; }
-  .d-tab.on { color: #0d0e10; background: #f5a524; }
-  .d-tab[disabled] { color: #5f5e5a; background: none; cursor: default; }
-  .side .d-tab { height: 52px; padding: 0 16px; border: 1px solid #3a3a3a; border-radius: 8px; background: #232323; color: #cfcec8; font-size: 18px; font-weight: 700; }
-  .side .d-tab.on { border-color: #f5a524; color: #f5a524; background: #261f12; }
-  .side .d-tab[disabled] { color: #5f5e5a; border-style: dashed; background: #232323; }
+  .d-tab:hover { color: var(--ink, #ecebe6); background: #1f1f1f; }
+  .d-tab.on { color: var(--bg, #0d0e10); background: var(--accent, #f5a524); }
+  .d-tab[disabled] { color: var(--ink-muted, #5f5e5a); background: none; cursor: default; }
+  .side .d-tab { height: 52px; padding: 0 16px; border: 1px solid var(--line-strong, #3a3a3a); border-radius: 8px; background: var(--surface, #232323); color: var(--ink, #cfcec8); font-size: 18px; font-weight: 700; }
+  .side .d-tab.on { border-color: var(--accent, #f5a524); color: var(--accent, #f5a524); background: var(--accent-soft, #261f12); }
+  .side .d-tab[disabled] { color: var(--ink-muted, #5f5e5a); border-style: dashed; background: var(--surface, #232323); }
   .d-alarm {
     box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 24px; cursor: pointer;
-    background: #141516; border-top: 1px solid #2c2c2c; border-bottom: 1px solid #2c2c2c;
-    color: #8f8e88; font-size: 17px; letter-spacing: .04em; white-space: nowrap; overflow: hidden;
+    background: var(--surface, #141516); border-top: 1px solid var(--line, #2c2c2c); border-bottom: 1px solid var(--line, #2c2c2c);
+    color: var(--ink-muted, #8f8e88); font-size: 17px; letter-spacing: .04em; white-space: nowrap; overflow: hidden;
   }
-  .d-alarm.on { background: #3a1512; border-color: #ff5b4f; color: #ffd9d6; }
+  .d-alarm.on { background: var(--alarm-soft, #3a1512); border-color: var(--alarm, #ff5b4f); color: var(--ink, #ffd9d6); }
   .d-alarm .d-num { font-size: 14px; font-weight: 400; color: inherit; }
   .d-block { display: flex; flex-direction: column; }
-  .d-block > div { box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #3a3a3a; }
-  .d-block .hd { height: 30px; border-radius: 6px 6px 0 0; background: #232323; font-size: 17px; font-weight: 700; letter-spacing: .1em; }
-  .d-block .bd { height: 62px; border-top: 0; border-bottom: 0; background: #121212; color: #a3a29c; font-family: "JetBrains Mono", monospace; font-size: 15px; }
-  .d-block .ft { height: 34px; border-radius: 0 0 6px 6px; background: #1b1b1b; font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 16px; }
-  .d-block .rt { position: absolute; top: -30px; left: 0; right: 0; border: 0; color: #a3a29c; font-family: "JetBrains Mono", monospace; font-size: 14px; }
-  .d-block.alarm > div:not(.rt) { border-color: #ff5b4f; }
-  .d-block.alarm .hd { background: #3a1512; color: #ffd9d6; }
-  .d-block.active > div:not(.rt) { border-color: #34d27b; }
-  .d-block.active .hd { background: #12261a; color: #34d27b; }
-  .d-box.active { border-color: #34d27b; color: #34d27b; background: #12261a; box-shadow: 0 0 12px rgba(52, 210, 123, .25); }
-  .d-box.alarm { border-color: #ff5b4f; color: #ffd9d6; background: #3a1512; }
+  .d-block > div { box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line-strong, #3a3a3a); }
+  .d-block .hd { height: 30px; border-radius: 6px 6px 0 0; background: var(--surface, #232323); font-size: 17px; font-weight: 700; letter-spacing: .1em; }
+  .d-block .bd { height: 62px; border-top: 0; border-bottom: 0; background: var(--surface-raised, #121212); color: var(--ink-muted, #a3a29c); font-family: "JetBrains Mono", monospace; font-size: 15px; }
+  .d-block .ft { height: 34px; border-radius: 0 0 6px 6px; background: var(--surface, #1b1b1b); font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 16px; }
+  .d-block .rt { position: absolute; top: -30px; left: 0; right: 0; border: 0; color: var(--ink-muted, #a3a29c); font-family: "JetBrains Mono", monospace; font-size: 14px; }
+  .d-block.alarm > div:not(.rt) { border-color: var(--alarm, #ff5b4f); }
+  .d-block.alarm .hd { background: var(--alarm-soft, #3a1512); color: var(--ink, #ffd9d6); }
+  .d-block.active > div:not(.rt) { border-color: var(--ok, #34d27b); }
+  .d-block.active .hd { background: var(--ok-soft, #12261a); color: var(--ok, #34d27b); }
+  .d-box.active { border-color: var(--ok, #34d27b); color: var(--ok, #34d27b); background: var(--ok-soft, #12261a); box-shadow: 0 0 12px rgba(52, 210, 123, .25); }
+  .d-box.alarm { border-color: var(--alarm, #ff5b4f); color: var(--ink, #ffd9d6); background: var(--alarm-soft, #3a1512); }
   svg.d-pipe { overflow: visible; pointer-events: none; }
   .d-pipe .bs { transition: stroke-opacity .4s; }
   .d-hull { pointer-events: none; }
   .d-sym { cursor: default; }
   .d-sym.click { cursor: pointer; }
   .d-sym > svg { width: 100%; height: 100%; display: block; overflow: visible; }
-  .d-sym .bd, .d-sym .ac { fill: #121212; stroke: #8f8e88; stroke-width: 2; stroke-linejoin: round; transition: fill .3s, stroke .3s; }
-  .d-sym .ln { fill: none; stroke: #8f8e88; stroke-width: 2; stroke-linecap: round; }
+  .d-sym .bd, .d-sym .ac { fill: var(--surface-raised, #121212); stroke: var(--ink-muted, #8f8e88); stroke-width: 2; stroke-linejoin: round; transition: fill .3s, stroke .3s; }
+  .d-sym .ln { fill: none; stroke: var(--ink-muted, #8f8e88); stroke-width: 2; stroke-linecap: round; }
   .d-sym.on .bd, .d-sym.on .ac, .d-sym.on .ln { stroke: var(--c); }
   .d-sym.on .ac { fill: var(--c); }
   .d-sym.on > svg { filter: drop-shadow(0 0 5px var(--c)); }
   .d-sym .lb {
     position: absolute; left: 50%; transform: translateX(-50%); white-space: pre; text-align: center; line-height: 1.1;
-    font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #a3a29c;
+    font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted, #a3a29c);
   }
   .d-sym .blades { transform-box: fill-box; transform-origin: center; }
   .d-sym.on .blades { animation: prop var(--dur, .5s) linear infinite alternate; }
-  .d-sym .puff { opacity: 0; fill: #8f8e88; transform-box: fill-box; transform-origin: center; }
+  .d-sym .puff { opacity: 0; fill: var(--ink-muted, #8f8e88); transform-box: fill-box; transform-origin: center; }
   .d-sym.on .puff { animation: puff 2.4s ease-out infinite; }
-  .d-sym .gl { fill: #8f8e88; font: 600 14px "JetBrains Mono", monospace; transition: fill .3s; }
+  .d-sym .gl { fill: var(--ink-muted, #8f8e88); font: 600 14px "JetBrains Mono", monospace; transition: fill .3s; }
   .d-sym.on .gl { fill: var(--c); }
   .d-sym .rotor { transform-box: fill-box; transform-origin: center; }
   .d-sym.on .rotor { animation: spin var(--dur, 1s) linear infinite; }
@@ -479,7 +479,15 @@ const TC_STYLE =
   @keyframes tc-blink { 50% { background: var(--alarm-soft); color: var(--alarm); } }
   @media (prefers-reduced-motion: reduce) { .tc-blink, .tc-switch.is-busy .tc-icon { animation: none; } }
 
-  /* navigation bar */
+  /* sub-page tabs in the status bar */
+  .tc-sb-tabs { display: flex; gap: var(--space-1); padding: var(--space-1); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .tc-sb-tab { height: 38px; padding: 0 var(--space-4); border: 0; border-radius: 7px; background: transparent; color: var(--ink-muted); cursor: pointer; }
+  .tc-sb-tab:active { background: var(--surface-raised); }
+  .tc-sb-tab.is-active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  /* navigation bar, in a dock fixed to the bottom of the screen */
+  .tc-dock { position: fixed; bottom: 0; z-index: 4; overflow: hidden; background: var(--surface); }
+  .tc-dock > .tc-navbar { transform-origin: 0 0; box-sizing: border-box; }
   .tc-navbar { display: flex; background: var(--surface); border-top: 1px solid var(--line); }
   .tc-nav-item { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: var(--touch-min); border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; }
   .tc-nav-item.is-active { color: var(--accent); }
@@ -642,6 +650,11 @@ const roundedPath = (pts, r) => {
 };
 // A path without a leading slash is a view of the current dashboard: "sys-diesel" → "/<dashboard>/sys-diesel".
 const viewPath = (p) => (!p || p.startsWith("/") ? p : `/${location.pathname.split("/")[1]}/${p}`);
+// True when one of these views is open (in demo/plc.html: ?view=<path>).
+const isHere = (paths) => {
+  const view = new URLSearchParams(location.search).get("view");
+  return [].concat(paths || []).some((p) => p && (location.pathname === viewPath(p) || view === p));
+};
 const pad2 = (n) => String(n).padStart(2, "0");
 const stamp = (iso) => {
   const d = new Date(iso);
@@ -825,6 +838,7 @@ class ShipbornPanelCard extends HTMLElement {
     const root = this.shadowRoot;
     this._tc = c.design === "tc90";
     this._themeHooks = [];
+    this._dock = null;
     root.innerHTML = `<style>${STYLE}${this._tc ? TC_STYLE : ""}</style>`;
     this._outer = h("div", "outer");
     this._panel = h("div", "panel" + (this._tc ? " tc" : ""), { width: W + "px", height: H + "px" });
@@ -857,6 +871,11 @@ class ShipbornPanelCard extends HTMLElement {
     this._panel.style.transform = `scale(${s})`;
     this._panel.style.left = `${Math.max(0, (w - this._W * s) / 2)}px`;
     this._outer.style.height = `${this._H * s}px`;
+    if (this._dock) {
+      const r = this._outer.getBoundingClientRect();
+      Object.assign(this._dock.style, { left: r.left + "px", width: r.width + "px", height: 88 * s + "px" });
+      Object.assign(this._dock.firstChild.style, { transform: `scale(${s})`, marginLeft: this._panel.style.left });
+    }
   }
 
   _shapeSvg(W, H) {
@@ -1306,11 +1325,11 @@ class ShipbornPanelCard extends HTMLElement {
     svg.setAttribute("aria-hidden", "true");
     const arcD = "M20 100 A80 80 0 0 1 180 100";
     svg.innerHTML = `
-      <path d="${arcD}" fill="none" stroke="#2a2a2a" stroke-width="14" pathLength="1000"/>
+      <path d="${arcD}" fill="none" style="stroke:var(--line, #2a2a2a)" stroke-width="14" pathLength="1000"/>
       <path class="arc" d="${arcD}" fill="none" stroke="${base}" stroke-width="14" pathLength="1000" stroke-dasharray="0 2000"/>
-      <line class="ndl" x1="100" y1="100" x2="100" y2="34" stroke="#ecebe6" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="100" cy="100" r="6" fill="#ecebe6"/>
-      <g fill="#8f8e88" font-size="10" text-anchor="middle" font-family="JetBrains Mono, monospace">
+      <line class="ndl" x1="100" y1="100" x2="100" y2="34" style="stroke:var(--ink, #ecebe6)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="6" style="fill:var(--ink, #ecebe6)"/>
+      <g style="fill:var(--ink-muted, #8f8e88)" font-size="10" text-anchor="middle" font-family="JetBrains Mono, monospace">
         <text x="20" y="116">${min}</text><text x="100" y="12">${g.mid ?? (min + max) / 2}</text><text x="180" y="116">${max}</text>
       </g>`;
     n.appendChild(svg);
@@ -1396,7 +1415,7 @@ class ShipbornPanelCard extends HTMLElement {
     const fillColor = color(t.color, DESIGN_COLORS.blue);
     let led = null;
     if (t.label) {
-      const head = h("div", "d-ph", { fontSize: "15px", letterSpacing: ".08em", color: "#cfcec8", whiteSpace: "normal", lineHeight: "1.1", minHeight: "36px" });
+      const head = h("div", "d-ph", { fontSize: "15px", letterSpacing: ".08em", color: "var(--ink, #cfcec8)", whiteSpace: "normal", lineHeight: "1.1", minHeight: "36px" });
       led = h("span", "d-led");
       head.append(led, t.label);
       n.appendChild(head);
@@ -1453,8 +1472,8 @@ class ShipbornPanelCard extends HTMLElement {
   _dValue(item) {
     const tile = item.style === "tile";
     const n = this._place(h("div", "d " + (tile ? "d-col d-panel" : "d-row")), item, 260, tile ? 80 : 40);
-    if (tile) Object.assign(n.style, { padding: "12px 16px", background: "#121212", boxSizing: "border-box" });
-    const l = h("span", tile ? "d-lbl" : null, tile ? {} : { fontSize: (item.font_size || 17) + "px", color: "#cfcec8" });
+    if (tile) Object.assign(n.style, { padding: "12px 16px", background: "var(--surface-raised, #121212)", boxSizing: "border-box" });
+    const l = h("span", tile ? "d-lbl" : null, tile ? {} : { fontSize: (item.font_size || 17) + "px", color: "var(--ink, #cfcec8)" });
     l.textContent = item.label ?? "";
     const v = h(
       "span",
@@ -1478,7 +1497,7 @@ class ShipbornPanelCard extends HTMLElement {
   // off_color lights it in that colour while not active (red cross on a checklist).
   _dIndicator(item) {
     const n = this._place(h("div", "d d-row"), item, null, null);
-    Object.assign(n.style, { justifyContent: "flex-start", fontSize: (item.font_size || 17) + "px", color: this._tc ? "" : "#cfcec8", whiteSpace: "nowrap" });
+    Object.assign(n.style, { justifyContent: "flex-start", fontSize: (item.font_size || 17) + "px", color: "var(--ink, #cfcec8)", whiteSpace: "nowrap" });
     const s = item.led_size || 14;
     let led;
     if (item.off_color || item.active_above != null || item.active_below != null) {
@@ -1545,6 +1564,7 @@ class ShipbornPanelCard extends HTMLElement {
   _applyTheme(t) {
     this._theme = TC_THEMES[t] ? t : "nacht";
     this._panel.dataset.tcTheme = this._theme;
+    if (this._dock) this._dock.dataset.tcTheme = this._theme;
     this._paintPage?.(TC_THEMES[this._theme].bg);
     for (const f of this._themeHooks) f();
   }
@@ -1559,6 +1579,19 @@ class ShipbornPanelCard extends HTMLElement {
     ident.appendChild(logo);
     const title = h("div", "tc-sb-title title");
     title.textContent = s.title ?? "";
+    // tabs: switch between the sub-pages of a destination (e.g. Zeewater | Zoetwater | Vuilwater) instead of the title.
+    if (s.tabs) {
+      title.className = "tc-sb-tabs";
+      title.textContent = "";
+      for (const t of s.tabs) {
+        const b = h("button", "tc-sb-tab label");
+        b.type = "button";
+        b.textContent = t.label;
+        b.addEventListener("click", () => this._handleAction(t, { action: "navigate", navigation_path: t.path }, b));
+        title.appendChild(b);
+        this._updaters.push(() => b.classList.toggle("is-active", isHere([t.path, ...[].concat(t.match || [])])));
+      }
+    }
     const right = h("div", "tc-sb-right");
     for (const st of s.status || []) {
       const el = h("span", "tc-sb-stat");
@@ -1634,7 +1667,12 @@ class ShipbornPanelCard extends HTMLElement {
 
   // Icon navigation at the bottom; the item whose path matches the URL (or `active`) is highlighted, with an alarm badge.
   _tNavbar(nv) {
-    const n = this._place(h("nav", "tc-navbar"), { x: 0, ...nv }, this._W, 88);
+    // Not in the panel: a dock fixed to the bottom of the screen, so it stays in view on long pages (see _fit).
+    const n = h("nav", "tc-navbar", { width: this._W + "px", height: "88px" });
+    this._dock = h("div", "tc tc-dock");
+    this._dock.dataset.tcTheme = this._theme;
+    this._dock.appendChild(n);
+    this._outer.appendChild(this._dock);
     const items = (nv.items || []).map((it) => {
       const b = h("button", "tc-nav-item");
       b.type = "button";
@@ -1648,12 +1686,8 @@ class ShipbornPanelCard extends HTMLElement {
       return [it, b, badge];
     });
     this._updaters.push((hass) => {
-      const here = location.pathname;
       for (const [it, b, badge] of items) {
-        b.classList.toggle(
-          "is-active",
-          nv.active ? nv.active === it.label : !!it.path && (here === viewPath(it.path) || [].concat(it.match || []).map(viewPath).includes(here))
-        );
+        b.classList.toggle("is-active", nv.active ? nv.active === it.label : isHere([it.path, ...[].concat(it.match || [])]));
         if (!badge) continue;
         const so = hass.states[it.badge_entity];
         const v = it.badge_attribute ? so?.attributes?.[it.badge_attribute] : num(so);
@@ -1662,7 +1696,7 @@ class ShipbornPanelCard extends HTMLElement {
         badge.style.display = count ? "" : "none";
       }
     });
-    return n;
+    return null;
   }
 
   // Measured value with label, unit and a line below (sub / sub_entity); warn/alarm colours with a triangle.
@@ -2018,7 +2052,7 @@ class ShipbornPanelCard extends HTMLElement {
       arrow = `<polygon class="bs" points="${pt(L * 0.6, 0)} ${pt(-L * 0.4, -W)} ${pt(-L * 0.4, W)}" fill="${col}"/>`;
     }
     svg.innerHTML =
-      `<path d="${d}" fill="none" stroke="${p.casing || "#0a0b0c"}" stroke-width="${t + 4}" stroke-linejoin="round" stroke-linecap="${p.cap || "butt"}"/>` +
+      `<path d="${d}" fill="none" style="stroke:${p.casing || "var(--bg, #0a0b0c)"}" stroke-width="${t + 4}" stroke-linejoin="round" stroke-linecap="${p.cap || "butt"}"/>` +
       `<path class="bs" d="${d}" fill="none" stroke="${col}" stroke-width="${t}" stroke-linejoin="round" stroke-linecap="${p.cap || "butt"}"/>` +
       `<path class="fl" d="${d}" fill="none" stroke="${p.flow_color || "rgba(255,255,255,.75)"}" stroke-width="${Math.max(1.5, t * 0.45)}"` +
       ` stroke-linecap="round" stroke-dasharray="${dash.join(" ")}" visibility="hidden"/>` +
@@ -2045,14 +2079,14 @@ class ShipbornPanelCard extends HTMLElement {
   // Ship outline seen from above, bow to the right (bow: left to flip).
   _dHull(item) {
     const n = this._place(h("div", "d d-hull"), item, 1200, 360);
-    const fill = item.color || "#141516";
-    const line = item.border || "#3a3a3a";
+    const fill = item.color || "var(--surface, #141516)";
+    const line = item.border || "var(--line-strong, #3a3a3a)";
     n.innerHTML =
       `<svg viewBox="0 0 1000 300" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible${item.bow === "left" ? ";transform:scaleX(-1)" : ""}">` +
       `<path d="M14,34 C300,6 640,8 790,34 C900,56 975,110 996,150 C975,190 900,244 790,266 C640,292 300,294 14,266 Q4,150 14,34 Z"` +
-      ` fill="${fill}" stroke="${line}" stroke-width="2" vector-effect="non-scaling-stroke"/>` +
+      ` style="fill:${fill};stroke:${line}" stroke-width="2" vector-effect="non-scaling-stroke"/>` +
       `<path d="M34,52 C300,26 630,28 775,52 C875,72 940,115 958,150 C940,185 875,228 775,248 C630,272 300,274 34,248 Q26,150 34,52 Z"` +
-      ` fill="none" stroke="${line}" stroke-width="1" stroke-dasharray="6 6" vector-effect="non-scaling-stroke" opacity=".6"/>` +
+      ` fill="none" style="stroke:${line}" stroke-width="1" stroke-dasharray="6 6" vector-effect="non-scaling-stroke" opacity=".6"/>` +
       `</svg>`;
     return n;
   }

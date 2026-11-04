@@ -767,45 +767,44 @@
       n.flow = true;
       return flowSeqs(n);
     };
-    // Header shared by all screens; the tabs point at the &sys_tabs list (YAML alias).
-    function headerItems(kind) {
-      const nav = (obj, anchor) => {
+    // Frame shared by all screens (design: tc90): status bar, alarm bar and the icon bar (&tc_status, &tc_nav aliases).
+    function headerItems(kind, title) {
+      const withAlias = (obj, key, anchor) => {
         const n = flowItem(obj);
         const list = anchored(anchor);
-        if (list) n.set("tabs", doc.createAlias(list));
+        if (list) n.set(key, doc.createAlias(list));
         return n;
       };
       const out = [
-        flowItem({ type: "line", x: 0, y: 0, width: 1280, height: 64, color: "#141516" }),
-        flowItem({ type: "image", x: 24, y: 18, width: 200, height: 28, image: "shipborn-joal" }),
-        nav({ type: "nav", x: 240, y: 14, font_size: 12, tab_padding: 8, letter_spacing: 0 }, "sys_tabs"),
-        flowItem({ type: "indicator", x: 1144, y: 25, entity: "binary_sensor.plc_lifebeat", label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }),
-        flowItem({ type: "alarm", x: 0, y: 64, width: 1280, height: 40, entity: "sensor.plc_active_alarm", active_entity: "binary_sensor.plc_alarm_active" }),
+        withAlias({ type: "statusbar", title: title || "" }, "status", "tc_status"),
+        flowItem({ type: "alarmbar", y: 56, entity: "sensor.er_alarm_status_active_alarms", attribute: "alarms", tap_action: { action: "navigate", navigation_path: "alarms" } }),
+        withAlias({ type: "navbar" }, "items", "tc_nav"),
       ];
-      if (kind === "sys") out.push(flowItem({ type: "hull", x: 20, y: 160, width: 1240, height: 600 }));
+      if (kind === "sys") out.push(flowItem({ type: "hull", x: 20, y: 112, width: 1240, height: 600 }));
       return out;
     }
-    function newCard(kind) {
+    function newCard(kind, title) {
       if (kind === "copy") {
         const c = doc.getIn(cardPath(), true).clone();
         // A copy may not define the same anchor twice: turn definitions into aliases.
         visit(c, { Node(_, n) { if (n.anchor) { const a = doc.createAlias(anchored(n.anchor)); return a; } } });
         return c;
       }
-      const c = doc.createNode({ type: "custom:shipborn-panel-card", kiosk: true, width: 1280, height: 800, background: "#0d0e10", border: "#0d0e10", corner_radius: 0 });
+      const c = doc.createNode({ type: "custom:shipborn-panel-card", design: "tc90", kiosk: true, width: 1280, height: 896 });
       const its = doc.createNode([]);
-      its.items = headerItems(kind);
+      its.items = headerItems(kind, title);
       c.set("items", its);
       const media = cardCfg().media_colors;
       if (media) c.set("media_colors", flowItem(media));
       return c;
     }
+    // The icon bar has eight fixed destinations; a new screen goes in as a destination only while there is room.
     function addTab(where, title, path) {
-      const tab = flowItem({ label: title, path });
-      if (where === "sys") anchored("sys_tabs")?.items.push(tab);
+      const nav = anchored("tc_nav");
+      if (where === "sys" && nav && nav.items.length < 8) nav.items.push(flowItem({ icon: "schip", label: title, path }));
     }
     function removeTabs(path) {
-      for (const name of ["sys_tabs"]) {
+      for (const name of ["tc_nav", "voort_tabs", "energie_tabs", "water_tabs", "ship_tabs"]) {
         const list = anchored(name);
         if (!list) continue;
         list.items = list.items.filter((n) => n.get("path") !== path);
@@ -834,7 +833,7 @@
       snapshot();
       const view = doc.createNode({ title, path, panel: true });
       view.set("cards", doc.createNode([]));
-      view.get("cards").items.push(newCard($("v-kind").value));
+      view.get("cards").items.push(newCard($("v-kind").value, title));
       views.items.push(view);
       addTab($("v-tab").value, title, path);
       vi = views.items.length - 1;
