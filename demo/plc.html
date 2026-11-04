@@ -32,7 +32,6 @@
       const now = new Date().toISOString();
       const st = (state, attributes = {}) => ({ state: String(state), attributes, last_changed: now });
       const states = {
-        "binary_sensor.plc_lifebeat": st("on"),
         "sensor.plc_active_alarm": st("026 Jetvalve 3 won't move to starboard"),
         "binary_sensor.plc_alarm_active": st("on"),
         "sensor.er_alarm_status_active_alarms": st(2, { alarms: ["Bilge engine room high", "Diesel PS level low"] }),
@@ -70,6 +69,8 @@
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd": st("on"),
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft": st("off"),
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in": st("off"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr": st("off"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat": st("on"),
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running": st("off"),
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode": st("off"),
         "binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode": st("off"),

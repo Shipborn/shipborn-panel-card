@@ -5,7 +5,7 @@
 # Elke pagina: bovenaan de statusbalk (met de keuze tussen de subpagina's van een bestemming) en onderin
 # de icoonbalk met acht bestemmingen (&tc_nav); beide staan vast op het scherm. Actieve alarmen: het
 # getal op Alarmen in de icoonbalk. Thema Nacht / Dag / Rood nacht met de knop rechtsboven.
-# In de statusbalk staat nog binary_sensor.plc_lifebeat (niet gevonden in HA).
+# PLC lifebeat in de statusbalk: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat (interne communicatie PLC's).
 # Elke view is één kaart van 1280 breed die meeschaalt met de schermbreedte; de eerste 56 px en de
 # laatste 96 px zijn vrij voor de statusbalk en de icoonbalk.
 title: PLC
@@ -37,7 +37,7 @@ views:
               - { label: Boegschroef, path: sys-bowthruster }
               - { label: Brandstof, path: sys-fuel }
             status: &tc_status
-              - { icon: lifebeat, label: PLC lifebeat, entity: binary_sensor.plc_lifebeat }
+              - { icon: lifebeat, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat }
               - { icon: walstroom, label: Walstroom, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, tone: accent }
               - { icon: accu, label: Accu, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, value: true, unit: "%", warn_below: 30, alarm_below: 15 }
           - type: navbar
@@ -199,6 +199,7 @@ views:
           - { type: indicator, x: 674, y: 1122, label: Diesel running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, font_size: 17 }
           - { type: indicator, x: 674, y: 1158, label: Diesel clutch AFT, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, font_size: 17 }
           - { type: indicator, x: 674, y: 1194, label: Diesel clutch FWD, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, font_size: 17 }
+          - { type: indicator, x: 674, y: 1230, label: Diesel clutch neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 17 }
           - { type: indicator, x: 964, y: 1122, label: E-motor clutch in, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, font_size: 17 }
           - { type: indicator, x: 964, y: 1158, label: E-motor running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, font_size: 17 }
           - { type: text, x: 422, y: 413, width: 95, height: 120, text: Exhaust Separator, font_size: 15, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
@@ -498,6 +499,8 @@ views:
           - { type: pushbutton, x: 1054, y: 958, width: 188, height: 44, label: Gen. requested, entity: switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 1054, y: 1012, width: 188, height: 44, label: Shore, entity: switch.wago_energy_controls_wago_energy_controls_shore_supply_2, led: green, align: left, font_size: 15 }
           - { type: indicator, x: 1054, y: 1074, label: Shore beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, font_size: 15 }
+          # lifebeat = interne communicatie tussen de PLC-systemen
+          - { type: indicator, x: 1054, y: 1110, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat, font_size: 15 }
 
           # ---- PMS-status (ER_PMS_Status2: BMS & BGC) ----
           - { type: panel, x: 20, y: 1318, width: 1240, height: 296, title: PMS status (BMS & BGC) }
@@ -1157,9 +1160,8 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
 
-          # ---- aanzichten: subnavigatie + tekening op een wit vel ----
-          - { type: line, x: 20, y: 72, width: 1240, height: 604, color: "#ffffff", radius: 10 }
-          - { type: image, x: 40, y: 224, width: 1200, height: 299, image: tc90-dekplan }
+          # ---- dekplan (tekening uit de map "TC90 JOAL", transparant; de romp ligt op dezelfde plek als op de oude tekening) ----
+          - { type: image, x: 43, y: 222, width: 1211, height: 319, image: tc90-dekplan }
 
           # ---- dek: zones (gegenereerd door tools/interieur_zones.py) ----
           - type: zone
@@ -1252,9 +1254,8 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
 
-          # ---- aanzichten: subnavigatie + tekening op een wit vel ----
-          - { type: line, x: 20, y: 72, width: 1240, height: 464, color: "#ffffff", radius: 10 }
-          - { type: image, x: 40, y: 172, width: 1200, height: 264, image: tc90-interieur }
+          # ---- interieur (tekening uit de map "TC90 JOAL", transparant; de romp ligt op dezelfde plek als op de oude tekening) ----
+          - { type: image, x: 41, y: 164, width: 1210, height: 287, image: tc90-interieur }
 
           # ---- ruimtes: tik = inzoomen, rechts alle lampen en apparaten van die ruimte ----
           # Oranje = er brandt licht, rood knipperend = lekalarm. Plaats en maat per ruimte zijn een eerste schatting.
