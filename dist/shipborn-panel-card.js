@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.1";
+const VERSION = "0.5.2";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -486,8 +486,10 @@ const TC_STYLE =
   .tc-sb-tab.is-active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
   /* navigation bar, in a dock fixed to the bottom of the screen */
-  .tc-dock { position: fixed; bottom: 0; z-index: 4; overflow: hidden; background: var(--surface); }
-  .tc-dock > .tc-navbar { transform-origin: 0 0; box-sizing: border-box; }
+  .tc-dock { position: fixed; z-index: 4; overflow: hidden; background: var(--surface); }
+  .tc-dock-top { top: var(--header-height, 0px); }
+  .tc-dock-bottom { bottom: 0; }
+  .tc-dock > * { transform-origin: 0 0; box-sizing: border-box; }
   .tc-navbar { display: flex; background: var(--surface); border-top: 1px solid var(--line); }
   .tc-nav-item { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: var(--touch-min); border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; }
   .tc-nav-item.is-active { color: var(--accent); }
@@ -838,7 +840,7 @@ class ShipbornPanelCard extends HTMLElement {
     const root = this.shadowRoot;
     this._tc = c.design === "tc90";
     this._themeHooks = [];
-    this._dock = null;
+    this._docks = [];
     root.innerHTML = `<style>${STYLE}${this._tc ? TC_STYLE : ""}</style>`;
     this._outer = h("div", "outer");
     this._panel = h("div", "panel" + (this._tc ? " tc" : ""), { width: W + "px", height: H + "px" });
@@ -871,10 +873,12 @@ class ShipbornPanelCard extends HTMLElement {
     this._panel.style.transform = `scale(${s})`;
     this._panel.style.left = `${Math.max(0, (w - this._W * s) / 2)}px`;
     this._outer.style.height = `${this._H * s}px`;
-    if (this._dock) {
+    if (this._docks.length) {
       const r = this._outer.getBoundingClientRect();
-      Object.assign(this._dock.style, { left: r.left + "px", width: r.width + "px", height: 88 * s + "px" });
-      Object.assign(this._dock.firstChild.style, { transform: `scale(${s})`, marginLeft: this._panel.style.left });
+      for (const [dock, dh] of this._docks) {
+        Object.assign(dock.style, { left: r.left + "px", width: r.width + "px", height: dh * s + "px" });
+        Object.assign(dock.firstChild.style, { transform: `scale(${s})`, marginLeft: this._panel.style.left });
+      }
     }
   }
 
@@ -1564,14 +1568,26 @@ class ShipbornPanelCard extends HTMLElement {
   _applyTheme(t) {
     this._theme = TC_THEMES[t] ? t : "nacht";
     this._panel.dataset.tcTheme = this._theme;
-    if (this._dock) this._dock.dataset.tcTheme = this._theme;
+    for (const [dock] of this._docks) dock.dataset.tcTheme = this._theme;
     this._paintPage?.(TC_THEMES[this._theme].bg);
     for (const f of this._themeHooks) f();
   }
 
+  // Status or icon bar fixed to the top or bottom of the screen, so it stays in view on long pages (sized in _fit).
+  // With dock: false on the card (layout editor) it stays in the panel instead.
+  _dockIt(node, where, height) {
+    if (this._config.dock === false) return this._place(node, { x: 0, y: where === "top" ? 0 : this._H - height }, this._W, height);
+    const dock = h("div", `tc tc-dock tc-dock-${where}`);
+    dock.dataset.tcTheme = this._theme;
+    dock.appendChild(node);
+    this._outer.appendChild(dock);
+    this._docks.push([dock, height]);
+    return null;
+  }
+
   // Top bar: logo, page title, status icons (lit in their tone while the entity is on), clock and theme button.
   _tStatusbar(s) {
-    const n = this._place(h("div", "tc-statusbar"), { x: 0, y: 0, ...s }, this._W, 56);
+    const n = h("div", "tc-statusbar", { width: this._W + "px", height: "56px" });
     const ident = h("div", "tc-sb-ident");
     const logo = h("img", "tc-img tc-sb-logo");
     logo.src = IMAGES[s.logo || "shipborn-joal"] || s.logo;
@@ -1632,7 +1648,7 @@ class ShipbornPanelCard extends HTMLElement {
       right.appendChild(b);
     }
     n.append(ident, title, right);
-    return n;
+    return this._dockIt(n, "top", 56);
   }
 
   // Alarm bar: "Geen actieve alarmen" or the newest alarm on a blinking alarm surface, +N MEER; tap = alarm page.
@@ -1667,12 +1683,7 @@ class ShipbornPanelCard extends HTMLElement {
 
   // Icon navigation at the bottom; the item whose path matches the URL (or `active`) is highlighted, with an alarm badge.
   _tNavbar(nv) {
-    // Not in the panel: a dock fixed to the bottom of the screen, so it stays in view on long pages (see _fit).
     const n = h("nav", "tc-navbar", { width: this._W + "px", height: "88px" });
-    this._dock = h("div", "tc tc-dock");
-    this._dock.dataset.tcTheme = this._theme;
-    this._dock.appendChild(n);
-    this._outer.appendChild(this._dock);
     const items = (nv.items || []).map((it) => {
       const b = h("button", "tc-nav-item");
       b.type = "button";
@@ -1696,7 +1707,7 @@ class ShipbornPanelCard extends HTMLElement {
         badge.style.display = count ? "" : "none";
       }
     });
-    return null;
+    return this._dockIt(n, "bottom", 88);
   }
 
   // Measured value with label, unit and a line below (sub / sub_entity); warn/alarm colours with a triangle.

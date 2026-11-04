@@ -253,7 +253,7 @@
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         fillViews();
-        const cfg = { ...doc.toJS().views[vi].cards[0], kiosk: false };
+        const cfg = { ...doc.toJS().views[vi].cards[0], kiosk: false, dock: false }; // bars stay on the canvas
         card.setConfig(cfg);
         card.hass = { states: simStates(cfg.items), locale: { language: "nl" }, callService() {} };
         requestAnimationFrame(draw);
@@ -767,7 +767,7 @@
       n.flow = true;
       return flowSeqs(n);
     };
-    // Frame shared by all screens (design: tc90): status bar, alarm bar and the icon bar (&tc_status, &tc_nav aliases).
+    // Frame shared by all screens (design: tc90): status bar and icon bar (&tc_status, &tc_nav aliases).
     function headerItems(kind, title) {
       const withAlias = (obj, key, anchor) => {
         const n = flowItem(obj);
@@ -777,7 +777,6 @@
       };
       const out = [
         withAlias({ type: "statusbar", title: title || "" }, "status", "tc_status"),
-        flowItem({ type: "alarmbar", y: 56, entity: "sensor.er_alarm_status_active_alarms", attribute: "alarms", tap_action: { action: "navigate", navigation_path: "alarms" } }),
         withAlias({ type: "navbar" }, "items", "tc_nav"),
       ];
       if (kind === "sys") out.push(flowItem({ type: "hull", x: 20, y: 112, width: 1240, height: 600 }));

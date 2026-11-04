@@ -2,11 +2,12 @@
 # Maak een dashboard aan (de URL maakt niet uit) en plak dit in de Raw configuration editor.
 # Tab-paden zonder "/" (bijv. "sys-diesel") verwijzen naar een view van hetzelfde dashboard.
 # Entiteiten komen uit examples/plc-entiteiten.csv; de overgebleven *.plc_… zijn nog niet gevonden in HA.
-# Elke pagina: statusbalk (met de keuze tussen de subpagina's van een bestemming), alarmbalk en onderin
-# de icoonbalk met acht bestemmingen (&tc_nav). Thema Nacht / Dag / Rood nacht met de knop rechtsboven.
+# Elke pagina: bovenaan de statusbalk (met de keuze tussen de subpagina's van een bestemming) en onderin
+# de icoonbalk met acht bestemmingen (&tc_nav); beide staan vast op het scherm. Actieve alarmen: het
+# getal op Alarmen in de icoonbalk. Thema Nacht / Dag / Rood nacht met de knop rechtsboven.
 # In de statusbalk staat nog binary_sensor.plc_lifebeat (niet gevonden in HA).
-# Elke view is één kaart van 1280 breed die meeschaalt met de schermbreedte; de laatste 96 px zijn
-# vrij voor de icoonbalk, die altijd onderaan het scherm staat.
+# Elke view is één kaart van 1280 breed die meeschaalt met de schermbreedte; de eerste 56 px en de
+# laatste 96 px zijn vrij voor de statusbalk en de icoonbalk.
 title: PLC
 views:
   # ===== Systemschema's (omgezet uit Overszichtstekeningen/*.jpg) =====
@@ -39,7 +40,6 @@ views:
               - { icon: lifebeat, label: PLC lifebeat, entity: binary_sensor.plc_lifebeat }
               - { icon: walstroom, label: Walstroom, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, tone: accent }
               - { icon: accu, label: Accu, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, value: true, unit: "%", warn_below: 30, alarm_below: 15 }
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - type: navbar
             items: &tc_nav
               - { icon: schip, label: Schip, path: ship-side, match: [ship-deck, ship-interior] }
@@ -227,7 +227,6 @@ views:
             title: Voortstuwing
             tabs: *voort_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: text, x: 497, y: 187, width: 160, height: 100, text: Daytank Diesel ER, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_daytank_level_statistics, font_size: 14 }
@@ -294,7 +293,6 @@ views:
             title: Voortstuwing
             tabs: *voort_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[980, 585], [980, 542]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
@@ -382,7 +380,6 @@ views:
               - { label: "Accu's", path: sys-power }
               - { label: DC-bus, path: sys-dcbus }
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[77, 484], [77, 441]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
@@ -533,7 +530,6 @@ views:
             title: Voortstuwing
             tabs: *voort_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[159, 525], [159, 482]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
@@ -605,7 +601,6 @@ views:
               - { label: Zoetwater, path: sys-freshwater }
               - { label: Vuilwater, path: sys-wastewater }
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[325, 482], [325, 439]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
@@ -747,7 +742,6 @@ views:
             title: Water
             tabs: *water_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: text, x: 37, y: 410, width: 57, height: 79, text: "Shore\ntap", boxed: true, font_size: 12, active_entity: binary_sensor.plc_shore_water_valve_open }
@@ -809,7 +803,6 @@ views:
             title: Water
             tabs: *water_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: pipe, medium: seawater, points: [[296, 560], [296, 517]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
@@ -868,7 +861,6 @@ views:
           - type: statusbar
             title: Bilge
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: text, x: 117, y: 452, text: Aft peak, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
@@ -934,7 +926,6 @@ views:
             title: Energie
             tabs: *energie_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 112, width: 1240, height: 600 }
           - { type: text, x: 110, y: 272, width: 191, height: 120, text: "", boxed: true, active_entity: binary_sensor.generatoron }
@@ -990,7 +981,6 @@ views:
           - type: statusbar
             title: Klimaat
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: panel, x: 20, y: 160, width: 298, height: 248, title: Crew cabin }
           - { type: value, style: tile, x: 38, y: 212, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_crew_cabin_temp, value_size: 24 }
@@ -1049,7 +1039,6 @@ views:
           - type: statusbar
             title: Navigatieverlichting
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
           - { type: panel, x: 20, y: 160, width: 400, height: 380, title: Navlights setting }
           - { type: pushbutton, x: 38, y: 212, width: 364, height: 52, label: Onder motor, entity: switch.navigatieverlichting_onder_motor, led: green, align: left, font_size: 15 }
@@ -1083,12 +1072,11 @@ views:
         width: 1280
         height: 800
         items:
-          # ---- kader: statusbalk, alarmbalk, icoonbalk ----
+          # ---- kader: statusbalk en icoonbalk ----
           - type: statusbar
             title: Voortstuwing
             tabs: *voort_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
 
           # ---- het schip met hotspots (tik = schema) ----
@@ -1147,7 +1135,6 @@ views:
               - { label: Dekplan, path: ship-deck }
               - { label: Interieur, path: ship-interior }
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
 
           # ---- aanzichten: subnavigatie + tekening op een wit vel ----
@@ -1168,7 +1155,6 @@ views:
             title: Schip
             tabs: *ship_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
 
           # ---- aanzichten: subnavigatie + tekening op een wit vel ----
@@ -1264,7 +1250,6 @@ views:
             title: Schip
             tabs: *ship_tabs
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
 
           # ---- aanzichten: subnavigatie + tekening op een wit vel ----
@@ -1756,7 +1741,6 @@ views:
           - type: statusbar
             title: Alarmen
             status: *tc_status
-          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
           - { type: navbar, items: *tc_nav }
 
           # ---- links: actieve alarmen (attribuut alarms van de ER-alarmstatus) + reset ----
