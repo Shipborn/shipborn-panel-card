@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.7";
+const VERSION = "0.5.8";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -715,6 +715,9 @@ class ShipbornPanelCard extends HTMLElement {
     if (this._outer && !this._ro) {
       this._ro = new ResizeObserver(() => this._fit());
       this._ro.observe(this._outer);
+      // The screen height matters too (fitting between the bars), e.g. when an iPad rotates.
+      this._onResize ??= () => this._fit(); // same function each time, so a rebuild adds no second listener
+      window.addEventListener("resize", this._onResize);
     }
     // HA keeps views it has shown and hangs the same card back in: take over a theme chosen on another page meanwhile.
     this._syncTheme();
@@ -731,6 +734,8 @@ class ShipbornPanelCard extends HTMLElement {
     this._ro?.disconnect();
     this._ro = null;
     this._kioskOff();
+    this._lockScroll(false);
+    window.removeEventListener("resize", this._onResize);
     window.removeEventListener("shipborn-tc-theme", this._onTcTheme);
     window.removeEventListener("storage", this._onStorage);
     this._onTcTheme = this._onStorage = null;
@@ -880,6 +885,7 @@ class ShipbornPanelCard extends HTMLElement {
       this.removeEventListener("pointerdown", onEnter);
       this.removeEventListener("pointerleave", onLeave);
     };
+    this._fit(); // fitting and the scroll lock depend on kiosk mode
   }
 
   _kioskOff() {
@@ -909,6 +915,8 @@ class ShipbornPanelCard extends HTMLElement {
     this._tc = c.design === "tc90";
     this._themeHooks = [];
     this._docks = [];
+    this._contentH = 0;
+    this._scale = 0; // the new panel is not scaled yet (_contentBottom measures it)
     root.innerHTML = `<style>${STYLE}${this._tc ? TC_STYLE : ""}</style>`;
     this._outer = h("div", "outer");
     this._panel = h("div", "panel" + (this._tc ? " tc" : ""), { width: W + "px", height: H + "px" });
@@ -936,11 +944,20 @@ class ShipbornPanelCard extends HTMLElement {
   _fit() {
     const w = this._outer.clientWidth;
     if (!w) return;
-    const s = Math.min(w / this._W, this._config.max_scale || 4);
+    let s = Math.min(w / this._W, this._config.max_scale || 4);
+    let H = this._H;
+    // TC90 page with fixed bars: as tall as its content plus room for the icon bar. If that just exceeds the
+    // screen (at most fit_tolerance, default 15 %), shrink to fit between the bars and lock the page scroll.
+    if (this._docks.length) {
+      H = Math.min(this._H, this._contentBottom() + 24 + 88);
+      const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
+      if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1.15)) s = avail / H;
+      this._lockScroll(!!this._kiosk && H * s <= avail + 1);
+    }
     this._scale = s; // popups (zone) open at the same scale
     this._panel.style.transform = `scale(${s})`;
     this._panel.style.left = `${Math.max(0, (w - this._W * s) / 2)}px`;
-    this._outer.style.height = `${this._H * s}px`;
+    this._outer.style.height = `${H * s}px`;
     this._kioskFlatten?.();
     if (this._docks.length) {
       const r = this._outer.getBoundingClientRect();
@@ -948,6 +965,32 @@ class ShipbornPanelCard extends HTMLElement {
         Object.assign(dock.style, { left: r.left + "px", width: r.width + "px", height: dh * s + "px" });
         Object.assign(dock.firstChild.style, { transform: `scale(${s})`, marginLeft: this._panel.style.left });
       }
+    }
+  }
+
+  // Lowest edge of the page content in design px (status and icon bar are in docks, not in the panel).
+  _contentBottom() {
+    if (this._contentH) return this._contentH;
+    const top = this._panel.getBoundingClientRect().top;
+    const k = this._scale || 1;
+    let b = 0;
+    for (const n of this._panel.children) {
+      const r = n.getBoundingClientRect();
+      if (r.height) b = Math.max(b, (r.bottom - top) / k);
+    }
+    return b ? (this._contentH = Math.ceil(b)) : this._H;
+  }
+
+  // Page scroll off while a fitting TC90 page is shown in kiosk mode; back on otherwise.
+  _lockScroll(on) {
+    const el = document.scrollingElement || document.documentElement;
+    if (on && !this._unlock) {
+      const prev = el.style.overflow;
+      el.style.overflow = "hidden";
+      this._unlock = () => (el.style.overflow = prev);
+    } else if (!on && this._unlock) {
+      this._unlock();
+      this._unlock = null;
     }
   }
 
