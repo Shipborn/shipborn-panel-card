@@ -173,6 +173,13 @@
         ["Romp", { type: "hull", x: 20, y: 160, width: 1240, height: 600 }],
         ["Zone (ruimte)", { type: "zone", width: 160, height: 120, label: "Ruimte" }],
       ],
+      "TC90-ontwerp (design: tc90)": [
+        ["Tegel", { type: "tile", width: 203, height: 120, icon: "motor", label: "Waarde", entity: "sensor.x" }],
+        ["Schakelaar", { type: "switch", width: 112, height: 112, icon: "aan", label: "Schakelaar", entity: "switch.x" }],
+        ["Hotspot", { type: "hotspot", icon: "motor", label: "Punt", entity: "sensor.x" }],
+        ["Ronde meter", { type: "dial", width: 174, label: "Meter", entity: "sensor.x", min: 0, max: 100 }],
+        ["Romp (los)", { type: "image", width: 848, height: 100, image: "tc90-romp" }],
+      ],
     };
     const $ = (id) => document.getElementById(id);
     const stage = $("stage"), ov = $("ov");

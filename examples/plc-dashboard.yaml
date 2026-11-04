@@ -45,6 +45,7 @@ views:
               - { label: Accu's, path: sys-power }
               - { label: Webasto, path: sys-webasto }
               - { label: Navigatie, path: sys-navlights }
+              - { label: Voortstuwing, path: voortstuwing }
               - { label: Schip, path: ship-side, match: [ship-deck, ship-interior] }
               - { label: Alarms, path: alarms }
           - { type: indicator, x: 1144, y: 25, entity: binary_sensor.plc_lifebeat, label: "PLC LIFEBEAT", font_size: 13, led_size: 10 }
@@ -1078,6 +1079,78 @@ views:
           - { type: pushbutton, x: 454, y: 401, width: 254, height: 52, label: Red nav SB, entity: switch.lopolight_navigation_lights_navlight_red_nav_sb, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 719, y: 401, width: 254, height: 52, label: Red nav PS, entity: switch.lopolight_navigation_lights_navlight_red_nav_ps, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 984, y: 401, width: 254, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
+
+  # ===== Nieuw ontwerp "TC90 JOAL Bediening" (design system op claude.ai) – voorbeeldpagina =====
+  # design: tc90 geeft de kaart de thema's Nacht / Dag / Rood nacht (knop rechtsboven) en de items
+  # statusbar, alarmbar, navbar, tile, switch, hotspot en dial. De icoonbalk onderin wijst voorlopig
+  # naar de bestaande pagina's; die krijgen het nieuwe kader pas als dit ontwerp is goedgekeurd.
+
+  - title: Voortstuwing
+    path: voortstuwing
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          # ---- kader: statusbalk, alarmbalk, icoonbalk ----
+          - type: statusbar
+            title: Voortstuwing
+            status:
+              - { icon: lifebeat, label: PLC lifebeat, entity: binary_sensor.plc_lifebeat }
+              - { icon: walstroom, label: Walstroom, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, tone: accent }
+              - { icon: accu, label: Accu, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, value: true, unit: "%", warn_below: 30, alarm_below: 15 }
+          - { type: alarmbar, y: 56, entity: sensor.er_alarm_status_active_alarms, attribute: alarms, tap_action: { action: navigate, navigation_path: alarms } }
+          - type: navbar
+            y: 712
+            active: Voortstuwing
+            items: &tc_nav
+              - { icon: schip, label: Schip, path: ship-deck, match: [ship-side, ship-interior] }
+              - { icon: energie, label: Energie, path: sys-power, match: [sys-dcbus] }
+              - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster] }
+              - { icon: water, label: Water, path: sys-freshwater, match: [sys-seawater, sys-wastewater, sys-fuel] }
+              - { icon: klimaat, label: Klimaat, path: sys-webasto }
+              - { icon: verlichting, label: Verlichting, path: sys-navlights }
+              - { icon: bilge, label: Bilge, path: sys-bilge }
+              - { icon: alarm, label: Alarmen, path: alarms, badge_entity: sensor.er_alarm_status_active_alarms, badge_attribute: alarms }
+
+          # ---- het schip met hotspots (tik = schema) ----
+          - { type: image, x: 24, y: 150, width: 848, height: 100, image: tc90-romp }
+          - { type: hotspot, x: 380, y: 162, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, tap_action: { action: navigate, navigation_path: sys-diesel } }
+          - { type: hotspot, x: 448, y: 206, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, tap_action: { action: navigate, navigation_path: sys-diesel } }
+          - { type: hotspot, x: 236, y: 248, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
+          - { type: hotspot, x: 787, y: 236, side: left, icon: ventilator, label: Boegschroef, entity: binary_sensor.er_thruster_status_bow_thruster_running, active_entity: binary_sensor.er_thruster_status_bow_thruster_running, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
+
+          # ---- Volvo Penta: tegels (kleur alleen als de diesel draait; grenzen uit het oude dashboard) ----
+          - { type: tile, x: 24, y: 304, width: 203, height: 120, icon: motor, label: Oliedruk, entity: sensor.engine_room_me_oil_press, unit: bar, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 1.8, alarm_below: 1.5 }
+          - { type: tile, x: 239, y: 304, width: 203, height: 120, icon: klimaat, label: Olietemp, entity: sensor.main_engine_oil_temp, unit: "°C", decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 104, alarm_above: 110 }
+          - { type: tile, x: 454, y: 304, width: 203, height: 120, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
+          - { type: tile, x: 669, y: 304, width: 203, height: 120, icon: accu, label: Dynamo, entity: sensor.engine_room_main_engine_me_alt_v, unit: V, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 13.6, alarm_below: 12, alarm_above: 15 }
+          - { type: tile, x: 24, y: 432, width: 203, height: 120, icon: klimaat, label: Uitlaat, entity: sensor.al1590_er_volvo_exhaust_temperature, unit: "°C", decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 59, alarm_above: 89 }
+          - { type: tile, x: 239, y: 432, width: 203, height: 120, icon: water, label: Zeewaterflow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, unit: L/min, decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 49, alarm_below: 40 }
+          - { type: tile, x: 454, y: 432, width: 203, height: 120, icon: water, label: Schroefas koeling, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, unit: L/min, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 3.5, alarm_below: 2.5 }
+          - { type: tile, x: 669, y: 432, width: 203, height: 120, icon: klimaat, label: Schroefas vet, entity: sensor.al1590_er_prop_shaft_grease_temperature, unit: "°C", decimals: 0, sub: Druk, sub_entity: sensor.al1590_er_prop_shaft_grease_pressure, sub_unit: bar, sub_decimals: 1, warn_above: 50, alarm_above: 80 }
+          - { type: tile, x: 24, y: 560, width: 203, height: 120, icon: klep, label: Manifold, entity: sensor.al1590_er_compressor_manifold_pressure, factor: 0.001, unit: bar, decimals: 1, warn_below: 3, alarm_above: 10 }
+          - { type: tile, x: 239, y: 560, width: 203, height: 120, icon: pijl, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, unit: "%", decimals: 0, sub: Instelpunt, sub_entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, sub_unit: rpm }
+          - { type: tile, x: 454, y: 560, width: 203, height: 120, icon: generator, label: Generator, entity: sensor.generator_gen_rpm, unit: rpm, decimals: 0, sub: Koelwater, sub_entity: sensor.generator_gen_coolant_temp, sub_unit: "°C", tap_action: { action: navigate, navigation_path: sys-generator } }
+          - { type: tile, x: 669, y: 560, width: 203, height: 120, icon: instellingen, label: Draaiuren, entity: sensor.engine_room_main_engine_me_hours, unit: uur, decimals: 0, sub: Generator, sub_entity: sensor.generator_gen_hours, sub_unit: uur }
+
+          # ---- zijpaneel: vaarmodus, meters, status ----
+          - { type: text, x: 896, y: 124, text: Vaarmodus, style: caption }
+          - { type: switch, x: 896, y: 148, width: 112, height: 112, icon: motor, label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { title: Dieselmodus inschakelen?, yes: Inschakelen } } }
+          - { type: switch, x: 1020, y: 148, width: 112, height: 112, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { title: Elektrische modus inschakelen?, yes: Inschakelen } } }
+          - { type: switch, x: 1144, y: 148, width: 112, height: 112, icon: anker, label: Haven, entity: button.wago_hcs_controls_wago_controls_harbormode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, tap_action: { action: toggle, confirmation: { title: Havenmodus inschakelen?, yes: Inschakelen } } }
+          - { type: text, x: 896, y: 280, text: Toerental, style: caption }
+          - { type: dial, x: 896, y: 300, width: 174, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, min: 0, max: 4000, unit: rpm }
+          - { type: dial, x: 1082, y: 300, width: 174, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, unit: rpm, warn_above: 500 }
+          - { type: panel, x: 896, y: 476, width: 360, height: 212, title: Aandrijving }
+          - { type: indicator, x: 912, y: 512, width: 328, label: Diesel loopt, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }
+          - { type: indicator, x: 912, y: 545, width: 328, label: Koppeling vooruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }
+          - { type: indicator, x: 912, y: 578, width: 328, label: Koppeling achteruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }
+          - { type: indicator, x: 912, y: 611, width: 328, label: E-motor gekoppeld, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }
+          - { type: indicator, x: 912, y: 644, width: 328, label: E-motor loopt, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }
 
   # ===== Aanzichten van het schip (canvas "TC 90 aanzichten") =====
   # De tekeningen zitten in de kaart zelf (image: tc90-…), HA heeft geen extra bestanden nodig.

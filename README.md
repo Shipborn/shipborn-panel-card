@@ -165,6 +165,24 @@ Een `zone` legt een tikbaar vlak over een plattegrond. Het venster (`popup`) hee
 
 Met `zoom` in plaats van `popup` zoomt een tik vloeiend in op de zone: de afbeelding waar de zone op ligt vult het vak `area` (standaard `[20, 120, 740, hoogte − 140]`, met een wit vel), met maximaal `max_scale` (standaard 3) zodat de omgeving zichtbaar blijft. Rechts schuift een paneel in (`panel`, standaard `[776, 120, 484, hoogte − 140]`) met een kop, een knop *← Terug* en de items; die staan in px vanaf linksboven in het paneel (breedte ±448 binnen de marges) en scrollen als `height` groter is dan het paneel. De ruimtes op het interieurplan worden gemaakt met `tools/interieur_zones.py` uit de HA-export.
 
+### Ontwerp TC90 JOAL (`design: tc90`)
+
+Het ontwerp uit het design system *TC90 JOAL Bediening*: rustige donkere schermen, het schip groot in beeld, een statusbalk bovenaan en een icoonbalk onderin. Zet `design: tc90` op de kaart; de kaart krijgt dan de kleuren, letters (Barlow) en iconen van dat ontwerp en drie thema's: **Nacht** (standaard), **Dag** en **Rood nacht**. De themaknop in de statusbalk wisselt ze; de keuze geldt voor alle TC90-pagina's op dat scherm (bewaard in de browser). `theme: dag` op de kaart kiest het beginthema.
+
+Iconen (`icon:`): `schip`, `energie`, `motor`, `water`, `klimaat`, `verlichting`, `bilge`, `alarm`, `anker`, `diesel`, `accu`, `walstroom`, `ventilator`, `pomp`, `klep`, `generator`, `verwarming`, `navlicht`, `interieur`, `instellingen`, `zon`, `maan`, `lifebeat`, `aan`, `pijl`, `vink`, `sluit`, `tank`.
+
+| Item | Opties |
+|---|---|
+| `statusbar` | bovenaan (56 hoog): `title`, `logo` (standaard `shipborn-joal`), `status: [{ icon, label, entity, tone }]` (icoon in `tone` – `ok`, `accent`, `warn`, `alarm` – zolang de entiteit aan is; met `value: true` de waarde + `unit`, met `warn_below` / `alarm_below`), `clock: false`, `theme_toggle: false` |
+| `alarmbar` | `entity`, `attribute` (lijst), `y`; leeg = "Geen actieve alarmen", anders het nieuwste alarm knipperend in alarmrood met `+N MEER`; tik = `tap_action` (standaard naar `alarms`) |
+| `navbar` | icoonbalk (88 hoog): `items: [{ icon, label, path, match, badge_entity, badge_attribute }]`; het item van de huidige pagina (of `active: <label>`) is blauw met een streep |
+| `tile` | meetwaarde: `icon`, `label`, `entity`, `unit`, `decimals`, `factor`, `sub` en/of `sub_entity` (+ `sub_unit`, `sub_decimals`) voor de regel eronder, `size: lg`; `warn_above` / `warn_below` / `alarm_above` / `alarm_below` kleuren de tegel met driehoek, alleen zolang `tone_entity` actief is (bijv. de motor draait); tik = `tap_action` (standaard more-info) |
+| `switch` | schakelaartegel (136×136): `icon`, `label`, `entity` (wat bediend wordt), `state_entity` (wat AAN/UIT toont, bijv. de binary_sensor bij een `button.*`), `tap_action` (standaard toggle, met `confirmation: { title, text, yes, no, danger }`), `fault_entity` (STORING), `text_on` / `text_off`; na een tik BEZIG tot de stand verandert |
+| `hotspot` | punt op het schip met een label: `x`/`y` = het punt, `icon`, `label`, `entity` (+ `unit`, `decimals`, `factor`), `side: left`, `active_entity` (blauw), `alarm_entity`, `warn_*` / `alarm_*`, `tap_action` |
+| `dial` | ronde meter (270°): `label`, `entity`, `min`, `max`, `unit`, `warn_above` (dunne oranje zone), `width` |
+
+Bestaande items passen zich aan: `panel` wordt een vlak met een kop in kleine kapitalen, `indicator` met `show_state: true` zet AAN/UIT rechts (`color: "var(--ok)"` voor de themakleur), `text` met `style: caption` / `title` / `label` / `body` krijgt de lettergrootte uit het ontwerp. Een `confirmation` toont in dit ontwerp de vraag als titel met werkwoorden op de knoppen (`yes: Inschakelen`, standaard Annuleren / Ja). Afbeeldingen worden in Rood nacht rood gefilterd; `image: tc90-romp` is alleen de romp, vrijstaand.
+
 ### Schema's met stromende leidingen
 
 Voor systeemschema's – zie de views `sys-…` in `examples/plc-dashboard.yaml` (de tabs bovenin): Diesel, Fuel, Generator, DC-bus koeling, Bow thruster, Zeewater, Zoetwater, Vuilwater, Bilge, Accu's, Webasto en Navigatie, omgezet uit `Overszichtstekeningen/`. Bovenaan elke view staan de entiteiten die nog niet in de PLC-lijst voorkomen.

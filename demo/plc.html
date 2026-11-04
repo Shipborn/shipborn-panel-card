@@ -57,6 +57,26 @@
         "sensor.wago_values_lr_fresh_water_level": st(66),
         "sensor.wago_values_er_dirtywater_level": st(22),
         "sensor.al1590_er_compressor_manifold_pressure": st(6475, { unit_of_measurement: "mbar" }),
+        // Voortstuwing (design: tc90).
+        "binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on": st("on"),
+        "sensor.engine_room_me_oil_press": st(3.4, { unit_of_measurement: "bar" }),
+        "sensor.main_engine_oil_temp": st(92, { unit_of_measurement: "°C" }),
+        "sensor.engine_room_main_engine_me_alt_v": st(14.1, { unit_of_measurement: "V" }),
+        "sensor.engine_room_main_engine_me_hours": st(1287),
+        "sensor.al1590_er_prop_shaft_cooling_water_flow": st(4.2),
+        "sensor.wago_hcs_controls_wago_hcs_controls_lever_position": st(35, { unit_of_measurement: "%" }),
+        "sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint": st(1500),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running": st("on"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd": st("on"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft": st("off"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in": st("off"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running": st("off"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode": st("off"),
+        "binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode": st("off"),
+        "binary_sensor.er_thruster_status_bow_thruster_running": st("off"),
+        "sensor.generator_gen_rpm": st(0, { unit_of_measurement: "rpm" }),
+        "sensor.generator_gen_coolant_temp": st(31, { unit_of_measurement: "°C" }),
+        "sensor.generator_gen_hours": st(642),
       };
       for (const id of ["button.wago_hcs_controls_wago_controls_dieselmode", "button.wago_hcs_controls_wago_controls_electricmode", "button.plc_mode_generator", "button.wago_hcs_controls_wago_controls_harbormode", "button.wago_energy_controls_wago_energy_controls_reset_main_2"])
         states[id] = st("unknown");
