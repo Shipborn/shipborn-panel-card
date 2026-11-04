@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.3";
+const VERSION = "0.5.4";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -765,17 +765,47 @@ class ShipbornPanelCard extends HTMLElement {
     const delay = this._config.kiosk_delay ?? 800;
     let timer;
     const hidden = () => styles[0][1].isConnected;
-    // The space HA keeps for the (hidden) sidebar differs between HA versions: zero every left margin or
-    // padding between the card and the page, so the card uses the full width; show() puts them back.
+    // The space HA keeps for the (hidden) sidebar differs between HA versions, so it is undone by measuring:
+    // zero left margins and paddings, then pull the element that still adds an offset back to the left edge
+    // and hide whatever still covers that edge. show() puts everything back.
     const flat = [];
+    const up = (el) => el.parentElement || el.getRootNode().host || null;
+    const within = (anc, el) => {
+      for (; el; el = up(el)) if (el === anc) return true;
+      return false;
+    };
+    const set = (el, prop, value) => {
+      flat.push([el, prop, el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)]);
+      el.style.setProperty(prop, value, "important");
+    };
     const flatten = () => {
-      for (let el = this.parentElement || this.getRootNode().host; el && el !== document.documentElement; el = el.parentElement || el.getRootNode().host) {
+      for (let el = up(this); el && el !== document.documentElement; el = up(el)) {
         const cs = getComputedStyle(el);
-        for (const prop of ["margin-left", "padding-left", "margin-inline-start", "padding-inline-start"]) {
-          if (!(parseFloat(cs.getPropertyValue(prop)) > 0)) continue;
-          flat.push([el, prop, el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)]);
-          el.style.setProperty(prop, "0px", "important");
+        for (const prop of ["margin-left", "padding-left", "margin-inline-start", "padding-inline-start"])
+          if (parseFloat(cs.getPropertyValue(prop)) > 0) set(el, prop, "0px");
+      }
+      for (let i = 0; i < 6 && this.getBoundingClientRect().left > 0.5; i++) {
+        // The outermost ancestor that is still off the left edge (its parent is not) adds the offset.
+        let a = null;
+        for (let el = up(this); el && el !== document.documentElement; el = up(el)) {
+          const r = el.getBoundingClientRect();
+          if (r.width && r.left > 0.5) a = el;
         }
+        if (!a) break;
+        const d = a.getBoundingClientRect().left;
+        const w = a.getBoundingClientRect().width;
+        set(a, "margin-left", `${parseFloat(getComputedStyle(a).marginLeft) - d}px`);
+        if (a.getBoundingClientRect().width < w + d - 0.5) set(a, "width", `${w + d}px`);
+      }
+      // A narrow strip (a sidebar or its empty panel) still drawn over the left edge of the card: hide it.
+      // Wide things (a dialog, its scrim) are left alone.
+      const y = innerHeight / 2;
+      let el = document.elementFromPoint(20, y);
+      for (let inner; el?.shadowRoot && (inner = el.shadowRoot.elementFromPoint(20, y)) && inner !== el; ) el = inner;
+      if (el && !within(this, el) && el !== document.body && el !== document.documentElement) {
+        while (up(el) && !within(up(el), this) && up(el).getBoundingClientRect().width < innerWidth / 3) el = up(el);
+        const r = el.getBoundingClientRect();
+        if (r.left < 1 && r.width < innerWidth / 3) set(el, "display", "none");
       }
     };
     const unflatten = () => {
@@ -789,6 +819,8 @@ class ShipbornPanelCard extends HTMLElement {
       for (const z of zones) z.style.pointerEvents = "auto";
       flatten();
     };
+    // Again whenever the card changes size (_fit): on opening the view the layout is often not final yet.
+    this._kioskFlatten = () => hidden() && flatten();
     const show = () => {
       unflatten();
       for (const [, s] of styles) s.remove();
@@ -825,6 +857,7 @@ class ShipbornPanelCard extends HTMLElement {
     hide();
     this._kiosk = () => {
       this._paintPage = null;
+      this._kioskFlatten = null;
       cancel();
       show();
       page.remove();
@@ -894,6 +927,7 @@ class ShipbornPanelCard extends HTMLElement {
     this._panel.style.transform = `scale(${s})`;
     this._panel.style.left = `${Math.max(0, (w - this._W * s) / 2)}px`;
     this._outer.style.height = `${this._H * s}px`;
+    this._kioskFlatten?.();
     if (this._docks.length) {
       const r = this._outer.getBoundingClientRect();
       for (const [dock, dh] of this._docks) {
@@ -1613,6 +1647,7 @@ class ShipbornPanelCard extends HTMLElement {
     const logo = h("img", "tc-img tc-sb-logo");
     logo.src = IMAGES[s.logo || "shipborn-joal"] || s.logo;
     logo.alt = "Shipborn JOAL";
+    logo.title = `Shipborn Panel Card v${VERSION}`; // which card version HA loaded, without the console
     ident.appendChild(logo);
     const title = h("div", "tc-sb-title title");
     title.textContent = s.title ?? "";
