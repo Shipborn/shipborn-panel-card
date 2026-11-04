@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.5";
+const VERSION = "0.5.6";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -696,6 +696,7 @@ class ShipbornPanelCard extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (!this._updaters) return;
+    this._syncTheme();
     for (const u of this._updaters) u(hass);
     for (const c of this._childCards) c.hass = hass;
   }
@@ -714,12 +715,13 @@ class ShipbornPanelCard extends HTMLElement {
       this._ro.observe(this._outer);
     }
     // HA keeps views it has shown and hangs the same card back in: take over a theme chosen on another page meanwhile.
-    const stored = tcStoredTheme();
-    if (this._tc && TC_THEMES[stored] && stored !== this._theme) this._applyTheme(stored);
+    this._syncTheme();
     if (this._config?.kiosk && !this._kiosk) setTimeout(() => this.isConnected && !this._kiosk && this._kioskOn());
     if (!this._onTcTheme) {
       this._onTcTheme = (e) => this._tc && this._applyTheme(e.detail);
+      this._onStorage = (e) => e.key === TC_THEME_KEY && this._syncTheme(); // another window or tab of HA
       window.addEventListener("shipborn-tc-theme", this._onTcTheme);
+      window.addEventListener("storage", this._onStorage);
     }
   }
 
@@ -728,7 +730,8 @@ class ShipbornPanelCard extends HTMLElement {
     this._ro = null;
     this._kioskOff();
     window.removeEventListener("shipborn-tc-theme", this._onTcTheme);
-    this._onTcTheme = null;
+    window.removeEventListener("storage", this._onStorage);
+    this._onTcTheme = this._onStorage = null;
   }
 
   // ---------- kiosk: hide HA's top bar and sidebar ----------
@@ -1621,6 +1624,13 @@ class ShipbornPanelCard extends HTMLElement {
       // private window: only this page changes
     }
     window.dispatchEvent(new CustomEvent("shipborn-tc-theme", { detail: t }));
+  }
+
+  // Follows the stored theme: on (re)connect and on every hass update, however HA reuses or rebuilds this view.
+  _syncTheme() {
+    if (!this._tc) return;
+    const t = tcStoredTheme();
+    if (TC_THEMES[t] && t !== this._theme) this._applyTheme(t);
   }
 
   _applyTheme(t) {

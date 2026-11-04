@@ -167,7 +167,7 @@ Met `zoom` in plaats van `popup` zoomt een tik vloeiend in op de zone: de afbeel
 
 ### Ontwerp TC90 JOAL (`design: tc90`)
 
-Het ontwerp uit het design system *TC90 JOAL Bediening*: rustige donkere schermen, het schip groot in beeld, een statusbalk bovenaan en een icoonbalk onderin. Zet `design: tc90` op de kaart; de kaart krijgt dan de kleuren, letters (Barlow) en iconen van dat ontwerp en drie thema's: **Nacht** (standaard), **Dag** en **Rood nacht**. De themaknop in de statusbalk wisselt ze; de keuze geldt voor alle TC90-pagina's op dat scherm (bewaard in de browser), ook voor pagina's die HA al eerder had geopend. `theme: dag` op de kaart kiest het beginthema.
+Het ontwerp uit het design system *TC90 JOAL Bediening*: rustige donkere schermen, het schip groot in beeld, een statusbalk bovenaan en een icoonbalk onderin. Zet `design: tc90` op de kaart; de kaart krijgt dan de kleuren, letters (Barlow) en iconen van dat ontwerp en drie thema's: **Nacht** (standaard), **Dag** en **Rood nacht**. De themaknop in de statusbalk wisselt ze; de keuze geldt voor alle TC90-pagina's op dat scherm (bewaard in de browser), ook voor pagina's die HA al eerder had geopend (elke kaart controleert het bij elke statusupdate) en voor andere vensters van HA op hetzelfde apparaat. `theme: dag` op de kaart kiest het beginthema.
 
 Iconen (`icon:`): `schip`, `energie`, `motor`, `water`, `klimaat`, `verlichting`, `bilge`, `alarm`, `anker`, `diesel`, `accu`, `walstroom`, `ventilator`, `pomp`, `klep`, `generator`, `verwarming`, `navlicht`, `interieur`, `instellingen`, `zon`, `maan`, `lifebeat`, `aan`, `pijl`, `vink`, `sluit`, `tank`.
 
