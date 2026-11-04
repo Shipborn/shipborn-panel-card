@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.8";
+const VERSION = "0.5.9";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -949,7 +949,7 @@ class ShipbornPanelCard extends HTMLElement {
     // TC90 page with fixed bars: as tall as its content plus room for the icon bar. If that just exceeds the
     // screen (at most fit_tolerance, default 15 %), shrink to fit between the bars and lock the page scroll.
     if (this._docks.length) {
-      H = Math.min(this._H, this._contentBottom() + 24 + 88);
+      H = Math.min(this._H, this._contentBottom() + 16 + 88);
       const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
       if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1.15)) s = avail / H;
       this._lockScroll(!!this._kiosk && H * s <= avail + 1);
@@ -2445,8 +2445,10 @@ class ShipbornPanelCard extends HTMLElement {
       const iy = i.y ?? i.true ?? 0;
       return zx + zw / 2 >= i.x && zx + zw / 2 <= i.x + i.width && zy + zh / 2 >= iy && zy + zh / 2 <= iy + i.height;
     });
-    const [ax, ay, aw, ah] = zc.area || [20, 120, 740, H - 140];
-    const [px, py, pw, ph] = zc.panel || [776, 120, W - 796, H - 140];
+    // Default: from just below the header to above the icon bar (TC90) or the bottom edge.
+    const [top0, bot0] = this._tc ? [72, 116] : [120, 20];
+    const [ax, ay, aw, ah] = zc.area || [20, top0, 740, H - top0 - bot0];
+    const [px, py, pw, ph] = zc.panel || [776, top0, W - 796, H - top0 - bot0];
     const T = Math.min(ay, py);
     const ov = this._place(h("div", "d d-zoom"), { x: 0, y: T, width: W, height: H - T });
     const view = h("div", "zv", { background: zc.background ?? "#ffffff" });

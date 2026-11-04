@@ -64,11 +64,11 @@ class Panel:
         self.used.update(re.findall(r"entity(?:_id)?: ([a-z_]+\.[a-z0-9_]+)", s))
 
     def title(self, t):
-        self.add(f'{{ type: text, x: {self.X0}, y: {self.y}, text: {q(t)}, font_size: 13, uppercase: true, color: "#a3a29c" }}')
+        self.add(f'{{ type: text, x: {self.X0}, y: {self.y}, text: {q(t)}, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }}')
         self.y += 30
 
     def note(self, t):
-        self.add(f'{{ type: text, x: {self.X0}, y: {self.y}, width: {self.W}, text: {q(t)}, font_size: 13, color: "#8f8e88" }}')
+        self.add(f'{{ type: text, x: {self.X0}, y: {self.y}, width: {self.W}, text: {q(t)}, font_size: 13, color: "var(--ink-muted, #8f8e88)" }}')
         self.y += 24 * (1 + len(t) // 60) + 6
 
     def scenes(self, sc):
@@ -348,21 +348,21 @@ def front(p):
     p.grid([("Boiler", "switch.fp_boiler"), ("Boiler (relais)", "switch.0xa4c138dd3d53bb57")])
 
 
-room("interior", "Aft peak", (63, 305, 189, 206), aft, leak="ap")
-room("interior", "Owners cabin", (258, 293, 247, 230), owners, value="sensor.temp_ownerscabin_temperature",
+room("interior", "Aft peak", (63, 201, 189, 206), aft, leak="ap")
+room("interior", "Owners cabin", (258, 189, 247, 230), owners, value="sensor.temp_ownerscabin_temperature",
      active=ents(r"^light\.(oc_|owners_cabin_)"))
-room("interior", "Deck lounge", (505, 293, 109, 115), deck_lounge, value="sensor.0x001788010df593f4_temperature",
+room("interior", "Deck lounge", (505, 189, 109, 115), deck_lounge, value="sensor.0x001788010df593f4_temperature",
      active=ents(r"^light\.(main_cabin_salon|mc_s_3)"))
-room("interior", "Engine room", (505, 408, 109, 115), engine, value="sensor.0x001788010cdae144_temperature", leak="er",
+room("interior", "Engine room", (505, 304, 109, 115), engine, value="sensor.0x001788010cdae144_temperature", leak="er",
      active=ents(r"^light\.er_"), alarm=[SCHROEFAS])
-room("interior", "Dining", (614, 293, 115, 127), dining, leak="d", active=ents(r"^light\.mc_(5a$|5b$|s_5)"))
-room("interior", "Galley", (614, 420, 115, 103), galley, active=ents(r"^light\.(g_s_4|mc_4a_g$|main_cabin_aanrecht)"))
-room("interior", "Main cabin", (729, 293, 172, 132), main, value="sensor.temp_main_temperature",
+room("interior", "Dining", (614, 189, 115, 127), dining, leak="d", active=ents(r"^light\.mc_(5a$|5b$|s_5)"))
+room("interior", "Galley", (614, 316, 115, 103), galley, active=ents(r"^light\.(g_s_4|mc_4a_g$|main_cabin_aanrecht)"))
+room("interior", "Main cabin", (729, 189, 172, 132), main, value="sensor.temp_main_temperature",
      active=ents(r"^light\.(main_cabin_(lounge|workplace|gangpad|plinten)|mc_(6a|7a|7b|led)$|mc_s_(6|7))"))
-room("interior", "Crew cabin", (729, 425, 172, 98), crew, value="sensor.motionsensorcrew_temperature", leak="cc",
+room("interior", "Crew cabin", (729, 321, 172, 98), crew, value="sensor.motionsensorcrew_temperature", leak="cc",
      active=ents(r"^light\.(cc_|crew_cabin_)"))
-room("interior", "Guest cabin", (901, 310, 132, 207), guest, active=ents(r"^light\.(gc_|guest_cabin_)"))
-room("interior", "Front peak", (1039, 345, 172, 126), front, leak="fp", active=["switch.fp_boiler"])
+room("interior", "Guest cabin", (901, 206, 132, 207), guest, active=ents(r"^light\.(gc_|guest_cabin_)"))
+room("interior", "Front peak", (1039, 241, 172, 126), front, leak="fp", active=["switch.fp_boiler"])
 
 
 # ---------- deck ----------
@@ -401,12 +401,12 @@ def deck_lights(p):
             ("Decklight BB", "light.decklight_bb")])
 
 
-room("deck", "Loopplank", (57, 428, 83, 100), gangway, active=["light.loopplank"])
-room("deck", "Bimini", (145, 405, 337, 144), bimini, value="sensor.temp_buiten_temperature",
+room("deck", "Loopplank", (57, 324, 83, 100), gangway, active=["light.loopplank"])
+room("deck", "Bimini", (145, 301, 337, 144), bimini, value="sensor.temp_buiten_temperature",
      active=["light.bimini_14b_1tafel_d28", "light.bimini14a_bank_d18_2_d22"])
-room("deck", "Mast en giek", (659, 439, 133, 88), mast,
+room("deck", "Mast en giek", (659, 335, 133, 88), mast,
      active=ents(r"^light\.mc_s_15(a0|b|c)_"))
-room("deck", "Dekverlichting", (814, 394, 332, 166), deck_lights,
+room("deck", "Dekverlichting", (814, 290, 332, 166), deck_lights,
      active=["light.mc_s_15a_deck_bb_d40", "light.mc_s_15a_deck_sb_d41", "light.decklight_bb"])
 
 
