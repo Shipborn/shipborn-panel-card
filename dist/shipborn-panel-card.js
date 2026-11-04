@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.9";
+const VERSION = "0.5.10";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -946,12 +946,12 @@ class ShipbornPanelCard extends HTMLElement {
     if (!w) return;
     let s = Math.min(w / this._W, this._config.max_scale || 4);
     let H = this._H;
-    // TC90 page with fixed bars: as tall as its content plus room for the icon bar. If that just exceeds the
-    // screen (at most fit_tolerance, default 15 %), shrink to fit between the bars and lock the page scroll.
+    // TC90 page with fixed bars: as tall as its content plus room for the icon bar; locked when it fits the screen.
+    // Shrinking to fit is off by default (fit_tolerance: 1), so every page shows at the same size.
     if (this._docks.length) {
       H = Math.min(this._H, this._contentBottom() + 16 + 88);
       const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
-      if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1.15)) s = avail / H;
+      if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1)) s = avail / H;
       this._lockScroll(!!this._kiosk && H * s <= avail + 1);
     }
     this._scale = s; // popups (zone) open at the same scale
