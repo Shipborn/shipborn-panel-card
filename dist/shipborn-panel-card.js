@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.2";
+const VERSION = "0.5.3";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -765,11 +765,32 @@ class ShipbornPanelCard extends HTMLElement {
     const delay = this._config.kiosk_delay ?? 800;
     let timer;
     const hidden = () => styles[0][1].isConnected;
+    // The space HA keeps for the (hidden) sidebar differs between HA versions: zero every left margin or
+    // padding between the card and the page, so the card uses the full width; show() puts them back.
+    const flat = [];
+    const flatten = () => {
+      for (let el = this.parentElement || this.getRootNode().host; el && el !== document.documentElement; el = el.parentElement || el.getRootNode().host) {
+        const cs = getComputedStyle(el);
+        for (const prop of ["margin-left", "padding-left", "margin-inline-start", "padding-inline-start"]) {
+          if (!(parseFloat(cs.getPropertyValue(prop)) > 0)) continue;
+          flat.push([el, prop, el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)]);
+          el.style.setProperty(prop, "0px", "important");
+        }
+      }
+    };
+    const unflatten = () => {
+      for (const [el, prop, value, prio] of flat.splice(0).reverse()) {
+        if (value) el.style.setProperty(prop, value, prio);
+        else el.style.removeProperty(prop);
+      }
+    };
     const hide = () => {
       for (const [sr, s] of styles) sr.appendChild(s);
       for (const z of zones) z.style.pointerEvents = "auto";
+      flatten();
     };
     const show = () => {
+      unflatten();
       for (const [, s] of styles) s.remove();
       for (const z of zones) z.style.pointerEvents = "none";
     };

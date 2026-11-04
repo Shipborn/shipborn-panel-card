@@ -92,7 +92,7 @@ Standaardactie per domein: `switch/light/input_boolean` → toggle, `button/inpu
 
 ### Kiosk: HA-balken verbergen
 
-Met `kiosk: true` op de kaart verbergt HA de bovenbalk en de zijbalk zolang die view open is. Blijf even met de muis (of een vinger) op de bovenste of linker schermrand staan om ze weer te tonen; terug op de kaart verdwijnen ze weer. `kiosk_delay` (ms, standaard 800) bepaalt hoe lang. In bewerkmodus blijven de balken zichtbaar.
+Met `kiosk: true` op de kaart verbergt HA de bovenbalk en de zijbalk zolang die view open is. Blijf even met de muis (of een vinger) op de bovenste of linker schermrand staan om ze weer te tonen; terug op de kaart verdwijnen ze weer. `kiosk_delay` (ms, standaard 800) bepaalt hoe lang. In bewerkmodus blijven de balken zichtbaar. De ruimte die HA voor de verborgen zijbalk vrijhoudt (een witte strook links) zet de kaart op 0, ongeacht de HA-versie: elke linkermarge en -opvulling tussen de kaart en de pagina; bij het tonen van de balken of het verlaten van de view komen ze terug.
 
 De pagina rond de kaart (naast of onder het scherm als de verhouding niet past) krijgt de `background` van de kaart, of `page_background` als je een andere kleur wilt.
 
