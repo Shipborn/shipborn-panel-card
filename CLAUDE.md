@@ -25,6 +25,7 @@ Lokaal staat het project in dagmappen `YYMMDD/` onder `…/32.Home Assistant/18.
 | `demo/index.html` | Demo van `examples/dashboard.yaml` (het eerste ontwerp). |
 | `Overszichtstekeningen/*.jpg` | De systeemtekeningen waarop de `sys-…`-schema's zijn gebaseerd. Niet in git. |
 | `Voorbeeld foto's plc/` | Screenshots van het oorspronkelijke PLC-scherm (ontwerpvoorbeeld). Niet in git. |
+| `_ds_bron/*.webp` | Bronnen van de ingebouwde afbeeldingen (logo `shipborn-joal`, `tc90-zijaanzicht`, `tc90-dekplan`, `tc90-interieur`). De kaart bevat ze als base64 in `IMAGES`; alleen nodig om een afbeelding te vervangen. Niet in git. |
 | `tools/interieur_zones.py` | Genereert de ruimtes (`zone` met `zoom`) op het interieurplan uit `Entiteiten-HA.xlsx`. |
 | `hacs.json` | HACS-metadata (naam, bestandsnaam `shipborn-panel-card.js`); in HACS toegevoegd als custom repository van het type *Dashboard*. |
 
@@ -89,22 +90,26 @@ De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities
 
 Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Geen framework.
 
-- **Bovenaan:** `VERSION`, kleurtabellen (`LED_COLORS`, `DESIGN_COLORS`, `MEDIA` voor leidingkleuren per medium), `STYLE` (alle CSS als string), `SYMBOLS` en `DESIGN_TYPES` (lijsten met item-types), ingebouwde afbeeldingen (`IMAGES`, o.a. het logo `shipborn-joal`) en hulpfuncties: `isOn`, `num` (met `factor`), `fmt`, `unitOf`, `color`, `activeOf` (actief-logica met `*_above` / `*_below` / `*_abs` / `*_state`), `colorOf` (de `colors`-regels), `viewPath`, `stamp`.
+- **Bovenaan:** `VERSION`, kleurtabellen (TC90: `TC_THEMES` met de kleuren per thema uit `tokens.json`, `TC_THEME_ORDER`/`TC_THEME_NAMES`, `TC_ICONS` met de lijn-iconen, `TC_WORDS` voor statuswoorden als AAN/DICHT, `TC_STYLE` met de CSS van het ontwerp), verder (`LED_COLORS`, `DESIGN_COLORS`, `MEDIA` voor leidingkleuren per medium), `STYLE` (alle CSS als string), `SYMBOLS` en `DESIGN_TYPES` (lijsten met item-types), ingebouwde afbeeldingen (`IMAGES`, o.a. het logo `shipborn-joal`) en hulpfuncties: `isOn`, `num` (met `factor`), `fmt`, `unitOf`, `color`, `activeOf` (actief-logica met `*_above` / `*_below` / `*_abs` / `*_state`), `colorOf` (de `colors`-regels), `viewPath`, `stamp`.
 - **`setConfig` → `_build()`:** maakt het paneel (vaste ontwerpmaat `width`×`height`, geschaald met CSS `transform` in `_fit()`), tekent de vorm (`_shapeSvg`) en roept per item `_renderItem(item)` aan. Elk DOM-element krijgt `data-i` = index van het item; de editor gebruikt dat.
 - **`_renderItem`:** `switch` op `item.type`. Twee families:
   - *Fysiek paneel* (eerste ontwerp): `group`/knop (`_group`, `_button`, `_momentary` voor hold-to-run), `estop`, `throttle`/`_lever`, `knob`, `joystick`, `screen` (andere HA-kaart in een bezel), `box`, `label`, `image`.
   - *Schermontwerp* (`_d…`-methoden): `panel`, `gauge`, `bar`, `tank`, `value`, `indicator`, `pushbutton`, `nav`, `alarm`, `block`, `line`, `text`, `pipe`, `hull`, en alle schema-symbolen via `_dSymbol` (pompen, kleppen, `hx`, `converter`, `generator`, `propeller`, `jet_thruster`, …).
+  - *TC90-ontwerp* (`_t…`-methoden, alleen zinvol met `design: tc90`): `statusbar` (`_tStatusbar`: logo-knop, titel, subtabs, statusiconen, klok, themaknop), `navbar` (`_tNavbar`: icoonbalk met alarmbadge), `tile`, `switch` (BEZIG tot de terugmelding), `hotspot`, `dial`, en `alarmbar` (niet meer gebruikt). Plus `zone` (`_dZone`: tikbaar vlak op een tekening met `zoom` of `popup`).
   - Onbekend type → rood vak `? type (vVERSION)`, zodat het opvalt.
 - **Updates:** elk item dat van een entiteit afhangt, registreert een functie in `this._updaters`; de `hass`-setter roept ze allemaal aan bij elke statuswijziging. Nieuwe items volgen dat patroon.
 - **Plaatsing:** `_place(node, item, defW, defH)` zet `x`, `y`, `width`/`height`/`size`. Let op: HA's YAML 1.1-parser maakt van de sleutel `y` soms `true`; daarom wordt `item.true` als terugval gelezen (ook in de editor).
 - **Acties:** `_handleAction` (toggle, more-info, perform-action, navigate, url, fire-dom-event), `_confirm` (eigen donker Ja/Nee-venster, met `text_on`/`text_off`), `_toggle` (kiest de juiste dienst per domein: switch/light/input_boolean, button/input_button → press, valve → toggle, …), `_turn`, `_setValue`.
-- **Kiosk:** `_kioskOn`/`_kioskOff` verbergen de HA-header en zijbalk en kleuren de pagina rond de kaart (`page_background`); niet in bewerkmodus.
+- **Vaste balken (TC90):** `_dockIt` hangt statusbalk en icoonbalk in een `position: fixed`-laag (`tc-dock`) buiten het geschaalde paneel; `this._docks` houdt ze bij. Met `dock: false` (editor) blijven ze in het paneel.
+- **Maat en scrollen:** `_fit()` schaalt het paneel op de breedte. Met vaste balken is de hoogte `_contentBottom()` (gemeten onderkant van de inhoud) + 16 + 88 voor de icoonbalk, met `height` als bovengrens. Krimpen naar de schermhoogte alleen met `fit_tolerance` > 1. `_lockScroll` zet het scrollen van de pagina uit als een pagina in kiosk past. `_fit` zet ook de docks op de juiste plek en schaal.
+- **Thema's:** `_setTheme` bewaart de keuze in `localStorage` (`shipborn-tc-theme`) en meldt het aan de andere kaarten; `_applyTheme` zet de variabelen; `_syncTheme` vergelijkt bij elke `hass`-update en bij het `storage`-event het bewaarde thema (HA hergebruikt views, dus alleen bij opbouwen lezen is niet genoeg).
+- **Kiosk:** `_kioskOn`/`_kioskOff` verbergen de HA-header en zijbalk en kleuren de pagina rond de kaart (`page_background`); niet in bewerkmodus. Een tik op het logo wisselt dat (`kiosk_toggle: edge` geeft de oude randstroken terug). Omdat HA's zijbalk-opmaak per versie verschilt, meet `_kioskOn` waar de kaart staat en trekt hij hem met negatieve marge naar de linkerrand (`_kioskFlatten`, opnieuw bij elke `_fit`).
 - **Lettertypes:** Barlow Condensed en JetBrains Mono van Google Fonts (`fonts: false` om uit te zetten).
 - Conventies in de code: Engelse commentaarregels boven elke methode in één zin, compacte stijl, geen afhankelijkheden.
 
 ## Layout-editor (`demo/editor.html`)
 
-- ES-module die de kaart zelf laadt en `yaml@2.5.1` (`parseDocument`) gebruikt, zodat opmerkingen, ankers (`&sys_tabs`) en flow-stijl bewaard blijven bij opslaan.
+- ES-module die de kaart zelf laadt en `yaml@2.5.1` (`parseDocument`) gebruikt, zodat opmerkingen, ankers (`&tc_status`, `&tc_nav`, `&…_tabs`) en flow-stijl bewaard blijven bij opslaan.
 - Werkt op `views[vi].cards[0].items`: selecteren, slepen (met raster), leidingpunten bewerken, labels los verslepen (`label_offset`), formaat wijzigen, eigenschappen rechts bewerken, items toevoegen uit een palet (`PALETTE`), kleuren en `media_colors`, schermen toevoegen/verwijderen (met de gedeelde kop en een tab).
 - Opslaan (`Ctrl+S`) doet een `PUT` naar `edit_server.py`, die alleen `examples/plc-dashboard.yaml` mag schrijven en alleen op `127.0.0.1` luistert.
 - Komt er een nieuw item-type of optie in de kaart, voeg het dan ook aan het palet en, waar zinvol, aan de eigenschappenlijst van de editor toe.
@@ -118,7 +123,7 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
   git config user.name admin
   git config user.email jerom.dirven@gmail.com
   ```
-- Niet in git (bewust): `.claude/`, `Overszichtstekeningen/`, `Voorbeeld foto's plc/`, `examples/Entiteiten-HA.xlsx`. Die komen alleen via de Dropbox-map mee.
+- Niet in git (bewust): `.claude/`, `Overszichtstekeningen/`, `Voorbeeld foto's plc/`, `_ds_bron/`, `examples/Entiteiten-HA.xlsx`. Die komen alleen via de Dropbox-map mee.
 - Er is geen testsuite; controleren gebeurt in `demo/plc.html` en daarna in HA.
 
 ## Op een andere pc beginnen
@@ -127,9 +132,9 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots en de HA-export ontbreken dan.
 - Controleer of `python` werkt (anders `python3`) en pas `.claude/launch.json` daarop aan.
 
-## Stand van zaken en open punten (04-11-2026, v0.5.2)
+## Stand van zaken en open punten (04-11-2026, v0.5.10)
 
-- **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `alarmbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`; zie README). Alle pagina's staan in het nieuwe kader (statusbalk met subtabs, icoonbalk); de systeemschema's en hun bediening zijn verder nog de oude onderdelen, die nu wel de themakleuren volgen. Alleen `voortstuwing` is helemaal in de nieuwe stijl (schip met hotspots, tegels, schakelaars); de andere bestemmingen kunnen zo'n overzichtspagina nog krijgen. Brandstof staat onder Voortstuwing (keuze van Claude, niet van de gebruiker). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
+- **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`, en het ongebruikte `alarmbar`; zie README). Alle pagina's staan in het nieuwe kader (statusbalk met subtabs, icoonbalk); de systeemschema's en hun bediening zijn verder nog de oude onderdelen, die nu wel de themakleuren volgen. Alleen `voortstuwing` is helemaal in de nieuwe stijl (schip met hotspots, tegels, schakelaars); de andere bestemmingen kunnen zo'n overzichtspagina nog krijgen. Brandstof staat onder Voortstuwing (keuze van Claude, niet van de gebruiker). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
 - Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `voortstuwing`, `ship-side`, `ship-deck`, `ship-interior`, `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
 - De drie `ship-…`-pagina's (tab **Schip**, onderling gewisseld met `&ship_tabs`) tonen de aanzichten uit het canvas "TC 90 aanzichten"; de tekeningen staan als WebP in `IMAGES` (`tc90-zijaanzicht`, `tc90-dekplan`, `tc90-interieur`). Het interieurplan (`ship-interior`) heeft tikbare `zone`s per ruimte met `zoom`: inzoomen op de ruimte en rechts een paneel met alle lampen, groepen en apparaten (plus scènes, Webasto, lekdetectie, bilgepomp/boiler); onderaan scènes voor het hele schip. Die zones worden **gegenereerd** door `tools/interieur_zones.py` (uit `examples/Entiteiten-HA.xlsx`, vereist openpyxl); het script vervangt alles tussen `# ---- ruimtes:` en `# ---- algemeen:` in die view, dus handwerk daar gaat verloren bij opnieuw genereren — pas dan liever het script aan (kamerindeling, labels, volgorde). De zones zijn op het oog geplaatst (`room(...)`-regels in het script); de items in een `zoom`/`popup` toont de layout-editor niet. `popup` (een los venster) bestaat ook nog. De indeling per ruimte (secties en namen) volgt het HA-dashboard van de bemanning; wat daar niet in stond komt onder *Overig*. Het script maakt ook de zones op het **dekplan** (tussen `# ---- dek: zones` en `# ---- einde dek ----`). Het zijaanzicht heeft nog geen bediening (voorstel: mast- en navigatieverlichting op hoogte).
 - De compressordruk (`sensor.al1590_er_compressor_manifold_pressure`) is in **bar** (bevestigd door de gebruiker); geen `factor` gebruiken.
