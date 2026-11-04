@@ -19,15 +19,6 @@
   <div id="sim"></div>
   <div id="log">Mock: service calls verschijnen hier (geen echte HA).</div>
   <script>
-    // HA's <ha-icon> does not exist here: draw the same MDI icon from the CDN.
-    if (!customElements.get("ha-icon"))
-      customElements.define("ha-icon", class extends HTMLElement {
-        connectedCallback() {
-          const name = (this.getAttribute("icon") || "").replace(/^mdi:/, "");
-          const u = `url(https://cdn.jsdelivr.net/npm/@mdi/svg@7.4.47/svg/${name}.svg) center / contain no-repeat`;
-          Object.assign(this.style, { display: "inline-block", width: "var(--mdc-icon-size, 24px)", height: "var(--mdc-icon-size, 24px)", background: "currentColor", mask: u, webkitMask: u });
-        }
-      });
     // Tabs in the card navigate as in HA (/<dashboard>/<view>), which does not exist here: go to ?view=<view> instead.
     window.addEventListener("location-changed", () => {
       location.replace(`plc.html?view=${encodeURIComponent(location.pathname.split("/").pop())}`);
@@ -66,39 +57,6 @@
         "sensor.wago_values_lr_fresh_water_level": st(66),
         "sensor.wago_values_er_dirtywater_level": st(22),
         "sensor.al1590_er_compressor_manifold_pressure": st(6475, { unit_of_measurement: "mbar" }),
-        // Instrumenten en onderhoud (sys-instruments, sys-maintenance).
-        "sensor.engine_room_me_oil_press": st(3.4, { unit_of_measurement: "bar" }),
-        "sensor.main_engine_oil_temp": st(92, { unit_of_measurement: "°C" }),
-        "sensor.engine_room_main_engine_me_alt_v": st(14.1, { unit_of_measurement: "V" }),
-        "sensor.engine_room_main_engine_me_hours": st(1287),
-        "sensor.al1590_er_prop_shaft_cooling_water_flow": st(4.2),
-        "sensor.wago_hcs_controls_wago_hcs_controls_lever_position": st(35, { unit_of_measurement: "%" }),
-        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running": st("on"),
-        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd": st("on"),
-        "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft": st("off"),
-        "binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in": st("off"),
-        "binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running": st("off"),
-        "sensor.generator_gen_rpm": st(0, { unit_of_measurement: "rpm" }),
-        "sensor.generator_gen_oil_pressure": st(0, { unit_of_measurement: "bar" }),
-        "sensor.generator_gen_coolant_temp": st(31, { unit_of_measurement: "°C" }),
-        "sensor.generator_gen_hours": st(642),
-        "sensor.al1590_er_generator_seawater_cooling_flow": st(0),
-        "switch.0x781c9dfffea1854f": st("off"),
-        "switch.0x781c9dfffea18853": st("on"),
-        "valve.er_ventielblok_1tm4_l1": st("open"),
-        "valve.er_ventielblok_1tm4_l2": st("open"),
-        "valve.er_ventielblok_1tm4_l3": st("open"),
-        "valve.er_ventielblok_1tm4_l4": st("open"),
-        "cover.0xe4b063fffe6370e8": st("open"),
-        "cover.0xccba97fffedd4780": st("open"),
-        "cover.0xccba97fffedd76a0": st("open"),
-        "cover.0xccba97fffedcfc10": st("open"),
-        "cover.0xccba97fffedd50bc": st("closed"),
-        "cover.er_vlinderklep_jet2": st("closed"),
-        "cover.0xe4b063fffe62e8f0": st("closed"),
-        "sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage": st(12.71),
-        "sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage": st(12.32),
-        "sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage": st(26.4),
       };
       for (const id of ["button.wago_hcs_controls_wago_controls_dieselmode", "button.wago_hcs_controls_wago_controls_electricmode", "button.plc_mode_generator", "button.wago_hcs_controls_wago_controls_harbormode", "button.wago_energy_controls_wago_energy_controls_reset_main_2"])
         states[id] = st("unknown");
