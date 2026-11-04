@@ -81,7 +81,7 @@ De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities
 - Statusbalk en icoonbalk staan vast boven- en onderaan het scherm (ook bij scrollen); houd de eerste 56 px en de laatste 96 px van elke kaart vrij (`height` = inhoud + 96). Er is geen alarmbalk meer (op verzoek weggehaald); actieve alarmen staan als getal op Alarmen in de icoonbalk. Het item `alarmbar` bestaat nog in de kaart.
 - Tab-paden zonder `/` (bijv. `sys-fuel`) verwijzen naar een view in hetzelfde dashboard, ongeacht de URL van het dashboard.
 - Schema: `hull` (romp) op **precies** `{ type: hull, x: 20, y: 112, width: 1240, height: 600 }` op elke schemapagina (de omtrek moet overal gelijk zijn), met daarin `pipe`-items en symbolen; daaronder vanaf `y: 732` de `panel`s met de bediening. Schuif je een schema, schuif dan alle coördinaten (ook `points`) mee en laat de romp staan.
-- Kiosk: elke kaart heeft `kiosk: true` (HA-balken verborgen; even op de boven-/linkerrand blijven toont ze).
+- Kiosk: elke kaart heeft `kiosk: true` (HA-balken verborgen). Een tik op het Shipborn JOAL-logo in de statusbalk toont de balken van HA (naar andere HA-pagina's), nog een tik verbergt ze. De oude randstroken (even op de boven-/linkerrand blijven) gelden alleen nog zonder TC90-statusbalk of met `kiosk_toggle: edge`.
 - Stijl: items op één regel in flow-stijl (`- { type: …, x: …, y: … }`), opmerkingen in het Nederlands, secties met `# ---- … ----`. De editor bewaart die opmaak.
 - Entiteiten met `.plc_` in de naam zijn **placeholders** die (nog) niet in HA bestaan; ze tonen "—" of niets.
 

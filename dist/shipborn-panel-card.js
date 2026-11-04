@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.6";
+const VERSION = "0.5.7";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -455,6 +455,8 @@ const TC_STYLE =
   .tc-statusbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 var(--space-6); background: var(--surface); border-bottom: 1px solid var(--line); }
   .tc-sb-ident { display: flex; align-items: center; min-width: 0; }
   .tc-sb-logo { height: 26px; width: auto; display: block; }
+  .tc-sb-logo-btn { display: flex; align-items: center; height: 44px; margin-left: -8px; padding: 0 8px; border: 0; border-radius: var(--radius-md); background: transparent; cursor: pointer; }
+  .tc-sb-logo-btn:active { background: var(--surface-raised); }
   .tc-sb-title { text-align: center; }
   .tc-sb-right { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-4); color: var(--ink-muted); }
   .tc-sb-stat { display: inline-flex; align-items: center; gap: var(--space-1); cursor: pointer; }
@@ -837,11 +839,14 @@ class ShipbornPanelCard extends HTMLElement {
       timer = setTimeout(fn, delay);
     };
     const cancel = () => clearTimeout(timer);
-    // Edge strips that reveal the bars; they only catch the pointer while the bars are hidden.
-    const zones = [
+    // With a TC90 status bar the logo is the button that shows and hides HA's bars (see _tStatusbar);
+    // otherwise edge strips reveal them, catching the pointer only while the bars are hidden.
+    const byLogo = this._tc && this._config.items.some((i) => i.type === "statusbar") && this._config.kiosk_toggle !== "edge";
+    this._kioskToggle = byLogo ? () => (hidden() ? show() : hide()) : null;
+    const zones = (byLogo ? [] : [
       { top: 0, left: 0, right: 0, height: "8px" },
       { top: 0, left: 0, bottom: 0, width: "8px" },
-    ].map((pos) => {
+    ]).map((pos) => {
       const z = document.createElement("div");
       Object.assign(z.style, { position: "fixed", zIndex: 9999, ...Object.fromEntries(Object.entries(pos).map(([k, v]) => [k, typeof v === "number" ? v + "px" : v])) });
       z.addEventListener("pointerenter", () => later(show));
@@ -857,13 +862,16 @@ class ShipbornPanelCard extends HTMLElement {
       else later(hide);
     };
     const onLeave = () => !hidden() && cancel();
-    this.addEventListener("pointerenter", onEnter);
-    this.addEventListener("pointerdown", onEnter);
-    this.addEventListener("pointerleave", onLeave);
+    if (!byLogo) {
+      this.addEventListener("pointerenter", onEnter);
+      this.addEventListener("pointerdown", onEnter);
+      this.addEventListener("pointerleave", onLeave);
+    }
     hide();
     this._kiosk = () => {
       this._paintPage = null;
       this._kioskFlatten = null;
+      this._kioskToggle = null;
       cancel();
       show();
       page.remove();
@@ -1657,11 +1665,16 @@ class ShipbornPanelCard extends HTMLElement {
   _tStatusbar(s) {
     const n = h("div", "tc-statusbar", { width: this._W + "px", height: "56px" });
     const ident = h("div", "tc-sb-ident");
+    // The logo is a button: in kiosk mode it shows or hides HA's top bar and sidebar (the way to HA's other pages).
+    const logoBtn = h("button", "tc-sb-logo-btn");
+    logoBtn.type = "button";
+    logoBtn.title = `Shipborn Panel Card v${VERSION} – tik: menu van Home Assistant tonen of verbergen`;
+    logoBtn.addEventListener("click", () => this._kioskToggle?.());
     const logo = h("img", "tc-img tc-sb-logo");
     logo.src = IMAGES[s.logo || "shipborn-joal"] || s.logo;
     logo.alt = "Shipborn JOAL";
-    logo.title = `Shipborn Panel Card v${VERSION}`; // which card version HA loaded, without the console
-    ident.appendChild(logo);
+    logoBtn.appendChild(logo);
+    ident.appendChild(logoBtn);
     const title = h("div", "tc-sb-title title");
     title.textContent = s.title ?? "";
     // tabs: switch between the sub-pages of a destination (e.g. Zeewater | Zoetwater | Vuilwater) instead of the title.
