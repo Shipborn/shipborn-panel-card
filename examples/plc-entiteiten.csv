@@ -121,7 +121,7 @@ Systemen / Diesel engine;Diesel alarm (motorblok rood);status;binary_sensor.plc_
 Systemen / Diesel engine;Zeewater flow motor (L/min);meetwaarde;sensor.plc_seawater_flow_engine;sensor.al1590_er_volvo_seawater_cooling_flow;zeker;
 Systemen / Diesel engine;Uitlaattemperatuur (exhaust drain);meetwaarde;sensor.plc_exhaust_temperature;sensor.al1590_er_volvo_exhaust_temperature;zeker;
 Systemen / Diesel engine + Zeewater + Vuilwater;Compressor draait (luchtleidingen inlaten);status;binary_sensor.plc_compressor_running;switch.0x781c9dfffea18853;waarschijnlijk;"ER_Compressor_Relais; switch: aan = ingeschakeld, niet per se draaiend (vermogenssensor is nauwkeuriger)"
-Systemen / Diesel engine + Zeewater;Compressor druk;meetwaarde;sensor.plc_compressor_pressure;sensor.al1590_er_compressor_manifold_pressure;zeker;waarde in mbar (6475): in YAML unit/decimalen aanpassen
+Systemen / Diesel engine + Zeewater;Compressor druk;meetwaarde;sensor.plc_compressor_pressure;sensor.al1590_er_compressor_manifold_pressure;zeker;waarde in bar (bevestigd door gebruiker 04-11-2026; eerder als mbar genoteerd)
 Systemen / Brandstof;Transferpomp Diesel PS → daytank draait;status;binary_sensor.plc_fuel_transfer_ps_running;switch.ifm_output_bakboord_diesel_pomp;zeker;
 Systemen / Brandstof;Transferpomp Diesel SB → daytank draait;status;binary_sensor.plc_fuel_transfer_sb_running;switch.ifm_output_stuurboord_diesel_pomp;zeker;
 Systemen / Brandstof;Pomp daytank → daytank Webasto draait;status;binary_sensor.plc_fuel_webasto_pump_running;switch.0xe4b063fffe7ac868;zeker;"ER_Dieselpomp_tank_Webasto; nu unavailable"

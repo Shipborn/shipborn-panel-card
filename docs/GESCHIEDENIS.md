@@ -77,6 +77,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.4) In HA 2026.10 (frontend 20260930) bleef de strook: daar is het geen marge. De kiosk meet nu waar de kaart staat: het buitenste element dat hem nog van de linkerrand houdt krijgt een negatieve marge (en zo nodig meer breedte), en een smalle strook die nog over de linkerrand ligt wordt verborgen. Dat loopt opnieuw als de kaart van maat verandert. Getest met een nagebootste zijbalk als marge, als rasterkolom en als vaste overlay. Het versienummer staat als tooltip op het logo.
 - (v0.5.5) Het thema ging niet mee naar een andere pagina: HA bouwt een eerder geopende view niet opnieuw op maar hangt dezelfde kaart terug, en die las het bewaarde thema alleen bij het opbouwen. Nu neemt een kaart bij elke terugkeer op het scherm het bewaarde thema over.
 - (v0.5.6) Van Klimaat naar Verlichting ging het thema in HA nog steeds niet mee (in de demo wel; de oorzaak in HA is niet gevonden). Daarom vergelijkt elke TC90-kaart nu bij elke statusupdate van HA het bewaarde thema met het zijne, en reageert hij op een themawissel in een ander venster (`storage`-event), los van hoe HA de view hergebruikt.
+- De compressordruk is in bar, niet in mbar zoals in de koppellijst stond (de gebruiker zag de Diesel-pagina goed en Overzicht op 0,0 bar). `factor: 0.001` en de grens `2999` weggehaald op Voortstuwing en Generator; demo en koppellijst op bar gezet.
 
 ## Lessen en keuzes die je moet kennen
 

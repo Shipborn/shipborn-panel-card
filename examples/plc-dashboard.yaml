@@ -320,7 +320,7 @@ views:
           - { type: value, style: tile, x: 336, y: 784, width: 137, height: 88, label: Coolant temp, entity: sensor.generator_gen_coolant_temp, value_size: 22, decimals: 0, colors: [{ above: 95, color: red }, { above: 86, color: amber }, { color: green }] }
           - { type: value, style: tile, x: 485, y: 784, width: 137, height: 88, label: Seawater flow, entity: sensor.al1590_er_generator_seawater_cooling_flow, value_size: 22, colors: [{ below: 25, color: red }, { below: 28, color: amber }, { color: green }] }
           - { type: value, style: tile, x: 38, y: 884, width: 137, height: 88, label: Sea glyc flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 22, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 187, y: 884, width: 137, height: 88, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, factor: 0.001, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 187, y: 884, width: 137, height: 88, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
           - { type: value, style: tile, x: 336, y: 884, width: 137, height: 88, label: Hours, entity: sensor.generator_gen_hours, value_size: 22, decimals: 0 }
           - { type: panel, x: 656, y: 732, width: 604, height: 270, title: Start generator checklist }
           - { type: indicator, x: 674, y: 784, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
@@ -328,7 +328,7 @@ views:
           - { type: indicator, x: 674, y: 844, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
           - { type: indicator, x: 964, y: 784, label: "Flow zeewaterpomp glycol ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
           - { type: indicator, x: 964, y: 814, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
-          - { type: indicator, x: 964, y: 844, label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 2999 }
+          - { type: indicator, x: 964, y: 844, label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
           - {
               type: pushbutton,
               x: 674,
@@ -1095,7 +1095,7 @@ views:
           - { type: tile, x: 239, y: 432, width: 203, height: 120, icon: water, label: Zeewaterflow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, unit: L/min, decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 49, alarm_below: 40 }
           - { type: tile, x: 454, y: 432, width: 203, height: 120, icon: water, label: Schroefas koeling, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, unit: L/min, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 3.5, alarm_below: 2.5 }
           - { type: tile, x: 669, y: 432, width: 203, height: 120, icon: klimaat, label: Schroefas vet, entity: sensor.al1590_er_prop_shaft_grease_temperature, unit: "°C", decimals: 0, sub: Druk, sub_entity: sensor.al1590_er_prop_shaft_grease_pressure, sub_unit: bar, sub_decimals: 1, warn_above: 50, alarm_above: 80 }
-          - { type: tile, x: 24, y: 560, width: 203, height: 120, icon: klep, label: Manifold, entity: sensor.al1590_er_compressor_manifold_pressure, factor: 0.001, unit: bar, decimals: 1, warn_below: 3, alarm_above: 10 }
+          - { type: tile, x: 24, y: 560, width: 203, height: 120, icon: klep, label: Manifold, entity: sensor.al1590_er_compressor_manifold_pressure, unit: bar, decimals: 1, warn_below: 3, alarm_above: 10 }
           - { type: tile, x: 239, y: 560, width: 203, height: 120, icon: pijl, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, unit: "%", decimals: 0, sub: Instelpunt, sub_entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, sub_unit: rpm }
           - { type: tile, x: 454, y: 560, width: 203, height: 120, icon: generator, label: Generator, entity: sensor.generator_gen_rpm, unit: rpm, decimals: 0, sub: Koelwater, sub_entity: sensor.generator_gen_coolant_temp, sub_unit: "°C", tap_action: { action: navigate, navigation_path: sys-generator } }
           - { type: tile, x: 669, y: 560, width: 203, height: 120, icon: instellingen, label: Draaiuren, entity: sensor.engine_room_main_engine_me_hours, unit: uur, decimals: 0, sub: Generator, sub_entity: sensor.generator_gen_hours, sub_unit: uur }
