@@ -1,0 +1,2251 @@
+views:
+  - type: sections
+    max_columns: 4
+    title: Crew
+    path: crew-new
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Crew Cabin - Lights
+            heading_style: title
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.crew_cabin_plafond
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                    - entity: light.crew_cabin_hal_en_plinten
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.cc_s_11a_bed_d6
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Plafond bed (2 spots)
+                    - entity: light.cc_s_11a_zitje_d5
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Plafond zitjes (2 spots)
+                    - entity: light.cc_s_11b_gang_d11
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Hal (2 spots)
+                    - entity: light.cc_s_11a_tafel_d7
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Tafel (spot)
+                    - type: section
+                    - entity: light.cc_12a
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Toilet (4 spots)
+                    - type: section
+                    - entity: light.cc_s_11b_plint_d8
+                      icon: mdi:led-strip-variant
+                      secondary_info: brightness
+                      name: Plinten
+                    - type: section
+                    - entity: light.cc_s_11b_kasten_d12
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Kasten ledstrip(-)
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading: Crew Cabin - Powersupply
+            heading_style: title
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: fan.cc_w_e1
+                      color: blue
+                    - entity: switch.cc_w_e2
+                    - entity: switch.cc_w_e3
+                      icon: mdi:toilet
+                      name: Toilet
+                      secondary_info: none
+                    - entity: switch.cc_k1
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Wall Sockets
+                    - entity: switch.0xa4c138f65edc9815
+                      icon: mdi:power-plug
+                      secondary_info: none
+                      name: Socket Plug
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Crew Cabin - Motion & Temperature
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.motionsensorcrew_occupancy
+                  hours_to_show: 1
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.motionsensorcrew_occupancy
+                  hours_to_show: 48
+                - type: entities
+                  entities:
+                    - binary_sensor.motionsensorcrew_occupancy
+                    - sensor.motionsensorcrew_temperature
+                - chart_type: line
+                  period: 5minute
+                  type: statistics-graph
+                  entities:
+                    - sensor.motionsensorcrew_temperature
+                  stat_types:
+                    - mean
+                  days_to_show: 7
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Webasto Crew Cabin
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_crew_cabin_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_crew_cabin_ac
+                      name: Crew Cabin
+                    - entity: number.webasto_bluecool_noder_crew_cabin_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_crew_cabin
+                      name: Temperatuur
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/0ac019d39324cf444e0feb9794869fb3
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/0ac019d39324cf444e0feb9794869fb3/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Main
+    path: main-new
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Zithoek - Lights
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.main_cabin_lounge_bank_geheel
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                    - entity: light.main_cabin_plinten
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_7a_tafel_d25
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge tafel (2 spots)
+                    - entity: light.mc_s_7ab_bank_1_d31
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge bank dwars 1 (2 spots)
+                    - entity: light.mc_s_7ac_bank_2_d30
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge bank dwars 2 (spot)
+                    - entity: light.mc_s_7ad_bank_3_d29
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge bank 1 (spot)
+                    - entity: light.mc_s_7ae_bank_4_d28
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge bank 2 (spot)
+                    - entity: light.mc_s_7af_bank_5_d27
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge bank 3 (spot)
+                    - entity: light.mc_s_7ag_bank_6_d26
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Lounge bank 4 (spot)
+                    - type: section
+                    - entity: light.mc_s_7ai_raam_d33
+                      icon: mdi:led-strip-variant
+                      secondary_info: brightness
+                      name: Lounge patrijspoort
+                    - type: section
+                    - entity: light.mc_s_7ak_plint_d34
+                      secondary_info: brightness
+                      icon: mdi:led-strip-variant
+                      name: Lounge plinten
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Deck Lounge - Lights
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.main_cabin_salon_rondom
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                    - entity: light.main_cabin_plinten
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_3a_dl_bba_d11_1
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon hoek BB hoek achter (2 spots)
+                    - entity: light.mc_s_3a_dl_bbm_d11_2
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon hoek BB midden (2 spots)
+                    - entity: light.mc_s_3a_dl_bbv_d11_3
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon hoek BB hoek voor (2 spots)
+                    - entity: light.mc_s_3a_dl_sba_d11_7
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon hoek SB achter (2 spots)
+                    - entity: light.mc_s_3a_dl_sbm_d11_6
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon hoek SB midden (2 spots)
+                    - entity: light.mc_s_3a_dl_sbv_d11_5
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon hoek SB voor (2 spots)
+                    - entity: light.mc_s_3a_dl_v_d11_4
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Salon voor (2 spots)
+                    - type: section
+                    - entity: light.mc_s_3b_trap_d9
+                      secondary_info: brightness
+                      icon: mdi:led-strip-variant
+                      name: Salon plinten
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Eetkamer - Lights
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_5a_d_lr_d18
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Scheiding eettkamer - Lounge (spot)
+                    - entity: light.mc_s_5b_raam_kast_d13
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Eetkamer kast + patrijspoort
+                    - type: section
+                    - entity: light.mc_s_5c_plint_d14
+                      secondary_info: brightness
+                      icon: mdi:led-strip-variant
+                      name: Eetkamer plinten kast
+                  title: All
+          - type: heading
+            heading_style: title
+            heading: Werkkamer - Lights
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.main_cabin_workplace_plafond
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_7b_gang_d36
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Workplace gang (2)
+                    - entity: light.mc_s_7b_kast_d35
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Workplace kast (2)
+                    - type: section
+                    - entity: light.mc_s_7b_plint_d37
+                      secondary_info: brightness
+                      icon: mdi:led-strip-variant
+                      name: Workplace plinten
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Gang - Lights
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.main_cabin_gangpad_geheel
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_6a_gang1_d19
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Gang 1 (2)
+                    - entity: light.mc_s_6a_gang2_d21
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Gang 2 (2)
+                    - entity: light.mc_s_6a_gang3_d22
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Gang 3 (2)
+                    - entity: light.mc_s_6a_gang4_d23
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Gang 4
+                    - type: section
+                    - entity: light.mc_s_7aj_mast_d24
+                      secondary_info: brightness
+                      icon: mdi:led-strip-variant
+                      name: Mast
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Webasto Main Cabin
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_main_cabin_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_main_cabin_ac
+                      name: Main Cabin
+                    - entity: number.webasto_bluecool_noder_main_cabin_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_main_cabin
+                      name: Temperatuur
+          - type: heading
+            heading_style: title
+            heading: Main Cabin - Motion & Temperature
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - chart_type: line
+                  period: 5minute
+                  type: statistics-graph
+                  entities:
+                    - sensor.temp_main_temperature
+                  stat_types:
+                    - mean
+                  days_to_show: 7
+                - type: markdown
+                  content: <center> Ligt bij de mast</center>
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Main Cabin - Powersupply
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 14px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.mc_w_e1_2
+                      icon: mdi:fan
+                      color: blue
+                      secondary_info: none
+                      name: Webasto Climate
+                    - entity: switch.mc_k1
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Wall Sockets
+                    - entity: switch.0xa4c138269e44b698
+                      icon: mdi:power-plug
+                      secondary_info: none
+                      name: Socket Plug
+                  title: Alles
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/78ad05af90c2194143a617d660aff8ed
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/78ad05af90c2194143a617d660aff8ed/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Guest
+    path: guest-new
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Guest Cabin - Lights
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.guest_cabin_plafond
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.gc_s_9a_gang_d5
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Gang (2 spots)
+                    - entity: light.gc_s_9b_bed_a_d9
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Bed achterzijde (spot)
+                    - entity: light.gc_s_9b_bed_v_d8
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Bed voorzijde (2 spots)
+                    - type: section
+                    - entity: light.gc_s_9b_plint_d10
+                      icon: mdi:led-strip-variant
+                      secondary_info: brightness
+                      name: Plint
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Guest Cabin Toilet - Lights
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.guest_cabin_toilet
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.gc_s_10a_wc_d7
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Toilet (2 spots)
+                    - entity: light.gc_s_10a_wasbak_d6
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Wasbak (2 spots)
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Guest Cabin - Powersupply
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.gc_w_e1
+                      icon: mdi:fan
+                      color: blue
+                      secondary_info: none
+                      name: Climate Control
+                    - entity: switch.gc_w_e2
+                      icon: mdi:pump
+                      secondary_info: none
+                      name: Sanibroyeur
+                    - entity: switch.gc_w_e3
+                      icon: mdi:toilet
+                      secondary_info: none
+                      name: Toilet
+                    - entity: switch.gc_k1
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Wall Sockets
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Webasto Guest Cabin
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_guest_cabin_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_guest_cabin_ac
+                      name: Guest Cabin
+                    - entity: number.webasto_bluecool_noder_guest_cabin_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_guest_cabin
+                      name: Temperatuur
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/fc624ad3f3371474a5c41bded350ff34
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/fc624ad3f3371474a5c41bded350ff34/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Galley
+    path: galley
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Galley - Lights
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.main_cabin_aanrecht_geheel
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.g_s_4a_achter_d1
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Aanrecht achterzijde
+                    - entity: light.g_s_4a_kookplaat_d3
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Aanrecht kookplaat
+                    - entity: light.g_s_4a_raam_d2
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Patrijs (2)
+                    - entity: light.g_s_4a_vaatw_d4
+                      name: Aanrecht vaatwasser
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                    - type: section
+                    - entity: light.g_s_4b_led_kast_d5
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                      name: Aanrecht onder kastjes
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Galley - Powersupply
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.g_w_e1
+                      icon: mdi:fan
+                      color: blue
+                      secondary_info: none
+                      name: Webasto Climate Control
+                    - entity: switch.g_w_e3
+                      icon: mdi:pump
+                      secondary_info: none
+                      name: Sanibroyeur (wastafel)
+                    - entity: switch.g_w_e4
+                      icon: mdi:pump
+                      secondary_info: none
+                      name: Sanibroyeur (was/droog)
+                    - entity: switch.g_k2
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Wall Sockets Galley
+                    - entity: switch.g_k1
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Afzuigkap
+                    - entity: switch.g_k3
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Vaatwasser
+                    - entity: switch.g_k4
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Oven
+                    - entity: switch.g_k5
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: koelkast
+                    - entity: switch.g_k6
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Vriezer
+                    - entity: switch.g_k7
+                      icon: mdi:power-socket-eu
+                      secondary_info: none
+                      name: Was- Droog
+                    - entity: switch.socketgally
+                      icon: mdi:power-plug
+                      secondary_info: none
+                      name: Philips Smart Plug Keuken
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Temperatuur omvormer schakelkast
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 2px; }
+            card:
+              type: vertical-stack
+              cards:
+                - chart_type: line
+                  period: 5minute
+                  type: statistics-graph
+                  entities:
+                    - sensor.boiler_water_temp_temperature
+                  stat_types:
+                    - mean
+                  days_to_show: 7
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Webasto Galley
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_galley_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_galley_ac
+                      name: Galley
+                    - entity: number.webasto_bluecool_noder_galley_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_galley
+                      name: Temperatuur
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/d1456108b0cd76359936a934db5a3801
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/d1456108b0cd76359936a934db5a3801/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Deck Lounge
+    path: deck-lounge
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Printer
+            heading_style: title
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: sensor.hp_smart_tank_5100_series_black_ink
+                      name: Black ink
+                    - entity: sensor.hp_smart_tank_5100_series_cyan_ink
+                      name: Cyan ink
+                    - sensor.hp_smart_tank_5100_series
+                    - entity: sensor.hp_smart_tank_5100_series_magenta_ink
+                      name: Magenta ink
+                    - entity: sensor.hp_smart_tank_5100_series_yellow_ink
+                      name: Yellow ink
+                  title: HP Smart Tank 5100 series
+      - type: grid
+        cards:
+          - type: heading
+            heading: Deck Lounge - Motion & Temperature
+            heading_style: title
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 16px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.0x001788010df593f4_occupancy
+                  hours_to_show: 1
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.0x001788010df593f4_occupancy
+                  hours_to_show: 48
+                - type: entities
+                  entities:
+                    - binary_sensor.0x001788010df593f4_occupancy
+                - chart_type: line
+                  period: hour
+                  type: statistics-graph
+                  entities:
+                    - sensor.0x001788010df593f4_temperature
+                  stat_types:
+                    - mean
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Webasto Deck lounge Cabin
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_deck_lounge_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_deck_lounge_ac
+                      name: Deck lounge
+                    - entity: number.webasto_bluecool_noder_deck_lounge_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_deck_lounge
+                      name: Temperatuur
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/c60a7a36464dae6adf24a5ed20fc6ad9
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/c60a7a36464dae6adf24a5ed20fc6ad9/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Owners
+    path: owners
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Owners Cabin - Lights
+            heading_style: title
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.owners_cabin_rondom_laag_plafond
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                    - entity: light.owners_cabin_plinten
+                      icon: mdi:led-strip-variant
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.oc_s_1b_laag_bba_d11
+                      name: Laag Plafond bba (2 spots)
+                    - entity: light.oc_s_1b_laag_bbm_d10
+                      name: Laag Plafond bbm (2 spots)
+                    - entity: light.oc_s_1b_laag_bbv_d9
+                      name: Laag Plafond bbv (2 spots)
+                    - entity: light.oc_s_1b_laag_sba_d16
+                      name: Laag Plafond sba (2 spots)
+                    - entity: light.oc_s_1b_laag_sbm_d15
+                      name: Laag Plafond sbm (2 spots)
+                    - entity: light.oc_s_1b_laag_sbv_d14
+                      name: Laag Plafond sbv (2 spots)
+                    - type: section
+                    - entity: light.oc_s_1b2_led_bed_d12
+                      icon: mdi:led-strip-variant
+                      name: Plinten Bed
+                    - entity: light.oc_s_1b2_led_vloer_d8
+                      icon: mdi:led-strip-variant
+                      name: Plinten Trappen
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bad Toilet Douche - Lights
+            heading_style: title
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.owners_cabin_douche_ruimte
+                      icon: mdi:wall-sconce-flat
+                      secondary_info: brightness
+                  title: Groups
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.oc_s_2a_douche_d18_1
+                      name: Douche (spot)
+                    - entity: light.oc_s_2a_wasbak_d17
+                      name: Wasbak (spot)
+                    - entity: light.oc_s_2a_wc_d18
+                      name: WC (2 spots)
+                    - type: section
+                    - entity: light.oc_s_1b_kaptafel_d13
+                      icon: mdi:led-strip-variant
+                      name: Ledstrip wastafel
+                      secondary_info: brightness
+                    - type: section
+                    - entity: light.oc_1c2
+                      name: Hal bad (6)
+                    - entity: light.oc_1c3
+                      name: Plint badkamer
+                      icon: mdi:led-strip-variant
+                      secondary_info: brightness
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Owners Cabin - Powersupply
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.oc_e1_2_l1
+                      icon: mdi:fan
+                      color: blue
+                      name: Webasto klimaat (Bad)
+                      secondary_info: none
+                    - entity: switch.oc_w_e3
+                      icon: mdi:pump
+                      secondary_info: none
+                      name: Sanibroyeur 1
+                    - entity: switch.oc_w_e4
+                      icon: mdi:pump
+                      secondary_info: none
+                      name: Sanibroyeur 2
+                    - entity: switch.oc_w_e5
+                      icon: mdi:toilet
+                      secondary_info: none
+                      name: Toilet
+                    - entity: switch.oc_k1
+                      icon: mdi:power-socket-eu
+                      name: Wall Sockets (TV)
+                      secondary_info: none
+                    - entity: switch.0xa4c138b105c39a71
+                      icon: mdi:power-plug
+                      secondary_info: none
+                      name: Socket Plug
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Owners Cabin - Motion & Temperature
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.motion_sensor_ownerscabin_occupancy
+                  hours_to_show: 1
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.motion_sensor_ownerscabin_occupancy
+                  hours_to_show: 48
+                - type: entities
+                  entities:
+                    - binary_sensor.motion_sensor_ownerscabin_occupancy
+                    - sensor.motion_sensor_ownerscabin_temperature
+                - chart_type: line
+                  period: 5minute
+                  type: statistics-graph
+                  entities:
+                    - sensor.motion_sensor_ownerscabin_temperature
+                  stat_types:
+                    - mean
+                  days_to_show: 7
+                - type: markdown
+                  content: <center> Ligt bij kastje stuurboard</center>
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Webasto Owners Cabin bad
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac
+                      name: Owners Cabin bad
+                    - entity: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_owners_cabin_bad
+                      name: Temperatuur
+          - type: heading
+            heading_style: title
+            heading: Webasto Owners Cabin
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.webasto_bluecool_noder_owners_cabin_temp
+                color: red
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.webasto_bluecool_noder_owners_cabin_ac
+                      name: Owners Cabin
+                    - entity: number.webasto_bluecool_noder_owners_cabin_fan_speed
+                      name: Ventilator stand (6 = automatisch)
+                    - entity: number.webasto_bluecool_noder_owners_cabin
+                      name: Temperatuur
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/5759ef3ece8ed34d63fe06928cd41166
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/5759ef3ece8ed34d63fe06928cd41166/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Deck
+    path: deck
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Deck - Lights
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_15b_spreader_1_d42
+                      name: Spreader 3
+                      icon: mdi:lightbulb-spot
+                      secondary_info: brightness
+                    - entity: light.mc_s_15b_spreader_2_d43
+                      name: Spreader 2
+                      icon: mdi:lightbulb-spot
+                      secondary_info: brightness
+                    - entity: light.mc_s_15b_spreader_3_d44
+                      name: Spreader 1
+                      icon: mdi:lightbulb-spot
+                      secondary_info: brightness
+                    - entity: light.mc_s_15b_spreader_4_d45
+                      name: >-
+                        Spreader bovenin alleen bakboort (stuurboord niet te
+                        bedienen)
+                      icon: mdi:lightbulb-spot
+                      secondary_info: brightness
+                    - entity: light.mc_s_15a0_giek
+                      secondary_info: brightness
+                      icon: mdi:wall-sconce-flat
+                      name: Giek
+                  title: All Mast + Beam Lights
+                - type: markdown
+                  content: >-
+                    <center> The Mastlights + giekspot gaan automatisch bij
+                    zonsondergang aan en bij zonsopgang uit. </center>
+                  text_only: true
+                  state_color: true
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_15a_deck_bb_d40
+                      name: Deck licht - BB naar beneden
+                      secondary_info: brightness
+                      icon: mdi:wall-sconce-flat
+                    - entity: light.mc_s_15a_deck_sb_d41
+                      name: Deck Light - SB naar beneden
+                      secondary_info: brightness
+                      icon: mdi:wall-sconce-flat
+                  title: All Deck Lights
+                  state_color: true
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.bimini_14b_1tafel_d28
+                      secondary_info: brightness
+                      icon: mdi:wall-sconce-flat
+                    - entity: light.bimini14a_bank_d18_2_d22
+                      secondary_info: brightness
+                      icon: mdi:wall-sconce-flat
+                  title: All Bimini Lights
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.loopplank
+                      secondary_info: brightness
+                      icon: mdi:led-strip-variant
+                  title: All Gangway
+                  state_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Unknown
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.mc_s_15c_windex_d46
+                    - entity: light.mc_s_7aj_mast_d24
+                  title: All
+                  state_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Buiten - Temperature
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - chart_type: line
+                  period: 5minute
+                  type: statistics-graph
+                  entities:
+                    - sensor.temp_buiten_temperature
+                  stat_types:
+                    - mean
+                  days_to_show: 7
+                - type: markdown
+                  content: <center> Ligt op bimini</center>
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/a550fecfdfe76d00abf5de6ad6340190
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/a550fecfdfe76d00abf5de6ad6340190/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Engine
+    path: engine
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Engine Room - Lights
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: light.er_s_13a1
+                      name: Engine room lights
+                      icon: mdi:bulkhead-light
+                  title: All
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Engine Room - Leakage detection
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - binary_sensor.engine_room_leak_schroefas_water_leak
+                  state_color: false
+                - type: history-graph
+                  entities:
+                    - entity: binary_sensor.engine_room_leak_schroefas_water_leak
+                  hours_to_show: 24
+                - show_name: false
+                  show_icon: true
+                  type: button
+                  entity: binary_sensor.engine_room_leak_schroefas_water_leak
+                  icon_height: 50px
+                - type: markdown
+                  content: >-
+                    The **Lekkagedetector** geeft een notificatie naar telefoon
+                    Alber
+                  text_only: true
+          - type: tile
+            entity: update.engine_room_leak_schroefas
+          - type: tile
+            entity: binary_sensor.engine_room_leak_schroefas_battery_low
+          - type: tile
+            entity: sensor.engine_room_leak_schroefas_battery
+          - type: tile
+            entity: binary_sensor.engine_room_leak_schroefas_water_leak
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: 'Engine Room - Motion & Temperature '
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: sensor.0x001788010cdae144_temperature
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              chart_type: line
+              period: 5minute
+              type: statistics-graph
+              entities:
+                - sensor.0x001788010cdae144_temperature
+                - sensor.engineroom_naast_dagtankvulsensoren_temperature
+                - sensor.buitenlounchetemp_temperature
+              stat_types:
+                - mean
+              days_to_show: 10
+              title: Temp Engineroom
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              chart_type: line
+              period: 5minute
+              type: statistics-graph
+              entities:
+                - sensor.0x001788010cdae144_temperature
+                - sensor.engineroom_naast_dagtankvulsensoren_temperature
+                - sensor.buitenlounchetemp_temperature
+              stat_types:
+                - mean
+              days_to_show: 1
+              title: Temp Engineroom
+          - type: history-graph
+            entities:
+              - sensor.al1590_er_generator_seawater_cooling_flow
+            hours_to_show: 2
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Engine Room - Powersupply
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: switch.er_13a
+                      icon: mdi:power-socket-eu
+                    - entity: switch.er_s_13a2
+                      icon: mdi:power-socket-eu
+                - type: light
+                  entity: light.0xa4c138066737a09a
+                  icon: mdi:fan
+                  title: All
+          - type: tile
+            entity: light.0xa4c138066737a09a
+            features:
+              - type: light-color-favorites
+          - type: tile
+            entity: light.0xa4c138066737a09a
+            features:
+              - type: light-brightness
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Generator
+            card_mod:
+              style: >
+                ha-card .title p { font-size: 16px; }
+
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+
+                ha-card .subtitle p { font-size: 20px; color: black; }
+
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black;
+                }
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              chart_type: line
+              period: 5minute
+              type: statistics-graph
+              entities:
+                - sensor.temp_generator_zeewater_in_temperature
+                - sensor.temp_generator_zeewater_uit_temperature
+                - sensor.temp_generator_blok_temperature
+                - sensor.temp_generator_koelvloeistof_in_temperature
+                - sensor.temp_generator_koelvloeistof_uit_temperature
+              stat_types:
+                - mean
+              days_to_show: 1
+          - type: tile
+            entity: sensor.temp_generator_zeewater_in_temperature
+            name: Zeewater in
+          - type: tile
+            entity: sensor.temp_generator_zeewater_uit_temperature
+            name: Zeewater uit
+          - type: tile
+            entity: input_number.temp_gen_monitor
+          - type: tile
+            entity: sensor.temp_generator_blok_temperature
+            name: Blok generator
+          - type: tile
+            entity: sensor.temp_generator_koelvloeistof_in_temperature
+            name: Koelvloeistof uit
+          - type: tile
+            entity: sensor.temp_generator_koelvloeistof_uit_temperature
+            name: Koelvloeistof in
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: 'Unknown '
+            card_mod:
+              style: |
+                ha-card .title p { font-size: 20px; }
+                ha-card .title ha-icon { --mdc-icon-size: 20px; }
+                ha-card .subtitle p { font-size: 20px; color: black; }
+                ha-card .subtitle ha-icon { --mdc-icon-size: 20
+          - type: entities
+            entities:
+              - entity: light.er_0a
+              - entity: light.er_0b
+            title: All
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/65117b58f29d422619b2272d371a212a
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/65117b58f29d422619b2272d371a212a/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Batterijen
+    path: betterijen
+    sections:
+      - type: grid
+        cards:
+          - type: tile
+            entity: sensor.temp_buiten_battery
+          - type: tile
+            entity: sensor.temp_main_battery
+          - type: tile
+            entity: sensor.temp_ownerscabin_battery
+          - type: tile
+            entity: sensor.0x001788010cdae144_battery
+          - type: tile
+            entity: sensor.0x001788010df593f4_battery
+          - type: tile
+            entity: sensor.fp_waterleaksensor_laag_battery
+          - type: tile
+            entity: binary_sensor.fp_waterleaksensor_hoog_battery_low
+          - type: tile
+            entity: binary_sensor.0x8c65a3fffeda603c_battery_low
+          - type: tile
+            entity: binary_sensor.0x0ceff6fffe901b4e_battery_low
+          - type: tile
+            entity: sensor.engineroom_naast_dagtankvulsensoren_battery
+          - type: tile
+            entity: sensor.engine_room_leak_schroefas_battery
+          - type: tile
+            entity: binary_sensor.0x0ceff6fffe76dcea_battery_low
+          - type: tile
+            entity: binary_sensor.0x0ceff6fffe9009c8_battery_low
+          - type: tile
+            entity: binary_sensor.0x44e2f8fffe0be6ed_battery_low
+          - type: tile
+            entity: binary_sensor.0x8c65a3fffee0f85d_battery_low
+          - type: tile
+            entity: sensor.buitenlounchetemp_battery
+          - type: tile
+            entity: sensor.boiler_water_temp_battery
+          - type: tile
+            entity: binary_sensor.0x28dba7fffe752d09_battery_low
+          - type: tile
+            entity: binary_sensor.0x8c65a3fffecea649_battery_low
+          - type: tile
+            entity: sensor.motion_sensor_ownerscabin_battery
+          - type: tile
+            entity: sensor.motionsensorcrew_battery
+    cards: []
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/a02706d46388bcd71dfd6cf997d6feb2
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/a02706d46388bcd71dfd6cf997d6feb2/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+  - type: sections
+    max_columns: 4
+    title: Automatiseringen
+    path: automatiseringen
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Automatiseringen Aan/Uit zetten
+            heading_style: title
+          - type: custom:mod-card
+            style: |
+              ha-card {
+                border: 1px solid #2196f3;
+                border-radius: 12px;
+                box-shadow: 1px 1px 1px #888;
+                font-size: 12px;
+                --ha-card-header-font-size: 16px !important;
+               }
+            card:
+              type: vertical-stack
+              cards:
+                - type: entities
+                  entities:
+                    - entity: input_boolean.vuilwatertank_automatisch_legen_aanuit
+                      icon: mdi:wall-sconce-flat
+                      name: Legen vuilwatertank (nr001) (50% > 10% en max 30 sec)
+                  title: Automatisch aan/uit zetten
+          - type: heading
+            heading_style: title
+          - type: heading
+            heading_style: title
+            heading: Automatisch aan/uit zetten alle verlichting
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    name: Alle lampen Aan
+                    show_icon: false
+                    styles:
+                      card:
+                        - height: 50px
+                        - background-color: '#74db78'
+                        - color: white
+                        - font-weight: bold
+                        - border-radius: 12px
+                      name:
+                        - color: white
+                    tap_action:
+                      action: perform-action
+                      perform_action: input_select.select_option
+                      target:
+                        entity_id: input_select.alle_verlichting
+                      data:
+                        option: turn on
+                  - type: custom:button-card
+                    name: Alle lampen Uit
+                    show_icon: false
+                    styles:
+                      card:
+                        - height: 50px
+                        - background-color: '#FF8A80'
+                        - color: white
+                        - font-weight: bold
+                        - border-radius: 12px
+                      name:
+                        - color: white
+                    tap_action:
+                      action: perform-action
+                      perform_action: input_select.select_option
+                      target:
+                        entity_id: input_select.alle_verlichting
+                      data:
+                        option: turn off
+                  - type: custom:button-card
+                    entity: input_select.alle_verlichting
+                    show_icon: true
+                    show_name: false
+                    show_state: true
+                    styles:
+                      card:
+                        - height: 50px
+                        - background-color: white
+                        - font-weight: bold
+                        - border-radius: 12px
+                      state:
+                        - color: black
+                    hold_action:
+                      action: none
+              - type: markdown
+                content: >-
+                  Bediening van alle verlichting in het interieur
+
+                  Vanwege de hoeveelheid berichten duurt dit proces en de
+                  controle enkele seconden
+
+                  Het witte blok is de status van het programma
+                text_only: true
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/8a6d86c10a5dc7ae8f3b397950757281
+        media_content_type: image/jpeg
+        metadata:
+          title: Plattegrond-flat.jpg
+          thumbnail: /api/image/serve/8a6d86c10a5dc7ae8f3b397950757281/256x256
+          media_class: image
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://image_upload
+    cards: []

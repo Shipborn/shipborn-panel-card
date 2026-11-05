@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.18";
+const VERSION = "0.5.19";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -229,6 +229,7 @@ const STYLE = `
   .d-zoom .zh .d-btn { width: auto; height: 44px; font-size: 15px; }
   .d-zoom .zb { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
   .d-zoom .zc { position: relative; }
+  .d-zoom .zs { display: block; overflow: visible; transform: translateY(30px); }
   .d-btn:active, .d-btn.pressed { background: #333; }
   .d-btn.left { justify-content: flex-start; }
   .d-btn.stop { background: var(--alarm-soft, #3a1512); border-color: var(--alarm, #ff5b4f); color: var(--ink, #ffd9d6); }
@@ -355,6 +356,7 @@ const TC_THEMES = {
     "media-seawater": "#3cc7d6", "media-freshwater": "#4aa3ff", "media-hotwater": "#e0453a", "media-fuel": "#c0803f",
     "media-oil": "#e8c547", "media-hydraulic": "#f5a524", "media-exhaust": "#8f8e88", "media-wastewater": "#a58763",
     "media-glycol": "#b57be0", "media-power": "#ff9f1c", "shadow-dialog": "0 16px 48px #000000a6",
+    "light": "#f4cf6a", "light-soft": "#3a3016",
   },
   dag: {
     "bg": "#e9edf0", "surface": "#ffffff", "surface-raised": "#f4f6f8", "ink": "#11171c",
@@ -365,6 +367,7 @@ const TC_THEMES = {
     "media-seawater": "#13909e", "media-freshwater": "#1f6fc8", "media-hotwater": "#b8301f", "media-fuel": "#94591f",
     "media-oil": "#8f7408", "media-hydraulic": "#a86605", "media-exhaust": "#6b6a66", "media-wastewater": "#7a5c3c",
     "media-glycol": "#7d45b3", "media-power": "#b25e00", "shadow-dialog": "0 16px 48px #11171c40",
+    "light": "#8a6800", "light-soft": "#fbf1c8",
   },
   rood: {
     "bg": "#000000", "surface": "#0f0302", "surface-raised": "#1a0504", "ink": "#ff5a45",
@@ -375,6 +378,7 @@ const TC_THEMES = {
     "media-seawater": "#de4a34", "media-freshwater": "#de4a34", "media-hotwater": "#de4a34", "media-fuel": "#de4a34",
     "media-oil": "#de4a34", "media-hydraulic": "#de4a34", "media-exhaust": "#de4a34", "media-wastewater": "#de4a34",
     "media-glycol": "#de4a34", "media-power": "#de4a34", "shadow-dialog": "none",
+    "light": "#ff7a3c", "light-soft": "#220801",
   },
 };
 const TC_THEME_ORDER = ["nacht", "dag", "rood"];
@@ -570,6 +574,16 @@ const TC_STYLE =
   .tc-row-btn { flex: none; display: grid; place-items: center; width: 52px; padding: 0; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-md); color: var(--ink); cursor: pointer; font: 600 28px/1 var(--font-cond); }
   .tc-row-btn:disabled, .tc-row-main:disabled { opacity: .4; cursor: default; }
   .tc-lgroup .tc-row-state { min-width: 54px; text-align: right; }
+  /* lights in soft yellow (other row buttons keep the blue accent); on_tone: alarm / warn for leak and battery rows */
+  .tc-row.is-light.is-on .tc-row-main { background: var(--light-soft); border-color: var(--light); }
+  .tc-row.is-light.is-on .tc-row-main .ic, .tc .tc-row.is-light.is-on .tc-row-state { color: var(--light); }
+  .tc-row.is-light.is-busy .tc-row-main { border-color: var(--light); }
+  .tc-row.tone-alarm.is-on .tc-row-main { background: var(--alarm-soft); border-color: var(--alarm); }
+  .tc-row.tone-alarm.is-on .tc-row-main .ic, .tc .tc-row.tone-alarm.is-on .tc-row-state { color: var(--alarm); }
+  .tc-row.tone-warn.is-on .tc-row-main { background: var(--warn-soft); border-color: var(--warn); }
+  .tc-row.tone-warn.is-on .tc-row-main .ic, .tc .tc-row.tone-warn.is-on .tc-row-state { color: var(--warn); }
+  .tc-row.is-info .tc-row-main { cursor: pointer; }
+  .tc-step .tc-row-btn { width: 46px; }
   .tc-step { display: flex; align-items: stretch; gap: var(--space-2); }
   .tc-step-label { flex: 1; min-width: 0; align-self: center; color: var(--ink-muted); }
   .tc-step-val { min-width: 84px; display: grid; place-items: center; font: 600 26px/1 var(--font-cond); white-space: nowrap; }
@@ -577,9 +591,12 @@ const TC_STYLE =
   .tc-step.is-stacked { flex-wrap: wrap; align-content: flex-start; row-gap: 6px; }
   .tc-step.is-stacked .tc-step-label { flex-basis: 100%; align-self: auto; }
   .tc-step.is-stacked .tc-row-btn, .tc-step.is-stacked .tc-step-val { height: calc(100% - 22px); }
-  .tc-step.is-stacked .tc-step-val { flex: 1; }
+  .tc-step.is-stacked .tc-step-val { flex: 1; min-width: 0; font-size: 24px; }
   .tc-g-set { stroke: var(--ink); stroke-width: 3; }
   .tc-gauge-sub { position: absolute; left: 0; right: 0; text-align: center; }
+  .tc-g-fan { stroke: var(--ink-muted); stroke-width: 14; }
+  .tc-climate.is-auto .tc-g-fan { stroke-dasharray: 10 7; stroke-linecap: butt; }
+  .tc-clim-fan b { font: 600 18px/1 var(--font-cond); color: var(--ink); margin-left: 4px; letter-spacing: 0; text-transform: none; }
 
   /* hotspot */
   .tc-hotspot { display: flex; align-items: center; gap: var(--space-2); transform: translate(-7px, -50%); padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); z-index: 1; }
@@ -786,6 +803,13 @@ class ShipbornPanelCard extends HTMLElement {
     this._ro?.disconnect();
     this._ro = null;
     this._kioskOff();
+    // Leaving the page closes a zoomed room, so coming back shows the plan with a scrollable page.
+    for (const ov of this._panel?.querySelectorAll(".d-zoom") || []) {
+      ov.classList.remove("in");
+      ov.style.display = "none";
+    }
+    this._zoomLock = false;
+    this._zoomRelayout = null;
     this._lockScroll(false);
     window.removeEventListener("resize", this._onResize);
     window.removeEventListener("shipborn-tc-theme", this._onTcTheme);
@@ -1005,7 +1029,7 @@ class ShipbornPanelCard extends HTMLElement {
       H = Math.min(this._H, this._contentBottom() + 12 + 88);
       const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
       if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1)) s = avail / H;
-      this._lockScroll(!!this._kiosk && H * s <= avail + 1);
+      this._lockScroll((!!this._kiosk && H * s <= avail + 1) || !!this._zoomLock);
     }
     this._scale = s; // popups (zone) open at the same scale
     this._panel.style.transform = `scale(${s})`;
@@ -1019,6 +1043,7 @@ class ShipbornPanelCard extends HTMLElement {
         Object.assign(dock.firstChild.style, { transform: `scale(${s})`, marginLeft: this._panel.style.left });
       }
     }
+    this._zoomRelayout?.();
   }
 
   // Lowest edge of the page content in design px (status and icon bar are in docks, not in the panel).
@@ -1128,6 +1153,7 @@ class ShipbornPanelCard extends HTMLElement {
       case "toggle": return this._tToggle(item);
       case "light_group": return this._tLightGroup(item);
       case "stepper": return this._tStepper(item);
+      case "climate": return this._tClimate(item);
       default:
         if (SYMBOLS.includes(item.type)) return this._dSymbol(item);
         console.warn("shipborn-panel-card: unknown item type", item.type);
@@ -2043,8 +2069,9 @@ class ShipbornPanelCard extends HTMLElement {
     return n;
   }
 
-  // Row button: a tap toggles (or `tap_action`); BEZIG until the state changes. A light shows its brightness and
-  // gets a second button (`more_info`, default for lights) that opens HA's own more-info dialog for dimming.
+  // Row button: a tap toggles (or `tap_action`); BEZIG until the state changes. A light shows its brightness in soft
+  // yellow and gets a second button (`more_info`, default for lights) that opens HA's own more-info dialog for dimming.
+  // A sensor shows its value; `states` renames states (e.g. on: LEK) and `on_tone: alarm | warn` colours the on state.
   _tToggle(t) {
     const n = this._place(h("div", "tc-row"), t, 220, 48);
     const main = h("button", "tc-row-main");
@@ -2063,6 +2090,8 @@ class ShipbornPanelCard extends HTMLElement {
       more.addEventListener("click", () => this._handleAction(t, { action: "more-info" }, more));
       n.appendChild(more);
     }
+    if (isLight) n.classList.add("is-light");
+    if (t.on_tone) n.classList.add("tone-" + t.on_tone);
     let busy = 0;
     let last = null;
     main.addEventListener("click", async () => {
@@ -2086,7 +2115,10 @@ class ShipbornPanelCard extends HTMLElement {
       main.disabled = unavailable(so);
       if (more) more.disabled = unavailable(so);
       const b = so?.attributes?.brightness;
-      word.textContent = busy ? "BEZIG" : unavailable(so) ? "—" : on && isLight && b != null ? `${Math.round(b / 2.55)}%` : tcWord(so.state, t);
+      const v = isLight ? null : num(so, t.factor); // a sensor shows its value, e.g. a temperature
+      const u = unitOf(t, so);
+      word.textContent = busy ? "BEZIG" : unavailable(so) ? "—" : on && isLight && b != null ? `${Math.round(b / 2.55)}%`
+        : v != null ? `${fmt(v, t.decimals ?? (v % 1 ? 1 : 0), hass)}${u ? " " + u : ""}` : tcWord(so.state, t);
     });
     return n;
   }
@@ -2095,7 +2127,7 @@ class ShipbornPanelCard extends HTMLElement {
   // the lowest step, − at the lowest step switches it off. Shows the brightness and how many of its lights are on
   // (from the group's `entity_id` attribute, or `members`).
   _tLightGroup(g) {
-    const n = this._place(h("div", "tc-row tc-lgroup"), g, 448, 56);
+    const n = this._place(h("div", "tc-row tc-lgroup is-light"), g, 448, 56);
     const main = h("button", "tc-row-main");
     main.type = "button";
     main.innerHTML = `<span class="ic">${tcIcon(g.icon || "verlichting", 24)}</span><span class="tc-row-text"><span class="tc-row-label label"></span><span class="tc-row-sub caption"></span></span><span class="tc-row-state value-md"></span>`;
@@ -2208,6 +2240,53 @@ class ShipbornPanelCard extends HTMLElement {
       const off = unavailable(hass.states[s.entity]) || b == null;
       minus.disabled = off || b <= min;
       plus.disabled = off || b >= max;
+    });
+    return n;
+  }
+
+  // Round climate dial: the upper half is the temperature (`entity`, `min`–`max`, setpoint tick from `setpoint_entity`),
+  // the lower half the fan speed (`fan_entity`, `fan_min`–`fan_max`; `fan_names: { 6: Aut }` shows a word and a dashed arc).
+  _tClimate(c) {
+    const W = c.width || 180;
+    const n = this._place(h("div", "tc-gauge tc-climate"), c, W, W);
+    const k = W / 200;
+    const min = c.min ?? 10;
+    const max = c.max ?? 35;
+    const fmin = c.fan_min ?? 1;
+    const fmax = c.fan_max ?? 6;
+    const G = 0.14; // gap at 9 and 3 o'clock between the two halves
+    const PI = Math.PI;
+    const P = (a, r = 80) => `${(100 + r * Math.cos(a)).toFixed(2)} ${(100 + r * Math.sin(a)).toFixed(2)}`;
+    const arc = (a0, a1, sweep) => `M${P(a0)}A80 80 0 0 ${sweep} ${P(a1)}`;
+    const tA = (v) => PI + G + (PI - 2 * G) * clamp((v - min) / (max - min || 1), 0, 1); // left, over the top, right
+    const fA = (v) => PI - G - (PI - 2 * G) * clamp((v - fmin + 1) / (fmax - fmin + 1 || 1), 0, 1); // left, under, right
+    n.innerHTML =
+      `<svg viewBox="0 0 200 200"><path class="tc-g-track" d="${arc(PI + G, 2 * PI - G, 1)}"/><path class="tc-g-track" d="${arc(PI - G, G, 0)}"/>` +
+      `<path class="tc-g-val" d=""/><path class="tc-g-fan" d=""/><path class="tc-g-set" d=""/></svg>` +
+      `<div class="tc-gauge-center" style="top:${50 * k}px"><span class="value-lg" style="font-size:${36 * k}px"></span><span class="caption tc-unit"></span></div>` +
+      `<div class="tc-gauge-sub caption" style="top:${92 * k}px"></div>` +
+      `<div class="tc-gauge-sub caption tc-clim-fan" style="top:${112 * k}px">${c.fan_label ?? "Ventilator"}<b></b></div>`;
+    const [valArc, fanArc, setMark] = [...n.querySelectorAll("path")].slice(2);
+    const [big, unit] = n.querySelector(".tc-gauge-center").children;
+    const [setText, fanText] = n.querySelectorAll(".tc-gauge-sub");
+    const fanVal = fanText.querySelector("b");
+    this._updaters.push((hass) => {
+      const so = c.entity ? hass.states[c.entity] : null;
+      const v = num(so, c.factor);
+      valArc.setAttribute("d", v == null ? "" : arc(PI + G, tA(v), 1));
+      big.textContent = fmt(v, c.decimals ?? 1, hass);
+      unit.textContent = unitOf(c, so);
+      const ss = c.setpoint_entity ? hass.states[c.setpoint_entity] : null;
+      const sp = num(ss);
+      const a = sp == null ? null : tA(sp);
+      setMark.setAttribute("d", a == null ? "" : `M${P(a, 66)}L${P(a, 94)}`);
+      const su = c.setpoint_unit ?? c.unit ?? ss?.attributes?.unit_of_measurement ?? so?.attributes?.unit_of_measurement ?? "";
+      setText.textContent = c.setpoint_entity ? `${c.setpoint_label ?? "Setpoint"} ${fmt(sp, c.setpoint_decimals ?? 0, hass)}${sp != null && su ? " " + su : ""}` : "";
+      const fv = c.fan_entity ? num(hass.states[c.fan_entity]) : null;
+      const word = fv == null ? null : c.fan_names?.[fv] ?? c.fan_names?.[String(fv)];
+      n.classList.toggle("is-auto", word != null);
+      fanArc.setAttribute("d", fv == null ? "" : arc(PI - G, word != null ? G : fA(fv), 0));
+      fanVal.textContent = fv == null ? "—" : word ?? fmt(fv, 0, hass);
     });
     return n;
   }
@@ -2677,8 +2756,10 @@ class ShipbornPanelCard extends HTMLElement {
     return n;
   }
 
-  // Zoomed view of a zone: the drawing under it zooms into `area`, and a side panel (`panel`) with the zone's
-  // own items slides in; it scrolls when `height` is taller than the panel. "Terug" zooms out again.
+  // Zoomed view of a zone: the drawing under it zooms into the left part of the screen, a side panel with the zone's own
+  // `items` slides in on the right (it scrolls when `height` is taller), and `below: { height, items }` (e.g. the
+  // Webasto controls) sits under the zoomed drawing. Without `area`/`panel` it all fits the visible screen between the
+  // fixed bars, and the page does not scroll while zoomed. "Terug" zooms out again.
   _dZoom(z) {
     const zc = z.zoom;
     const W = this._W;
@@ -2691,20 +2772,15 @@ class ShipbornPanelCard extends HTMLElement {
       const iy = i.y ?? i.true ?? 0;
       return zx + zw / 2 >= i.x && zx + zw / 2 <= i.x + i.width && zy + zh / 2 >= iy && zy + zh / 2 <= iy + i.height;
     });
-    // Default: from just below the header to above the icon bar (TC90) or the bottom edge.
-    const [top0, bot0] = this._tc ? [72, 116] : [120, 20];
-    const [ax, ay, aw, ah] = zc.area || [20, top0, 740, H - top0 - bot0];
-    const [px, py, pw, ph] = zc.panel || [776, top0, W - 796, H - top0 - bot0];
-    const T = Math.min(ay, py);
-    const ov = this._place(h("div", "d d-zoom"), { x: 0, y: T, width: W, height: H - T });
+    const ov = this._place(h("div", "d d-zoom"), { x: 0, y: 0, width: W, height: H });
     const view = h("div", "zv", { background: zc.background ?? (this._tc ? "var(--bg)" : "#ffffff") });
-    const inner = h("div", "zi", { top: -T + "px", width: W + "px", height: H + "px" });
+    const inner = h("div", "zi", { width: W + "px", height: H + "px" });
     if (img) inner.appendChild(this._renderItem({ ...img }));
     const mark = h("div", "zm" + (z.points ? " poly" : ""), { left: zx + "px", top: zy + "px", width: zw + "px", height: zh + "px" });
     if (z.points) mark.innerHTML = `<svg viewBox="0 0 ${zw} ${zh}"><polygon points="${polyPoints(z.points, zx, zy)}"/></svg>`;
     inner.appendChild(mark);
     view.appendChild(inner);
-    const side = h("div", "d-panel zp", { left: px + "px", top: py - T + "px", width: pw + "px", height: ph + "px" });
+    const side = h("div", "d-panel zp");
     const head = h("div", "zh");
     const t = h("div", "d-ph");
     t.textContent = zc.title ?? z.label ?? "";
@@ -2712,7 +2788,7 @@ class ShipbornPanelCard extends HTMLElement {
     back.textContent = "← Terug";
     head.append(t, back);
     const body = h("div", "zb");
-    const content = h("div", "zc", { height: (zc.height || ph - 66) + "px" });
+    const content = h("div", "zc", { height: (zc.height || 400) + "px" });
     for (const it of zc.items || []) {
       const c = this._renderItem(it);
       if (c) content.appendChild(c);
@@ -2720,34 +2796,85 @@ class ShipbornPanelCard extends HTMLElement {
     body.appendChild(content);
     side.append(head, body);
     ov.append(view, side);
+    const bh = zc.below ? zc.below.height || 220 : 0;
+    let strip = null;
+    if (bh) {
+      strip = h("div", "zp zs");
+      for (const it of zc.below.items || []) {
+        const c = this._renderItem(it);
+        if (c) strip.appendChild(c);
+      }
+      ov.appendChild(strip);
+    }
     this._panel.appendChild(ov);
-    // Start: the white sheet around the drawing; end: the zoom area. Both as clip-path insets of the overlay.
-    const inset = (x, y, w, hh, r) => `inset(${y - T}px ${W - x - w}px ${H - y - hh}px ${x}px round ${r}px)`;
-    const iy = img ? (img.y ?? img.true ?? 0) : zy;
-    const from = img ? inset(img.x - 20, iy - 20, img.width + 40, img.height + 40, 10) : inset(zx, zy, zw, zh, 8);
-    const to = inset(ax, ay, aw, ah, 10);
-    const s = Math.min((aw / zw) * (zc.fill ?? 0.9), (ah / zh) * (zc.fill ?? 0.9), zc.max_scale ?? 3);
-    const tx = ax + aw / 2 - (zx + zw / 2) * s;
-    const ty = ay + ah / 2 - (zy + zh / 2) * s;
+    // Visible band of the page in design px: from under the status bar to above the icon bar (12 px margin each).
+    const layout = () => {
+      let T = 0;
+      let B = H;
+      if (zc.area || zc.panel) {
+        const [top0, bot0] = this._tc ? [72, 116] : [120, 20];
+        T = Math.min((zc.area || [0, top0])[1], (zc.panel || [0, top0])[1]);
+        B = H - bot0;
+      } else {
+        const r = this._outer.getBoundingClientRect();
+        const k = this._scale || 1;
+        // From the bars' design heights (their own size may not be updated yet right after a resize).
+        const tops = this._docks.filter(([d]) => d.classList.contains("tc-dock-top"));
+        const bots = this._docks.filter(([d]) => d.classList.contains("tc-dock-bottom"));
+        const topV = Math.max(0, ...tops.map(([d, dh]) => d.getBoundingClientRect().top + dh * k));
+        const botV = Math.min(innerHeight, ...bots.map(([, dh]) => innerHeight - dh * k));
+        T = clamp(Math.round((topV - r.top) / k) + 12, 0, H - 300);
+        B = clamp(Math.round((botV - r.top) / k) - 12, T + 300, H);
+      }
+      const area = zc.area || [20, T, 740, B - T - (bh ? bh + 12 : 0)];
+      const pan = zc.panel || [776, T, W - 796, B - T];
+      Object.assign(ov.style, { top: T + "px", height: B - T + "px" });
+      inner.style.top = -T + "px";
+      Object.assign(side.style, { left: pan[0] + "px", top: pan[1] - T + "px", width: pan[2] + "px", height: pan[3] + "px" });
+      if (strip) Object.assign(strip.style, { left: area[0] + "px", top: area[1] + area[3] + 12 - T + "px", width: area[2] + "px", height: bh + "px" });
+      return [T, B, area];
+    };
+    const inset = (T, B, x, y, w, hh, r) => `inset(${y - T}px ${W - x - w}px ${B - y - hh}px ${x}px round ${r}px)`;
+    let from = "";
     let timer;
     back.addEventListener("click", () => {
       ov.classList.remove("in");
       view.style.clipPath = from;
       inner.style.transform = "translate(0px, 0px) scale(1)";
       timer = setTimeout(() => (ov.style.display = "none"), 450);
+      this._zoomLock = false;
+      this._zoomRelayout = null;
+      this._lockScroll(false);
+      this._fit();
     });
+    // Places everything for the current screen; on open it animates, on a resize (this._zoomRelayout from _fit) it jumps.
+    const place = (animate) => {
+      const [T, B, [ax, ay, aw, ah]] = layout();
+      // Start: the sheet around the drawing; end: the zoom area. Both as clip-path insets of the overlay.
+      const iy = img ? (img.y ?? img.true ?? 0) : zy;
+      from = img ? inset(T, B, img.x - 20, iy - 20, img.width + 40, img.height + 40, 10) : inset(T, B, zx, zy, zw, zh, 8);
+      const s = Math.min((aw / zw) * (zc.fill ?? 0.9), (ah / zh) * (zc.fill ?? 0.9), zc.max_scale ?? 3);
+      const tx = ax + aw / 2 - (zx + zw / 2) * s;
+      const ty = ay + ah / 2 - (zy + zh / 2) * s;
+      mark.style.borderWidth = 3 / s + "px";
+      if (animate) {
+        view.style.clipPath = from;
+        inner.style.transform = "translate(0px, 0px) scale(1)";
+        void ov.offsetWidth; // start the transitions from the unzoomed state
+        ov.classList.add("in");
+      }
+      view.style.clipPath = inset(T, B, ax, ay, aw, ah, 10);
+      inner.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+    };
     return {
       open: () => {
         clearTimeout(timer);
         ov.style.display = "block";
-        view.style.clipPath = from;
-        inner.style.transform = "translate(0px, 0px) scale(1)";
-        mark.style.borderWidth = 3 / s + "px";
         body.scrollTop = 0;
-        void ov.offsetWidth; // start the transitions from the unzoomed state
-        ov.classList.add("in");
-        view.style.clipPath = to;
-        inner.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+        this._zoomLock = true;
+        this._lockScroll(true);
+        place(true);
+        this._zoomRelayout = () => place(false);
       },
     };
   }

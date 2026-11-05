@@ -37,7 +37,7 @@ def label(e):
 
 
 def q(s):
-    return '"' + s.replace('"', '\\"') + '"' if re.search(r"[:#,\[\]{}&*!|>'\"%@`]", s) or s[:1].isdigit() else s
+    return '"' + s.replace('"', '\\"') + '"' if re.search(r"[:#,\[\]{}&*!|>'\"%@`?]", s) or s[:1].isdigit() else s
 
 
 PUMP = ', tap_action: { action: toggle, confirmation: { text_on: "Wilt u de pomp aanzetten?", text_off: "Wilt u de pomp uitzetten?" } }'
@@ -58,6 +58,7 @@ class Panel:
 
     def __init__(self):
         self.items, self.y, self.used = [], 12, set()
+        self.below = []  # items under the zoomed drawing (the Webasto blocks), side by side
 
     def add(self, s):
         self.items.append(s)
@@ -169,20 +170,60 @@ class Panel:
                 self.y += 56
         self.y += 6
 
+    BW, BH = 364, 236  # one Webasto block in the strip under the zoomed drawing
+
     def webasto(self, key, title, lo=10, hi=35):
-        """Webasto unit: dial with the room temperature and the setpoint tick; airco on/off; setpoint and fan with − / +."""
+        """Webasto unit as a block under the zoomed drawing (next to the previous one): round dial with the temperature on
+        the upper half (setpoint tick) and the fan speed on the lower half; airco on/off; setpoint and fan with − / +."""
         b = f"webasto_bluecool_noder_{key}"
-        self.title(title)
-        y, x2 = self.y, self.X0 + 210
-        w2 = self.W - 210
-        self.add(f'{{ type: dial, x: {self.X0}, y: {y}, width: 196, label: Temperatuur, entity: sensor.{b}_temp, min: {lo}, max: {hi}, '
-                 f'unit: "°C", decimals: 1, setpoint_entity: sensor.{b}_setpoint_feedback }}')
-        self.add(f"{{ type: toggle, x: {x2}, y: {y}, width: {w2}, height: 52, icon: klimaat, label: Airco, entity: switch.{b}_ac }}")
-        self.add(f'{{ type: stepper, x: {x2}, y: {y + 62}, width: {w2}, height: 70, stacked: true, label: Setpoint, entity: number.{b}, '
-                 f'state_entity: sensor.{b}_setpoint_feedback, unit: "°C" }}')
-        self.add(f"{{ type: stepper, x: {x2}, y: {y + 142}, width: {w2}, height: 70, stacked: true, label: Ventilator, entity: number.{b}_fan_speed, "
-                 f"state_entity: sensor.{b}_fan_speed_feedback, value_names: {{ 6: Aut }} }}")
-        self.y = y + 226
+        x = len([i for i in self.below if "type: panel" in i]) * (self.BW + 12)
+        x2, w2 = x + 180, self.BW - 192
+        add = self.below.append
+        add(f"{{ type: panel, x: {x}, y: 0, width: {self.BW}, height: {self.BH}, title: {q(title)} }}")
+        add(f'{{ type: climate, x: {x + 12}, y: 50, width: 156, entity: sensor.{b}_temp, min: {lo}, max: {hi}, unit: "°C", decimals: 1, '
+            f'setpoint_entity: sensor.{b}_setpoint_feedback, fan_entity: sensor.{b}_fan_speed_feedback, fan_min: 1, fan_max: 6, fan_names: {{ 6: Aut }} }}')
+        add(f"{{ type: toggle, x: {x2}, y: 44, width: {w2}, height: 44, icon: klimaat, label: Airco, entity: switch.{b}_ac }}")
+        add(f'{{ type: stepper, x: {x2}, y: 98, width: {w2}, height: 62, stacked: true, label: Setpoint, entity: number.{b}, '
+            f'state_entity: sensor.{b}_setpoint_feedback, unit: "°C" }}')
+        add(f"{{ type: stepper, x: {x2}, y: 166, width: {w2}, height: 62, stacked: true, label: Ventilator, entity: number.{b}_fan_speed, "
+            f"state_entity: sensor.{b}_fan_speed_feedback, value_names: {{ 6: Aut }} }}")
+        self.used.update([f"switch.{b}_ac", f"number.{b}", f"number.{b}_fan_speed", f"sensor.{b}_temp"])
+
+    def info(self, rows):
+        """(label, entity, extra) as row buttons in two columns that show the state or value; a tap opens HA's more-info
+        (with the history graph)."""
+        for i, (lbl, e, *opt) in enumerate(rows):
+            x = self.X0 + (i % 2) * (self.W2 + 10)
+            extra = opt[0] if opt else ""
+            self.add(f"{{ type: toggle, x: {x}, y: {self.y}, width: {self.W2}, height: 48, label: {q(lbl)}, entity: {e}, more_info: false, "
+                     f"tap_action: {{ action: more-info }}{extra} }}")
+            if i % 2 == 1 or i == len(rows) - 1:
+                self.y += 56
+        self.y += 6
+
+    def motion(self, occupancy=None, temp=None, note=None):
+        """Motion & temperature of a room (as on the crew's HA pages); the graphs are in HA's more-info dialog."""
+        self.title("Beweging en temperatuur")
+        if note:
+            self.note(note)
+        rows = []
+        if occupancy:
+            rows.append(("Beweging", occupancy, ', icon: lifebeat, states: { "on": BEWEGING, "off": RUST }'))
+        if temp:
+            rows.append(("Temperatuur", temp, ", icon: klimaat"))
+        self.info(rows)
+
+    def bilge(self, key, pump=None, batteries=()):
+        """Leak sensors (red while wet), the bilge pump (yes/no) and the sensor batteries, in the row-button style."""
+        lo, hi = LEAK[key]
+        self.title("Bilge")
+        wet = ', icon: bilge, on_tone: alarm, states: { "on": LEK, "off": DROOG }'
+        rows = [("Water laag", lo, wet), ("Water hoog", hi, wet)]
+        for lbl, e in batteries:
+            rows.append((f"{lbl} batterij", e, ', on_tone: warn, states: { "on": LAAG, "off": OK }' if e.endswith("_battery_low") else ', unit: "%"'))
+        self.info(rows)
+        if pump:
+            self.power([(pump[0], pump[1], "pomp")])
 
     def rest(self, pattern, domain="light"):
         left = [e for e in ents(pattern, domain) if e not in self.used]
@@ -203,8 +244,8 @@ def room(plan, label_, rect, build, value=None, leak=None, active=(), alarm=(), 
 # ---------- interior ----------
 
 def owners(p):
-    # Layout from examples/OwnersCabinBediening.txt (05-11): light groups with their own lights below them,
-    # power supply, and the two Webasto units. No scenes, motion sensors or "Overig" here (on request).
+    # Layout from the crew's HA page "Owners" (dashboardOverview/overview.yaml): light groups with their own lights below
+    # them, power supply, motion & temperature; the two Webasto units sit under the zoomed drawing. No scenes or "Overig".
     p.title("Owners cabin – verlichting")
     p.group("Rondom laag plafond", "light.owners_cabin_rondom_laag_plafond",
             [("BBA (2 spots)", "light.oc_s_1b_laag_bba_d11"), ("SBA (2 spots)", "light.oc_s_1b_laag_sba_d16"),
@@ -222,29 +263,28 @@ def owners(p):
     p.power([("Webasto klimaat (bad)", "switch.oc_e1_2_l1", "klimaat"), ("Sanibroyeur 1", "switch.oc_w_e3", "pomp"),
              ("Sanibroyeur 2", "switch.oc_w_e4", "pomp"), ("Toilet", "switch.oc_w_e5", "water"),
              ("Wandcontactdozen (TV)", "switch.oc_k1", "energie"), ("Stopcontact (plug)", "switch.0xa4c138b105c39a71", "energie")])
+    p.motion("binary_sensor.motion_sensor_ownerscabin_occupancy", "sensor.motion_sensor_ownerscabin_temperature",
+             "Sensor ligt bij het kastje aan stuurboord.")
     p.webasto("owners_cabin", "Webasto owners cabin")
     p.webasto("owners_cabin_bad", "Webasto owners cabin bad")
 
 
 def deck_lounge(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "decklounge_aan"), ("Uit", "deck_lounge_uit")])
+    # Crew's HA pages: salon lights (page "Main", section Deck Lounge), printer, motion and Webasto (page "Deck Lounge").
     p.title("Salon – verlichting")
-    p.grid([("Salon rondom", "light.main_cabin_salon_rondom"), ("Plinten", "light.main_cabin_plinten")])
-    p.grid([("Salon hoek BB achter (2 spots)", "light.mc_s_3a_dl_bba_d11_1"), ("Salon hoek BB midden (2 spots)", "light.mc_s_3a_dl_bbm_d11_2"),
-            ("Salon hoek BB voor (2 spots)", "light.mc_s_3a_dl_bbv_d11_3"), ("Salon hoek SB achter (2 spots)", "light.mc_s_3a_dl_sba_d11_7"),
-            ("Salon hoek SB midden (2 spots)", "light.mc_s_3a_dl_sbm_d11_6"), ("Salon hoek SB voor (2 spots)", "light.mc_s_3a_dl_sbv_d11_5"),
-            ("Salon voor (2 spots)", "light.mc_s_3a_dl_v_d11_4"), ("Salon plinten", "light.mc_s_3b_trap_d9")])
-    p.climate("deck_lounge", "Webasto deck lounge")
-    p.title("Beweging en temperatuur")
-    p.sensors(("Temperatuur", "sensor.0x001788010df593f4_temperature"), "binary_sensor.0x001788010df593f4_occupancy",
-              [("Bewegingssensor", "sensor.0x001788010df593f4_battery")])
+    p.group("Salon rondom", "light.main_cabin_salon_rondom",
+            [("BBA (2 spots)", "light.mc_s_3a_dl_bba_d11_1"), ("SBA (2 spots)", "light.mc_s_3a_dl_sba_d11_7"),
+             ("BBM (2 spots)", "light.mc_s_3a_dl_bbm_d11_2"), ("SBM (2 spots)", "light.mc_s_3a_dl_sbm_d11_6"),
+             ("BBV (2 spots)", "light.mc_s_3a_dl_bbv_d11_3"), ("SBV (2 spots)", "light.mc_s_3a_dl_sbv_d11_5"),
+             ("Voor (2 spots)", "light.mc_s_3a_dl_v_d11_4")])
+    p.group("Plinten", "light.main_cabin_plinten", [("Salon plinten", "light.mc_s_3b_trap_d9")])
+    p.motion("binary_sensor.0x001788010df593f4_occupancy", "sensor.0x001788010df593f4_temperature")
     p.title("Printer HP Smart Tank 5100")
-    p.values([("Status", "sensor.hp_smart_tank_5100_series"), ("Zwart", "sensor.hp_smart_tank_5100_series_black_ink", ", decimals: 0"),
-              ("Cyaan", "sensor.hp_smart_tank_5100_series_cyan_ink", ", decimals: 0"),
-              ("Magenta", "sensor.hp_smart_tank_5100_series_magenta_ink", ", decimals: 0"),
-              ("Geel", "sensor.hp_smart_tank_5100_series_yellow_ink", ", decimals: 0")])
-    p.rest(r"^light\.mc_s_3c_")
+    p.info([("Status", "sensor.hp_smart_tank_5100_series"), ("Zwart", "sensor.hp_smart_tank_5100_series_black_ink", ', unit: "%"'),
+            ("Cyaan", "sensor.hp_smart_tank_5100_series_cyan_ink", ', unit: "%"'),
+            ("Magenta", "sensor.hp_smart_tank_5100_series_magenta_ink", ', unit: "%"'),
+            ("Geel", "sensor.hp_smart_tank_5100_series_yellow_ink", ', unit: "%"')])
+    p.webasto("deck_lounge", "Webasto deck lounge")
 
 
 def engine(p):
@@ -281,117 +321,113 @@ def engine(p):
 
 
 def dining(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "dining_aan"), ("Uit", "dining_uit")])
+    # Crew's HA page "Main", section Eetkamer: three single lights; the dining bilge stays (leak sensors and pump).
     p.title("Eetkamer – verlichting")
-    p.grid([("Scheiding eetkamer – lounge (spot)", "light.mc_s_5a_d_lr_d18"), ("Eetkamer kast + patrijspoort", "light.mc_s_5b_raam_kast_d13"),
-            ("Eetkamer plinten kast", "light.mc_s_5c_plint_d14")])
-    p.title("Bilge")
-    p.leaks("d", [("Bilgepomp", "switch.0xccba97fffeeb6ddc")])
-    p.sensors(batteries=[("Lek laag", "binary_sensor.0x0ceff6fffe76dcea_battery_low"), ("Lek hoog", "binary_sensor.0x0ceff6fffe9009c8_battery_low")])
-    p.rest(r"^light\.mc_(5a$|5b$|s_5)")
+    p.lights([("Scheiding lounge", "light.mc_s_5a_d_lr_d18"), ("Kast + patrijspoort", "light.mc_s_5b_raam_kast_d13"),
+              ("Plinten kast", "light.mc_s_5c_plint_d14")])
+    p.y += 6
+    p.bilge("d", ("Bilgepomp", "switch.0xccba97fffeeb6ddc"),
+            [("Lek laag", "binary_sensor.0x0ceff6fffe76dcea_battery_low"), ("Lek hoog", "binary_sensor.0x0ceff6fffe9009c8_battery_low")])
 
 
 def galley(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "galley_aan"), ("Uit", "galley_uit"), ("Apparatuur aan", "keuken_apparatuur_aan"), ("Apparatuur uit", "keuken_apparatuur_uit")])
-    p.title("Verlichting")
-    p.grid([("Aanrecht", "light.main_cabin_aanrecht_geheel")])
-    p.grid([("Aanrecht achterzijde", "light.g_s_4a_achter_d1"), ("Aanrecht kookplaat", "light.g_s_4a_kookplaat_d3"),
-            ("Patrijs (2)", "light.g_s_4a_raam_d2"), ("Aanrecht vaatwasser", "light.g_s_4a_vaatw_d4"),
-            ("Aanrecht onder kastjes", "light.g_s_4b_led_kast_d5")])
+    # Crew's HA page "Galley".
+    p.title("Galley – verlichting")
+    p.group("Aanrecht", "light.main_cabin_aanrecht_geheel",
+            [("Achterzijde", "light.g_s_4a_achter_d1"), ("Kookplaat", "light.g_s_4a_kookplaat_d3"),
+             ("Patrijs (2)", "light.g_s_4a_raam_d2"), ("Vaatwasser", "light.g_s_4a_vaatw_d4")])
+    p.lights([("Onder kastjes", "light.g_s_4b_led_kast_d5")])
+    p.y += 6
     p.title("Stroomvoorziening")
-    p.grid([("Webasto klimaat", "switch.g_w_e1"), ("Sanibroyeur (wastafel)", "switch.g_w_e3"), ("Sanibroyeur (was/droog)", "switch.g_w_e4"),
-            ("Wandcontactdozen", "switch.g_k2"), ("Afzuigkap", "switch.g_k1"), ("Vaatwasser", "switch.g_k3", CONFIRM), ("Oven", "switch.g_k4"),
-            ("Koelkast", "switch.g_k5", CONFIRM), ("Vriezer", "switch.g_k6", CONFIRM), ("Was-droog", "switch.g_k7", CONFIRM),
-            ("Smart plug keuken", "switch.socketgally")])
-    p.climate("galley", "Webasto galley")
+    p.power([("Webasto klimaat", "switch.g_w_e1", "klimaat"), ("Sanibroyeur (wastafel)", "switch.g_w_e3", "pomp"),
+             ("Sanibroyeur (was/droog)", "switch.g_w_e4", "pomp"), ("Wandcontactdozen", "switch.g_k2", "energie"),
+             ("Afzuigkap", "switch.g_k1", "ventilator"), ("Vaatwasser", "switch.g_k3", "water"), ("Oven", "switch.g_k4", "verwarming"),
+             ("Koelkast", "switch.g_k5", "energie"), ("Vriezer", "switch.g_k6", "energie"), ("Was-droog", "switch.g_k7", "water"),
+             ("Smart plug keuken", "switch.socketgally", "energie")])
     p.title("Temperatuur omvormer schakelkast")
-    p.sensors(("Temperatuur", "sensor.boiler_water_temp_temperature"), batteries=[("Temp-sensor", "sensor.boiler_water_temp_battery")])
-    p.rest(r"^light\.(g_s_4|mc_4a_g$)")
-    left = [e for e in ["switch.g_k8", "switch.0xa4c1384510c26c59", "switch.0xa4c1386689af54dc"] if e not in p.used]
-    names = {"switch.0xa4c1384510c26c59": "Koelkast (relais)", "switch.0xa4c1386689af54dc": "Vriezer (relais)"}
-    p.grid([(names.get(e, label(e)), e, CONFIRM if e in names else "") for e in left])
+    p.info([("Temperatuur", "sensor.boiler_water_temp_temperature", ", icon: klimaat")])
+    p.webasto("galley", "Webasto galley")
 
 
 def main(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "main_cabin_aan"), ("Uit", "main_cabin_uit"), ("Nacht", "living_room_nacht"),
-              ("Werkplek aan", "mc_workplace_aan"), ("Werkplek uit", "mc_workplace_uit"), ("Patrijspoorten", "patrijspoorten")])
+    # Crew's HA page "Main": zithoek, werkkamer, gang, power supply, temperature (the salon is in Deck lounge, the
+    # eetkamer in Dining); the salon bilge pump stays.
     p.title("Zithoek – verlichting")
-    p.grid([("Lounge bank", "light.main_cabin_lounge_bank_geheel"), ("Plinten", "light.main_cabin_plinten")])
-    p.grid([("Lounge tafel (2 spots)", "light.mc_s_7a_tafel_d25"), ("Lounge bank dwars 1 (2 spots)", "light.mc_s_7ab_bank_1_d31"),
-            ("Lounge bank dwars 2 (spot)", "light.mc_s_7ac_bank_2_d30"), ("Lounge bank 1 (spot)", "light.mc_s_7ad_bank_3_d29"),
-            ("Lounge bank 2 (spot)", "light.mc_s_7ae_bank_4_d28"), ("Lounge bank 3 (spot)", "light.mc_s_7af_bank_5_d27"),
-            ("Lounge bank 4 (spot)", "light.mc_s_7ag_bank_6_d26"), ("Lounge patrijspoort", "light.mc_s_7ai_raam_d33"),
-            ("Lounge plinten", "light.mc_s_7ak_plint_d34")])
+    p.group("Lounge bank", "light.main_cabin_lounge_bank_geheel",
+            [("Tafel (2 spots)", "light.mc_s_7a_tafel_d25"), ("Dwars 1 (2 spots)", "light.mc_s_7ab_bank_1_d31"),
+             ("Dwars 2 (spot)", "light.mc_s_7ac_bank_2_d30"), ("Bank 1 (spot)", "light.mc_s_7ad_bank_3_d29"),
+             ("Bank 2 (spot)", "light.mc_s_7ae_bank_4_d28"), ("Bank 3 (spot)", "light.mc_s_7af_bank_5_d27"),
+             ("Bank 4 (spot)", "light.mc_s_7ag_bank_6_d26")])
+    p.group("Plinten", "light.main_cabin_plinten", [("Lounge plinten", "light.mc_s_7ak_plint_d34")])
+    p.lights([("Lounge patrijspoort", "light.mc_s_7ai_raam_d33")])
+    p.y += 6
     p.title("Werkkamer – verlichting")
-    p.grid([("Werkplek plafond", "light.main_cabin_workplace_plafond"), ("Werkplek gang (2)", "light.mc_s_7b_gang_d36"),
-            ("Werkplek kast (2)", "light.mc_s_7b_kast_d35"), ("Werkplek plinten", "light.mc_s_7b_plint_d37")])
+    p.group("Werkplek plafond", "light.main_cabin_workplace_plafond",
+            [("Gang (2)", "light.mc_s_7b_gang_d36"), ("Kast (2)", "light.mc_s_7b_kast_d35")])
+    p.lights([("Werkplek plinten", "light.mc_s_7b_plint_d37")])
+    p.y += 6
     p.title("Gang – verlichting")
-    p.grid([("Gangpad", "light.main_cabin_gangpad_geheel"), ("Gang 1 (2)", "light.mc_s_6a_gang1_d19"), ("Gang 2 (2)", "light.mc_s_6a_gang2_d21"),
-            ("Gang 3 (2)", "light.mc_s_6a_gang3_d22"), ("Gang 4", "light.mc_s_6a_gang4_d23"), ("Mast", "light.mc_s_7aj_mast_d24")])
-    p.climate("main_cabin", "Webasto main cabin")
+    p.group("Gangpad", "light.main_cabin_gangpad_geheel",
+            [("Gang 1 (2)", "light.mc_s_6a_gang1_d19"), ("Gang 2 (2)", "light.mc_s_6a_gang2_d21"),
+             ("Gang 3 (2)", "light.mc_s_6a_gang3_d22"), ("Gang 4", "light.mc_s_6a_gang4_d23")])
+    p.lights([("Mast", "light.mc_s_7aj_mast_d24")])
+    p.y += 6
     p.title("Stroomvoorziening")
-    p.grid([("Webasto klimaat", "switch.mc_w_e1_2"), ("Wandcontactdozen", "switch.mc_k1"), ("Stopcontact (plug)", "switch.0xa4c138269e44b698"),
-            ("Schoonwaterpomp", "switch.0x781c9dfffeb6cfcd"), ("Watertank vullen via wal", "valve.lr_dwp_wal_vulpunt", CONFIRM),
-            ("Groep 5, 6, 7", "switch.main_cabin_mc_567"), ("Wandcontactdozen W-E3", "switch.mc_w_e3")])
+    p.power([("Webasto klimaat", "switch.mc_w_e1_2", "klimaat"), ("Wandcontactdozen", "switch.mc_k1", "energie"),
+             ("Stopcontact (plug)", "switch.0xa4c138269e44b698", "energie")])
+    p.motion(temp="sensor.temp_main_temperature", note="Sensor ligt bij de mast.")
     p.title("Bilge")
-    p.grid([("Bilgepomp salon", "switch.0xe4b063fffe78d1e0", PUMP)])
-    p.title("Temperatuur")
-    p.note("Sensor ligt bij de mast.")
-    p.sensors(("Temperatuur", "sensor.temp_main_temperature"), batteries=[("Temp-sensor", "sensor.temp_main_battery")])
-    p.rest(r"^light\.(main_cabin_(?!aanrecht|salon)|mc_(3a|3b|6a|7a|7b|led)$|mc_s_(6|7))")
+    p.power([("Bilgepomp salon", "switch.0xe4b063fffe78d1e0", "pomp")])
+    p.webasto("main_cabin", "Webasto main cabin")
 
 
 def crew(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "crewcabin_aan"), ("Uit", "crewcabin_uit"), ("50%", "crew_cabin_50"), ("Bed", "crew_cabin_bed")])
-    p.title("Verlichting")
-    p.grid([("Plafond", "light.crew_cabin_plafond"), ("Hal en plinten", "light.crew_cabin_hal_en_plinten")])
-    p.grid([("Plafond bed (2 spots)", "light.cc_s_11a_bed_d6"), ("Plafond zitjes (2 spots)", "light.cc_s_11a_zitje_d5"),
-            ("Hal (2 spots)", "light.cc_s_11b_gang_d11"), ("Tafel (spot)", "light.cc_s_11a_tafel_d7"), ("Toilet (4 spots)", "light.cc_12a"),
-            ("Plinten", "light.cc_s_11b_plint_d8"), ("Kasten ledstrip", "light.cc_s_11b_kasten_d12")])
+    # Crew's HA page "Crew"; the crew cabin bilge stays (leak sensors and pump).
+    p.title("Crew cabin – verlichting")
+    p.group("Plafond", "light.crew_cabin_plafond",
+            [("Bed (2 spots)", "light.cc_s_11a_bed_d6"), ("Zitjes (2 spots)", "light.cc_s_11a_zitje_d5"),
+             ("Tafel (spot)", "light.cc_s_11a_tafel_d7")])
+    p.group("Hal en plinten", "light.crew_cabin_hal_en_plinten",
+            [("Hal (2 spots)", "light.cc_s_11b_gang_d11"), ("Plinten", "light.cc_s_11b_plint_d8")])
+    p.lights([("Toilet (4 spots)", "light.cc_12a"), ("Kasten ledstrip", "light.cc_s_11b_kasten_d12")])
+    p.y += 6
     p.title("Stroomvoorziening")
-    p.grid([("Climate control", "fan.cc_w_e1"), ("Sanibroyeur", "switch.cc_w_e2"), ("Toilet", "switch.cc_w_e3"),
-            ("Wandcontactdozen", "switch.cc_k1"), ("Stopcontact (plug)", "switch.0xa4c138f65edc9815")])
-    p.climate("crew_cabin", "Webasto crew cabin")
-    p.title("Bilge")
-    p.leaks("cc", [("Bilgepomp", "switch.0xccba97fffeea6c90")])
-    p.title("Beweging en temperatuur")
-    p.sensors(("Temperatuur", "sensor.motionsensorcrew_temperature"), "binary_sensor.motionsensorcrew_occupancy",
-              [("Bewegingssensor", "sensor.motionsensorcrew_battery"), ("Lek laag", "binary_sensor.0x44e2f8fffe0be6ed_battery_low"),
-               ("Lek hoog", "binary_sensor.0x8c65a3fffee0f85d_battery_low")])
-    p.rest(r"^light\.(cc_|crew_cabin_)")
+    p.power([("Klimaat", "fan.cc_w_e1", "klimaat"), ("Sanibroyeur", "switch.cc_w_e2", "pomp"), ("Toilet", "switch.cc_w_e3", "water"),
+             ("Wandcontactdozen", "switch.cc_k1", "energie"), ("Stopcontact (plug)", "switch.0xa4c138f65edc9815", "energie")])
+    p.motion("binary_sensor.motionsensorcrew_occupancy", "sensor.motionsensorcrew_temperature")
+    p.bilge("cc", ("Bilgepomp", "switch.0xccba97fffeea6c90"),
+            [("Lek laag", "binary_sensor.0x44e2f8fffe0be6ed_battery_low"), ("Lek hoog", "binary_sensor.0x8c65a3fffee0f85d_battery_low")])
+    p.webasto("crew_cabin", "Webasto crew cabin")
 
 
 def guest(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "guestcabin_aan"), ("Uit", "guestcabin_uit"), ("50%", "guest_cabin_50"), ("Bed", "guest_cabin_bed")])
+    # Crew's HA page "Guest".
     p.title("Guest cabin – verlichting")
-    p.grid([("Plafond", "light.guest_cabin_plafond"), ("Gang (2 spots)", "light.gc_s_9a_gang_d5"), ("Bed achterzijde (spot)", "light.gc_s_9b_bed_a_d9"),
-            ("Bed voorzijde (2 spots)", "light.gc_s_9b_bed_v_d8"), ("Plint", "light.gc_s_9b_plint_d10")])
+    p.group("Plafond", "light.guest_cabin_plafond",
+            [("Gang (2 spots)", "light.gc_s_9a_gang_d5"), ("Bed achter (spot)", "light.gc_s_9b_bed_a_d9"),
+             ("Bed voor (2 spots)", "light.gc_s_9b_bed_v_d8")])
+    p.lights([("Plint", "light.gc_s_9b_plint_d10")])
+    p.y += 6
     p.title("Toilet – verlichting")
-    p.grid([("Toilet", "light.guest_cabin_toilet"), ("Toilet (2 spots)", "light.gc_s_10a_wc_d7"), ("Wasbak (2 spots)", "light.gc_s_10a_wasbak_d6")])
+    p.group("Toilet", "light.guest_cabin_toilet", [("Toilet (2 spots)", "light.gc_s_10a_wc_d7"), ("Wasbak (2 spots)", "light.gc_s_10a_wasbak_d6")])
     p.title("Stroomvoorziening")
-    p.grid([("Climate control", "switch.gc_w_e1"), ("Sanibroyeur", "switch.gc_w_e2"), ("Toilet", "switch.gc_w_e3"), ("Wandcontactdozen", "switch.gc_k1")])
-    p.climate("guest_cabin", "Webasto guest cabin")
-    p.rest(r"^light\.(gc_|guest_cabin_)")
+    p.power([("Klimaat", "switch.gc_w_e1", "klimaat"), ("Sanibroyeur", "switch.gc_w_e2", "pomp"), ("Toilet", "switch.gc_w_e3", "water"),
+             ("Wandcontactdozen", "switch.gc_k1", "energie")])
+    p.webasto("guest_cabin", "Webasto guest cabin")
 
 
 def aft(p):
-    p.title("Bilge")
-    p.leaks("ap", [("Bilgepomp", "switch.ap_bilgepumpcontrol_01")])
-    p.sensors(batteries=[("Lek laag", "binary_sensor.0x28dba7fffe752d09_battery_low"), ("Lek hoog", "binary_sensor.0x8c65a3fffecea649_battery_low")])
+    # No HA page of its own: leak sensors, bilge pump and sensor batteries in the new style.
+    p.bilge("ap", ("Bilgepomp", "switch.ap_bilgepumpcontrol_01"),
+            [("Lek laag", "binary_sensor.0x28dba7fffe752d09_battery_low"), ("Lek hoog", "binary_sensor.0x8c65a3fffecea649_battery_low")])
 
 
 def front(p):
-    p.title("Bilge")
-    p.leaks("fp", [("Bilgepomp", "switch.fp_bilgepumpcontrol_01")])
-    p.sensors(batteries=[("Lek laag", "sensor.fp_waterleaksensor_laag_battery"), ("Lek hoog", "binary_sensor.fp_waterleaksensor_hoog_battery_low")])
+    # No HA page of its own: leak sensors, bilge pump, sensor batteries and the boiler in the new style.
+    p.bilge("fp", ("Bilgepomp", "switch.fp_bilgepumpcontrol_01"),
+            [("Lek laag", "sensor.fp_waterleaksensor_laag_battery"), ("Lek hoog", "binary_sensor.fp_waterleaksensor_hoog_battery_low")])
     p.title("Boiler")
-    p.scenes([("Boiler aan", "boiler_aan"), ("Boiler uit", "boiler_uit")])
-    p.grid([("Boiler", "switch.fp_boiler"), ("Boiler (relais)", "switch.0xa4c138dd3d53bb57")])
+    p.power([("Boiler", "switch.fp_boiler", "verwarming"), ("Boiler (relais)", "switch.0xa4c138dd3d53bb57", "verwarming")])
 
 
 
@@ -506,6 +542,9 @@ def render(plan):
             out.append(f"            alarm_entity: [{', '.join(alarm)}]")
         out += ["            zoom:", f"              height: {p.y + 12}", "              items:"]
         out += [f"                - {s}" for s in p.items]
+        if p.below:
+            out += ["              below:", f"                height: {Panel.BH}", "                items:"]
+            out += [f"                  - {s}" for s in p.below]
     return out
 
 
