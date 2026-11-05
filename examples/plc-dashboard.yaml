@@ -1141,7 +1141,7 @@ views:
 
           # ---- aanzichten: subnavigatie + tekening op een wit vel ----
           - { type: line, x: 20, y: 76, width: 1240, height: 604, color: "#ffffff", radius: 10 }
-          - { type: image, x: 394, y: 88, width: 493, height: 580, image: tc90-zijaanzicht }
+          - { type: image, x: 404, y: 88, width: 473, height: 580, image: tc90-zijaanzicht }
 
   - title: Dek en interieur
     path: ship-deck
