@@ -87,6 +87,11 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Nieuwe Wago-entiteiten: de **PLC lifebeat** (`binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat`, interne communicatie tussen de PLC-systemen) vervangt de placeholder in de statusbalk en staat ook op DC-bus; *Diesel clutch neutraal* (`…_diesel_clutch_ntr`) staat bij *Status aandrijving* op Diesel.
 - (v0.5.11) **Nieuwe interieur- en dektekening** uit de map `TC90 JOAL` (hoge resolutie, transparant met een gloed rond de romp). Bijgesneden en als WebP van 2200 px in `IMAGES` gezet (samen 250 kB; de kaart is nu 560 kB). Geplaatst door de romp-omtrek van oud en nieuw te meten, zodat de nieuwe romp precies op de oude ligt: alle ruimtes en het generatorscript bleven gelijk. Het witte vel achter de tekeningen is weg; inzoomen gebruikt in TC90 de themakleur als achtergrond in plaats van wit.
 
+## 05-11-2026 – tekeningen op één plek
+
+- Dagmap `261105` (op de Mac met de hand aangemaakt, zelfde stappen als `nieuwe-dag.ps1`).
+- Interieur- en dektekening op dezelfde plek en zo hoog mogelijk: beide `x: 42, width: 1210`, met de middenlijn van de romp gelijk (gemeten op 20, 50 en 80 % van de lengte). Het dekplan staat op `y: 72` (hoger kan niet door de loopplank), het interieur op `y: 103`. Alle items van beide pagina's (ruimtes, scènepaneel) zijn meegeschoven met de YAML-bibliotheek van de editor, en de `room(...)`-regels in `tools/interieur_zones.py` ook. Alleen YAML en script; de kaart is niet veranderd.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

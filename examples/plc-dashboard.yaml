@@ -1161,12 +1161,12 @@ views:
           - { type: navbar, items: *tc_nav }
 
           # ---- dekplan (tekening uit de map "TC90 JOAL", transparant; de romp ligt op dezelfde plek als op de oude tekening) ----
-          - { type: image, x: 43, y: 222, width: 1211, height: 319, image: tc90-dekplan }
+          - { type: image, x: 42, y: 72, width: 1210, height: 319, image: tc90-dekplan }
 
           # ---- dek: zones (gegenereerd door tools/interieur_zones.py) ----
           - type: zone
             x: 57
-            y: 324
+            y: 174
             width: 83
             height: 100
             label: Loopplank
@@ -1178,7 +1178,7 @@ views:
                 - { type: pushbutton, x: 18, y: 42, width: 219, height: 44, label: Loopplank, entity: light.loopplank, led: green, align: left, font_size: 14 }
           - type: zone
             x: 145
-            y: 301
+            y: 151
             width: 337
             height: 144
             label: Bimini
@@ -1200,7 +1200,7 @@ views:
                 - { type: value, x: 18, y: 344, width: 448, height: 36, label: Temp buiten lounge batterij, entity: sensor.buitenlounchetemp_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
           - type: zone
             x: 659
-            y: 335
+            y: 185
             width: 133
             height: 88
             label: Mast en giek
@@ -1221,7 +1221,7 @@ views:
                 - { type: text, x: 18, y: 298, width: 448, text: De mastverlichting en de giekspot gaan automatisch aan bij zonsondergang en uit bij zonsopgang., font_size: 13, color: "var(--ink-muted, #8f8e88)" }
           - type: zone
             x: 814
-            y: 290
+            y: 140
             width: 332
             height: 166
             label: Dekverlichting
@@ -1255,14 +1255,14 @@ views:
           - { type: navbar, items: *tc_nav }
 
           # ---- interieur (tekening uit de map "TC90 JOAL", transparant; de romp ligt op dezelfde plek als op de oude tekening) ----
-          - { type: image, x: 41, y: 164, width: 1210, height: 287, image: tc90-interieur }
+          - { type: image, x: 42, y: 103, width: 1210, height: 287, image: tc90-interieur }
 
           # ---- ruimtes: tik = inzoomen, rechts alle lampen en apparaten van die ruimte ----
           # Oranje = er brandt licht, rood knipperend = lekalarm. Plaats en maat per ruimte zijn een eerste schatting.
           # Gegenereerd door tools/interieur_zones.py (indeling volgens het HA-dashboard van de bemanning); niet met de hand aanpassen.
           - type: zone
             x: 63
-            y: 201
+            y: 140
             width: 189
             height: 206
             label: Aft peak
@@ -1278,7 +1278,7 @@ views:
                 - { type: indicator, x: 247, y: 144, entity: binary_sensor.0x8c65a3fffecea649_battery_low, label: "Lek hoog: batterij laag", color: amber, font_size: 16, tap_action: { action: more-info } }
           - type: zone
             x: 258
-            y: 189
+            y: 128
             width: 247
             height: 230
             label: Owners cabin
@@ -1357,7 +1357,7 @@ views:
                 - { type: pushbutton, x: 247, y: 1902, width: 219, height: 44, label: Plint Bad, entity: light.oc_s_1c3_plint_bad_d23, led: green, align: left, font_size: 14 }
           - type: zone
             x: 505
-            y: 189
+            y: 128
             width: 109
             height: 115
             label: Deck lounge
@@ -1401,7 +1401,7 @@ views:
                 - { type: pushbutton, x: 18, y: 1062, width: 219, height: 44, label: Dl Zitje, entity: light.mc_s_3c_dl_zitje_d6, led: green, align: left, font_size: 14 }
           - type: zone
             x: 505
-            y: 304
+            y: 243
             width: 109
             height: 115
             label: Engine room
@@ -1448,7 +1448,7 @@ views:
                 - { type: pushbutton, x: 247, y: 1274, width: 219, height: 44, label: Stopcontact, entity: switch.socket_engine_room, led: green, align: left, font_size: 14 }
           - type: zone
             x: 614
-            y: 189
+            y: 128
             width: 115
             height: 127
             label: Dining
@@ -1479,7 +1479,7 @@ views:
                 - { type: pushbutton, x: 247, y: 556, width: 219, height: 44, label: Kasten, entity: light.mc_s_5b_kasten_d13_2, led: green, align: left, font_size: 14 }
           - type: zone
             x: 614
-            y: 316
+            y: 255
             width: 115
             height: 103
             label: Galley
@@ -1527,7 +1527,7 @@ views:
                 - { type: pushbutton, x: 18, y: 1184, width: 219, height: 44, label: Vriezer (relais), entity: switch.0xa4c1386689af54dc, led: green, align: left, font_size: 14, tap_action: { action: toggle, confirmation: { text_on: "Aanzetten?", text_off: "Uitzetten?" } } }
           - type: zone
             x: 729
-            y: 189
+            y: 128
             width: 172
             height: 132
             label: Main cabin
@@ -1596,7 +1596,7 @@ views:
                 - { type: pushbutton, x: 18, y: 1680, width: 219, height: 44, label: Kast, entity: light.mc_s_7ah_kast_d32, led: green, align: left, font_size: 14 }
           - type: zone
             x: 729
-            y: 321
+            y: 260
             width: 172
             height: 98
             label: Crew cabin
@@ -1650,7 +1650,7 @@ views:
                 - { type: pushbutton, x: 18, y: 1294, width: 219, height: 44, label: Toilet, entity: light.crew_cabin_cc_s_12a_toilet_d9, led: green, align: left, font_size: 14 }
           - type: zone
             x: 901
-            y: 206
+            y: 145
             width: 132
             height: 207
             label: Guest cabin
@@ -1689,7 +1689,7 @@ views:
                 - { type: pushbutton, x: 18, y: 874, width: 219, height: 44, label: Groep 9B, entity: light.gc_9b, led: green, align: left, font_size: 14 }
           - type: zone
             x: 1039
-            y: 241
+            y: 180
             width: 172
             height: 126
             label: Front peak
@@ -1711,16 +1711,16 @@ views:
                 - { type: pushbutton, x: 247, y: 330, width: 219, height: 44, label: Boiler (relais), entity: switch.0xa4c138dd3d53bb57, led: green, align: left, font_size: 14 }
 
           # ---- algemeen: scènes voor het hele schip ----
-          - { type: panel, x: 20, y: 552, width: 1240, height: 124, title: "Algemeen – tik op een ruimte voor de bediening per ruimte" }
+          - { type: panel, x: 20, y: 491, width: 1240, height: 124, title: "Algemeen – tik op een ruimte voor de bediening per ruimte" }
           # Alle lampen aan/uit gaat via het programma input_select.alle_verlichting (duurt enkele seconden); het vak ernaast toont de status.
-          - { type: pushbutton, x: 38, y: 596, width: 141, height: 56, label: Alle lampen aan, font_size: 14, tap_action: { action: perform-action, perform_action: input_select.select_option, data: { entity_id: input_select.alle_verlichting, option: turn on } } }
-          - { type: pushbutton, x: 189, y: 596, width: 141, height: 56, label: Alle lampen uit, font_size: 14, variant: stop, tap_action: { action: perform-action, perform_action: input_select.select_option, data: { entity_id: input_select.alle_verlichting, option: turn off }, confirmation: { text: "Alle verlichting in het interieur uitzetten?" } } }
-          - { type: text, x: 340, y: 596, width: 141, height: 56, entity: input_select.alle_verlichting, boxed: true, font_size: 14 }
-          - { type: pushbutton, x: 491, y: 596, width: 141, height: 56, label: Nacht 50%, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_night_alles_50 } } }
-          - { type: pushbutton, x: 642, y: 596, width: 141, height: 56, label: Plinten aan, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_plinten_aan } } }
-          - { type: pushbutton, x: 793, y: 596, width: 141, height: 56, label: Plinten uit, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_plinten_uit } } }
-          - { type: pushbutton, x: 944, y: 596, width: 141, height: 56, label: Webasto aan, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_hvac_webasto_aan } } }
-          - { type: pushbutton, x: 1095, y: 596, width: 141, height: 56, label: Webasto uit, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_hvac_webasto_uit } } }
+          - { type: pushbutton, x: 38, y: 535, width: 141, height: 56, label: Alle lampen aan, font_size: 14, tap_action: { action: perform-action, perform_action: input_select.select_option, data: { entity_id: input_select.alle_verlichting, option: turn on } } }
+          - { type: pushbutton, x: 189, y: 535, width: 141, height: 56, label: Alle lampen uit, font_size: 14, variant: stop, tap_action: { action: perform-action, perform_action: input_select.select_option, data: { entity_id: input_select.alle_verlichting, option: turn off }, confirmation: { text: "Alle verlichting in het interieur uitzetten?" } } }
+          - { type: text, x: 340, y: 535, width: 141, height: 56, entity: input_select.alle_verlichting, boxed: true, font_size: 14 }
+          - { type: pushbutton, x: 491, y: 535, width: 141, height: 56, label: Nacht 50%, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_night_alles_50 } } }
+          - { type: pushbutton, x: 642, y: 535, width: 141, height: 56, label: Plinten aan, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_plinten_aan } } }
+          - { type: pushbutton, x: 793, y: 535, width: 141, height: 56, label: Plinten uit, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_plinten_uit } } }
+          - { type: pushbutton, x: 944, y: 535, width: 141, height: 56, label: Webasto aan, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_hvac_webasto_aan } } }
+          - { type: pushbutton, x: 1095, y: 535, width: 141, height: 56, label: Webasto uit, font_size: 14, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_hvac_webasto_uit } } }
 
   - title: Alarmen
     path: alarms
