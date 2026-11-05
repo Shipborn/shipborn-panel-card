@@ -148,8 +148,10 @@ class Panel:
 ROOMS = {"interior": [], "deck": []}
 
 
-def room(plan, label_, rect, build, value=None, leak=None, active=(), alarm=()):
-    ROOMS[plan].append(dict(label=label_, rect=rect, build=build, value=value, leak=leak, active=list(active), alarm=list(alarm)))
+def room(plan, label_, rect, build, value=None, leak=None, active=(), alarm=(), outline=None, label_at=None):
+    # outline: the room's contour as [(x, y), …] in page coordinates (traced from the drawing); otherwise the rectangle.
+    ROOMS[plan].append(dict(label=label_, rect=rect, build=build, value=value, leak=leak, active=list(active), alarm=list(alarm),
+                            outline=OUTLINES.get(label_, outline), label_at=label_at))
 
 
 # ---------- interior ----------
@@ -348,6 +350,32 @@ def front(p):
     p.grid([("Boiler", "switch.fp_boiler"), ("Boiler (relais)", "switch.0xa4c138dd3d53bb57")])
 
 
+
+# Room contours (page coordinates, traced along the walls of the drawings in "TC90 JOAL"). A room listed here is drawn
+# as that shape instead of its rectangle; LABEL_AT puts its label inside the shape.
+OUTLINES = {
+    # interior (drawing at x 42, y 377, 1210 × 287), aft → bow
+    "Aft peak": [(54, 518), (64, 470), (150, 446), (262, 421), (262, 622), (150, 598), (64, 566)],
+    "Owners cabin": [(264, 421), (360, 407), (480, 398), (480, 487), (410, 487), (410, 547), (505, 547), (505, 636), (400, 632), (264, 622)],
+    "Engine room": [(482, 398), (612, 390), (612, 545), (412, 545), (412, 489), (482, 489)],
+    "Dining": [(614, 389), (732, 397), (732, 545), (614, 545)],
+    "Galley": [(590, 549), (735, 549), (735, 634), (640, 642), (590, 642)],
+    "Main cabin": [(734, 397), (840, 412), (905, 424), (905, 545), (734, 545)],
+    "Guest cabin": [(737, 549), (905, 549), (905, 602), (840, 617), (737, 634)],
+    "Crew cabin": [(910, 425), (1000, 452), (1040, 462), (1040, 567), (1000, 577), (910, 602)],
+    "Front peak": [(1042, 463), (1140, 487), (1235, 514), (1140, 542), (1042, 567)],
+    # deck (drawing at x 42, y 76, 1210 × 319)
+    "Loopplank": [(46, 250), (52, 205), (100, 186), (100, 312), (52, 296)],
+    "Bimini": [(130, 215), (150, 196), (495, 186), (495, 311), (150, 302), (130, 282)],
+    "Deck lounge": [(504, 166), (640, 166), (646, 172), (646, 320), (640, 326), (504, 326), (498, 320), (498, 172)],
+    "Mast en giek": [(655, 200), (790, 200), (790, 300), (655, 300)],
+    "Dekverlichting": [(800, 142), (900, 166), (1050, 198), (1185, 246), (1050, 294), (900, 331), (800, 352)],
+}
+LABEL_AT = {"Aft peak": (78, 505), "Owners cabin": (272, 430), "Engine room": (490, 404), "Dining": (620, 396),
+            "Galley": (596, 555), "Main cabin": (740, 404), "Guest cabin": (743, 555), "Crew cabin": (916, 434),
+            "Front peak": (1048, 505), "Loopplank": (52, 192), "Bimini": (152, 200), "Deck lounge": (504, 172),
+            "Mast en giek": (661, 206), "Dekverlichting": (830, 180)}
+
 room("interior", "Aft peak", (63, 414, 189, 206), aft, leak="ap")
 room("interior", "Owners cabin", (258, 402, 247, 230), owners, value="sensor.temp_ownerscabin_temperature",
      active=ents(r"^light\.(oc_|owners_cabin_)"))
@@ -416,9 +444,15 @@ def render(plan):
     for r in ROOMS[plan]:
         p = Panel()
         r["build"](p)
-        x, y, w, hh = r["rect"]
-        out += ["          - type: zone", f"            x: {x}", f"            y: {y}", f"            width: {w}", f"            height: {hh}",
-                f"            label: {q(r['label'])}"]
+        if r["outline"]:
+            pts = r["outline"]
+            lx, ly = r["label_at"] or LABEL_AT.get(r["label"]) or (min(p[0] for p in pts) + 6, min(p[1] for p in pts) + 6)
+            out += ["          - type: zone", f"            points: [{', '.join(f'[{x}, {y}]' for x, y in pts)}]",
+                    f"            label_at: [{lx}, {ly}]", f"            label: {q(r['label'])}"]
+        else:
+            x, y, w, hh = r["rect"]
+            out += ["          - type: zone", f"            x: {x}", f"            y: {y}", f"            width: {w}", f"            height: {hh}",
+                    f"            label: {q(r['label'])}"]
         if r["value"]:
             out.append(f"            value_entity: {r['value']}")
         if r["active"]:

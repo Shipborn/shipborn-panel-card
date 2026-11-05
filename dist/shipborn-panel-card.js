@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.12";
+const VERSION = "0.5.13";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -185,6 +185,18 @@ const STYLE = `
   .d-zone.on { border: 2px solid var(--accent, #f5a524); background: rgba(245, 165, 36, .16); }
   .d-zone.alarm { border: 2px solid var(--alarm, #ff5b4f); background: rgba(255, 91, 79, .3); animation: zalarm 1s steps(2, start) infinite; }
   @keyframes zalarm { to { background: rgba(255, 91, 79, .08); } }
+  /* zone with points: the room's own outline instead of a rectangle; only the shape and the label take taps */
+  .d-zone.poly { border: none; background: none; pointer-events: none; animation: none; }
+  .d-zone.poly > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .d-zone.poly .zs {
+    fill: transparent; stroke: rgba(20, 21, 22, .35); stroke-width: 2; stroke-dasharray: 6 4; stroke-linejoin: round;
+    pointer-events: all; cursor: pointer; transition: fill .3s, stroke .3s;
+  }
+  .d-zone.poly:hover .zs { fill: rgba(20, 21, 22, .06); }
+  .d-zone.poly.on .zs { fill: rgba(245, 165, 36, .16); stroke: var(--accent, #f5a524); stroke-dasharray: none; }
+  .d-zone.poly.alarm .zs { fill: rgba(255, 91, 79, .3); stroke: var(--alarm, #ff5b4f); stroke-dasharray: none; animation: zalarmp 1s steps(2, start) infinite; }
+  @keyframes zalarmp { to { fill: rgba(255, 91, 79, .08); } }
+  .d-zone.poly .chip { pointer-events: auto; cursor: pointer; }
   .d-zone .chip {
     position: absolute; left: 6px; top: 6px; display: flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 5px;
     background: var(--surface, #141516); color: var(--ink, #ecebe6); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
@@ -204,6 +216,9 @@ const STYLE = `
   .d-zoom .zv { position: absolute; inset: 0; overflow: hidden; transition: clip-path .45s ease; }
   .d-zoom .zi { position: absolute; left: 0; transform-origin: 0 0; transition: transform .45s ease; }
   .d-zoom .zm { position: absolute; box-sizing: border-box; border: 3px solid var(--accent, #f5a524); border-radius: 8px; }
+  .d-zoom .zm.poly { border: none; }
+  .d-zoom .zm.poly svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .d-zoom .zm.poly polygon { fill: none; stroke: var(--accent, #f5a524); stroke-width: 3; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
   .d-zoom .zp {
     position: absolute; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;
     opacity: 0; transform: translateX(40px); transition: opacity .35s .1s, transform .35s .1s;
@@ -652,6 +667,16 @@ const roundedPath = (pts, r) => {
   const [lx, ly] = pts[pts.length - 1];
   return d + ` L${lx},${ly}`;
 };
+// Bounding box of a polygon given as [[x, y], …].
+const polyBox = (pts) => {
+  const xs = pts.map((p) => p[0]);
+  const ys = pts.map((p) => p[1]);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
+};
+// SVG points attribute of a polygon, relative to (ox, oy).
+const polyPoints = (pts, ox, oy) => pts.map(([x, y]) => `${x - ox},${y - oy}`).join(" ");
 // A path without a leading slash is a view of the current dashboard: "sys-diesel" → "/<dashboard>/sys-diesel".
 const viewPath = (p) => (!p || p.startsWith("/") ? p : `/${location.pathname.split("/")[1]}/${p}`);
 // True when one of these views is open (in demo/plc.html: ?view=<path>).
@@ -2404,9 +2429,17 @@ class ShipbornPanelCard extends HTMLElement {
   // Tappable area on a drawing (a room on a plan): lit while an active_entity is on, blinking red on
   // alarm_entity, with a label and optional value; a tap opens its popup (or runs tap_action).
   _dZone(z) {
+    // points: the room's outline (page coordinates); its bounding box becomes the zone's place and size.
+    if (z.points) z = { ...z, ...polyBox(z.points) };
     const n = this._place(h("div", "d d-zone"), z, 100, 100);
     if (z.radius != null) n.style.borderRadius = z.radius + "px";
+    if (z.points) {
+      n.classList.add("poly");
+      n.innerHTML = `<svg viewBox="0 0 ${z.width} ${z.height}"><polygon class="zs" points="${polyPoints(z.points, z.x, z.y)}"/></svg>`;
+    }
     const chip = h("div", "chip");
+    // label_at: where the label goes (page coordinates), so it stays inside an irregular room.
+    if (z.label_at) Object.assign(chip.style, { left: z.label_at[0] - z.x + "px", top: z.label_at[1] - (z.y ?? 0) + "px" });
     const led = h("span", "d-led");
     const val = h("span", "v");
     chip.append(led, z.label ?? "");
@@ -2455,7 +2488,8 @@ class ShipbornPanelCard extends HTMLElement {
     const view = h("div", "zv", { background: zc.background ?? (this._tc ? "var(--bg)" : "#ffffff") });
     const inner = h("div", "zi", { top: -T + "px", width: W + "px", height: H + "px" });
     if (img) inner.appendChild(this._renderItem({ ...img }));
-    const mark = h("div", "zm", { left: zx + "px", top: zy + "px", width: zw + "px", height: zh + "px" });
+    const mark = h("div", "zm" + (z.points ? " poly" : ""), { left: zx + "px", top: zy + "px", width: zw + "px", height: zh + "px" });
+    if (z.points) mark.innerHTML = `<svg viewBox="0 0 ${zw} ${zh}"><polygon points="${polyPoints(z.points, zx, zy)}"/></svg>`;
     inner.appendChild(mark);
     view.appendChild(inner);
     const side = h("div", "d-panel zp", { left: px + "px", top: py - T + "px", width: pw + "px", height: ph + "px" });
