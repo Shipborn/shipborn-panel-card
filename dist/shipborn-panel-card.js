@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.11";
+const VERSION = "0.5.12";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -757,7 +757,7 @@ class ShipbornPanelCard extends HTMLElement {
     const css = [
       [root.shadowRoot, `:host { --header-height: 0px !important; }
         .header, app-header, app-toolbar { display: none !important; }
-        #view, hui-view-container { padding-top: env(safe-area-inset-top) !important; min-height: 100vh !important; }`],
+        #view, hui-view-container { padding-top: ${this._tc ? "0px" : "env(safe-area-inset-top)"} !important; min-height: 100vh !important; }`],
       [main.shadowRoot, `:host { --mdc-drawer-width: 0px !important; } ha-sidebar { display: none !important; }`],
       [drawer, `.mdc-drawer { display: none !important; } .mdc-drawer-app-content { margin-left: 0 !important; }`],
     ].filter(([sr]) => sr);
@@ -794,7 +794,8 @@ class ShipbornPanelCard extends HTMLElement {
     const flatten = () => {
       for (let el = up(this); el && el !== document.documentElement; el = up(el)) {
         const cs = getComputedStyle(el);
-        for (const prop of ["margin-left", "padding-left", "margin-inline-start", "padding-inline-start"])
+        // A TC90 page also starts at the very top: its status bar is fixed there, so a top offset only adds a gap below it.
+        for (const prop of ["margin-left", "padding-left", "margin-inline-start", "padding-inline-start", ...(this._tc ? ["margin-top", "padding-top"] : [])])
           if (parseFloat(cs.getPropertyValue(prop)) > 0) set(el, prop, "0px");
       }
       for (let i = 0; i < 6 && this.getBoundingClientRect().left > 0.5; i++) {
@@ -949,7 +950,7 @@ class ShipbornPanelCard extends HTMLElement {
     // TC90 page with fixed bars: as tall as its content plus room for the icon bar; locked when it fits the screen.
     // Shrinking to fit is off by default (fit_tolerance: 1), so every page shows at the same size.
     if (this._docks.length) {
-      H = Math.min(this._H, this._contentBottom() + 16 + 88);
+      H = Math.min(this._H, this._contentBottom() + 12 + 88);
       const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
       if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1)) s = avail / H;
       this._lockScroll(!!this._kiosk && H * s <= avail + 1);

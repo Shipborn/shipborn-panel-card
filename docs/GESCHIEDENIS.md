@@ -91,6 +91,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 
 - Dagmap `261105` (op de Mac met de hand aangemaakt, zelfde stappen als `nieuwe-dag.ps1`).
 - Interieur- en dektekening op dezelfde plek en zo hoog mogelijk: beide `x: 42, width: 1210`, met de middenlijn van de romp gelijk (gemeten op 20, 50 en 80 % van de lengte). Het dekplan staat op `y: 72` (hoger kan niet door de loopplank), het interieur op `y: 103`. Alle items van beide pagina's (ruimtes, scènepaneel) zijn meegeschoven met de YAML-bibliotheek van de editor, en de `room(...)`-regels in `tools/interieur_zones.py` ook. Alleen YAML en script; de kaart is niet veranderd.
+- (v0.5.12) Op de iPad zat 40 px tussen statusbalk en inhoud in plaats van 16: de kiosk hield bovenaan de iPad-veilige zone vrij (`padding-top: env(safe-area-inset-top)`, ±24 px), terwijl de vaste statusbalk gewoon bovenaan staat. Op TC90-pagina's is die ruimte nu 0, en ook andere bovenmarges tussen kaart en pagina gaan in de kiosk naar 0 (bij verlaten terug). Op verzoek is de afstand overal 20 px: alle inhoud 4 px omlaag (romp op `y: 76`), en de ruimte boven de icoonbalk van 16 naar 12 px, zodat dezelfde pagina's blijven passen. Getest met een nagebootste HA-pagina met 36 px bovenmarge.
 
 ## Lessen en keuzes die je moet kennen
 
