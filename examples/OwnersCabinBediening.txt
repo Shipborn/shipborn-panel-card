@@ -1,0 +1,243 @@
+type: grid
+cards:
+  - type: heading
+    heading: Owners Cabin - Lights
+    heading_style: title
+    card_mod:
+      style: |
+        ha-card .title p { font-size: 16px; }
+        ha-card .title ha-icon { --mdc-icon-size: 20px; }
+        ha-card .subtitle p { font-size: 20px; color: black; }
+        ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black; }
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+        --ha-card-header-font-size: 16px !important;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: light.owners_cabin_rondom_laag_plafond
+              icon: mdi:wall-sconce-flat
+              secondary_info: brightness
+            - entity: light.owners_cabin_plinten
+              icon: mdi:led-strip-variant
+              secondary_info: brightness
+          title: Groups
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+        --ha-card-header-font-size: 16px !important;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: light.oc_s_1b_laag_bba_d11
+              name: Laag Plafond bba (2 spots)
+            - entity: light.oc_s_1b_laag_bbm_d10
+              name: Laag Plafond bbm (2 spots)
+            - entity: light.oc_s_1b_laag_bbv_d9
+              name: Laag Plafond bbv (2 spots)
+            - entity: light.oc_s_1b_laag_sba_d16
+              name: Laag Plafond sba (2 spots)
+            - entity: light.oc_s_1b_laag_sbm_d15
+              name: Laag Plafond sbm (2 spots)
+            - entity: light.oc_s_1b_laag_sbv_d14
+              name: Laag Plafond sbv (2 spots)
+            - type: section
+            - entity: light.oc_s_1b2_led_bed_d12
+              icon: mdi:led-strip-variant
+              name: Plinten Bed
+            - entity: light.oc_s_1b2_led_vloer_d8
+              icon: mdi:led-strip-variant
+              name: Plinten Trappen
+          title: All
+
+type: grid
+cards:
+  - type: heading
+    heading: Bad Toilet Douche - Lights
+    heading_style: title
+    card_mod:
+      style: |
+        ha-card .title p { font-size: 16px; }
+        ha-card .title ha-icon { --mdc-icon-size: 20px; }
+        ha-card .subtitle p { font-size: 20px; color: black; }
+        ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black; }
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+        --ha-card-header-font-size: 16px !important;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: light.owners_cabin_douche_ruimte
+              icon: mdi:wall-sconce-flat
+              secondary_info: brightness
+          title: Groups
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+        --ha-card-header-font-size: 16px !important;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: light.oc_s_2a_douche_d18_1
+              name: Douche (spot)
+            - entity: light.oc_s_2a_wasbak_d17
+              name: Wasbak (spot)
+            - entity: light.oc_s_2a_wc_d18
+              name: WC (2 spots)
+            - type: section
+            - entity: light.oc_s_1b_kaptafel_d13
+              icon: mdi:led-strip-variant
+              name: Ledstrip wastafel
+              secondary_info: brightness
+            - type: section
+            - entity: light.oc_1c2
+              name: Hal bad (6)
+            - entity: light.oc_1c3
+              name: Plint badkamer
+              icon: mdi:led-strip-variant
+              secondary_info: brightness
+          title: All
+
+
+type: grid
+cards:
+  - type: heading
+    heading_style: title
+    heading: Owners Cabin - Powersupply
+    card_mod:
+      style: |
+        ha-card .title p { font-size: 16px; }
+        ha-card .title ha-icon { --mdc-icon-size: 20px; }
+        ha-card .subtitle p { font-size: 20px; color: black; }
+        ha-card .subtitle ha-icon { --mdc-icon-size: 20px; color: black; }
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: switch.oc_e1_2_l1
+              icon: mdi:fan
+              color: blue
+              name: Webasto klimaat (Bad)
+              secondary_info: none
+            - entity: switch.oc_w_e3
+              icon: mdi:pump
+              secondary_info: none
+              name: Sanibroyeur 1
+            - entity: switch.oc_w_e4
+              icon: mdi:pump
+              secondary_info: none
+              name: Sanibroyeur 2
+            - entity: switch.oc_w_e5
+              icon: mdi:toilet
+              secondary_info: none
+              name: Toilet
+            - entity: switch.oc_k1
+              icon: mdi:power-socket-eu
+              name: Wall Sockets (TV)
+              secondary_info: none
+            - entity: switch.0xa4c138b105c39a71
+              icon: mdi:power-plug
+              secondary_info: none
+              name: Socket Plug
+
+type: grid
+cards:
+  - type: heading
+    heading_style: title
+    heading: Webasto Owners Cabin bad
+    badges:
+      - type: entity
+        show_state: true
+        show_icon: true
+        entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp
+        color: red
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+        --ha-card-header-font-size: 16px !important;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac
+              name: Owners Cabin bad
+            - entity: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed
+              name: Ventilator stand (6 = automatisch)
+            - entity: number.webasto_bluecool_noder_owners_cabin_bad
+              name: Temperatuur
+  - type: heading
+    heading_style: title
+    heading: Webasto Owners Cabin
+    badges:
+      - type: entity
+        show_state: true
+        show_icon: true
+        entity: sensor.webasto_bluecool_noder_owners_cabin_temp
+        color: red
+  - type: custom:mod-card
+    style: |
+      ha-card {
+        border: 1px solid #2196f3;
+        border-radius: 12px;
+        box-shadow: 1px 1px 1px #888;
+        font-size: 12px;
+        --ha-card-header-font-size: 16px !important;
+       }
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: switch.webasto_bluecool_noder_owners_cabin_ac
+              name: Owners Cabin
+            - entity: number.webasto_bluecool_noder_owners_cabin_fan_speed
+              name: Ventilator stand (6 = automatisch)
+            - entity: number.webasto_bluecool_noder_owners_cabin
+              name: Temperatuur
+
+

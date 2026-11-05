@@ -79,6 +79,33 @@
         "sensor.generator_gen_coolant_temp": st(31, { unit_of_measurement: "°C" }),
         "sensor.generator_gen_hours": st(642),
       };
+      // Owners cabin (room panel on ship-deck): light groups with their members, Webasto with feedback.
+      const ocGroups = {
+        "light.owners_cabin_rondom_laag_plafond": ["light.oc_s_1b_laag_bba_d11", "light.oc_s_1b_laag_sba_d16", "light.oc_s_1b_laag_bbm_d10", "light.oc_s_1b_laag_sbm_d15", "light.oc_s_1b_laag_bbv_d9", "light.oc_s_1b_laag_sbv_d14"],
+        "light.owners_cabin_plinten": ["light.oc_s_1b2_led_bed_d12", "light.oc_s_1b2_led_vloer_d8"],
+        "light.owners_cabin_douche_ruimte": ["light.oc_s_2a_douche_d18_1", "light.oc_s_2a_wasbak_d17", "light.oc_s_2a_wc_d18"],
+      };
+      const lit = (on, pct = 60) => st(on ? "on" : "off", on ? { brightness: Math.round(pct * 2.55) } : {});
+      for (const [g, ms] of Object.entries(ocGroups)) ms.forEach((m, i) => (states[m] = lit(g.endsWith("plafond") && i < 4, 60)));
+      for (const id of ["light.oc_s_1b_kaptafel_d13", "light.oc_1c2", "light.oc_1c3"]) states[id] = lit(id.endsWith("d13"), 35);
+      const syncGroups = () => {
+        for (const [g, ms] of Object.entries(ocGroups)) {
+          const on = ms.filter((m) => states[m]?.state === "on");
+          const b = on.length ? Math.round(on.reduce((t, m) => t + (states[m].attributes.brightness ?? 255), 0) / on.length) : null;
+          states[g] = st(on.length ? "on" : "off", { entity_id: ms, ...(b != null ? { brightness: b } : {}) });
+        }
+      };
+      syncGroups();
+      for (const id of ["switch.oc_e1_2_l1", "switch.oc_w_e3", "switch.oc_w_e4", "switch.oc_w_e5", "switch.oc_k1", "switch.0xa4c138b105c39a71"]) states[id] = st("on");
+      for (const [k, t, sp, fan, ac] of [["owners_cabin", 17.7, 18, 3, "on"], ["owners_cabin_bad", 18.9, 22, 6, "off"]]) {
+        const b = `webasto_bluecool_noder_${k}`;
+        states[`sensor.${b}_temp`] = st(t, { unit_of_measurement: "°C" });
+        states[`switch.${b}_ac`] = st(ac);
+        states[`number.${b}`] = st(sp, { min: 16, max: 30, step: 1, unit_of_measurement: "°C" });
+        states[`sensor.${b}_setpoint_feedback`] = st(sp, { unit_of_measurement: "°C" });
+        states[`number.${b}_fan_speed`] = st(fan, { min: 1, max: 6, step: 1 });
+        states[`sensor.${b}_fan_speed_feedback`] = st(fan);
+      }
       for (const id of ["button.wago_hcs_controls_wago_controls_dieselmode", "button.wago_hcs_controls_wago_controls_electricmode", "button.plc_mode_generator", "button.wago_hcs_controls_wago_controls_harbormode", "button.wago_energy_controls_wago_energy_controls_reset_main_2"])
         states[id] = st("unknown");
       const el = document.createElement("shipborn-panel-card");
@@ -88,6 +115,23 @@
         locale: { language: "nl" },
         callService(domain, service, data = {}) {
           log.textContent = `${domain}.${service} ${JSON.stringify(data)}`;
+          // Lights, switches and numbers react like HA (feedback of a number after 1.5 s), so the room panels can be tried.
+          const id = data.entity_id || "";
+          const push = () => (el.hass = { ...hass, states: { ...states } });
+          const setLight = (e, on, pct) => (states[e] = e.startsWith("light.") ? lit(on, pct ?? Math.round((states[e]?.attributes?.brightness ?? 153) / 2.55)) : st(on ? "on" : "off"));
+          const targets = ocGroups[id] || [id];
+          if (/^(homeassistant|light|switch)$/.test(domain) && /^turn_(on|off)$|^toggle$/.test(service) && states[id]) {
+            const on = service === "toggle" ? states[id].state !== "on" : service === "turn_on";
+            targets.forEach((e) => setLight(e, on, data.brightness_pct));
+            syncGroups();
+            setTimeout(push, 300);
+          }
+          if (domain === "number" && service === "set_value") {
+            states[id] = st(data.value, states[id]?.attributes);
+            const fb = id.replace(/^number\.(.*?)(_fan_speed)?$/, (m, b, f) => `sensor.${b}${f ? "_fan_speed" : "_setpoint"}_feedback`);
+            setTimeout(() => { if (states[fb]) states[fb] = st(data.value, states[fb].attributes); push(); }, 1500);
+            push();
+          }
           const mode = /^button\.wago_hcs_controls_wago_controls_(diesel|electric|harbor)mode$/.exec(data.entity_id || "");
           if (mode) {
             for (const m of ["diesel", "electric", "harbor"]) states[`binary_sensor.wago_hcs_controls_wago_hcs_controls_${m}_mode`] = st(m === mode[1] ? "on" : "off");

@@ -138,6 +138,52 @@ class Panel:
         if low:
             self.inds(low)
 
+    # ---- TC90 building blocks (new room layout, so far only the Owners cabin) ----
+
+    def lights(self, rows, indent=0):
+        """(label, light) as row buttons in two columns: tap = on/off, the sun button opens HA's own dialog to dim."""
+        x0, w = self.X0 + indent, (self.W - indent - 10) // 2
+        for i, (lbl, e) in enumerate(rows):
+            self.add(f"{{ type: toggle, x: {x0 + (i % 2) * (w + 10)}, y: {self.y}, width: {w}, height: 48, label: {q(lbl)}, entity: {e} }}")
+            if i % 2 == 1 or i == len(rows) - 1:
+                self.y += 56
+
+    def group(self, lbl, entity, members):
+        """Light group (tap = all on/off, − / + dim in 5 % steps) with its own lights indented below it, joined by a line."""
+        ids = ", ".join(e for _, e in members)
+        self.add(f"{{ type: light_group, x: {self.X0}, y: {self.y}, width: {self.W}, height: 56, label: {q(lbl)}, entity: {entity}, members: [{ids}] }}")
+        self.y += 64
+        top = self.y
+        self.lights(members, indent=22)
+        self.add(f'{{ type: line, x: {self.X0 + 8}, y: {top - 8}, width: 3, height: {self.y - top}, color: "var(--line-strong, #3a3a38)", radius: 2 }}')
+        self.y += 8
+
+    def power(self, rows):
+        """(label, switch, icon) in two columns; switching on and off both ask first (yes/no)."""
+        for i, (lbl, e, icon) in enumerate(rows):
+            x = self.X0 + (i % 2) * (self.W2 + 10)
+            on, off = q(f"{lbl} aanzetten?"), q(f"{lbl} uitzetten?")
+            self.add(f"{{ type: toggle, x: {x}, y: {self.y}, width: {self.W2}, height: 48, icon: {icon}, label: {q(lbl)}, entity: {e}, "
+                     f"tap_action: {{ action: toggle, confirmation: {{ title_on: {on}, title_off: {off} }} }} }}")
+            if i % 2 == 1 or i == len(rows) - 1:
+                self.y += 56
+        self.y += 6
+
+    def webasto(self, key, title, lo=10, hi=35):
+        """Webasto unit: dial with the room temperature and the setpoint tick; airco on/off; setpoint and fan with − / +."""
+        b = f"webasto_bluecool_noder_{key}"
+        self.title(title)
+        y, x2 = self.y, self.X0 + 210
+        w2 = self.W - 210
+        self.add(f'{{ type: dial, x: {self.X0}, y: {y}, width: 196, label: Temperatuur, entity: sensor.{b}_temp, min: {lo}, max: {hi}, '
+                 f'unit: "°C", decimals: 1, setpoint_entity: sensor.{b}_setpoint_feedback }}')
+        self.add(f"{{ type: toggle, x: {x2}, y: {y}, width: {w2}, height: 52, icon: klimaat, label: Airco, entity: switch.{b}_ac }}")
+        self.add(f'{{ type: stepper, x: {x2}, y: {y + 62}, width: {w2}, height: 70, stacked: true, label: Setpoint, entity: number.{b}, '
+                 f'state_entity: sensor.{b}_setpoint_feedback, unit: "°C" }}')
+        self.add(f"{{ type: stepper, x: {x2}, y: {y + 142}, width: {w2}, height: 70, stacked: true, label: Ventilator, entity: number.{b}_fan_speed, "
+                 f"state_entity: sensor.{b}_fan_speed_feedback, value_names: {{ 6: Aut }} }}")
+        self.y = y + 226
+
     def rest(self, pattern, domain="light"):
         left = [e for e in ents(pattern, domain) if e not in self.used]
         if left:
@@ -157,29 +203,27 @@ def room(plan, label_, rect, build, value=None, leak=None, active=(), alarm=(), 
 # ---------- interior ----------
 
 def owners(p):
-    p.title("Scènes")
-    p.scenes([("Aan", "owners_cabin_aan"), ("Uit", "owners_cabin_uit"), ("50%", "oc_50"),
-              ("Bed", "oc_bed"), ("Sanitair aan", "oc_sanitair_aan"), ("Sanitair uit", "oc_sanitair_uit")])
+    # Layout from examples/OwnersCabinBediening.txt (05-11): light groups with their own lights below them,
+    # power supply, and the two Webasto units. No scenes, motion sensors or "Overig" here (on request).
     p.title("Owners cabin – verlichting")
-    p.grid([("Rondom laag plafond", "light.owners_cabin_rondom_laag_plafond"), ("Plinten", "light.owners_cabin_plinten")])
-    p.grid([("Laag plafond BBA (2 spots)", "light.oc_s_1b_laag_bba_d11"), ("Laag plafond BBM (2 spots)", "light.oc_s_1b_laag_bbm_d10"),
-            ("Laag plafond BBV (2 spots)", "light.oc_s_1b_laag_bbv_d9"), ("Laag plafond SBA (2 spots)", "light.oc_s_1b_laag_sba_d16"),
-            ("Laag plafond SBM (2 spots)", "light.oc_s_1b_laag_sbm_d15"), ("Laag plafond SBV (2 spots)", "light.oc_s_1b_laag_sbv_d14"),
-            ("Plinten bed", "light.oc_s_1b2_led_bed_d12"), ("Plinten trappen", "light.oc_s_1b2_led_vloer_d8")])
+    p.group("Rondom laag plafond", "light.owners_cabin_rondom_laag_plafond",
+            [("BBA (2 spots)", "light.oc_s_1b_laag_bba_d11"), ("SBA (2 spots)", "light.oc_s_1b_laag_sba_d16"),
+             ("BBM (2 spots)", "light.oc_s_1b_laag_bbm_d10"), ("SBM (2 spots)", "light.oc_s_1b_laag_sbm_d15"),
+             ("BBV (2 spots)", "light.oc_s_1b_laag_bbv_d9"), ("SBV (2 spots)", "light.oc_s_1b_laag_sbv_d14")])
+    p.group("Plinten", "light.owners_cabin_plinten",
+            [("Plinten bed", "light.oc_s_1b2_led_bed_d12"), ("Plinten trappen", "light.oc_s_1b2_led_vloer_d8")])
     p.title("Bad, toilet en douche – verlichting")
-    p.grid([("Douche ruimte", "light.owners_cabin_douche_ruimte"), ("Douche (spot)", "light.oc_s_2a_douche_d18_1"),
-            ("Wasbak (spot)", "light.oc_s_2a_wasbak_d17"), ("WC (2 spots)", "light.oc_s_2a_wc_d18"),
-            ("Ledstrip wastafel", "light.oc_s_1b_kaptafel_d13"), ("Hal bad (6)", "light.oc_1c2"), ("Plint badkamer", "light.oc_1c3")])
+    p.group("Douche ruimte", "light.owners_cabin_douche_ruimte",
+            [("Douche (spot)", "light.oc_s_2a_douche_d18_1"), ("Wasbak (spot)", "light.oc_s_2a_wasbak_d17"),
+             ("WC (2 spots)", "light.oc_s_2a_wc_d18")])
+    p.lights([("Ledstrip wastafel", "light.oc_s_1b_kaptafel_d13"), ("Hal bad (6)", "light.oc_1c2"), ("Plint badkamer", "light.oc_1c3")])
+    p.y += 6
     p.title("Stroomvoorziening")
-    p.grid([("Webasto klimaat (bad)", "switch.oc_e1_2_l1"), ("Sanibroyeur 1", "switch.oc_w_e3"), ("Sanibroyeur 2", "switch.oc_w_e4"),
-            ("Toilet", "switch.oc_w_e5"), ("Wandcontactdozen (TV)", "switch.oc_k1"), ("Stopcontact (plug)", "switch.0xa4c138b105c39a71")])
-    p.climate("owners_cabin", "Webasto owners cabin")
-    p.climate("owners_cabin_bad", "Webasto owners cabin bad")
-    p.title("Beweging en temperatuur")
-    p.note("Sensor ligt bij het kastje aan stuurboord.")
-    p.sensors(("Temperatuur", "sensor.motion_sensor_ownerscabin_temperature"), "binary_sensor.motion_sensor_ownerscabin_occupancy",
-              [("Bewegingssensor", "sensor.motion_sensor_ownerscabin_battery"), ("Temp-sensor", "sensor.temp_ownerscabin_battery")])
-    p.rest(r"^light\.(oc_|owners_cabin_)")
+    p.power([("Webasto klimaat (bad)", "switch.oc_e1_2_l1", "klimaat"), ("Sanibroyeur 1", "switch.oc_w_e3", "pomp"),
+             ("Sanibroyeur 2", "switch.oc_w_e4", "pomp"), ("Toilet", "switch.oc_w_e5", "water"),
+             ("Wandcontactdozen (TV)", "switch.oc_k1", "energie"), ("Stopcontact (plug)", "switch.0xa4c138b105c39a71", "energie")])
+    p.webasto("owners_cabin", "Webasto owners cabin")
+    p.webasto("owners_cabin_bad", "Webasto owners cabin bad")
 
 
 def deck_lounge(p):

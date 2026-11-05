@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.17";
+const VERSION = "0.5.18";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -494,7 +494,7 @@ const TC_STYLE =
   .tc .tc-alarmbar-alarm .caption { color: inherit; }
   .tc-blink { animation: tc-blink 1s steps(2, jump-none) infinite; }
   @keyframes tc-blink { 50% { background: var(--alarm-soft); color: var(--alarm); } }
-  @media (prefers-reduced-motion: reduce) { .tc-blink, .tc-switch.is-busy .tc-icon { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .tc-blink, .tc-switch.is-busy .tc-icon, .tc-row.is-busy .tc-row-state, .tc-step-val.is-busy { animation: none; } }
 
   /* sub-page tabs in the status bar */
   .tc-sb-tabs { display: flex; gap: var(--space-1); padding: var(--space-1); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); }
@@ -553,6 +553,33 @@ const TC_STYLE =
   .tc-gauge-label { display: flex; justify-content: center; align-items: center; gap: var(--space-1); }
   .tc-gauge.tc-tone-warn .tc-gauge-label, .tc-gauge.tc-tone-warn .tc-gauge-center { color: var(--warn); }
   .tc-gauge-range { position: absolute; display: flex; justify-content: space-between; }
+
+  /* row button (toggle), light group and stepper: room panels */
+  .tc-row { display: flex; align-items: stretch; gap: var(--space-2); }
+  .tc-row-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-3); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-md); color: var(--ink); text-align: left; cursor: pointer; }
+  .tc-row-main:active, .tc-row-btn:active { background: var(--surface-raised); }
+  .tc-row-main .ic { display: inline-flex; color: var(--ink-muted); }
+  .tc-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px; }
+  .tc .tc-row-label { font-size: 15px; line-height: 19px; overflow: hidden; text-overflow: ellipsis; }
+  .tc-row-state { white-space: nowrap; }
+  .tc-row-sub { white-space: nowrap; }
+  .tc-row.is-on .tc-row-main { background: var(--accent-soft); border-color: var(--accent); }
+  .tc-row.is-on .tc-row-main .ic, .tc .tc-row.is-on .tc-row-state { color: var(--accent); }
+  .tc-row.is-busy .tc-row-main { border-style: dashed; border-color: var(--accent); }
+  .tc-row.is-busy .tc-row-state { animation: tc-pulse 1.2s ease-in-out infinite; }
+  .tc-row-btn { flex: none; display: grid; place-items: center; width: 52px; padding: 0; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-md); color: var(--ink); cursor: pointer; font: 600 28px/1 var(--font-cond); }
+  .tc-row-btn:disabled, .tc-row-main:disabled { opacity: .4; cursor: default; }
+  .tc-lgroup .tc-row-state { min-width: 54px; text-align: right; }
+  .tc-step { display: flex; align-items: stretch; gap: var(--space-2); }
+  .tc-step-label { flex: 1; min-width: 0; align-self: center; color: var(--ink-muted); }
+  .tc-step-val { min-width: 84px; display: grid; place-items: center; font: 600 26px/1 var(--font-cond); white-space: nowrap; }
+  .tc-step-val.is-busy { animation: tc-pulse 1.2s ease-in-out infinite; color: var(--accent); }
+  .tc-step.is-stacked { flex-wrap: wrap; align-content: flex-start; row-gap: 6px; }
+  .tc-step.is-stacked .tc-step-label { flex-basis: 100%; align-self: auto; }
+  .tc-step.is-stacked .tc-row-btn, .tc-step.is-stacked .tc-step-val { height: calc(100% - 22px); }
+  .tc-step.is-stacked .tc-step-val { flex: 1; }
+  .tc-g-set { stroke: var(--ink); stroke-width: 3; }
+  .tc-gauge-sub { position: absolute; left: 0; right: 0; text-align: center; }
 
   /* hotspot */
   .tc-hotspot { display: flex; align-items: center; gap: var(--space-2); transform: translate(-7px, -50%); padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); z-index: 1; }
@@ -1098,6 +1125,9 @@ class ShipbornPanelCard extends HTMLElement {
       case "switch": return this._tSwitch(item);
       case "hotspot": return this._tHotspot(item);
       case "dial": return this._tDial(item);
+      case "toggle": return this._tToggle(item);
+      case "light_group": return this._tLightGroup(item);
+      case "stepper": return this._tStepper(item);
       default:
         if (SYMBOLS.includes(item.type)) return this._dSymbol(item);
         console.warn("shipborn-panel-card: unknown item type", item.type);
@@ -1977,10 +2007,13 @@ class ShipbornPanelCard extends HTMLElement {
     n.innerHTML =
       `<svg viewBox="0 0 200 170"><path class="tc-g-track" d="${arc(A0, A0 + span)}"/>` +
       (g.warn_above != null ? `<path class="tc-g-zone" d="${arc(ang(g.warn_above), A0 + span)}"/>` : "") +
-      `<path class="tc-g-val" d=""/></svg>` +
+      `<path class="tc-g-val" d=""/><path class="tc-g-set" d=""/></svg>` +
       `<div class="tc-gauge-center" style="top:${74 * k}px"><span class="value-lg" style="font-size:${36 * k}px"></span><span class="caption tc-unit"></span></div>` +
       `<div class="tc-gauge-label label" style="margin-top:${-12 * k}px"><span class="fl"></span><span></span></div>` +
-      `<div class="tc-gauge-range caption" style="top:${158 * k}px;left:${30 * k}px;right:${30 * k}px"><span>${min}</span><span>${max}</span></div>`;
+      `<div class="tc-gauge-range caption" style="top:${158 * k}px;left:${30 * k}px;right:${30 * k}px"><span>${min}</span><span>${max}</span></div>` +
+      (g.setpoint_entity ? `<div class="tc-gauge-sub caption" style="top:${118 * k}px"></div>` : "");
+    const setMark = n.querySelector(".tc-g-set");
+    const setText = n.querySelector(".tc-gauge-sub");
     const valArc = n.querySelector(".tc-g-val");
     const [big, unit] = n.querySelector(".tc-gauge-center").children;
     const [flag, lbl] = n.querySelector(".tc-gauge-label").children;
@@ -1993,9 +2026,188 @@ class ShipbornPanelCard extends HTMLElement {
       valArc.setAttribute("d", Math.abs(a - zero) < 0.001 ? "" : a > zero ? arc(zero, a) : arc(a, zero));
       big.textContent = fmt(v, g.decimals ?? 0, hass);
       unit.textContent = unitOf(g, so);
+      if (setText) {
+        // setpoint_entity: a tick across the track and "Setpoint 18 °C" under the value.
+        const ss = hass.states[g.setpoint_entity];
+        const sp = num(ss);
+        const a = sp == null ? null : ang(sp);
+        const P = (r) => `${(100 + r * Math.cos(a)).toFixed(2)} ${(100 + r * Math.sin(a)).toFixed(2)}`;
+        setMark.setAttribute("d", a == null ? "" : `M${P(66)}L${P(94)}`);
+        const su = g.setpoint_unit ?? g.unit ?? ss?.attributes?.unit_of_measurement ?? so?.attributes?.unit_of_measurement ?? "";
+        setText.textContent = `${g.setpoint_label ?? "Setpoint"} ${fmt(sp, g.setpoint_decimals ?? 0, hass)}${sp != null && su ? " " + su : ""}`;
+      }
       const warn = v != null && g.warn_above != null && v >= g.warn_above;
       n.classList.toggle("tc-tone-warn", warn);
       flag.innerHTML = warn ? tcIcon("alarm", 16) : "";
+    });
+    return n;
+  }
+
+  // Row button: a tap toggles (or `tap_action`); BEZIG until the state changes. A light shows its brightness and
+  // gets a second button (`more_info`, default for lights) that opens HA's own more-info dialog for dimming.
+  _tToggle(t) {
+    const n = this._place(h("div", "tc-row"), t, 220, 48);
+    const main = h("button", "tc-row-main");
+    main.type = "button";
+    main.innerHTML = `${t.icon ? `<span class="ic">${tcIcon(t.icon, 22)}</span>` : ""}<span class="tc-row-text"><span class="tc-row-label label"></span><span class="tc-row-state caption"></span></span>`;
+    main.querySelector(".tc-row-label").textContent = t.label ?? "";
+    const word = main.querySelector(".tc-row-state");
+    n.appendChild(main);
+    const isLight = !!t.entity?.startsWith("light.");
+    let more = null;
+    if (t.more_info ?? isLight) {
+      more = h("button", "tc-row-btn");
+      more.type = "button";
+      more.title = "Dimmen en meer";
+      more.innerHTML = tcIcon(t.more_icon || "zon", 22);
+      more.addEventListener("click", () => this._handleAction(t, { action: "more-info" }, more));
+      n.appendChild(more);
+    }
+    let busy = 0;
+    let last = null;
+    main.addEventListener("click", async () => {
+      const before = this._hass?.states[t.entity]?.state;
+      if ((await this._handleAction(t, t.tap_action || { action: "toggle" }, main)) === false) return;
+      if (this._hass?.states[t.entity]?.state !== before) return; // feedback already arrived
+      busy = Date.now();
+      setTimeout(() => this._hass && (this.hass = this._hass), 10100);
+      this.hass = this._hass;
+    });
+    this._updaters.push((hass) => {
+      const so = hass.states[t.entity];
+      if (so?.state !== last) {
+        if (last !== null) busy = 0;
+        last = so?.state;
+      }
+      if (busy && Date.now() - busy > 10000) busy = 0;
+      const on = isOn(so);
+      n.classList.toggle("is-on", on && !busy);
+      n.classList.toggle("is-busy", !!busy);
+      main.disabled = unavailable(so);
+      if (more) more.disabled = unavailable(so);
+      const b = so?.attributes?.brightness;
+      word.textContent = busy ? "BEZIG" : unavailable(so) ? "—" : on && isLight && b != null ? `${Math.round(b / 2.55)}%` : tcWord(so.state, t);
+    });
+    return n;
+  }
+
+  // Light group: a tap toggles all its lights; − / + dim in `step` % steps (default 5): + on a dark group lights it at
+  // the lowest step, − at the lowest step switches it off. Shows the brightness and how many of its lights are on
+  // (from the group's `entity_id` attribute, or `members`).
+  _tLightGroup(g) {
+    const n = this._place(h("div", "tc-row tc-lgroup"), g, 448, 56);
+    const main = h("button", "tc-row-main");
+    main.type = "button";
+    main.innerHTML = `<span class="ic">${tcIcon(g.icon || "verlichting", 24)}</span><span class="tc-row-text"><span class="tc-row-label label"></span><span class="tc-row-sub caption"></span></span><span class="tc-row-state value-md"></span>`;
+    main.querySelector(".tc-row-label").textContent = g.label ?? "";
+    const sub = main.querySelector(".tc-row-sub");
+    const pct = main.querySelector(".tc-row-state");
+    const btn = (txt, title) => {
+      const b = h("button", "tc-row-btn");
+      b.type = "button";
+      b.textContent = txt;
+      b.title = title;
+      return b;
+    };
+    const minus = btn("−", "Dimmen");
+    const plus = btn("+", "Feller");
+    n.append(main, minus, plus);
+    const step = g.step || 5;
+    let pend = null; // [percentage asked, time]: shown and used for the next step until HA reports it
+    const now = () => {
+      if (pend && Date.now() - pend[1] < 4000) return pend[0];
+      const so = this._hass?.states[g.entity];
+      return isOn(so) ? Math.round((so.attributes.brightness ?? 255) / 2.55) : 0;
+    };
+    const dim = (dir) => {
+      const cur = now();
+      const to = cur === 0 ? (dir > 0 ? step : 0) : dir > 0 ? Math.min(100, Math.floor(cur / step) * step + step) : Math.ceil(cur / step) * step - step;
+      if (to === cur) return;
+      pend = [Math.max(0, to), Date.now()];
+      fire(this, "haptic", "light");
+      if (to <= 0) this._hass.callService("light", "turn_off", { entity_id: g.entity });
+      else this._hass.callService("light", "turn_on", { entity_id: g.entity, brightness_pct: to });
+      setTimeout(() => this._hass && (this.hass = this._hass), 4100);
+      this.hass = this._hass;
+    };
+    minus.addEventListener("click", () => dim(-1));
+    plus.addEventListener("click", () => dim(1));
+    main.addEventListener("click", () => {
+      pend = null;
+      this._handleAction(g, g.tap_action || { action: "toggle" }, main);
+    });
+    this._updaters.push((hass) => {
+      const so = hass.states[g.entity];
+      const on = isOn(so);
+      const real = on ? Math.round((so.attributes.brightness ?? 255) / 2.55) : 0;
+      if (pend && (Math.abs(real - pend[0]) <= 1 || Date.now() - pend[1] >= 4000)) pend = null;
+      const p = pend ? pend[0] : real;
+      n.classList.toggle("is-on", p > 0);
+      n.classList.toggle("is-busy", !!pend);
+      pct.textContent = unavailable(so) ? "—" : p > 0 ? `${p}%` : "UIT";
+      const ids = [].concat(so?.attributes?.entity_id || g.members || []);
+      sub.textContent = ids.length ? `${ids.filter((e) => isOn(hass.states[e])).length}/${ids.length} aan` : "";
+      const off = unavailable(so);
+      main.disabled = off;
+      minus.disabled = off || p <= 0;
+      plus.disabled = off || p >= 100;
+    });
+    return n;
+  }
+
+  // − value + for a number entity (e.g. a Webasto setpoint or fan speed). Shows `state_entity` (the device's own
+  // feedback) or else the number; after a tap the asked value pulses until the feedback matches it (max 10 s).
+  // `value_names: { 6: Aut }` shows a word for a value; `stacked: true` puts the label above the buttons.
+  _tStepper(s) {
+    const n = this._place(h("div", "tc-step"), s, 448, 56);
+    const lbl = h("span", "tc-step-label " + (s.stacked ? "caption" : "label")); // stacked: small label above the buttons
+    lbl.textContent = s.label ?? "";
+    if (s.stacked) n.classList.add("is-stacked");
+    const val = h("span", "tc-step-val");
+    const mk = (txt) => {
+      const b = h("button", "tc-row-btn");
+      b.type = "button";
+      b.textContent = txt;
+      return b;
+    };
+    const minus = mk("−");
+    const plus = mk("+");
+    n.append(lbl, minus, val, plus);
+    let pend = null; // [value asked, time]
+    const range = () => {
+      const a = this._hass?.states[s.entity]?.attributes || {};
+      return [s.min ?? a.min ?? 0, s.max ?? a.max ?? 100, s.step ?? a.step ?? 1];
+    };
+    const fb = (hass) => num(hass.states[s.state_entity || s.entity]);
+    const base = (hass) => (pend ? pend[0] : num(hass.states[s.entity]) ?? fb(hass));
+    const go = (dir) => {
+      const hass = this._hass;
+      const [min, max, st] = range();
+      const b = base(hass);
+      if (b == null) return;
+      const to = +clamp(Math.round((b + dir * st) / st) * st, min, max).toFixed(4);
+      if (to === b) return;
+      pend = [to, Date.now()];
+      fire(this, "haptic", "light");
+      this._setValue(s.entity, to);
+      setTimeout(() => this._hass && (this.hass = this._hass), 10100);
+      this.hass = hass;
+    };
+    minus.addEventListener("click", () => go(-1));
+    plus.addEventListener("click", () => go(1));
+    this._updaters.push((hass) => {
+      const f = fb(hass);
+      if (pend && (f === pend[0] || Date.now() - pend[1] >= 10000)) pend = null;
+      const v = pend ? pend[0] : f;
+      const word = v == null ? null : s.value_names?.[v] ?? s.value_names?.[String(v)];
+      const u = unitOf(s, hass.states[s.state_entity || s.entity]);
+      val.textContent = v == null ? "—" : word ?? `${fmt(v, s.decimals ?? 0, hass)}${u ? " " + u : ""}`;
+      val.classList.toggle("is-busy", !!pend);
+      const [min, max] = range();
+      const b = base(hass);
+      const off = unavailable(hass.states[s.entity]) || b == null;
+      minus.disabled = off || b <= min;
+      plus.disabled = off || b >= max;
     });
     return n;
   }
@@ -2580,10 +2792,12 @@ class ShipbornPanelCard extends HTMLElement {
     const a = action || { action: "default" };
     const entity = a.entity || cfg.entity;
     if (a.action === "none") return;
-    if (a.confirmation) {
+    const on = entity && isOn(hass.states[entity]);
+    // `when: off` / `when: on`: only ask before switching off (or on); the other way goes straight through.
+    const when = a.confirmation?.when === false ? "off" : a.confirmation?.when === true ? "on" : a.confirmation?.when; // YAML 1.1 reads off as false
+    if (a.confirmation && !(when === "off" && !on) && !(when === "on" && on)) {
       // text_on / text_off: a different question depending on whether the entity is on now.
       const c = a.confirmation;
-      const on = entity && isOn(hass.states[entity]);
       const name = String(cfg.label || cfg.title || hass.states[entity]?.attributes?.friendly_name || entity || "").replace(/\n/g, " ");
       if (this._tc) {
         const question = (on ? c.title_off : c.title_on) || c.title || `${name}?`;

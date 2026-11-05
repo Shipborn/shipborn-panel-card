@@ -1298,76 +1298,47 @@ views:
             value_entity: sensor.temp_ownerscabin_temperature
             active_entity: [light.oc_1a1, light.oc_1a2, light.oc_1b1, light.oc_1b2, light.oc_1c1, light.oc_1c2, light.oc_1c3, light.oc_2a, light.oc_led, light.oc_s_1a_hoog_bba_d22, light.oc_s_1a_hoog_bbv_d23, light.oc_s_1a_hoog_ma_d27, light.oc_s_1a_hoog_mv_d24, light.oc_s_1a_hoog_sba_d26, light.oc_s_1a_hoog_sbv_d25, light.oc_s_1b2_led_bed_d12, light.oc_s_1b2_led_vloer_d8, light.oc_s_1b_kaptafel_d13, light.oc_s_1b_laag_bba_d11, light.oc_s_1b_laag_bbm_d10, light.oc_s_1b_laag_bbv_d9, light.oc_s_1b_laag_sba_d16, light.oc_s_1b_laag_sbm_d15, light.oc_s_1b_laag_sbv_d14, light.oc_s_1c1_bad_a_d19, light.oc_s_1c1_bad_v_d19b, light.oc_s_1c2_gang_a_d20, light.oc_s_1c2_gang_v_d21, light.oc_s_1c3_plint_bad_d23, light.oc_s_2a_douche_d18_1, light.oc_s_2a_wasbak_d17, light.oc_s_2a_wc_d18, light.owners_cabin_douche_ruimte, light.owners_cabin_plinten, light.owners_cabin_rondom_laag_plafond]
             zoom:
-              height: 1972
+              height: 1470
               items:
-                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 42, width: 142, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_owners_cabin_aan } } }
-                - { type: pushbutton, x: 170, y: 42, width: 142, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_owners_cabin_uit } } }
-                - { type: pushbutton, x: 322, y: 42, width: 142, height: 48, label: "50%", font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_50 } } }
-                - { type: pushbutton, x: 18, y: 100, width: 142, height: 48, label: Bed, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_bed } } }
-                - { type: pushbutton, x: 170, y: 100, width: 142, height: 48, label: Sanitair aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_sanitair_aan } } }
-                - { type: pushbutton, x: 322, y: 100, width: 142, height: 48, label: Sanitair uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_oc_sanitair_uit } } }
-                - { type: text, x: 18, y: 164, text: Owners cabin – verlichting, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Rondom laag plafond, entity: light.owners_cabin_rondom_laag_plafond, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Plinten, entity: light.owners_cabin_plinten, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 252, width: 219, height: 44, label: Laag plafond BBA (2 spots), entity: light.oc_s_1b_laag_bba_d11, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 252, width: 219, height: 44, label: Laag plafond BBM (2 spots), entity: light.oc_s_1b_laag_bbm_d10, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 304, width: 219, height: 44, label: Laag plafond BBV (2 spots), entity: light.oc_s_1b_laag_bbv_d9, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 304, width: 219, height: 44, label: Laag plafond SBA (2 spots), entity: light.oc_s_1b_laag_sba_d16, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 356, width: 219, height: 44, label: Laag plafond SBM (2 spots), entity: light.oc_s_1b_laag_sbm_d15, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 356, width: 219, height: 44, label: Laag plafond SBV (2 spots), entity: light.oc_s_1b_laag_sbv_d14, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 408, width: 219, height: 44, label: Plinten bed, entity: light.oc_s_1b2_led_bed_d12, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 408, width: 219, height: 44, label: Plinten trappen, entity: light.oc_s_1b2_led_vloer_d8, led: green, align: left, font_size: 14 }
-                - { type: text, x: 18, y: 466, text: "Bad, toilet en douche – verlichting", font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 496, width: 219, height: 44, label: Douche ruimte, entity: light.owners_cabin_douche_ruimte, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 496, width: 219, height: 44, label: Douche (spot), entity: light.oc_s_2a_douche_d18_1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 548, width: 219, height: 44, label: Wasbak (spot), entity: light.oc_s_2a_wasbak_d17, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 548, width: 219, height: 44, label: WC (2 spots), entity: light.oc_s_2a_wc_d18, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 600, width: 219, height: 44, label: Ledstrip wastafel, entity: light.oc_s_1b_kaptafel_d13, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 600, width: 219, height: 44, label: Hal bad (6), entity: light.oc_1c2, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 652, width: 219, height: 44, label: Plint badkamer, entity: light.oc_1c3, led: green, align: left, font_size: 14 }
-                - { type: text, x: 18, y: 710, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 740, width: 219, height: 44, label: Webasto klimaat (bad), entity: switch.oc_e1_2_l1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 740, width: 219, height: 44, label: Sanibroyeur 1, entity: switch.oc_w_e3, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 792, width: 219, height: 44, label: Sanibroyeur 2, entity: switch.oc_w_e4, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 792, width: 219, height: 44, label: Toilet, entity: switch.oc_w_e5, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 844, width: 219, height: 44, label: Wandcontactdozen (TV), entity: switch.oc_k1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 844, width: 219, height: 44, label: Stopcontact (plug), entity: switch.0xa4c138b105c39a71, led: green, align: left, font_size: 14 }
-                - { type: text, x: 18, y: 902, text: Webasto owners cabin, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: value, style: tile, x: 18, y: 932, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_owners_cabin_temp, value_size: 22 }
-                - { type: pushbutton, x: 247, y: 932, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_ac, led: green, align: left, font_size: 15 }
-                - { type: value, x: 18, y: 1006, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_owners_cabin, font_size: 15, box_width: 80 }
-                - { type: value, x: 247, y: 1006, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_owners_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
-                - { type: text, x: 18, y: 1058, text: Webasto owners cabin bad, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: value, style: tile, x: 18, y: 1088, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp, value_size: 22 }
-                - { type: pushbutton, x: 247, y: 1088, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac, led: green, align: left, font_size: 15 }
-                - { type: value, x: 18, y: 1162, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_owners_cabin_bad, font_size: 15, box_width: 80 }
-                - { type: value, x: 247, y: 1162, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
-                - { type: text, x: 18, y: 1214, text: Beweging en temperatuur, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: text, x: 18, y: 1244, width: 448, text: Sensor ligt bij het kastje aan stuurboord., font_size: 13, color: "var(--ink-muted, #8f8e88)" }
-                - { type: value, x: 18, y: 1274, width: 448, height: 36, label: Temperatuur, entity: sensor.motion_sensor_ownerscabin_temperature, font_size: 15, box_width: 110, decimals: 1 }
-                - { type: indicator, x: 18, y: 1322, entity: binary_sensor.motion_sensor_ownerscabin_occupancy, label: Beweging, color: amber, font_size: 16, tap_action: { action: more-info } }
-                - { type: value, x: 18, y: 1366, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.motion_sensor_ownerscabin_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
-                - { type: value, x: 18, y: 1408, width: 448, height: 36, label: Temp-sensor batterij, entity: sensor.temp_ownerscabin_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
-                - { type: text, x: 18, y: 1456, text: Overig, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 1486, width: 219, height: 44, label: Groep 1A1, entity: light.oc_1a1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1486, width: 219, height: 44, label: Groep 1A2, entity: light.oc_1a2, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1538, width: 219, height: 44, label: Groep 1B1, entity: light.oc_1b1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1538, width: 219, height: 44, label: Groep 1B2, entity: light.oc_1b2, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1590, width: 219, height: 44, label: Groep 1C1, entity: light.oc_1c1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1590, width: 219, height: 44, label: Groep 2A, entity: light.oc_2a, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1642, width: 219, height: 44, label: Groep Led, entity: light.oc_led, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1642, width: 219, height: 44, label: Hoog Bba, entity: light.oc_s_1a_hoog_bba_d22, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1694, width: 219, height: 44, label: Hoog Bbv, entity: light.oc_s_1a_hoog_bbv_d23, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1694, width: 219, height: 44, label: Hoog Ma, entity: light.oc_s_1a_hoog_ma_d27, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1746, width: 219, height: 44, label: Hoog Mv, entity: light.oc_s_1a_hoog_mv_d24, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1746, width: 219, height: 44, label: Hoog Sba, entity: light.oc_s_1a_hoog_sba_d26, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1798, width: 219, height: 44, label: Hoog Sbv, entity: light.oc_s_1a_hoog_sbv_d25, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1798, width: 219, height: 44, label: Bad A, entity: light.oc_s_1c1_bad_a_d19, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1850, width: 219, height: 44, label: Bad V, entity: light.oc_s_1c1_bad_v_d19b, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1850, width: 219, height: 44, label: Gang A, entity: light.oc_s_1c2_gang_a_d20, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1902, width: 219, height: 44, label: Gang V, entity: light.oc_s_1c2_gang_v_d21, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1902, width: 219, height: 44, label: Plint Bad, entity: light.oc_s_1c3_plint_bad_d23, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 12, text: Owners cabin – verlichting, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: light_group, x: 18, y: 42, width: 448, height: 56, label: Rondom laag plafond, entity: light.owners_cabin_rondom_laag_plafond, members: [light.oc_s_1b_laag_bba_d11, light.oc_s_1b_laag_sba_d16, light.oc_s_1b_laag_bbm_d10, light.oc_s_1b_laag_sbm_d15, light.oc_s_1b_laag_bbv_d9, light.oc_s_1b_laag_sbv_d14] }
+                - { type: toggle, x: 40, y: 106, width: 208, height: 48, label: BBA (2 spots), entity: light.oc_s_1b_laag_bba_d11 }
+                - { type: toggle, x: 258, y: 106, width: 208, height: 48, label: SBA (2 spots), entity: light.oc_s_1b_laag_sba_d16 }
+                - { type: toggle, x: 40, y: 162, width: 208, height: 48, label: BBM (2 spots), entity: light.oc_s_1b_laag_bbm_d10 }
+                - { type: toggle, x: 258, y: 162, width: 208, height: 48, label: SBM (2 spots), entity: light.oc_s_1b_laag_sbm_d15 }
+                - { type: toggle, x: 40, y: 218, width: 208, height: 48, label: BBV (2 spots), entity: light.oc_s_1b_laag_bbv_d9 }
+                - { type: toggle, x: 258, y: 218, width: 208, height: 48, label: SBV (2 spots), entity: light.oc_s_1b_laag_sbv_d14 }
+                - { type: line, x: 26, y: 98, width: 3, height: 168, color: "var(--line-strong, #3a3a38)", radius: 2 }
+                - { type: light_group, x: 18, y: 282, width: 448, height: 56, label: Plinten, entity: light.owners_cabin_plinten, members: [light.oc_s_1b2_led_bed_d12, light.oc_s_1b2_led_vloer_d8] }
+                - { type: toggle, x: 40, y: 346, width: 208, height: 48, label: Plinten bed, entity: light.oc_s_1b2_led_bed_d12 }
+                - { type: toggle, x: 258, y: 346, width: 208, height: 48, label: Plinten trappen, entity: light.oc_s_1b2_led_vloer_d8 }
+                - { type: line, x: 26, y: 338, width: 3, height: 56, color: "var(--line-strong, #3a3a38)", radius: 2 }
+                - { type: text, x: 18, y: 410, text: "Bad, toilet en douche – verlichting", font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: light_group, x: 18, y: 440, width: 448, height: 56, label: Douche ruimte, entity: light.owners_cabin_douche_ruimte, members: [light.oc_s_2a_douche_d18_1, light.oc_s_2a_wasbak_d17, light.oc_s_2a_wc_d18] }
+                - { type: toggle, x: 40, y: 504, width: 208, height: 48, label: Douche (spot), entity: light.oc_s_2a_douche_d18_1 }
+                - { type: toggle, x: 258, y: 504, width: 208, height: 48, label: Wasbak (spot), entity: light.oc_s_2a_wasbak_d17 }
+                - { type: toggle, x: 40, y: 560, width: 208, height: 48, label: WC (2 spots), entity: light.oc_s_2a_wc_d18 }
+                - { type: line, x: 26, y: 496, width: 3, height: 112, color: "var(--line-strong, #3a3a38)", radius: 2 }
+                - { type: toggle, x: 18, y: 624, width: 219, height: 48, label: Ledstrip wastafel, entity: light.oc_s_1b_kaptafel_d13 }
+                - { type: toggle, x: 247, y: 624, width: 219, height: 48, label: Hal bad (6), entity: light.oc_1c2 }
+                - { type: toggle, x: 18, y: 680, width: 219, height: 48, label: Plint badkamer, entity: light.oc_1c3 }
+                - { type: text, x: 18, y: 742, text: Stroomvoorziening, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: toggle, x: 18, y: 772, width: 219, height: 48, icon: klimaat, label: Webasto klimaat (bad), entity: switch.oc_e1_2_l1, tap_action: { action: toggle, confirmation: { title_on: Webasto klimaat (bad) aanzetten?, title_off: Webasto klimaat (bad) uitzetten? } } }
+                - { type: toggle, x: 247, y: 772, width: 219, height: 48, icon: pomp, label: Sanibroyeur 1, entity: switch.oc_w_e3, tap_action: { action: toggle, confirmation: { title_on: Sanibroyeur 1 aanzetten?, title_off: Sanibroyeur 1 uitzetten? } } }
+                - { type: toggle, x: 18, y: 828, width: 219, height: 48, icon: pomp, label: Sanibroyeur 2, entity: switch.oc_w_e4, tap_action: { action: toggle, confirmation: { title_on: Sanibroyeur 2 aanzetten?, title_off: Sanibroyeur 2 uitzetten? } } }
+                - { type: toggle, x: 247, y: 828, width: 219, height: 48, icon: water, label: Toilet, entity: switch.oc_w_e5, tap_action: { action: toggle, confirmation: { title_on: Toilet aanzetten?, title_off: Toilet uitzetten? } } }
+                - { type: toggle, x: 18, y: 884, width: 219, height: 48, icon: energie, label: Wandcontactdozen (TV), entity: switch.oc_k1, tap_action: { action: toggle, confirmation: { title_on: Wandcontactdozen (TV) aanzetten?, title_off: Wandcontactdozen (TV) uitzetten? } } }
+                - { type: toggle, x: 247, y: 884, width: 219, height: 48, icon: energie, label: Stopcontact (plug), entity: switch.0xa4c138b105c39a71, tap_action: { action: toggle, confirmation: { title_on: Stopcontact (plug) aanzetten?, title_off: Stopcontact (plug) uitzetten? } } }
+                - { type: text, x: 18, y: 946, text: Webasto owners cabin, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: dial, x: 18, y: 976, width: 196, label: Temperatuur, entity: sensor.webasto_bluecool_noder_owners_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_owners_cabin_setpoint_feedback }
+                - { type: toggle, x: 228, y: 976, width: 238, height: 52, icon: klimaat, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_ac }
+                - { type: stepper, x: 228, y: 1038, width: 238, height: 70, stacked: true, label: Setpoint, entity: number.webasto_bluecool_noder_owners_cabin, state_entity: sensor.webasto_bluecool_noder_owners_cabin_setpoint_feedback, unit: "°C" }
+                - { type: stepper, x: 228, y: 1118, width: 238, height: 70, stacked: true, label: Ventilator, entity: number.webasto_bluecool_noder_owners_cabin_fan_speed, state_entity: sensor.webasto_bluecool_noder_owners_cabin_fan_speed_feedback, value_names: { 6: Aut } }
+                - { type: text, x: 18, y: 1202, text: Webasto owners cabin bad, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: dial, x: 18, y: 1232, width: 196, label: Temperatuur, entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_setpoint_feedback }
+                - { type: toggle, x: 228, y: 1232, width: 238, height: 52, icon: klimaat, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac }
+                - { type: stepper, x: 228, y: 1294, width: 238, height: 70, stacked: true, label: Setpoint, entity: number.webasto_bluecool_noder_owners_cabin_bad, state_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_setpoint_feedback, unit: "°C" }
+                - { type: stepper, x: 228, y: 1374, width: 238, height: 70, stacked: true, label: Ventilator, entity: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed, state_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_fan_speed_feedback, value_names: { 6: Aut } }
           - type: zone
             points: [[482, 398], [612, 390], [612, 545], [412, 545], [412, 489], [482, 489]]
             label_at: [490, 404]

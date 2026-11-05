@@ -179,6 +179,9 @@
         ["Schakelaar", { type: "switch", width: 112, height: 112, icon: "aan", label: "Schakelaar", entity: "switch.x" }, [112, 112]],
         ["Hotspot", { type: "hotspot", icon: "motor", label: "Punt", entity: "sensor.x" }, [150, 44]],
         ["Ronde meter", { type: "dial", width: 174, label: "Meter", entity: "sensor.x", min: 0, max: 100 }, [174, 172]],
+        ["Rijknop / lamp", { type: "toggle", width: 219, height: 48, label: "Lamp", entity: "light.x" }, [219, 48]],
+        ["Lichtgroep", { type: "light_group", width: 448, height: 56, label: "Groep", entity: "light.x" }, [448, 56]],
+        ["− waarde +", { type: "stepper", width: 448, height: 56, label: "Instelling", entity: "number.x" }, [448, 56]],
         ["Waardepaneel", { type: "panel", width: 360, height: 212, title: "Groep" }, [360, 212]],
         ["Romp (los)", { type: "image", width: 848, height: 100, image: "tc90-romp" }, [848, 100]],
       ],
@@ -198,7 +201,7 @@
     const snap = (v) => Math.round(v / grid()) * grid();
     const yOf = (it) => it.y ?? it.true ?? 0;
     // TC90 design items; the frame (status and icon bar) is fixed in place, only its options are edited.
-    const TC = ["statusbar", "alarmbar", "navbar", "tile", "switch", "hotspot", "dial"];
+    const TC = ["statusbar", "alarmbar", "navbar", "tile", "switch", "hotspot", "dial", "toggle", "light_group", "stepper"];
     const FRAME = ["statusbar", "alarmbar", "navbar"];
     const isTc = () => cardCfg().design === "tc90";
 
