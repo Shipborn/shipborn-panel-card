@@ -1,4 +1,4 @@
-"""Generates the room zones (zone + zoom panel) on the interior and deck plans in examples/plc-dashboard.yaml.
+"""Generates the room zones (zone + zoom panel) on the deck plan and the interior plan below it (view ship-deck) in examples/plc-dashboard.yaml.
 
 Usage (from the day folder): python tools/interieur_zones.py examples/Entiteiten-HA.xlsx examples/plc-dashboard.yaml
 Needs openpyxl. Replaces everything between "# ---- ruimtes:" and "# ---- algemeen:" in the interior view, and between
@@ -348,21 +348,21 @@ def front(p):
     p.grid([("Boiler", "switch.fp_boiler"), ("Boiler (relais)", "switch.0xa4c138dd3d53bb57")])
 
 
-room("interior", "Aft peak", (63, 144, 189, 206), aft, leak="ap")
-room("interior", "Owners cabin", (258, 132, 247, 230), owners, value="sensor.temp_ownerscabin_temperature",
+room("interior", "Aft peak", (63, 414, 189, 206), aft, leak="ap")
+room("interior", "Owners cabin", (258, 402, 247, 230), owners, value="sensor.temp_ownerscabin_temperature",
      active=ents(r"^light\.(oc_|owners_cabin_)"))
-room("interior", "Deck lounge", (505, 132, 109, 115), deck_lounge, value="sensor.0x001788010df593f4_temperature",
+room("interior", "Deck lounge", (505, 402, 109, 115), deck_lounge, value="sensor.0x001788010df593f4_temperature",
      active=ents(r"^light\.(main_cabin_salon|mc_s_3)"))
-room("interior", "Engine room", (505, 247, 109, 115), engine, value="sensor.0x001788010cdae144_temperature", leak="er",
+room("interior", "Engine room", (505, 517, 109, 115), engine, value="sensor.0x001788010cdae144_temperature", leak="er",
      active=ents(r"^light\.er_"), alarm=[SCHROEFAS])
-room("interior", "Dining", (614, 132, 115, 127), dining, leak="d", active=ents(r"^light\.mc_(5a$|5b$|s_5)"))
-room("interior", "Galley", (614, 259, 115, 103), galley, active=ents(r"^light\.(g_s_4|mc_4a_g$|main_cabin_aanrecht)"))
-room("interior", "Main cabin", (729, 132, 172, 132), main, value="sensor.temp_main_temperature",
+room("interior", "Dining", (614, 402, 115, 127), dining, leak="d", active=ents(r"^light\.mc_(5a$|5b$|s_5)"))
+room("interior", "Galley", (614, 529, 115, 103), galley, active=ents(r"^light\.(g_s_4|mc_4a_g$|main_cabin_aanrecht)"))
+room("interior", "Main cabin", (729, 402, 172, 132), main, value="sensor.temp_main_temperature",
      active=ents(r"^light\.(main_cabin_(lounge|workplace|gangpad|plinten)|mc_(6a|7a|7b|led)$|mc_s_(6|7))"))
-room("interior", "Crew cabin", (729, 264, 172, 98), crew, value="sensor.motionsensorcrew_temperature", leak="cc",
+room("interior", "Crew cabin", (729, 534, 172, 98), crew, value="sensor.motionsensorcrew_temperature", leak="cc",
      active=ents(r"^light\.(cc_|crew_cabin_)"))
-room("interior", "Guest cabin", (901, 149, 132, 207), guest, active=ents(r"^light\.(gc_|guest_cabin_)"))
-room("interior", "Front peak", (1039, 184, 172, 126), front, leak="fp", active=["switch.fp_boiler"])
+room("interior", "Guest cabin", (901, 419, 132, 207), guest, active=ents(r"^light\.(gc_|guest_cabin_)"))
+room("interior", "Front peak", (1039, 454, 172, 126), front, leak="fp", active=["switch.fp_boiler"])
 
 
 # ---------- deck ----------
