@@ -170,23 +170,20 @@ class Panel:
                 self.y += 56
         self.y += 6
 
-    BW, BH = 364, 236  # one Webasto block in the strip under the zoomed drawing
+    BW, BH = 280, 236  # one Webasto block in the strip under the zoomed drawing
 
     def webasto(self, key, title, lo=10, hi=35):
-        """Webasto unit as a block under the zoomed drawing (next to the previous one): round dial with the temperature on
-        the upper half (setpoint tick) and the fan speed on the lower half; airco on/off; setpoint and fan with − / +."""
+        """Webasto unit as a compact block under the zoomed drawing (next to the previous one): on/off as a small switch in
+        the header, and a round dial (temperature + setpoint above, fan speed below) with − / + in its corners: top for
+        the setpoint, bottom for the fan."""
         b = f"webasto_bluecool_noder_{key}"
         x = len([i for i in self.below if "type: panel" in i]) * (self.BW + 12)
-        x2, w2 = x + 180, self.BW - 192
         add = self.below.append
         add(f"{{ type: panel, x: {x}, y: 0, width: {self.BW}, height: {self.BH}, title: {q(title)} }}")
-        add(f'{{ type: climate, x: {x + 12}, y: 50, width: 156, entity: sensor.{b}_temp, min: {lo}, max: {hi}, unit: "°C", decimals: 1, '
-            f'setpoint_entity: sensor.{b}_setpoint_feedback, fan_entity: sensor.{b}_fan_speed_feedback, fan_min: 1, fan_max: 6, fan_names: {{ 6: Aut }} }}')
-        add(f"{{ type: toggle, x: {x2}, y: 44, width: {w2}, height: 44, icon: klimaat, label: Airco, entity: switch.{b}_ac }}")
-        add(f'{{ type: stepper, x: {x2}, y: 98, width: {w2}, height: 62, stacked: true, label: Setpoint, entity: number.{b}, '
-            f'state_entity: sensor.{b}_setpoint_feedback, unit: "°C" }}')
-        add(f"{{ type: stepper, x: {x2}, y: 166, width: {w2}, height: 62, stacked: true, label: Ventilator, entity: number.{b}_fan_speed, "
-            f"state_entity: sensor.{b}_fan_speed_feedback, value_names: {{ 6: Aut }} }}")
+        add(f"{{ type: toggle, style: pill, x: {x + self.BW - 12 - 52}, y: 6, width: 52, height: 30, label: Airco, entity: switch.{b}_ac }}")
+        add(f'{{ type: climate, x: {x + (self.BW - 186) // 2}, y: 42, width: 186, entity: sensor.{b}_temp, min: {lo}, max: {hi}, unit: "°C", decimals: 1, '
+            f'setpoint_entity: sensor.{b}_setpoint_feedback, setpoint_number: number.{b}, '
+            f'fan_entity: sensor.{b}_fan_speed_feedback, fan_number: number.{b}_fan_speed, fan_min: 1, fan_max: 6, fan_names: {{ 6: Aut }} }}')
         self.used.update([f"switch.{b}_ac", f"number.{b}", f"number.{b}_fan_speed", f"sensor.{b}_temp"])
 
     def info(self, rows):

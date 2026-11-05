@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.19";
+const VERSION = "0.5.20";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -596,6 +596,15 @@ const TC_STYLE =
   .tc-gauge-sub { position: absolute; left: 0; right: 0; text-align: center; }
   .tc-g-fan { stroke: var(--ink-muted); stroke-width: 14; }
   .tc-climate.is-auto .tc-g-fan { stroke-dasharray: 10 7; stroke-linecap: butt; }
+  .tc-clim-dial { position: absolute; }
+  .tc-clim-btn { position: absolute; width: auto; font-size: 26px; }
+  .tc-gauge-sub.is-busy { animation: tc-pulse 1.2s ease-in-out infinite; color: var(--accent); }
+  .tc-pill { padding: 0; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); background: var(--surface-raised); cursor: pointer; }
+  .tc-pill-knob { position: absolute; top: 3px; left: 3px; width: var(--k); height: var(--k); border-radius: 50%; background: var(--ink-muted); transition: left .2s, background .2s; }
+  .tc-pill.is-on { background: var(--accent-soft); border-color: var(--accent); }
+  .tc-pill.is-on .tc-pill-knob { left: calc(100% - var(--k) - 5px); background: var(--accent); }
+  .tc-pill.is-busy { border-style: dashed; border-color: var(--accent); }
+  .tc-pill:disabled { opacity: .4; cursor: default; }
   .tc-clim-fan b { font: 600 18px/1 var(--font-cond); color: var(--ink); margin-left: 4px; letter-spacing: 0; text-transform: none; }
 
   /* hotspot */
@@ -2073,6 +2082,7 @@ class ShipbornPanelCard extends HTMLElement {
   // yellow and gets a second button (`more_info`, default for lights) that opens HA's own more-info dialog for dimming.
   // A sensor shows its value; `states` renames states (e.g. on: LEK) and `on_tone: alarm | warn` colours the on state.
   _tToggle(t) {
+    if (t.style === "pill") return this._tPill(t); // small slide switch, e.g. Webasto on/off in a panel header
     const n = this._place(h("div", "tc-row"), t, 220, 48);
     const main = h("button", "tc-row-main");
     main.type = "button";
@@ -2246,10 +2256,15 @@ class ShipbornPanelCard extends HTMLElement {
 
   // Round climate dial: the upper half is the temperature (`entity`, `min`–`max`, setpoint tick from `setpoint_entity`),
   // the lower half the fan speed (`fan_entity`, `fan_min`–`fan_max`; `fan_names: { 6: Aut }` shows a word and a dashed arc).
+  // With `setpoint_number` / `fan_number` it gets − and + in the corners of its square: top for the setpoint, bottom for
+  // the fan. The asked value shows (pulsing) until the feedback (`setpoint_entity` / `fan_entity`) matches it (max 10 s).
   _tClimate(c) {
-    const W = c.width || 180;
-    const n = this._place(h("div", "tc-gauge tc-climate"), c, W, W);
-    const k = W / 200;
+    const A = c.width || 180;
+    const ctl = !!(c.setpoint_number || c.fan_number);
+    const pad = ctl ? Math.round(A * 0.06) : 0;
+    const D = A - 2 * pad;
+    const k = D / 200;
+    const n = this._place(h("div", "tc-gauge tc-climate"), c, A, A);
     const min = c.min ?? 10;
     const max = c.max ?? 35;
     const fmin = c.fan_min ?? 1;
@@ -2260,33 +2275,114 @@ class ShipbornPanelCard extends HTMLElement {
     const arc = (a0, a1, sweep) => `M${P(a0)}A80 80 0 0 ${sweep} ${P(a1)}`;
     const tA = (v) => PI + G + (PI - 2 * G) * clamp((v - min) / (max - min || 1), 0, 1); // left, over the top, right
     const fA = (v) => PI - G - (PI - 2 * G) * clamp((v - fmin + 1) / (fmax - fmin + 1 || 1), 0, 1); // left, under, right
-    n.innerHTML =
+    const dial = h("div", "tc-clim-dial", { left: pad + "px", top: pad + "px", width: D + "px", height: D + "px" });
+    dial.innerHTML =
       `<svg viewBox="0 0 200 200"><path class="tc-g-track" d="${arc(PI + G, 2 * PI - G, 1)}"/><path class="tc-g-track" d="${arc(PI - G, G, 0)}"/>` +
       `<path class="tc-g-val" d=""/><path class="tc-g-fan" d=""/><path class="tc-g-set" d=""/></svg>` +
       `<div class="tc-gauge-center" style="top:${50 * k}px"><span class="value-lg" style="font-size:${36 * k}px"></span><span class="caption tc-unit"></span></div>` +
       `<div class="tc-gauge-sub caption" style="top:${92 * k}px"></div>` +
       `<div class="tc-gauge-sub caption tc-clim-fan" style="top:${112 * k}px">${c.fan_label ?? "Ventilator"}<b></b></div>`;
-    const [valArc, fanArc, setMark] = [...n.querySelectorAll("path")].slice(2);
-    const [big, unit] = n.querySelector(".tc-gauge-center").children;
-    const [setText, fanText] = n.querySelectorAll(".tc-gauge-sub");
+    n.appendChild(dial);
+    const [valArc, fanArc, setMark] = [...dial.querySelectorAll("path")].slice(2);
+    const [big, unit] = dial.querySelector(".tc-gauge-center").children;
+    const [setText, fanText] = dial.querySelectorAll(".tc-gauge-sub");
     const fanVal = fanText.querySelector("b");
+    // − / + per number entity; pend[key] = [value asked, time] until the feedback reports it.
+    const pend = {};
+    const steppers = [];
+    const B = Math.round(A * 0.22); // corner buttons stay just clear of the ring
+    const stepper = (key, entity, feedback, lo, hi, corners) => {
+      if (!entity) return;
+      const range = () => {
+        const a = this._hass?.states[entity]?.attributes || {};
+        return [a.min ?? lo, a.max ?? hi, a.step ?? 1];
+      };
+      const base = (hass) => (pend[key] ? pend[key][0] : num(hass.states[entity]) ?? num(hass.states[feedback]));
+      const btns = corners.map(([txt, x, y, dir, title]) => {
+        const b = h("button", "tc-row-btn tc-clim-btn", { left: x + "px", top: y + "px", width: B + "px", height: B + "px" });
+        b.type = "button";
+        b.textContent = txt;
+        b.title = title;
+        b.addEventListener("click", () => {
+          const hass = this._hass;
+          const [mn, mx, st] = range();
+          const v = base(hass);
+          if (v == null) return;
+          const to = +clamp(Math.round((v + dir * st) / st) * st, mn, mx).toFixed(4);
+          if (to === v) return;
+          pend[key] = [to, Date.now()];
+          fire(this, "haptic", "light");
+          this._setValue(entity, to);
+          setTimeout(() => this._hass && (this.hass = this._hass), 10100);
+          this.hass = hass;
+        });
+        n.appendChild(b);
+        return [b, dir];
+      });
+      steppers.push((hass) => {
+        const f = num(hass.states[feedback]);
+        if (pend[key] && (f === pend[key][0] || Date.now() - pend[key][1] >= 10000)) delete pend[key];
+        const [mn, mx] = range();
+        const v = base(hass);
+        const off = unavailable(hass.states[entity]) || v == null;
+        for (const [b, dir] of btns) b.disabled = off || (dir < 0 ? v <= mn : v >= mx);
+      });
+    };
+    const R = A - B;
+    stepper("set", c.setpoint_number, c.setpoint_entity, min, max, [["−", 0, 0, -1, "Setpoint lager"], ["+", R, 0, 1, "Setpoint hoger"]]);
+    stepper("fan", c.fan_number, c.fan_entity, fmin, fmax, [["−", 0, R, -1, "Ventilator lager"], ["+", R, R, 1, "Ventilator hoger"]]);
     this._updaters.push((hass) => {
+      for (const f of steppers) f(hass);
       const so = c.entity ? hass.states[c.entity] : null;
       const v = num(so, c.factor);
       valArc.setAttribute("d", v == null ? "" : arc(PI + G, tA(v), 1));
       big.textContent = fmt(v, c.decimals ?? 1, hass);
       unit.textContent = unitOf(c, so);
       const ss = c.setpoint_entity ? hass.states[c.setpoint_entity] : null;
-      const sp = num(ss);
+      const sp = pend.set ? pend.set[0] : num(ss);
       const a = sp == null ? null : tA(sp);
       setMark.setAttribute("d", a == null ? "" : `M${P(a, 66)}L${P(a, 94)}`);
       const su = c.setpoint_unit ?? c.unit ?? ss?.attributes?.unit_of_measurement ?? so?.attributes?.unit_of_measurement ?? "";
       setText.textContent = c.setpoint_entity ? `${c.setpoint_label ?? "Setpoint"} ${fmt(sp, c.setpoint_decimals ?? 0, hass)}${sp != null && su ? " " + su : ""}` : "";
-      const fv = c.fan_entity ? num(hass.states[c.fan_entity]) : null;
+      setText.classList.toggle("is-busy", !!pend.set);
+      const fv = pend.fan ? pend.fan[0] : c.fan_entity ? num(hass.states[c.fan_entity]) : null;
       const word = fv == null ? null : c.fan_names?.[fv] ?? c.fan_names?.[String(fv)];
       n.classList.toggle("is-auto", word != null);
       fanArc.setAttribute("d", fv == null ? "" : arc(PI - G, word != null ? G : fA(fv), 0));
       fanVal.textContent = fv == null ? "—" : word ?? fmt(fv, 0, hass);
+      fanText.classList.toggle("is-busy", !!pend.fan);
+    });
+    return n;
+  }
+
+  // Small on/off slide switch (e.g. in a panel header): `entity`, `label` as tooltip; BEZIG (dashed) until the state changes.
+  _tPill(t) {
+    const hh = t.height || 30;
+    const n = this._place(h("button", "tc-pill"), t, Math.round(hh * 1.75), hh);
+    n.type = "button";
+    n.title = t.label ?? "";
+    n.style.setProperty("--k", hh - 8 + "px");
+    n.innerHTML = '<span class="tc-pill-knob"></span>';
+    let busy = 0;
+    let last = null;
+    n.addEventListener("click", async () => {
+      const before = this._hass?.states[t.entity]?.state;
+      if ((await this._handleAction(t, t.tap_action || { action: "toggle" }, n)) === false) return;
+      if (this._hass?.states[t.entity]?.state !== before) return;
+      busy = Date.now();
+      setTimeout(() => this._hass && (this.hass = this._hass), 10100);
+      this.hass = this._hass;
+    });
+    this._updaters.push((hass) => {
+      const so = hass.states[t.entity];
+      if (so?.state !== last) {
+        if (last !== null) busy = 0;
+        last = so?.state;
+      }
+      if (busy && Date.now() - busy > 10000) busy = 0;
+      n.classList.toggle("is-on", isOn(so));
+      n.classList.toggle("is-busy", !!busy);
+      n.disabled = unavailable(so);
     });
     return n;
   }
