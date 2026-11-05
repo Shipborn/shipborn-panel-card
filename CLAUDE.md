@@ -27,6 +27,7 @@ Lokaal staat het project in dagmappen `YYMMDD/` onder `…/32.Home Assistant/18.
 | `Voorbeeld foto's plc/` | Screenshots van het oorspronkelijke PLC-scherm (ontwerpvoorbeeld). Niet in git. |
 | `TC90 JOAL/` | De juiste interieur- en dektekening (`*.png`, transparant) en het zijaanzicht (`Side view.jpg`), bron van `tc90-interieur`, `tc90-dekplan`, `tc90-zijaanzicht` en `tc90-romp`. Niet in git. |
 | `_ds_bron/*.webp` | Bronnen van de ingebouwde afbeeldingen (logo `shipborn-joal`, `tc90-zijaanzicht`, `tc90-romp`, `tc90-dekplan`, `tc90-interieur`). De kaart bevat ze als base64 in `IMAGES`; alleen nodig om een afbeelding te vervangen. Niet in git. |
+| `tools/romp_uitsnede.py` | Snijdt de romp (`tc90-romp`, Voortstuwing) uit `TC90 JOAL/Side view.jpg`, transparant, met vlag en railing (Pillow, numpy, scipy). |
 | `tools/interieur_zones.py` | Genereert de ruimtes (`zone` met `zoom`) op het interieurplan uit `Entiteiten-HA.xlsx`. |
 | `hacs.json` | HACS-metadata (naam, bestandsnaam `shipborn-panel-card.js`); in HACS toegevoegd als custom repository van het type *Dashboard*. |
 
@@ -134,7 +135,7 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots en de HA-export ontbreken dan.
 - Controleer of `python` werkt (anders `python3`) en pas `.claude/launch.json` daarop aan.
 
-## Stand van zaken en open punten (05-11-2026, v0.5.15)
+## Stand van zaken en open punten (05-11-2026, v0.5.16)
 
 - **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`, en het ongebruikte `alarmbar`; zie README). Alle pagina's staan in het nieuwe kader (statusbalk met subtabs, icoonbalk); de systeemschema's en hun bediening zijn verder nog de oude onderdelen, die nu wel de themakleuren volgen. Alleen `voortstuwing` is helemaal in de nieuwe stijl (schip met hotspots, tegels, schakelaars); de andere bestemmingen kunnen zo'n overzichtspagina nog krijgen. Brandstof staat onder Voortstuwing (keuze van Claude, niet van de gebruiker). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
 - Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `voortstuwing`, `ship-side`, `ship-deck` (dekplan en interieur samen), `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
