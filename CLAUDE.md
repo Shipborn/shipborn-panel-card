@@ -42,10 +42,11 @@ python demo/edit_server.py              # editor: http://localhost:8770/demo/edi
 python -m http.server 8765              # demo:   http://localhost:8765/demo/plc.html?view=sys-dcbus
 ```
 
-- Op de pc van GBS werkt alleen `python`, niet `python3`.
+- Op de pc van GBS (Windows) werkt alleen `python`, niet `python3`; op de Mac juist `python3`.
+- De hulpscripts in `tools/` hebben extra pakketten nodig: `interieur_zones.py` openpyxl, `romp_uitsnede.py` Pillow, numpy en scipy (`python -m pip install --user openpyxl pillow numpy scipy`). De kaart, demo en editor zelf hebben niets extra nodig.
 - `http.server` stuurt geen cache-headers: na een wijziging kan de browser oude bestanden tonen. Harde refresh, of de editorserver gebruiken (die stuurt `no-store`).
 - In de demo zijn entiteiten die niet in de nep-lijst van `demo/plc.html` staan "—" (waarden) of gedimd (knoppen). Dat is normaal.
-- Claude Code: `.claude/launch.json` (niet in git) bevat preview-configuraties: in de dagmap `demo` (8765), in de bovenmap `demo` en `editor` (8770), die naar de actieve dagmap wijzen. Start ze met de preview-tool, niet met Bash.
+- Claude Code: `.claude/launch.json` (niet in git) bevat preview-configuraties: in de dagmap `demo` (8765), in de bovenmap `demo` en `editor` (8770, met `python`, Windows) en `demo-mac` en `editor-mac` (met `python3`), die naar de actieve dagmap wijzen. Start ze met de preview-tool, niet met Bash.
 
 ### Uitrollen naar Home Assistant
 
@@ -131,11 +132,15 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 
 ## Op een andere pc beginnen
 
-- **Met de Dropbox-map:** open de bovenmap `18.Bestruringspagina` en voer `nieuwe-dag.ps1` uit; alles (inclusief `.git` en de niet-geversioneerde bestanden) komt mee.
-- **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots en de HA-export ontbreken dan.
-- Controleer of `python` werkt (anders `python3`) en pas `.claude/launch.json` daarop aan.
+- **Met de Dropbox-map:** open de bovenmap `18.Bestruringspagina` en maak de dagmap van vandaag: op Windows `nieuwe-dag.ps1`, op de Mac `bash nieuwe-dag.sh`. Alles (inclusief `.git` en de niet-geversioneerde bestanden) komt mee. Wacht eerst tot Dropbox klaar is met synchroniseren (anders kopieer je een halve map).
+- **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots, `_ds_bron/` en de HA-export ontbreken dan.
+- Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
+- Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). De stand bij overdracht op 05-11: commit `0f4f143`, alles gepusht.
 
 ## Stand van zaken en open punten (05-11-2026, v0.5.17)
+
+- **Laatste werk (05-11):** dekplan en interieur samen op `ship-deck`, ruimtes met de omtrek van de kamers (v0.5.13), layout-editor volgt wijzigingen op schijf, nieuw zijaanzicht (v0.5.14) en daaruit gesneden romp op Voortstuwing met vlag en railing (v0.5.15–0.5.17). Details in `docs/GESCHIEDENIS.md`.
+- **In HA nog na te lopen:** of HACS op v0.5.17 staat (console: `SHIPBORN-PANEL-CARD v0.5.17`) en of de YAML van 05-11 geplakt is (romp op Voortstuwing `y: 94`, zijaanzicht `x: 404`, pagina *Dek en interieur*). Haal bij twijfel eerst de raw config uit HA op en vergelijk, zodat wijzigingen die daar gemaakt zijn niet verloren gaan.
 
 - **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`, en het ongebruikte `alarmbar`; zie README). Alle pagina's staan in het nieuwe kader (statusbalk met subtabs, icoonbalk); de systeemschema's en hun bediening zijn verder nog de oude onderdelen, die nu wel de themakleuren volgen. Alleen `voortstuwing` is helemaal in de nieuwe stijl (schip met hotspots, tegels, schakelaars); de andere bestemmingen kunnen zo'n overzichtspagina nog krijgen. Brandstof staat onder Voortstuwing (keuze van Claude, niet van de gebruiker). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
 - Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `voortstuwing`, `ship-side`, `ship-deck` (dekplan en interieur samen), `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.
