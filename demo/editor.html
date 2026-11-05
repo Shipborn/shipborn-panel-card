@@ -224,8 +224,26 @@
       const want = new URLSearchParams(location.search).get("view");
       const idx = doc.get("views").items.findIndex((v) => v.get("path") === want);
       vi = idx < 0 ? 0 : idx;
+      conflict = false;
       render();
     }
+    // Watches the file on disk: reloads a newer version when nothing is unsaved here, otherwise flags a conflict.
+    let conflict = false, polling = false;
+    async function watch() {
+      if (polling) return;
+      polling = true;
+      try {
+        const text = await (await fetch(FILE, { cache: "no-store" })).text();
+        if (text === saved || (dirty && text === serialize())) return;
+        if (!dirty) { undo = []; redo = []; sel = []; await load(); $("status").textContent = "bijgewerkt van schijf"; $("status").classList.remove("dirty"); }
+        else if (!conflict) {
+          conflict = true;
+          $("status").textContent = "bestand is buiten de editor gewijzigd – opslaan geblokkeerd; herlaad (Ctrl+R) om de nieuwe versie te zien";
+          $("status").classList.add("dirty");
+        }
+      } catch {} finally { polling = false; }
+    }
+    setInterval(watch, 3000);
     function fillViews() {
       const views = doc.get("views").items;
       vi = Math.min(vi, views.length - 1);
@@ -927,11 +945,14 @@
     $("undo").onclick = () => undo.length && (redo.push(serialize()), restore(undo.pop()));
     $("redo").onclick = () => redo.length && (undo.push(serialize()), restore(redo.pop()));
     async function save() {
+      await watch();
+      if (conflict && !confirm("Het bestand is buiten de editor gewijzigd. Toch opslaan en die wijzigingen overschrijven?")) return;
       const text = serialize();
       try {
         const r = await fetch(FILE, { method: "PUT", body: text });
         if (!r.ok) throw new Error(r.status);
         saved = text;
+        conflict = false;
         remember(text);
         changed();
       } catch {
