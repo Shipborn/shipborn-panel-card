@@ -516,6 +516,99 @@ room("deck", "Dekverlichting", (814, 144, 332, 166), deck_lights,
      active=["light.mc_s_15a_deck_bb_d40", "light.mc_s_15a_deck_sb_d41", "light.decklight_bb"])
 
 
+# ---------- lamps on the zoomed drawing ----------
+# There is no lighting plan, so the place of each lamp is estimated from its name: BB (port) = top of the drawing and
+# SB (starboard) = bottom (the bow points right), A / M / V (achter / midden / voor) = left / middle / right of the
+# room. Lamps without such a code are spread evenly over the rest of the room. Correct a place in LAMP_AT
+# (entity: (x, y), page coordinates) when it is wrong; that wins over the estimate.
+LAMP_AT = {}
+
+
+def inside(pt, poly):
+    x, y = pt
+    c = False
+    for (x1, y1), (x2, y2) in zip(poly, poly[1:] + poly[:1]):
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+            c = not c
+    return c
+
+
+def room_lamps(r, p):
+    """(label, light) of the room's own lamps (the panel's lights without the groups), with an estimated place."""
+    seen, rows = set(), []
+    for it in p.items:
+        if "type: light_group" in it:
+            continue
+        m = re.search(r'label: ("[^"]*"|[^,]+), entity: (light\.[a-z0-9_]+)', it)
+        if m and m.group(2) not in seen:
+            seen.add(m.group(2))
+            rows.append((m.group(1).strip('"'), m.group(2)))
+    if not rows:
+        return []
+    if r["outline"]:
+        poly = [tuple(pt) for pt in r["outline"]]
+    else:
+        x, y, w, hh = r["rect"]
+        poly = [(x, y), (x + w, y), (x + w, y + hh), (x, y + hh)]
+    xs, ys = [pt[0] for pt in poly], [pt[1] for pt in poly]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    w, hh = x1 - x0, y1 - y0
+    cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
+
+    def deep(pt, m=10):  # inside with some room to the walls
+        return all(inside((pt[0] + dx, pt[1] + dy), poly) for dx, dy in ((0, 0), (m, 0), (-m, 0), (0, m), (0, -m)))
+
+    def code(lbl, e):
+        t = (lbl + " " + e).lower()
+        side = "bb" if re.search(r"\bbb|_bb|bb[amv]\b|_bb[amv]_", t) else "sb" if re.search(r"\bsb|_sb|sb[amv]\b|_sb[amv]_", t) else None
+        lon = None
+        if re.search(r"(bb|sb)a\b|(bb|sb)a_|\bachter|_a_|_a$|achterzijde", t):
+            lon = "a"
+        elif re.search(r"(bb|sb)m\b|(bb|sb)m_|\bmidden", t):
+            lon = "m"
+        elif re.search(r"(bb|sb)v\b|(bb|sb)v_|\bvoor\b|_v_|_v$|voorzijde|_dl_v_", t):
+            lon = "v"
+        return side, lon
+
+    placed, free = [], []
+    for lbl, e in rows:
+        side, lon = code(lbl, e)
+        if e in LAMP_AT:
+            placed.append((lbl, e, LAMP_AT[e]))
+        elif side or lon:
+            px = x0 + w * {"a": 0.22, "m": 0.5, "v": 0.78, None: 0.5}[lon]
+            py = y0 + hh * {"bb": 0.22, "sb": 0.78, None: 0.5}[side]
+            # keep it inside an irregular room: walk towards the middle until it is
+            for _ in range(20):
+                if deep((px, py)):
+                    break
+                px, py = px + (cx - px) * 0.15, py + (cy - py) * 0.15
+            placed.append((lbl, e, (px, py)))
+        else:
+            free.append((lbl, e))
+    # spread the rest over a grid of points inside the room, away from the lamps already placed
+    if free:
+        need = len(free)
+        d = max(w, hh) / 3
+        while d > 6:
+            pts = [(x0 + d / 2 + i * d, y0 + d / 2 + j * d) for j in range(int(hh // d) + 1) for i in range(int(w // d) + 1)]
+            pts = [pt for pt in pts if deep(pt) and all((pt[0] - q_[0]) ** 2 + (pt[1] - q_[1]) ** 2 >= (d * 0.8) ** 2 for _, _, q_ in placed)]
+            if len(pts) >= need:
+                break
+            d *= 0.85
+        pts.sort(key=lambda pt: (pt[0], pt[1]))
+        step = len(pts) / need
+        for k, (lbl, e) in enumerate(free):
+            placed.append((lbl, e, pts[int(k * step)] if pts else (cx, cy)))
+    # lamps that ended up on the same spot: spread them sideways
+    out = []
+    for lbl, e, (px, py) in placed:
+        while any(abs(px - a) < 10 and abs(py - b) < 10 for _, _, (a, b) in out):
+            px += 12
+        out.append((lbl, e, (px, py)))
+    return [(lbl, e, (round(px), round(py))) for lbl, e, (px, py) in out]
+
+
 def render(plan):
     out = []
     for r in ROOMS[plan]:
@@ -542,6 +635,10 @@ def render(plan):
         if p.below:
             out += ["              below:", f"                height: {Panel.BH}", "                items:"]
             out += [f"                  - {s}" for s in p.below]
+        lamps = room_lamps(r, p)
+        if lamps:
+            out.append("              lamps:")
+            out += [f"                - {{ entity: {e}, x: {x}, y: {y}, label: {q(lbl)} }}" for lbl, e, (x, y) in lamps]
     return out
 
 

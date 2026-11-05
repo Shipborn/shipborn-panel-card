@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.20";
+const VERSION = "0.5.21";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -219,6 +219,13 @@ const STYLE = `
   .d-zoom .zm.poly { border: none; }
   .d-zoom .zm.poly svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
   .d-zoom .zm.poly polygon { fill: none; stroke: var(--accent, #f5a524); stroke-width: 3; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  /* lamps on the zoomed drawing: --zl is the dot size in drawing px, so it stays the same on screen at any zoom */
+  .d-zoom .zl { position: absolute; width: var(--zl, 14px); height: var(--zl, 14px); margin: calc(var(--zl, 14px) / -2) 0 0 calc(var(--zl, 14px) / -2);
+    padding: 0; box-sizing: border-box; border-radius: 50%; border: calc(var(--zl, 14px) * .14) solid #ffffff; background: #8b939b; cursor: pointer;
+    box-shadow: 0 0 0 calc(var(--zl, 14px) * .06) rgba(0, 0, 0, .45); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .d-zoom .zl.on { background: #f7d046; box-shadow: 0 0 calc(var(--zl, 14px) * .7) calc(var(--zl, 14px) * .2) rgba(247, 208, 70, .75); }
+  .d-zoom .zl.busy { border-style: dashed; }
+  .d-zoom .zl:disabled { opacity: .35; cursor: default; }
   .d-zoom .zp {
     position: absolute; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;
     opacity: 0; transform: translateX(40px); transition: opacity .35s .1s, transform .35s .1s;
@@ -2875,6 +2882,49 @@ class ShipbornPanelCard extends HTMLElement {
     const mark = h("div", "zm" + (z.points ? " poly" : ""), { left: zx + "px", top: zy + "px", width: zw + "px", height: zh + "px" });
     if (z.points) mark.innerHTML = `<svg viewBox="0 0 ${zw} ${zh}"><polygon points="${polyPoints(z.points, zx, zy)}"/></svg>`;
     inner.appendChild(mark);
+    // Lamps of the room on the drawing (`lamps: [{ entity, x, y, label }]`, page coordinates): tap = on/off,
+    // hold = HA's own more-info dialog (dimming). Yellow while on.
+    for (const l of zc.lamps || []) {
+      const b = h("button", "zl", { left: l.x + "px", top: (l.y ?? l.true ?? 0) + "px" });
+      b.type = "button";
+      b.title = l.label ?? "";
+      let hold = null;
+      let long = false;
+      let busy = 0;
+      b.addEventListener("pointerdown", () => {
+        long = false;
+        hold = setTimeout(() => {
+          long = true;
+          this._handleAction(l, { action: "more-info" }, b);
+        }, 500);
+      });
+      for (const ev of ["pointerup", "pointerleave", "pointercancel"]) b.addEventListener(ev, () => clearTimeout(hold));
+      b.addEventListener("contextmenu", (ev) => ev.preventDefault());
+      b.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        if (long) return (long = false);
+        fire(this, "haptic", "light");
+        this._toggle(l.entity);
+        busy = Date.now();
+        b.classList.add("busy");
+        setTimeout(() => this._hass && (this.hass = this._hass), 10100);
+      });
+      let last = null;
+      this._updaters.push((hass) => {
+        const so = hass.states[l.entity];
+        if (so?.state !== last) {
+          busy = 0;
+          last = so?.state;
+        }
+        if (busy && Date.now() - busy > 10000) busy = 0;
+        b.classList.toggle("on", isOn(so));
+        b.classList.toggle("busy", !!busy);
+        b.disabled = unavailable(so);
+        const br = so?.attributes?.brightness;
+        b.title = `${l.label ?? so?.attributes?.friendly_name ?? l.entity}${isOn(so) && br != null ? ` – ${Math.round(br / 2.55)}%` : ""}`;
+      });
+      inner.appendChild(b);
+    }
     view.appendChild(inner);
     const side = h("div", "d-panel zp");
     const head = h("div", "zh");
@@ -2953,6 +3003,7 @@ class ShipbornPanelCard extends HTMLElement {
       const tx = ax + aw / 2 - (zx + zw / 2) * s;
       const ty = ay + ah / 2 - (zy + zh / 2) * s;
       mark.style.borderWidth = 3 / s + "px";
+      inner.style.setProperty("--zl", (zc.lamp_size ?? 24) / s + "px"); // lamp dots: same size on screen at any zoom
       if (animate) {
         view.style.clipPath = from;
         inner.style.transform = "translate(0px, 0px) scale(1)";

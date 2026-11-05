@@ -85,6 +85,15 @@ views:
                   - { type: panel, x: 0, y: 0, width: 280, height: 236, title: Webasto deck lounge }
                   - { type: toggle, style: pill, x: 216, y: 6, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_deck_lounge_ac }
                   - { type: climate, x: 47, y: 42, width: 186, entity: sensor.webasto_bluecool_noder_deck_lounge_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_deck_lounge_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_deck_lounge, fan_entity: sensor.webasto_bluecool_noder_deck_lounge_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_deck_lounge_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+              lamps:
+                - { entity: light.mc_s_3a_dl_bba_d11_1, x: 531, y: 201, label: BBA (2 spots) }
+                - { entity: light.mc_s_3a_dl_sba_d11_7, x: 531, y: 291, label: SBA (2 spots) }
+                - { entity: light.mc_s_3a_dl_bbm_d11_2, x: 572, y: 201, label: BBM (2 spots) }
+                - { entity: light.mc_s_3a_dl_sbm_d11_6, x: 572, y: 291, label: SBM (2 spots) }
+                - { entity: light.mc_s_3a_dl_bbv_d11_3, x: 613, y: 201, label: BBV (2 spots) }
+                - { entity: light.mc_s_3a_dl_sbv_d11_5, x: 613, y: 291, label: SBV (2 spots) }
+                - { entity: light.mc_s_3a_dl_v_d11_4, x: 613, y: 246, label: Voor (2 spots) }
+                - { entity: light.mc_s_3b_trap_d9, x: 525, y: 246, label: Salon plinten }
           - type: zone
             points: [[46, 250], [52, 205], [100, 186], [100, 312], [52, 296]]
             label_at: [52, 192]
@@ -95,6 +104,8 @@ views:
               items:
                 - { type: text, x: 18, y: 12, text: Loopplank, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
                 - { type: pushbutton, x: 18, y: 42, width: 219, height: 44, label: Loopplank, entity: light.loopplank, led: green, align: left, font_size: 14 }
+              lamps:
+                - { entity: light.loopplank, x: 67, y: 249, label: Loopplank }
           - type: zone
             points: [[130, 215], [150, 196], [495, 186], [495, 311], [150, 302], [130, 282]]
             label_at: [152, 200]
@@ -115,6 +126,9 @@ views:
                 - { type: value, x: 18, y: 254, width: 448, height: 36, label: Temperatuur, entity: sensor.temp_buiten_temperature, font_size: 15, box_width: 110, decimals: 1 }
                 - { type: value, x: 18, y: 302, width: 448, height: 36, label: Temp-sensor batterij, entity: sensor.temp_buiten_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
                 - { type: value, x: 18, y: 344, width: 448, height: 36, label: Temp buiten lounge batterij, entity: sensor.buitenlounchetemp_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+              lamps:
+                - { entity: light.bimini_14b_1tafel_d28, x: 191, y: 247, label: Bimini tafel }
+                - { entity: light.bimini14a_bank_d18_2_d22, x: 312, y: 247, label: Bimini bank }
           - type: zone
             points: [[655, 200], [790, 200], [790, 300], [655, 300]]
             label_at: [661, 206]
@@ -134,6 +148,13 @@ views:
                 - { type: pushbutton, x: 18, y: 240, width: 219, height: 44, label: Giek, entity: light.mc_s_15a0_giek, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 247, y: 240, width: 219, height: 44, label: Windex, entity: light.mc_s_15c_windex_d46, led: green, align: left, font_size: 14 }
                 - { type: text, x: 18, y: 298, width: 448, text: De mastverlichting en de giekspot gaan automatisch aan bij zonsondergang en uit bij zonsopgang., font_size: 13, color: "var(--ink-muted, #8f8e88)" }
+              lamps:
+                - { entity: light.mc_s_15b_spreader_4_d45, x: 722, y: 222, label: Spreader bovenin (alleen BB) }
+                - { entity: light.mc_s_15b_spreader_1_d42, x: 678, y: 222, label: Spreader 3 }
+                - { entity: light.mc_s_15b_spreader_2_d43, x: 678, y: 268, label: Spreader 2 }
+                - { entity: light.mc_s_15b_spreader_3_d44, x: 722, y: 268, label: Spreader 1 }
+                - { entity: light.mc_s_15a0_giek, x: 768, y: 222, label: Giek }
+                - { entity: light.mc_s_15c_windex_d46, x: 768, y: 268, label: Windex }
           - type: zone
             points: [[800, 142], [900, 166], [1050, 198], [1185, 246], [1050, 294], [900, 331], [800, 352]]
             label_at: [830, 180]
@@ -149,6 +170,10 @@ views:
                 - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Deklicht BB naar beneden, entity: light.mc_s_15a_deck_bb_d40, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Deklicht SB naar beneden, entity: light.mc_s_15a_deck_sb_d41, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 18, y: 188, width: 219, height: 44, label: Decklight BB, entity: light.decklight_bb, led: green, align: left, font_size: 14 }
+              lamps:
+                - { entity: light.mc_s_15a_deck_bb_d40, x: 987, y: 197, label: Deklicht BB naar beneden }
+                - { entity: light.mc_s_15a_deck_sb_d41, x: 987, y: 297, label: Deklicht SB naar beneden }
+                - { entity: light.decklight_bb, x: 999, y: 197, label: Decklight BB }
           # ---- einde dek ----
 
           # ---- interieur (tekening uit de map "TC90 JOAL", transparant; onder het dekplan, op dezelfde breedte) ----
@@ -222,6 +247,21 @@ views:
                   - { type: panel, x: 292, y: 0, width: 280, height: 236, title: Webasto owners cabin bad }
                   - { type: toggle, style: pill, x: 508, y: 6, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac }
                   - { type: climate, x: 339, y: 42, width: 186, entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_owners_cabin_bad, fan_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+              lamps:
+                - { entity: light.oc_s_1b_laag_bba_d11, x: 317, y: 450, label: BBA (2 spots) }
+                - { entity: light.oc_s_1b_laag_sba_d16, x: 317, y: 584, label: SBA (2 spots) }
+                - { entity: light.oc_s_1b_laag_bbm_d10, x: 384, y: 450, label: BBM (2 spots) }
+                - { entity: light.oc_s_1b_laag_sbm_d15, x: 384, y: 584, label: SBM (2 spots) }
+                - { entity: light.oc_s_1b_laag_bbv_d9, x: 452, y: 450, label: BBV (2 spots) }
+                - { entity: light.oc_s_1b_laag_sbv_d14, x: 452, y: 584, label: SBV (2 spots) }
+                - { entity: light.oc_s_1b2_led_bed_d12, x: 285, y: 461, label: Plinten bed }
+                - { entity: light.oc_s_1b2_led_vloer_d8, x: 285, y: 503, label: Plinten trappen }
+                - { entity: light.oc_s_2a_douche_d18_1, x: 285, y: 545, label: Douche (spot) }
+                - { entity: light.oc_s_2a_wasbak_d17, x: 327, y: 503, label: Wasbak (spot) }
+                - { entity: light.oc_s_2a_wc_d18, x: 369, y: 419, label: WC (2 spots) }
+                - { entity: light.oc_s_1b_kaptafel_d13, x: 369, y: 503, label: Ledstrip wastafel }
+                - { entity: light.oc_1c2, x: 369, y: 545, label: Hal bad (6) }
+                - { entity: light.oc_1c3, x: 411, y: 419, label: Plint badkamer }
           - type: zone
             points: [[482, 398], [612, 390], [612, 545], [412, 545], [412, 489], [482, 489]]
             label_at: [490, 404]
@@ -267,6 +307,11 @@ views:
                 - { type: pushbutton, x: 247, y: 1216, width: 219, height: 44, label: Groep 0B, entity: light.er_0b, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 18, y: 1274, width: 219, height: 44, label: Groep K1, entity: switch.er_k1, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 247, y: 1274, width: 219, height: 44, label: Stopcontact, entity: switch.socket_engine_room, led: green, align: left, font_size: 14 }
+              lamps:
+                - { entity: light.er_s_13a1, x: 512, y: 423, label: Engine room lights }
+                - { entity: light.0xa4c138066737a09a, x: 512, y: 490, label: Ventilatie }
+                - { entity: light.er_0a, x: 579, y: 423, label: Groep 0A }
+                - { entity: light.er_0b, x: 579, y: 490, label: Groep 0B }
           - type: zone
             points: [[614, 389], [732, 397], [732, 545], [614, 545]]
             label_at: [620, 396]
@@ -286,6 +331,10 @@ views:
                 - { type: toggle, x: 18, y: 246, width: 219, height: 48, label: Lek laag batterij, entity: binary_sensor.0x0ceff6fffe76dcea_battery_low, more_info: false, tap_action: { action: more-info }, on_tone: warn, states: { "on": LAAG, "off": OK } }
                 - { type: toggle, x: 247, y: 246, width: 219, height: 48, label: Lek hoog batterij, entity: binary_sensor.0x0ceff6fffe9009c8_battery_low, more_info: false, tap_action: { action: more-info }, on_tone: warn, states: { "on": LAAG, "off": OK } }
                 - { type: toggle, x: 18, y: 308, width: 219, height: 48, icon: pomp, label: Bilgepomp, entity: switch.0xccba97fffeeb6ddc, tap_action: { action: toggle, confirmation: { title_on: "Bilgepomp aanzetten?", title_off: "Bilgepomp uitzetten?" } } }
+              lamps:
+                - { entity: light.mc_s_5a_d_lr_d18, x: 640, y: 415, label: Scheiding lounge }
+                - { entity: light.mc_s_5b_raam_kast_d13, x: 640, y: 519, label: Kast + patrijspoort }
+                - { entity: light.mc_s_5c_plint_d14, x: 692, y: 467, label: Plinten kast }
           - type: zone
             points: [[590, 549], [735, 549], [735, 634], [640, 642], [590, 642]]
             label_at: [596, 555]
@@ -322,6 +371,12 @@ views:
                   - { type: panel, x: 0, y: 0, width: 280, height: 236, title: Webasto galley }
                   - { type: toggle, style: pill, x: 216, y: 6, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_galley_ac }
                   - { type: climate, x: 47, y: 42, width: 186, entity: sensor.webasto_bluecool_noder_galley_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_galley_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_galley, fan_entity: sensor.webasto_bluecool_noder_galley_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_galley_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+              lamps:
+                - { entity: light.g_s_4a_achter_d1, x: 622, y: 596, label: Achterzijde }
+                - { entity: light.g_s_4a_kookplaat_d3, x: 662, y: 573, label: Kookplaat }
+                - { entity: light.g_s_4a_raam_d2, x: 662, y: 622, label: Patrijs (2) }
+                - { entity: light.g_s_4a_vaatw_d4, x: 711, y: 573, label: Vaatwasser }
+                - { entity: light.g_s_4b_led_kast_d5, x: 711, y: 622, label: Onder kastjes }
           - type: zone
             points: [[734, 397], [840, 412], [905, 424], [905, 545], [734, 545]]
             label_at: [740, 404]
@@ -374,6 +429,24 @@ views:
                   - { type: panel, x: 0, y: 0, width: 280, height: 236, title: Webasto main cabin }
                   - { type: toggle, style: pill, x: 216, y: 6, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_main_cabin_ac }
                   - { type: climate, x: 47, y: 42, width: 186, entity: sensor.webasto_bluecool_noder_main_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_main_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_main_cabin, fan_entity: sensor.webasto_bluecool_noder_main_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_main_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+              lamps:
+                - { entity: light.mc_s_7a_tafel_d25, x: 752, y: 415, label: Tafel (2 spots) }
+                - { entity: light.mc_s_7ab_bank_1_d31, x: 752, y: 450, label: Dwars 1 (2 spots) }
+                - { entity: light.mc_s_7ac_bank_2_d30, x: 752, y: 485, label: Dwars 2 (spot) }
+                - { entity: light.mc_s_7ad_bank_3_d29, x: 752, y: 520, label: Bank 1 (spot) }
+                - { entity: light.mc_s_7ae_bank_4_d28, x: 787, y: 415, label: Bank 2 (spot) }
+                - { entity: light.mc_s_7af_bank_5_d27, x: 787, y: 450, label: Bank 3 (spot) }
+                - { entity: light.mc_s_7ag_bank_6_d26, x: 787, y: 485, label: Bank 4 (spot) }
+                - { entity: light.mc_s_7ak_plint_d34, x: 787, y: 520, label: Lounge plinten }
+                - { entity: light.mc_s_7ai_raam_d33, x: 822, y: 450, label: Lounge patrijspoort }
+                - { entity: light.mc_s_7b_gang_d36, x: 822, y: 485, label: Gang (2) }
+                - { entity: light.mc_s_7b_kast_d35, x: 822, y: 520, label: Kast (2) }
+                - { entity: light.mc_s_7b_plint_d37, x: 857, y: 450, label: Werkplek plinten }
+                - { entity: light.mc_s_6a_gang1_d19, x: 857, y: 485, label: Gang 1 (2) }
+                - { entity: light.mc_s_6a_gang2_d21, x: 857, y: 520, label: Gang 2 (2) }
+                - { entity: light.mc_s_6a_gang3_d22, x: 892, y: 450, label: Gang 3 (2) }
+                - { entity: light.mc_s_6a_gang4_d23, x: 892, y: 485, label: Gang 4 }
+                - { entity: light.mc_s_7aj_mast_d24, x: 892, y: 520, label: Mast }
           - type: zone
             points: [[910, 425], [1000, 452], [1040, 462], [1040, 567], [1000, 577], [910, 602]]
             label_at: [916, 434]
@@ -417,6 +490,14 @@ views:
                   - { type: panel, x: 0, y: 0, width: 280, height: 236, title: Webasto crew cabin }
                   - { type: toggle, style: pill, x: 216, y: 6, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_crew_cabin_ac }
                   - { type: climate, x: 47, y: 42, width: 186, entity: sensor.webasto_bluecool_noder_crew_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_crew_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_crew_cabin, fan_entity: sensor.webasto_bluecool_noder_crew_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_crew_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+              lamps:
+                - { entity: light.cc_s_11a_bed_d6, x: 931, y: 446, label: Bed (2 spots) }
+                - { entity: light.cc_s_11a_zitje_d5, x: 931, y: 489, label: Zitjes (2 spots) }
+                - { entity: light.cc_s_11a_tafel_d7, x: 931, y: 532, label: Tafel (spot) }
+                - { entity: light.cc_s_11b_gang_d11, x: 931, y: 574, label: Hal (2 spots) }
+                - { entity: light.cc_s_11b_plint_d8, x: 974, y: 532, label: Plinten }
+                - { entity: light.cc_12a, x: 974, y: 574, label: Toilet (4 spots) }
+                - { entity: light.cc_s_11b_kasten_d12, x: 1017, y: 489, label: Kasten ledstrip }
           - type: zone
             points: [[737, 549], [905, 549], [905, 602], [840, 617], [737, 634]]
             label_at: [743, 555]
@@ -448,6 +529,13 @@ views:
                   - { type: panel, x: 0, y: 0, width: 280, height: 236, title: Webasto guest cabin }
                   - { type: toggle, style: pill, x: 216, y: 6, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_guest_cabin_ac }
                   - { type: climate, x: 47, y: 42, width: 186, entity: sensor.webasto_bluecool_noder_guest_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_guest_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_guest_cabin, fan_entity: sensor.webasto_bluecool_noder_guest_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_guest_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+              lamps:
+                - { entity: light.gc_s_9b_bed_a_d9, x: 774, y: 592, label: Bed achter (spot) }
+                - { entity: light.gc_s_9b_bed_v_d8, x: 868, y: 592, label: Bed voor (2 spots) }
+                - { entity: light.gc_s_9a_gang_d5, x: 754, y: 566, label: Gang (2 spots) }
+                - { entity: light.gc_s_9b_plint_d10, x: 789, y: 566, label: Plint }
+                - { entity: light.gc_s_10a_wc_d7, x: 823, y: 566, label: Toilet (2 spots) }
+                - { entity: light.gc_s_10a_wasbak_d6, x: 823, y: 601, label: Wasbak (2 spots) }
           - type: zone
             points: [[1042, 463], [1140, 487], [1235, 514], [1140, 542], [1042, 567]]
             label_at: [1048, 505]
