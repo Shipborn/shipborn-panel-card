@@ -50,23 +50,23 @@ views:
               - { icon: verlichting, label: Verlichting, path: sys-navlights }
               - { icon: bilge, label: Bilge, path: sys-bilge }
               - { icon: alarm, label: Alarmen, path: alarms, badge_entity: sensor.er_alarm_status_active_alarms, badge_attribute: alarms }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: pipe, medium: air, points: [[847, 573], [605, 573], [605, 273], [545, 273]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: pipe, medium: shaft, points: [[630, 384], [134, 384]], thickness: 10, speed: 60, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
-          - { type: propeller, x: 97, y: 297, width: 40, height: 170, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
-          - { type: text, x: 230, y: 414, text: Seal grease, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: grease, points: [[221, 479], [221, 406]], thickness: 5, arrow: true, idle_opacity: 0.8 }
-          - { type: text, x: 230, y: 434, entity: sensor.al1590_er_prop_shaft_grease_pressure, mono: true, font_size: 16, unit: bar, decimals: 2 }
-          - { type: text, x: 230, y: 460, entity: sensor.al1590_er_prop_shaft_grease_temperature, mono: true, font_size: 16, unit: "°C", decimals: 1 }
-          - { type: pipe, medium: seawater, points: [[529, 323], [529, 303]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 502, y: 110, width: 50, height: 150, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: butterfly_valve, x: 514, y: 256, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 460, y: 266, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[452, 460], [496, 460]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: pipe, medium: air, points: [[847, 526], [605, 526], [605, 226], [545, 226]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: pipe, medium: shaft, points: [[630, 337], [134, 337]], thickness: 10, speed: 60, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
+          - { type: propeller, x: 97, y: 250, width: 40, height: 170, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
+          - { type: text, x: 230, y: 367, text: Seal grease, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: grease, points: [[221, 432], [221, 359]], thickness: 5, arrow: true, idle_opacity: 0.8 }
+          - { type: text, x: 230, y: 387, entity: sensor.al1590_er_prop_shaft_grease_pressure, mono: true, font_size: 16, unit: bar, decimals: 2 }
+          - { type: text, x: 230, y: 413, entity: sensor.al1590_er_prop_shaft_grease_temperature, mono: true, font_size: 16, unit: "°C", decimals: 1 }
+          - { type: pipe, medium: seawater, points: [[529, 276], [529, 256]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 502, y: 63, width: 50, height: 150, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 514, y: 209, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 460, y: 219, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[452, 413], [496, 413]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - {
               type: text,
               x: 435,
-              y: 193,
+              y: 146,
               width: 70,
               height: 55,
               text: Cooling
@@ -77,12 +77,12 @@ views:
               font_size: 13,
               active_entity: switch.er_zeewaterpomp_cooling
             }
-          - { type: pipe, medium: seawater, points: [[555, 153], [650, 153], [650, 203]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[625, 349], [190, 349], [190, 369]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[555, 106], [650, 106], [650, 156]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[625, 302], [190, 302], [190, 322]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
           - {
               type: text,
               x: 629,
-              y: 214,
+              y: 167,
               width: 70,
               height: 190,
               text: Gear
@@ -94,27 +94,27 @@ views:
               active_above: 5,
               active_abs: true
             }
-          - { type: pipe, medium: shaft, points: [[736, 354], [700, 354]], thickness: 20, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 734, y: 317, width: 200, height: 120, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: engine, x: 746, y: 317, width: 105, height: 70, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: text, x: 752, y: 389, text: Volvo D6 340, font_size: 15, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 752, y: 412, entity: sensor.engine_room_main_engine_me_rpm, mono: true, font_size: 14 }
-          - { type: text, x: 849, y: 412, entity: sensor.engine_room_main_engine_me_coolant_temp, mono: true, font_size: 14, unit: "°C" }
-          - { type: pipe, medium: seawater, points: [[1070, 639], [1070, 596]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: strainer, x: 1045, y: 401, width: 50, height: 150, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: butterfly_valve, x: 1055, y: 549, active_entity: valve.er_ventielblok_1tm4_l4 }
-          - { type: text, x: 1086, y: 559, text: Inlet V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[1044, 417], [947, 417]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: text, x: 964, y: 385, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 16, unit: L/min, decimals: 1 }
-          - { type: pipe, medium: seawater, points: [[503, 538], [503, 575]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: butterfly_valve, x: 488, y: 584, active_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: text, x: 520, y: 580, text: Outlet V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[503, 629], [503, 663]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: pipe, medium: exhaust, points: [[755, 438], [755, 467], [536, 467]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: shaft, points: [[736, 307], [700, 307]], thickness: 20, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: text, x: 734, y: 270, width: 200, height: 120, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: engine, x: 746, y: 270, width: 105, height: 70, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: text, x: 752, y: 342, text: Volvo D6 340, font_size: 15, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 752, y: 365, entity: sensor.engine_room_main_engine_me_rpm, mono: true, font_size: 14 }
+          - { type: text, x: 849, y: 365, entity: sensor.engine_room_main_engine_me_coolant_temp, mono: true, font_size: 14, unit: "°C" }
+          - { type: pipe, medium: seawater, points: [[1070, 592], [1070, 549]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: strainer, x: 1045, y: 354, width: 50, height: 150, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: butterfly_valve, x: 1055, y: 502, active_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: text, x: 1086, y: 512, text: Inlet V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[1044, 370], [947, 370]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
+          - { type: text, x: 964, y: 338, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 16, unit: L/min, decimals: 1 }
+          - { type: pipe, medium: seawater, points: [[503, 491], [503, 528]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: butterfly_valve, x: 488, y: 537, active_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: text, x: 520, y: 533, text: Outlet V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[503, 582], [503, 616]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: exhaust, points: [[755, 391], [755, 420], [536, 420]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - {
               type: text,
               x: 337,
-              y: 561,
+              y: 514,
               width: 75,
               height: 65,
               text: Exhaust
@@ -125,42 +125,42 @@ views:
               active_entity: sensor.engine_room_main_engine_me_rpm,
               active_above: 100
             }
-          - { type: pipe, medium: exhaust, points: [[337, 583], [110, 583]], thickness: 12, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: smoke, x: 41, y: 561, width: 70, height: 40, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[368, 631], [368, 666]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: outlet, x: 233, y: 630, width: 80, height: 26, color: "#3cc7d6", label: Main outlet, active_entity: [sensor.engine_room_main_engine_me_rpm, switch.er_zeewaterpomp_cooling], active_above: 100 }
-          - { type: text, x: 849, y: 546, width: 130, height: 65, text: Compressor, boxed: true, font_size: 15, active_entity: switch.0x781c9dfffea18853 }
-          - { type: text, x: 889, y: 589, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 14, unit: bar, decimals: 2 }
-          - { type: pipe, medium: air, points: [[848, 602], [792, 602], [522, 602]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: pipe, medium: air, points: [[978, 564], [1005, 564], [1050, 564]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: pipe, medium: exhaust, points: [[337, 536], [110, 536]], thickness: 12, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: smoke, x: 41, y: 514, width: 70, height: 40, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: pipe, medium: seawater, points: [[368, 584], [368, 619]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
+          - { type: outlet, x: 233, y: 583, width: 80, height: 26, color: "#3cc7d6", label: Main outlet, active_entity: [sensor.engine_room_main_engine_me_rpm, switch.er_zeewaterpomp_cooling], active_above: 100 }
+          - { type: text, x: 849, y: 499, width: 130, height: 65, text: Compressor, boxed: true, font_size: 15, active_entity: switch.0x781c9dfffea18853 }
+          - { type: text, x: 889, y: 542, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 14, unit: bar, decimals: 2 }
+          - { type: pipe, medium: air, points: [[848, 555], [792, 555], [522, 555]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: pipe, medium: air, points: [[978, 517], [1005, 517], [1050, 517]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 698, width: 620, height: 360, title: "Sensoren – bij Volvo aan alles groen" }
-          - { type: value, style: tile, x: 38, y: 750, width: 137, height: 88, label: Engine speed, entity: sensor.engine_room_main_engine_me_rpm, value_size: 22, decimals: 0, colors: [{ above: 6000, color: red }, { above: 4000, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 187, y: 750, width: 137, height: 88, label: Oil pressure, entity: sensor.engine_room_me_oil_press, value_size: 22, decimals: 2, colors: [{ below: 1.5, color: red }, { below: 1.8, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 336, y: 750, width: 137, height: 88, label: Oil temp, entity: sensor.main_engine_oil_temp, value_size: 22, decimals: 0, colors: [{ above: 110, color: red }, { above: 104, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 485, y: 750, width: 137, height: 88, label: Coolant temp, entity: sensor.engine_room_main_engine_me_coolant_temp, value_size: 22, decimals: 0, colors: [{ above: 100, color: red }, { above: 78, color: amber }, { above: 1, color: green }, { color: grey }] }
-          - { type: value, style: tile, x: 38, y: 850, width: 137, height: 88, label: Alternator, entity: sensor.engine_room_main_engine_me_alt_v, value_size: 22, colors: [{ below: 12, color: red }, { below: 13.6, color: amber }, { above: 15, color: red }, { color: green }] }
-          - { type: value, style: tile, x: 187, y: 850, width: 137, height: 88, label: Engine hours, entity: sensor.engine_room_main_engine_me_hours, value_size: 22, decimals: 0 }
-          - { type: value, style: tile, x: 336, y: 850, width: 137, height: 88, label: Seawater flow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, value_size: 22, colors: [{ below: 40, color: red }, { below: 49, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 485, y: 850, width: 137, height: 88, label: PropSft flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 22, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 38, y: 950, width: 137, height: 88, label: Exhaust temp, entity: sensor.al1590_er_volvo_exhaust_temperature, value_size: 22, colors: [{ above: 89, color: red }, { above: 59, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 187, y: 950, width: 137, height: 88, label: PropSft temp, entity: sensor.al1590_er_prop_shaft_grease_temperature, value_size: 22, colors: [{ above: 80, color: red }, { above: 50, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 336, y: 950, width: 137, height: 88, label: PropSft press, entity: sensor.al1590_er_prop_shaft_grease_pressure, value_size: 22, decimals: 2, colors: [{ above: 2, color: red }, { below: 0.1, color: red }, { color: green }] }
-          - { type: value, style: tile, x: 485, y: 950, width: 137, height: 88, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
-          - { type: panel, x: 656, y: 698, width: 300, height: 360, title: Start Volvo checklist }
-          - { type: indicator, x: 674, y: 750, label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 778, label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 806, label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 834, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 862, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
-          - { type: indicator, x: 674, y: 890, label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
-          - { type: indicator, x: 674, y: 918, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
-          - { type: indicator, x: 674, y: 946, label: Compressordruk ≥ 3 bar, entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
+          - { type: panel, x: 20, y: 651, width: 620, height: 360, title: "Sensoren – bij Volvo aan alles groen" }
+          - { type: value, style: tile, x: 38, y: 703, width: 137, height: 88, label: Engine speed, entity: sensor.engine_room_main_engine_me_rpm, value_size: 22, decimals: 0, colors: [{ above: 6000, color: red }, { above: 4000, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 187, y: 703, width: 137, height: 88, label: Oil pressure, entity: sensor.engine_room_me_oil_press, value_size: 22, decimals: 2, colors: [{ below: 1.5, color: red }, { below: 1.8, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 336, y: 703, width: 137, height: 88, label: Oil temp, entity: sensor.main_engine_oil_temp, value_size: 22, decimals: 0, colors: [{ above: 110, color: red }, { above: 104, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 485, y: 703, width: 137, height: 88, label: Coolant temp, entity: sensor.engine_room_main_engine_me_coolant_temp, value_size: 22, decimals: 0, colors: [{ above: 100, color: red }, { above: 78, color: amber }, { above: 1, color: green }, { color: grey }] }
+          - { type: value, style: tile, x: 38, y: 803, width: 137, height: 88, label: Alternator, entity: sensor.engine_room_main_engine_me_alt_v, value_size: 22, colors: [{ below: 12, color: red }, { below: 13.6, color: amber }, { above: 15, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 187, y: 803, width: 137, height: 88, label: Engine hours, entity: sensor.engine_room_main_engine_me_hours, value_size: 22, decimals: 0 }
+          - { type: value, style: tile, x: 336, y: 803, width: 137, height: 88, label: Seawater flow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, value_size: 22, colors: [{ below: 40, color: red }, { below: 49, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 485, y: 803, width: 137, height: 88, label: PropSft flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 22, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 38, y: 903, width: 137, height: 88, label: Exhaust temp, entity: sensor.al1590_er_volvo_exhaust_temperature, value_size: 22, colors: [{ above: 89, color: red }, { above: 59, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 187, y: 903, width: 137, height: 88, label: PropSft temp, entity: sensor.al1590_er_prop_shaft_grease_temperature, value_size: 22, colors: [{ above: 80, color: red }, { above: 50, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 336, y: 903, width: 137, height: 88, label: PropSft press, entity: sensor.al1590_er_prop_shaft_grease_pressure, value_size: 22, decimals: 2, colors: [{ above: 2, color: red }, { below: 0.1, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 485, y: 903, width: 137, height: 88, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
+          - { type: panel, x: 656, y: 651, width: 300, height: 360, title: Start Volvo checklist }
+          - { type: indicator, x: 674, y: 703, label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 674, y: 731, label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 674, y: 759, label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 674, y: 787, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 674, y: 815, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
+          - { type: indicator, x: 674, y: 843, label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
+          - { type: indicator, x: 674, y: 871, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
+          - { type: indicator, x: 674, y: 899, label: Compressordruk ≥ 3 bar, entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
           - {
               type: pushbutton,
               x: 674,
-              y: 992,
+              y: 945,
               width: 126,
               height: 48,
               label: Prepare start,
@@ -185,32 +185,32 @@ views:
                     }
                 }
             }
-          - { type: pushbutton, x: 812, y: 992, width: 126, height: 48, label: Close valves, font_size: 14, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.closevolvovalves }, confirmation: { text: "Deze functie bedient de volgende aansturingen: close Volvo zeewatervalves, IN & OUT" } }, variant: stop }
-          - { type: panel, x: 972, y: 698, width: 288, height: 360, title: Propulsion mode }
-          - { type: pushbutton, x: 990, y: 750, width: 252, height: 56, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
-          - { type: pushbutton, x: 990, y: 816, width: 252, height: 56, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
-          - { type: pushbutton, x: 990, y: 882, width: 252, height: 56, label: Harbor, align: left, entity: button.wago_hcs_controls_wago_controls_harbormode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode }
-          - { type: panel, x: 20, y: 1074, width: 620, height: 330, title: Wago HCS controls }
-          - { type: gauge, x: 38, y: 1126, width: 280, label: Lever, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%" }
-          - { type: gauge, x: 342, y: 1126, width: 280, label: Shaft speed, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, warn_above: 500, warn_below: -500 }
-          - { type: value, x: 38, y: 1348, width: 280, height: 36, label: Speed setpoint, entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, font_size: 15, decimals: 0 }
-          - { type: value, x: 342, y: 1348, width: 280, height: 36, label: True speed, entity: sensor.engine_room_main_engine_me_rpm, font_size: 15, decimals: 0 }
-          - { type: panel, x: 656, y: 1074, width: 604, height: 330, title: Status aandrijving }
-          - { type: indicator, x: 674, y: 1126, label: Diesel running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, font_size: 17 }
-          - { type: indicator, x: 674, y: 1162, label: Diesel clutch AFT, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, font_size: 17 }
-          - { type: indicator, x: 674, y: 1198, label: Diesel clutch FWD, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, font_size: 17 }
-          - { type: indicator, x: 674, y: 1234, label: Diesel clutch neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 17 }
-          - { type: indicator, x: 964, y: 1126, label: E-motor clutch in, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, font_size: 17 }
-          - { type: indicator, x: 964, y: 1162, label: E-motor running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, font_size: 17 }
-          - { type: text, x: 422, y: 417, width: 95, height: 120, text: Exhaust Separator, font_size: 15, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: shaft, points: [[741, 249], [700, 249]], thickness: 20, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
-          - { type: text, x: 734, y: 192, width: 135, height: 115, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
-          - { type: motor, x: 755, y: 199 }
-          - { type: text, x: 742, y: 259, text: ENGIRO E-MOTOR, font_size: 15, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[785, 438], [785, 499], [527, 499]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: pipe, medium: exhaust, points: [[470, 538], [470, 582], [425, 582]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 454, y: 503, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: °C, decimals: 1 }
-          - { type: text, x: 215, y: 329, text: COOLING PROPSHAFT, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pushbutton, x: 812, y: 945, width: 126, height: 48, label: Close valves, font_size: 14, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.closevolvovalves }, confirmation: { text: "Deze functie bedient de volgende aansturingen: close Volvo zeewatervalves, IN & OUT" } }, variant: stop }
+          - { type: panel, x: 972, y: 651, width: 288, height: 360, title: Propulsion mode }
+          - { type: pushbutton, x: 990, y: 703, width: 252, height: 56, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
+          - { type: pushbutton, x: 990, y: 769, width: 252, height: 56, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
+          - { type: pushbutton, x: 990, y: 835, width: 252, height: 56, label: Harbor, align: left, entity: button.wago_hcs_controls_wago_controls_harbormode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode }
+          - { type: panel, x: 20, y: 1027, width: 620, height: 330, title: Wago HCS controls }
+          - { type: gauge, x: 38, y: 1079, width: 280, label: Lever, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%" }
+          - { type: gauge, x: 342, y: 1079, width: 280, label: Shaft speed, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, warn_above: 500, warn_below: -500 }
+          - { type: value, x: 38, y: 1301, width: 280, height: 36, label: Speed setpoint, entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, font_size: 15, decimals: 0 }
+          - { type: value, x: 342, y: 1301, width: 280, height: 36, label: True speed, entity: sensor.engine_room_main_engine_me_rpm, font_size: 15, decimals: 0 }
+          - { type: panel, x: 656, y: 1027, width: 604, height: 330, title: Status aandrijving }
+          - { type: indicator, x: 674, y: 1079, label: Diesel running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, font_size: 17 }
+          - { type: indicator, x: 674, y: 1115, label: Diesel clutch AFT, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, font_size: 17 }
+          - { type: indicator, x: 674, y: 1151, label: Diesel clutch FWD, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, font_size: 17 }
+          - { type: indicator, x: 674, y: 1187, label: Diesel clutch neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 17 }
+          - { type: indicator, x: 964, y: 1079, label: E-motor clutch in, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, font_size: 17 }
+          - { type: indicator, x: 964, y: 1115, label: E-motor running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, font_size: 17 }
+          - { type: text, x: 422, y: 370, width: 95, height: 120, text: Exhaust Separator, font_size: 15, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: pipe, medium: shaft, points: [[741, 202], [700, 202]], thickness: 20, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
+          - { type: text, x: 734, y: 145, width: 135, height: 115, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
+          - { type: motor, x: 755, y: 152 }
+          - { type: text, x: 742, y: 212, text: ENGIRO E-MOTOR, font_size: 15, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[785, 391], [785, 452], [527, 452]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
+          - { type: pipe, medium: exhaust, points: [[470, 491], [470, 535], [425, 535]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: text, x: 454, y: 456, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: °C, decimals: 1 }
+          - { type: text, x: 215, y: 282, text: COOLING PROPSHAFT, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
 
   - title: Brandstof
     path: sys-fuel
@@ -229,54 +229,54 @@ views:
             tabs: *voort_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: text, x: 497, y: 151, width: 160, height: 100, text: Daytank Diesel ER, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_daytank_level_statistics, font_size: 14 }
-          - { type: text, x: 544, y: 211, entity: sensor.wago_values_er_diesel_daytank_level, mono: true, font_size: 16, unit: "%" }
-          - { type: text, x: 790, y: 228, width: 193, height: 136, text: Diesel PS, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_ps_level, font_size: 14 }
-          - { type: text, x: 858, y: 306, entity: sensor.wago_values_er_diesel_ps_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
-          - { type: text, x: 790, y: 401, width: 193, height: 135, text: Diesel SB, boxed: true, medium: fuel, level_entity: sensor.wago_plc_er_diesel_sb_level, font_size: 14 }
-          - { type: text, x: 859, y: 479, entity: sensor.wago_plc_er_diesel_sb_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
-          - { type: text, x: 107, y: 228, width: 71, height: 148, text: "Daytank\nWebasto", boxed: true, medium: fuel, level_entity: sensor.wago_values_aft_diesel_webasto_level_statistics, font_size: 13 }
-          - { type: text, x: 116, y: 326, entity: sensor.wago_values_aft_diesel_webasto_level, mono: true, font_size: 14, unit: "%" }
-          - { type: pipe, medium: fuel, points: [[789, 303], [772, 303]], thickness: 6, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
-          - { type: pump, x: 735, y: 283, size: 40, rotation: 180, entity: switch.ifm_output_bakboord_diesel_pomp, active_entity: switch.ifm_output_bakboord_diesel_pomp }
-          - { type: pipe, medium: fuel, points: [[734, 301], [632, 301], [632, 261]], thickness: 6, arrow: true, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
-          - { type: pipe, medium: fuel, points: [[789, 476], [772, 476]], thickness: 6, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
-          - { type: pump, x: 735, y: 456, size: 40, rotation: 180, entity: switch.ifm_output_stuurboord_diesel_pomp, active_entity: switch.ifm_output_stuurboord_diesel_pomp }
-          - { type: pipe, medium: fuel, points: [[732, 475], [599, 475], [599, 374], [599, 261]], thickness: 6, arrow: true, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
-          - { type: pipe, medium: fuel, points: [[497, 201], [482, 201], [482, 261], [461, 261]], thickness: 6, flow_entity: switch.0xe4b063fffe7ac868 }
-          - { type: pump, x: 422, y: 241, size: 40, rotation: 180, entity: switch.0xe4b063fffe7ac868, active_entity: switch.0xe4b063fffe7ac868 }
-          - { type: pipe, medium: fuel, points: [[418, 259], [305, 259], [179, 259]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7ac868 }
-          - { type: pipe, medium: fuel, points: [[143, 376], [143, 430]], thickness: 6, arrow: true, flow_entity: binary_sensor.plc_webasto_running }
-          - { type: text, x: 109, y: 434, width: 69, height: 52, text: Webasto, boxed: true, font_size: 13, active_entity: binary_sensor.plc_webasto_running }
-          - { type: pipe, medium: fuel, points: [[554, 251], [554, 339], [537, 339]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: text, x: 342, y: 299, width: 190, height: 119, text: "", boxed: true, active_entity: binary_sensor.generatoron }
-          - { type: engine, x: 351, y: 324, width: 90, height: 63, active_entity: binary_sensor.generatoron }
-          - { type: generator, x: 464, y: 333, width: 50, height: 50, label: Generator, active_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: fuel, points: [[574, 250], [574, 493], [537, 493]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 341, y: 431, width: 191, height: 125, text: "", boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: propeller, x: 343, y: 443, width: 26, height: 100, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
-          - { type: pipe, medium: shaft, points: [[368, 493], [420, 493]], thickness: 4, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
-          - { type: engine, x: 411, y: 458, width: 100, height: 70, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: text, x: 655, y: 151, width: 90, height: 100, text: Dagtank vullen 30%->80%, boxed: true, entity: automation.daytank_vullen, active_entity: automation.daytank_vullen }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: text, x: 497, y: 104, width: 160, height: 100, text: Daytank Diesel ER, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_daytank_level_statistics, font_size: 14 }
+          - { type: text, x: 544, y: 164, entity: sensor.wago_values_er_diesel_daytank_level, mono: true, font_size: 16, unit: "%" }
+          - { type: text, x: 790, y: 181, width: 193, height: 136, text: Diesel PS, boxed: true, medium: fuel, level_entity: sensor.wago_values_er_diesel_ps_level, font_size: 14 }
+          - { type: text, x: 858, y: 259, entity: sensor.wago_values_er_diesel_ps_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
+          - { type: text, x: 790, y: 354, width: 193, height: 135, text: Diesel SB, boxed: true, medium: fuel, level_entity: sensor.wago_plc_er_diesel_sb_level, font_size: 14 }
+          - { type: text, x: 859, y: 432, entity: sensor.wago_plc_er_diesel_sb_level, mono: true, font_size: 16, unit: "%", decimals: 0 }
+          - { type: text, x: 107, y: 181, width: 71, height: 148, text: "Daytank\nWebasto", boxed: true, medium: fuel, level_entity: sensor.wago_values_aft_diesel_webasto_level_statistics, font_size: 13 }
+          - { type: text, x: 116, y: 279, entity: sensor.wago_values_aft_diesel_webasto_level, mono: true, font_size: 14, unit: "%" }
+          - { type: pipe, medium: fuel, points: [[789, 256], [772, 256]], thickness: 6, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
+          - { type: pump, x: 735, y: 236, size: 40, rotation: 180, entity: switch.ifm_output_bakboord_diesel_pomp, active_entity: switch.ifm_output_bakboord_diesel_pomp }
+          - { type: pipe, medium: fuel, points: [[734, 254], [632, 254], [632, 214]], thickness: 6, arrow: true, flow_entity: switch.ifm_output_bakboord_diesel_pomp }
+          - { type: pipe, medium: fuel, points: [[789, 429], [772, 429]], thickness: 6, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
+          - { type: pump, x: 735, y: 409, size: 40, rotation: 180, entity: switch.ifm_output_stuurboord_diesel_pomp, active_entity: switch.ifm_output_stuurboord_diesel_pomp }
+          - { type: pipe, medium: fuel, points: [[732, 428], [599, 428], [599, 327], [599, 214]], thickness: 6, arrow: true, flow_entity: switch.ifm_output_stuurboord_diesel_pomp }
+          - { type: pipe, medium: fuel, points: [[497, 154], [482, 154], [482, 214], [461, 214]], thickness: 6, flow_entity: switch.0xe4b063fffe7ac868 }
+          - { type: pump, x: 422, y: 194, size: 40, rotation: 180, entity: switch.0xe4b063fffe7ac868, active_entity: switch.0xe4b063fffe7ac868 }
+          - { type: pipe, medium: fuel, points: [[418, 212], [305, 212], [179, 212]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7ac868 }
+          - { type: pipe, medium: fuel, points: [[143, 329], [143, 383]], thickness: 6, arrow: true, flow_entity: binary_sensor.plc_webasto_running }
+          - { type: text, x: 109, y: 387, width: 69, height: 52, text: Webasto, boxed: true, font_size: 13, active_entity: binary_sensor.plc_webasto_running }
+          - { type: pipe, medium: fuel, points: [[554, 204], [554, 292], [537, 292]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: text, x: 342, y: 252, width: 190, height: 119, text: "", boxed: true, active_entity: binary_sensor.generatoron }
+          - { type: engine, x: 351, y: 277, width: 90, height: 63, active_entity: binary_sensor.generatoron }
+          - { type: generator, x: 464, y: 286, width: 50, height: 50, label: Generator, active_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: fuel, points: [[574, 203], [574, 446], [537, 446]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: text, x: 341, y: 384, width: 191, height: 125, text: "", boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: propeller, x: 343, y: 396, width: 26, height: 100, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
+          - { type: pipe, medium: shaft, points: [[368, 446], [420, 446]], thickness: 4, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
+          - { type: engine, x: 411, y: 411, width: 100, height: 70, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: text, x: 655, y: 104, width: 90, height: 100, text: Dagtank vullen 30%->80%, boxed: true, entity: automation.daytank_vullen, active_entity: automation.daytank_vullen }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 400, height: 340, title: Tanks vullen }
-          - { type: text, x: 38, y: 748, width: 364, text: Handmatig, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: pushbutton, x: 38, y: 774, width: 364, height: 44, label: Dagtank vullen vanuit BB-tank, entity: switch.ifm_output_bakboord_diesel_pomp, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 828, width: 364, height: 44, label: Dagtank vullen vanuit SB-tank, entity: switch.ifm_output_stuurboord_diesel_pomp, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 882, width: 364, height: 44, label: Webasto-tank vullen vanuit dagtank, entity: switch.0xe4b063fffe7ac868, led: green, align: left, font_size: 15 }
-          - { type: text, x: 38, y: 944, width: 364, text: Automations, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: pushbutton, x: 38, y: 970, width: 364, height: 44, label: "Dagtank vullen 30% → 80%", entity: automation.daytank_vullen, led: green, align: left, font_size: 15 }
-          - { type: panel, x: 436, y: 696, width: 824, height: 340, title: Tank levels }
-          - { type: gauge, x: 454, y: 748, width: 188, label: Diesel PS, entity: sensor.wago_values_er_diesel_ps_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
-          - { type: value, x: 454, y: 976, width: 188, height: 36, label: max 1973 L, entity: sensor.diesel_ps_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
-          - { type: gauge, x: 654, y: 748, width: 188, label: Diesel SB, entity: sensor.wago_plc_er_diesel_sb_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
-          - { type: value, x: 654, y: 976, width: 188, height: 36, label: max 1973 L, entity: sensor.diesel_sb_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
-          - { type: gauge, x: 854, y: 748, width: 188, label: Dagtank, entity: sensor.wago_values_er_diesel_daytank_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
-          - { type: value, x: 854, y: 976, width: 188, height: 36, label: max 100 L, entity: sensor.diesel_dagtank_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
-          - { type: gauge, x: 1054, y: 748, width: 188, label: Webasto, entity: sensor.wago_values_aft_diesel_webasto_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
-          - { type: value, x: 1054, y: 976, width: 188, height: 36, label: max 80 L, entity: sensor.diesel_webasto_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
+          - { type: panel, x: 20, y: 649, width: 400, height: 340, title: Tanks vullen }
+          - { type: text, x: 38, y: 701, width: 364, text: Handmatig, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: pushbutton, x: 38, y: 727, width: 364, height: 44, label: Dagtank vullen vanuit BB-tank, entity: switch.ifm_output_bakboord_diesel_pomp, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 781, width: 364, height: 44, label: Dagtank vullen vanuit SB-tank, entity: switch.ifm_output_stuurboord_diesel_pomp, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 835, width: 364, height: 44, label: Webasto-tank vullen vanuit dagtank, entity: switch.0xe4b063fffe7ac868, led: green, align: left, font_size: 15 }
+          - { type: text, x: 38, y: 897, width: 364, text: Automations, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: pushbutton, x: 38, y: 923, width: 364, height: 44, label: "Dagtank vullen 30% → 80%", entity: automation.daytank_vullen, led: green, align: left, font_size: 15 }
+          - { type: panel, x: 436, y: 649, width: 824, height: 340, title: Tank levels }
+          - { type: gauge, x: 454, y: 701, width: 188, label: Diesel PS, entity: sensor.wago_values_er_diesel_ps_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
+          - { type: value, x: 454, y: 929, width: 188, height: 36, label: max 1973 L, entity: sensor.diesel_ps_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
+          - { type: gauge, x: 654, y: 701, width: 188, label: Diesel SB, entity: sensor.wago_plc_er_diesel_sb_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
+          - { type: value, x: 654, y: 929, width: 188, height: 36, label: max 1973 L, entity: sensor.diesel_sb_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
+          - { type: gauge, x: 854, y: 701, width: 188, label: Dagtank, entity: sensor.wago_values_er_diesel_daytank_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
+          - { type: value, x: 854, y: 929, width: 188, height: 36, label: max 100 L, entity: sensor.diesel_dagtank_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
+          - { type: gauge, x: 1054, y: 701, width: 188, label: Webasto, entity: sensor.wago_values_aft_diesel_webasto_level, min: 0, max: 100, unit: "%", warn_below: 15, font_size: 30 }
+          - { type: value, x: 1054, y: 929, width: 188, height: 36, label: max 80 L, entity: sensor.diesel_webasto_liters, font_size: 13, decimals: 0, unit: L, box_width: 96 }
 
   - title: Generator
     path: sys-generator
@@ -295,45 +295,45 @@ views:
             tabs: *voort_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[980, 549], [980, 506]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: strainer, x: 955, y: 276, width: 50, height: 195, color: "#3cc7d6", active_entity: binary_sensor.generatoron }
-          - { type: butterfly_valve, x: 965, y: 465, active_entity: valve.er_ventielblok_1tm4_l1 }
-          - { type: text, x: 911, y: 449, text: Inlet V4, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[955, 331], [830, 331]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: text, x: 585, y: 264, width: 233, height: 139, text: "", boxed: true, alarm_entity: binary_sensor.plc_generator_alarm, active_entity: binary_sensor.generatoron }
-          - { type: engine, x: 590, y: 293, width: 110, height: 77, active_entity: binary_sensor.generatoron }
-          - { type: generator, x: 744, y: 303, width: 56, height: 56, active_entity: binary_sensor.generatoron }
-          - { type: text, x: 597, y: 376, entity: sensor.wago_values_wago_values_drivepower_gen, mono: true, font_size: 14, unit: kW, decimals: 1 }
-          - { type: pipe, medium: exhaust, points: [[703, 264], [703, 183], [530, 183]], thickness: 12, arrow: true, speed: 70, flow_entity: binary_sensor.generatoron }
-          - { type: text, x: 443, y: 113, width: 83, height: 181, text: "Exhaust\ndrain", boxed: true, active_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: exhaust, points: [[443, 183], [117, 183]], thickness: 12, speed: 70, flow_entity: binary_sensor.generatoron }
-          - { type: smoke, x: 51, y: 163, width: 70, height: 40, active_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: seawater, points: [[486, 294], [486, 413]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: butterfly_valve, x: 472, y: 421, color: "#3cc7d6", active_entity: binary_sensor.generatoron }
-          - { type: text, x: 505, y: 431, text: Main outlet, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[487, 465], [487, 505]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: pipe, medium: seawater, points: [[980, 502], [980, 459]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: strainer, x: 955, y: 229, width: 50, height: 195, color: "#3cc7d6", active_entity: binary_sensor.generatoron }
+          - { type: butterfly_valve, x: 965, y: 418, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: text, x: 911, y: 402, text: Inlet V4, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[955, 284], [830, 284]], thickness: 7, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: text, x: 585, y: 217, width: 233, height: 139, text: "", boxed: true, alarm_entity: binary_sensor.plc_generator_alarm, active_entity: binary_sensor.generatoron }
+          - { type: engine, x: 590, y: 246, width: 110, height: 77, active_entity: binary_sensor.generatoron }
+          - { type: generator, x: 744, y: 256, width: 56, height: 56, active_entity: binary_sensor.generatoron }
+          - { type: text, x: 597, y: 329, entity: sensor.wago_values_wago_values_drivepower_gen, mono: true, font_size: 14, unit: kW, decimals: 1 }
+          - { type: pipe, medium: exhaust, points: [[703, 217], [703, 136], [530, 136]], thickness: 12, arrow: true, speed: 70, flow_entity: binary_sensor.generatoron }
+          - { type: text, x: 443, y: 66, width: 83, height: 181, text: "Exhaust\ndrain", boxed: true, active_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: exhaust, points: [[443, 136], [117, 136]], thickness: 12, speed: 70, flow_entity: binary_sensor.generatoron }
+          - { type: smoke, x: 51, y: 116, width: 70, height: 40, active_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: seawater, points: [[486, 247], [486, 366]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: butterfly_valve, x: 472, y: 374, color: "#3cc7d6", active_entity: binary_sensor.generatoron }
+          - { type: text, x: 505, y: 384, text: Main outlet, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[487, 418], [487, 458]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 620, height: 270, title: "Sensoren – bij generator aan alles groen" }
-          - { type: value, style: tile, x: 38, y: 748, width: 137, height: 88, label: RPM, entity: sensor.generator_gen_rpm, value_size: 22, decimals: 0, colors: [{ above: 5000, color: red }, { color: green }] }
-          - { type: value, style: tile, x: 187, y: 748, width: 137, height: 88, label: Oil press, entity: sensor.generator_gen_oil_pressure, value_size: 22, decimals: 2, colors: [{ below: 1, color: red }, { below: 1.6, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 336, y: 748, width: 137, height: 88, label: Coolant temp, entity: sensor.generator_gen_coolant_temp, value_size: 22, decimals: 0, colors: [{ above: 95, color: red }, { above: 86, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 485, y: 748, width: 137, height: 88, label: Seawater flow, entity: sensor.al1590_er_generator_seawater_cooling_flow, value_size: 22, colors: [{ below: 25, color: red }, { below: 28, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 38, y: 848, width: 137, height: 88, label: Sea glyc flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 22, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 187, y: 848, width: 137, height: 88, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
-          - { type: value, style: tile, x: 336, y: 848, width: 137, height: 88, label: Hours, entity: sensor.generator_gen_hours, value_size: 22, decimals: 0 }
-          - { type: panel, x: 656, y: 696, width: 604, height: 270, title: Start generator checklist }
-          - { type: indicator, x: 674, y: 748, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 778, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, font_size: 15, off_color: red }
-          - { type: indicator, x: 674, y: 808, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
-          - { type: indicator, x: 964, y: 748, label: "Flow zeewaterpomp glycol ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
-          - { type: indicator, x: 964, y: 778, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
-          - { type: indicator, x: 964, y: 808, label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
+          - { type: panel, x: 20, y: 649, width: 620, height: 270, title: "Sensoren – bij generator aan alles groen" }
+          - { type: value, style: tile, x: 38, y: 701, width: 137, height: 88, label: RPM, entity: sensor.generator_gen_rpm, value_size: 22, decimals: 0, colors: [{ above: 5000, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 187, y: 701, width: 137, height: 88, label: Oil press, entity: sensor.generator_gen_oil_pressure, value_size: 22, decimals: 2, colors: [{ below: 1, color: red }, { below: 1.6, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 336, y: 701, width: 137, height: 88, label: Coolant temp, entity: sensor.generator_gen_coolant_temp, value_size: 22, decimals: 0, colors: [{ above: 95, color: red }, { above: 86, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 485, y: 701, width: 137, height: 88, label: Seawater flow, entity: sensor.al1590_er_generator_seawater_cooling_flow, value_size: 22, colors: [{ below: 25, color: red }, { below: 28, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 38, y: 801, width: 137, height: 88, label: Sea glyc flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, value_size: 22, colors: [{ below: 2.5, color: red }, { below: 3.5, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 187, y: 801, width: 137, height: 88, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, value_size: 22, unit: bar, decimals: 2, colors: [{ below: 3, color: red }, { above: 10, color: red }, { color: green }] }
+          - { type: value, style: tile, x: 336, y: 801, width: 137, height: 88, label: Hours, entity: sensor.generator_gen_hours, value_size: 22, decimals: 0 }
+          - { type: panel, x: 656, y: 649, width: 604, height: 270, title: Start generator checklist }
+          - { type: indicator, x: 674, y: 701, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
+          - { type: indicator, x: 674, y: 731, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, font_size: 15, off_color: red }
+          - { type: indicator, x: 674, y: 761, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
+          - { type: indicator, x: 964, y: 701, label: "Flow zeewaterpomp glycol ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
+          - { type: indicator, x: 964, y: 731, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
+          - { type: indicator, x: 964, y: 761, label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
           - {
               type: pushbutton,
               x: 674,
-              y: 900,
+              y: 853,
               width: 250,
               height: 48,
               label: Prepare generator start,
@@ -382,140 +382,140 @@ views:
               - { label: DC-bus, path: sys-dcbus }
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[77, 448], [77, 405]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 52, y: 167, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: butterfly_valve, x: 62, y: 357, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 97, y: 365, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[101, 186], [149, 186]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pump, x: 153, y: 163, size: 44, entity: switch.er_zeewaterpomp_cooling, label: SW pump, active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[200, 186], [230, 186], [230, 221]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: hx, x: 201, y: 236, width: 90, height: 75, rotation: 90, color: "#4aa3ff", active_entity: [switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea1854f] }
-          - { type: pipe, medium: seawater, points: [[230, 321], [230, 416], [230, 476]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: outlet, x: 193, y: 494, width: 70, height: 20, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: text, x: 330, y: 166, width: 60, height: 135, text: "Buffer\ntank", boxed: true, font_size: 13, active_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol, points: [[330, 186], [265, 186], [265, 221]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol, points: [[265, 321], [265, 356], [290, 356]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pump, x: 295, y: 334, size: 44, entity: switch.0x781c9dfffea1854f, label: Glycol pump, active_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol, points: [[340, 356], [390, 356], [965, 356]], thickness: 6, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[452, 584], [1020, 584], [1020, 171], [393, 171]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol, points: [[466, 354], [466, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[466, 234], [466, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 443, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_maingrit, active_entity: sensor.wago_values_drivepower_maingrit, active_above: 0.1, active_abs: true, label: Boardnet, label_position: above }
-          - { type: text, x: 440, y: 302, entity: sensor.wago_values_drivepower_maingrit, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[571, 354], [571, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[571, 234], [571, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 548, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_jetpump1, active_entity: sensor.wago_values_drivepower_jetpump1, active_above: 0.1, active_abs: true, label: Jet 1, label_position: above }
-          - { type: text, x: 551, y: 312, entity: sensor.wago_values_drivepower_jetpump1, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[632, 354], [632, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[632, 234], [632, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 609, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_jetpump2, active_entity: sensor.wago_values_drivepower_jetpump2, active_above: 0.1, active_abs: true, label: Jet 2, label_position: above }
-          - { type: text, x: 611, y: 312, entity: sensor.wago_values_drivepower_jetpump2, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[692, 354], [692, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[692, 234], [692, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 669, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_jetpump3, active_entity: sensor.wago_values_drivepower_jetpump3, active_above: 0.1, active_abs: true, label: Jet 3, label_position: above }
-          - { type: text, x: 671, y: 312, entity: sensor.wago_values_drivepower_jetpump3, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[806, 354], [806, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[806, 234], [806, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 783, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_hydraumotor1, active_entity: sensor.wago_values_drivepower_hydraumotor1, active_above: 0.1, active_abs: true, label: HP1, label_position: above, glyphs: ["=", "="] }
-          - { type: text, x: 786, y: 312, entity: sensor.wago_values_drivepower_hydraumotor1, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[866, 354], [866, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[866, 234], [866, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 843, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_hydraumotor2, active_entity: sensor.wago_values_drivepower_hydraumotor2, active_above: 0.1, active_abs: true, label: HP2, label_position: above, glyphs: ["=", "="] }
-          - { type: text, x: 846, y: 312, entity: sensor.wago_values_drivepower_hydraumotor2, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[963, 354], [963, 311]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[963, 234], [963, 174]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 940, y: 249, width: 46, height: 46, entity: sensor.wago_values_drivepower_bowthruster, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1, active_abs: true, label: Bowthrust, label_position: above }
-          - { type: text, x: 942, y: 312, entity: sensor.wago_values_drivepower_bowthruster, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[452, 358], [452, 394]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[452, 466], [452, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 429, y: 408, width: 46, height: 46, entity: sensor.wago_values_drivepower_shore_gen, active_entity: sensor.wago_values_drivepower_shore_gen, active_above: 0.1, active_abs: true, label: Shore/gen, label_position: above, glyphs: ["=", "~"] }
-          - { type: text, x: 431, y: 471, entity: sensor.wago_values_drivepower_shore_gen, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[580, 358], [580, 394]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[580, 466], [580, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 557, y: 408, width: 46, height: 46, entity: sensor.wago_values_drivepower_battery, active_entity: sensor.wago_values_drivepower_battery, active_above: 0.1, active_abs: true, label: Accu, label_position: above, glyphs: ["=", "="] }
-          - { type: text, x: 559, y: 471, entity: sensor.wago_values_drivepower_battery, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[775, 358], [775, 394]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[775, 466], [775, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 752, y: 408, width: 46, height: 46, entity: sensor.wago_values_drivepower_hybridemotor, active_entity: sensor.wago_values_drivepower_hybridemotor, active_above: 0.1, active_abs: true, label: Engiro, label_position: above, glyphs: ["=", "~"] }
-          - { type: text, x: 755, y: 471, entity: sensor.wago_values_drivepower_hybridemotor, mono: true, font_size: 12, unit: kW, decimals: 1 }
-          - { type: pipe, medium: glycol, points: [[675, 358], [675, 411]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[675, 451], [675, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: text, x: 665, y: 411, width: 20, height: 40, text: "1", boxed: true, alarm_entity: binary_sensor.plc_jp1_alarm, font_size: 12 }
-          - { type: pipe, medium: glycol, points: [[704, 358], [704, 411]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[704, 451], [704, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: text, x: 694, y: 411, width: 20, height: 40, text: "2", boxed: true, alarm_entity: binary_sensor.plc_jp2_alarm, font_size: 12 }
-          - { type: pipe, medium: glycol, points: [[733, 358], [733, 411]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[733, 451], [733, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: text, x: 723, y: 411, width: 20, height: 40, text: "3", boxed: true, alarm_entity: binary_sensor.plc_jp3_alarm, font_size: 12 }
-          - { type: generator, x: 886, y: 406, width: 50, height: 50, letter: M, entity: sensor.plc_emotor_rpm, active_entity: sensor.plc_electric_speed, active_above: 5, active_abs: true, label: Engiro }
-          - { type: pipe, medium: glycol, points: [[899, 358], [899, 396]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[899, 468], [899, 581]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: text, x: 386, y: 626, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, mono: true, font_size: 15, unit: V DC, decimals: 0 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: pipe, medium: seawater, points: [[77, 401], [77, 358]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 52, y: 120, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 62, y: 310, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 97, y: 318, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[101, 139], [149, 139]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pump, x: 153, y: 116, size: 44, entity: switch.er_zeewaterpomp_cooling, label: SW pump, active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[200, 139], [230, 139], [230, 174]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: hx, x: 201, y: 189, width: 90, height: 75, rotation: 90, color: "#4aa3ff", active_entity: [switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea1854f] }
+          - { type: pipe, medium: seawater, points: [[230, 274], [230, 369], [230, 429]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: outlet, x: 193, y: 447, width: 70, height: 20, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: text, x: 330, y: 119, width: 60, height: 135, text: "Buffer\ntank", boxed: true, font_size: 13, active_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol, points: [[330, 139], [265, 139], [265, 174]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol, points: [[265, 274], [265, 309], [290, 309]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pump, x: 295, y: 287, size: 44, entity: switch.0x781c9dfffea1854f, label: Glycol pump, active_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol, points: [[340, 309], [390, 309], [965, 309]], thickness: 6, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[452, 537], [1020, 537], [1020, 124], [393, 124]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol, points: [[466, 307], [466, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[466, 187], [466, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 443, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_maingrit, active_entity: sensor.wago_values_drivepower_maingrit, active_above: 0.1, active_abs: true, label: Boardnet, label_position: above }
+          - { type: text, x: 440, y: 255, entity: sensor.wago_values_drivepower_maingrit, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[571, 307], [571, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[571, 187], [571, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 548, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_jetpump1, active_entity: sensor.wago_values_drivepower_jetpump1, active_above: 0.1, active_abs: true, label: Jet 1, label_position: above }
+          - { type: text, x: 551, y: 265, entity: sensor.wago_values_drivepower_jetpump1, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[632, 307], [632, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[632, 187], [632, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 609, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_jetpump2, active_entity: sensor.wago_values_drivepower_jetpump2, active_above: 0.1, active_abs: true, label: Jet 2, label_position: above }
+          - { type: text, x: 611, y: 265, entity: sensor.wago_values_drivepower_jetpump2, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[692, 307], [692, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[692, 187], [692, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 669, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_jetpump3, active_entity: sensor.wago_values_drivepower_jetpump3, active_above: 0.1, active_abs: true, label: Jet 3, label_position: above }
+          - { type: text, x: 671, y: 265, entity: sensor.wago_values_drivepower_jetpump3, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[806, 307], [806, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[806, 187], [806, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 783, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_hydraumotor1, active_entity: sensor.wago_values_drivepower_hydraumotor1, active_above: 0.1, active_abs: true, label: HP1, label_position: above, glyphs: ["=", "="] }
+          - { type: text, x: 786, y: 265, entity: sensor.wago_values_drivepower_hydraumotor1, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[866, 307], [866, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[866, 187], [866, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 843, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_hydraumotor2, active_entity: sensor.wago_values_drivepower_hydraumotor2, active_above: 0.1, active_abs: true, label: HP2, label_position: above, glyphs: ["=", "="] }
+          - { type: text, x: 846, y: 265, entity: sensor.wago_values_drivepower_hydraumotor2, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[963, 307], [963, 264]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[963, 187], [963, 127]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 940, y: 202, width: 46, height: 46, entity: sensor.wago_values_drivepower_bowthruster, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1, active_abs: true, label: Bowthrust, label_position: above }
+          - { type: text, x: 942, y: 265, entity: sensor.wago_values_drivepower_bowthruster, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[452, 311], [452, 347]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[452, 419], [452, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 429, y: 361, width: 46, height: 46, entity: sensor.wago_values_drivepower_shore_gen, active_entity: sensor.wago_values_drivepower_shore_gen, active_above: 0.1, active_abs: true, label: Shore/gen, label_position: above, glyphs: ["=", "~"] }
+          - { type: text, x: 431, y: 424, entity: sensor.wago_values_drivepower_shore_gen, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[580, 311], [580, 347]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[580, 419], [580, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 557, y: 361, width: 46, height: 46, entity: sensor.wago_values_drivepower_battery, active_entity: sensor.wago_values_drivepower_battery, active_above: 0.1, active_abs: true, label: Accu, label_position: above, glyphs: ["=", "="] }
+          - { type: text, x: 559, y: 424, entity: sensor.wago_values_drivepower_battery, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[775, 311], [775, 347]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[775, 419], [775, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 752, y: 361, width: 46, height: 46, entity: sensor.wago_values_drivepower_hybridemotor, active_entity: sensor.wago_values_drivepower_hybridemotor, active_above: 0.1, active_abs: true, label: Engiro, label_position: above, glyphs: ["=", "~"] }
+          - { type: text, x: 755, y: 424, entity: sensor.wago_values_drivepower_hybridemotor, mono: true, font_size: 12, unit: kW, decimals: 1 }
+          - { type: pipe, medium: glycol, points: [[675, 311], [675, 364]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[675, 404], [675, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: text, x: 665, y: 364, width: 20, height: 40, text: "1", boxed: true, alarm_entity: binary_sensor.plc_jp1_alarm, font_size: 12 }
+          - { type: pipe, medium: glycol, points: [[704, 311], [704, 364]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[704, 404], [704, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: text, x: 694, y: 364, width: 20, height: 40, text: "2", boxed: true, alarm_entity: binary_sensor.plc_jp2_alarm, font_size: 12 }
+          - { type: pipe, medium: glycol, points: [[733, 311], [733, 364]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[733, 404], [733, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: text, x: 723, y: 364, width: 20, height: 40, text: "3", boxed: true, alarm_entity: binary_sensor.plc_jp3_alarm, font_size: 12 }
+          - { type: generator, x: 886, y: 359, width: 50, height: 50, letter: M, entity: sensor.plc_emotor_rpm, active_entity: sensor.plc_electric_speed, active_above: 5, active_abs: true, label: Engiro }
+          - { type: pipe, medium: glycol, points: [[899, 311], [899, 349]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[899, 421], [899, 534]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: text, x: 386, y: 579, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, mono: true, font_size: 15, unit: V DC, decimals: 0 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 400, height: 610, title: Cooling }
-          - { type: pushbutton, x: 38, y: 748, width: 364, height: 48, label: Main reset, entity: button.wago_energy_controls_wago_energy_controls_reset_main_2 }
-          - { type: pushbutton, x: 38, y: 808, width: 364, height: 44, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 860, width: 364, height: 44, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, led: green, align: left, font_size: 15 }
-          - { type: value, style: tile, x: 38, y: 920, width: 176, height: 76, label: Glycol pressure, entity: sensor.wago_values_drivepressure_glycol, value_size: 22, colors: [{ above: 0.5, color: green }, { color: grey }] }
-          - { type: value, style: tile, x: 226, y: 920, width: 176, height: 76, label: Glycol warm, entity: sensor.wago_values_drivetemp_glycol, value_size: 22, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { entity: sensor.wago_values_drivepressure_glycol, below: 0.5, color: grey }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, style: tile, x: 38, y: 1008, width: 176, height: 76, label: Seawater in, entity: sensor.al1590_er_generator_seawater_cooling_temperature, value_size: 22, colors: [{ entity: sensor.al1590_er_generator_seawater_cooling_flow, below: 10, color: grey }, { entity: sensor.al1590_er_prop_shaft_cooling_water_flow, below: 10, color: grey }, { below: 45, color: green }, { color: red }] }
-          - { type: value, style: tile, x: 226, y: 1008, width: 176, height: 76, label: Seawater out, entity: sensor.al1590_er_prop_shaft_cooling_water_temperature, value_size: 22, colors: [{ entity: sensor.al1590_er_prop_shaft_cooling_water_flow, below: 10, color: grey }, { above: 38, color: red }, { above: 30, color: amber }, { above: 0.99, color: green }, { color: red }] }
-          - { type: text, x: 38, y: 1104, width: 364, text: Automaten, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: pushbutton, x: 38, y: 1130, width: 364, height: 44, label: Glycolpomp on automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 1182, width: 364, height: 44, label: Zeewaterpomp glycol automaat, entity: automation.zeewater_pomp_voor_glycol_on_automaat, led: green, align: left, font_size: 15 }
-          - { type: text, x: 38, y: 1236, width: 364, text: "Glycolpomp start zodra de DC-bus voeding heeft; de zeewaterpomp volgt de glycolpomp (wierpotklep gaat mee open).", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
-          - { type: panel, x: 436, y: 696, width: 824, height: 610, title: Drives }
-          - { type: text, x: 784, y: 716, width: 120, text: Power, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: text, x: 914, y: 716, width: 120, text: Temp, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: value, x: 454, y: 748, width: 450, height: 36, label: Battery, entity: sensor.wago_values_drivepower_battery, font_size: 15, box_width: 120, colors: [{ above: 0.01, color: green }, { below: -0.01, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 748, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_battery, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 788, width: 450, height: 36, label: Generator, entity: sensor.wago_values_wago_values_drivepower_gen, font_size: 15, box_width: 120, colors: [{ below: -0.2, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 788, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_shore_gen, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 828, width: 450, height: 36, label: Shore, entity: sensor.wago_values_drivepower_shore, font_size: 15, box_width: 120, colors: [{ below: -0.2, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 828, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_shore_gen, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 868, width: 450, height: 36, label: MainGrid, entity: sensor.wago_values_drivepower_maingrit, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 868, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_maingrit, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 908, width: 450, height: 36, label: Hybrid, entity: sensor.wago_values_drivepower_hybridemotor, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 908, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_hybridemotor, font_size: 15, box_width: 120, colors: [{ above: 198, color: grey }, { above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 948, width: 450, height: 36, label: Hydraulic motor 1, entity: sensor.wago_values_drivepower_hydraumotor1, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 948, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_hydraumotor1, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 988, width: 450, height: 36, label: Hydraulic motor 2, entity: sensor.wago_values_drivepower_hydraumotor2, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 988, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_hydraumotor2, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 1028, width: 450, height: 36, label: Bow thruster, entity: sensor.wago_values_drivepower_bowthruster, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 1028, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_bowthruster, font_size: 15, box_width: 120, colors: [{ above: 198, color: grey }, { above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 1068, width: 450, height: 36, label: Jet pump 1, entity: sensor.wago_values_drivepower_jetpump1, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 1068, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_jetpump1, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 1108, width: 450, height: 36, label: Jet pump 2, entity: sensor.wago_values_drivepower_jetpump2, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 1108, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_jetpump2, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, x: 454, y: 1148, width: 450, height: 36, label: Jet pump 3, entity: sensor.wago_values_drivepower_jetpump3, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, x: 914, y: 1148, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_jetpump3, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: text, x: 1054, y: 716, width: 188, text: Wago, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: value, x: 1054, y: 748, width: 188, height: 36, label: SoC, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, font_size: 15, decimals: 0, box_width: 70 }
-          - { type: pushbutton, x: 1054, y: 800, width: 188, height: 44, label: Battery connect, entity: switch.wago_energy_controls_wago_energy_controls_battery_connect_2, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 1054, y: 854, width: 188, height: 44, label: Charge battery, entity: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 1054, y: 908, width: 188, height: 44, label: Generator, entity: switch.wago_energy_controls_wago_energy_controls_generator_2, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 1054, y: 962, width: 188, height: 44, label: Gen. requested, entity: switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 1054, y: 1016, width: 188, height: 44, label: Shore, entity: switch.wago_energy_controls_wago_energy_controls_shore_supply_2, led: green, align: left, font_size: 15 }
-          - { type: indicator, x: 1054, y: 1078, label: Shore beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, font_size: 15 }
+          - { type: panel, x: 20, y: 649, width: 400, height: 610, title: Cooling }
+          - { type: pushbutton, x: 38, y: 701, width: 364, height: 48, label: Main reset, entity: button.wago_energy_controls_wago_energy_controls_reset_main_2 }
+          - { type: pushbutton, x: 38, y: 761, width: 364, height: 44, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 813, width: 364, height: 44, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, led: green, align: left, font_size: 15 }
+          - { type: value, style: tile, x: 38, y: 873, width: 176, height: 76, label: Glycol pressure, entity: sensor.wago_values_drivepressure_glycol, value_size: 22, colors: [{ above: 0.5, color: green }, { color: grey }] }
+          - { type: value, style: tile, x: 226, y: 873, width: 176, height: 76, label: Glycol warm, entity: sensor.wago_values_drivetemp_glycol, value_size: 22, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { entity: sensor.wago_values_drivepressure_glycol, below: 0.5, color: grey }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, style: tile, x: 38, y: 961, width: 176, height: 76, label: Seawater in, entity: sensor.al1590_er_generator_seawater_cooling_temperature, value_size: 22, colors: [{ entity: sensor.al1590_er_generator_seawater_cooling_flow, below: 10, color: grey }, { entity: sensor.al1590_er_prop_shaft_cooling_water_flow, below: 10, color: grey }, { below: 45, color: green }, { color: red }] }
+          - { type: value, style: tile, x: 226, y: 961, width: 176, height: 76, label: Seawater out, entity: sensor.al1590_er_prop_shaft_cooling_water_temperature, value_size: 22, colors: [{ entity: sensor.al1590_er_prop_shaft_cooling_water_flow, below: 10, color: grey }, { above: 38, color: red }, { above: 30, color: amber }, { above: 0.99, color: green }, { color: red }] }
+          - { type: text, x: 38, y: 1057, width: 364, text: Automaten, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: pushbutton, x: 38, y: 1083, width: 364, height: 44, label: Glycolpomp on automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 1135, width: 364, height: 44, label: Zeewaterpomp glycol automaat, entity: automation.zeewater_pomp_voor_glycol_on_automaat, led: green, align: left, font_size: 15 }
+          - { type: text, x: 38, y: 1189, width: 364, text: "Glycolpomp start zodra de DC-bus voeding heeft; de zeewaterpomp volgt de glycolpomp (wierpotklep gaat mee open).", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: panel, x: 436, y: 649, width: 824, height: 610, title: Drives }
+          - { type: text, x: 784, y: 669, width: 120, text: Power, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: text, x: 914, y: 669, width: 120, text: Temp, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: value, x: 454, y: 701, width: 450, height: 36, label: Battery, entity: sensor.wago_values_drivepower_battery, font_size: 15, box_width: 120, colors: [{ above: 0.01, color: green }, { below: -0.01, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 701, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_battery, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 741, width: 450, height: 36, label: Generator, entity: sensor.wago_values_wago_values_drivepower_gen, font_size: 15, box_width: 120, colors: [{ below: -0.2, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 741, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_shore_gen, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 781, width: 450, height: 36, label: Shore, entity: sensor.wago_values_drivepower_shore, font_size: 15, box_width: 120, colors: [{ below: -0.2, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 781, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_shore_gen, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 821, width: 450, height: 36, label: MainGrid, entity: sensor.wago_values_drivepower_maingrit, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 821, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_maingrit, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 861, width: 450, height: 36, label: Hybrid, entity: sensor.wago_values_drivepower_hybridemotor, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 861, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_hybridemotor, font_size: 15, box_width: 120, colors: [{ above: 198, color: grey }, { above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 901, width: 450, height: 36, label: Hydraulic motor 1, entity: sensor.wago_values_drivepower_hydraumotor1, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 901, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_hydraumotor1, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 941, width: 450, height: 36, label: Hydraulic motor 2, entity: sensor.wago_values_drivepower_hydraumotor2, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 941, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_hydraumotor2, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 981, width: 450, height: 36, label: Bow thruster, entity: sensor.wago_values_drivepower_bowthruster, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 981, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_bowthruster, font_size: 15, box_width: 120, colors: [{ above: 198, color: grey }, { above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 1021, width: 450, height: 36, label: Jet pump 1, entity: sensor.wago_values_drivepower_jetpump1, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 1021, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_jetpump1, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 1061, width: 450, height: 36, label: Jet pump 2, entity: sensor.wago_values_drivepower_jetpump2, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 1061, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_jetpump2, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, x: 454, y: 1101, width: 450, height: 36, label: Jet pump 3, entity: sensor.wago_values_drivepower_jetpump3, font_size: 15, box_width: 120, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, x: 914, y: 1101, width: 120, height: 36, label: "", entity: sensor.wago_values_drivetemp_jetpump3, font_size: 15, box_width: 120, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: text, x: 1054, y: 669, width: 188, text: Wago, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: value, x: 1054, y: 701, width: 188, height: 36, label: SoC, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, font_size: 15, decimals: 0, box_width: 70 }
+          - { type: pushbutton, x: 1054, y: 753, width: 188, height: 44, label: Battery connect, entity: switch.wago_energy_controls_wago_energy_controls_battery_connect_2, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1054, y: 807, width: 188, height: 44, label: Charge battery, entity: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1054, y: 861, width: 188, height: 44, label: Generator, entity: switch.wago_energy_controls_wago_energy_controls_generator_2, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1054, y: 915, width: 188, height: 44, label: Gen. requested, entity: switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1054, y: 969, width: 188, height: 44, label: Shore, entity: switch.wago_energy_controls_wago_energy_controls_shore_supply_2, led: green, align: left, font_size: 15 }
+          - { type: indicator, x: 1054, y: 1031, label: Shore beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, font_size: 15 }
           # lifebeat = interne communicatie tussen de PLC-systemen
-          - { type: indicator, x: 1054, y: 1114, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat, font_size: 15 }
+          - { type: indicator, x: 1054, y: 1067, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat, font_size: 15 }
 
           # ---- PMS-status (ER_PMS_Status2: BMS & BGC) ----
-          - { type: panel, x: 20, y: 1322, width: 1240, height: 296, title: PMS status (BMS & BGC) }
-          - { type: value, style: tile, x: 38, y: 1374, width: 292, height: 76, label: DC-bus voltage, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 1374, width: 292, height: 76, label: BGC voltage, entity: sensor.er_pms_status2_bgc_voltage, value_size: 22 }
-          - { type: value, style: tile, x: 646, y: 1374, width: 292, height: 76, label: BGC current, entity: sensor.er_pms_status2_bgc_current, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 1374, width: 292, height: 76, label: BMS voltage, entity: sensor.er_pms_status2_bms_voltage, value_size: 22 }
-          - { type: value, style: tile, x: 38, y: 1462, width: 292, height: 76, label: BMS current, entity: sensor.er_pms_status2_bms_current, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 1462, width: 292, height: 76, label: BMS charge current, entity: sensor.er_pms_status2_bms_charge_current, value_size: 22 }
-          - { type: value, style: tile, x: 646, y: 1462, width: 292, height: 76, label: BMS discharge current, entity: sensor.er_pms_status2_bms_discharge_current, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 1462, width: 292, height: 76, label: BMS max SoC, entity: sensor.er_pms_status2_bms_max_soc, value_size: 22 }
-          - { type: pushbutton, x: 38, y: 1554, width: 292, height: 44, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 15 }
-          - { type: pushbutton, x: 342, y: 1554, width: 292, height: 44, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 15 }
-          - { type: pushbutton, x: 646, y: 1554, width: 292, height: 44, label: "Shore current −", entity: button.wago_hcs_controls_wago_controls_shorecurrent_dn, font_size: 15 }
-          - { type: pushbutton, x: 950, y: 1554, width: 292, height: 44, label: "Shore current +", entity: button.wago_hcs_controls_wago_controls_shorecurrent_up, font_size: 15 }
+          - { type: panel, x: 20, y: 1275, width: 1240, height: 296, title: PMS status (BMS & BGC) }
+          - { type: value, style: tile, x: 38, y: 1327, width: 292, height: 76, label: DC-bus voltage, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, value_size: 22 }
+          - { type: value, style: tile, x: 342, y: 1327, width: 292, height: 76, label: BGC voltage, entity: sensor.er_pms_status2_bgc_voltage, value_size: 22 }
+          - { type: value, style: tile, x: 646, y: 1327, width: 292, height: 76, label: BGC current, entity: sensor.er_pms_status2_bgc_current, value_size: 22 }
+          - { type: value, style: tile, x: 950, y: 1327, width: 292, height: 76, label: BMS voltage, entity: sensor.er_pms_status2_bms_voltage, value_size: 22 }
+          - { type: value, style: tile, x: 38, y: 1415, width: 292, height: 76, label: BMS current, entity: sensor.er_pms_status2_bms_current, value_size: 22 }
+          - { type: value, style: tile, x: 342, y: 1415, width: 292, height: 76, label: BMS charge current, entity: sensor.er_pms_status2_bms_charge_current, value_size: 22 }
+          - { type: value, style: tile, x: 646, y: 1415, width: 292, height: 76, label: BMS discharge current, entity: sensor.er_pms_status2_bms_discharge_current, value_size: 22 }
+          - { type: value, style: tile, x: 950, y: 1415, width: 292, height: 76, label: BMS max SoC, entity: sensor.er_pms_status2_bms_max_soc, value_size: 22 }
+          - { type: pushbutton, x: 38, y: 1507, width: 292, height: 44, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 15 }
+          - { type: pushbutton, x: 342, y: 1507, width: 292, height: 44, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 15 }
+          - { type: pushbutton, x: 646, y: 1507, width: 292, height: 44, label: "Shore current −", entity: button.wago_hcs_controls_wago_controls_shorecurrent_dn, font_size: 15 }
+          - { type: pushbutton, x: 950, y: 1507, width: 292, height: 44, label: "Shore current +", entity: button.wago_hcs_controls_wago_controls_shorecurrent_up, font_size: 15 }
 
   - title: Boegschroef
     path: sys-bowthruster
@@ -534,58 +534,58 @@ views:
             tabs: *voort_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[159, 489], [159, 446]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 134, y: 211, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: butterfly_valve, x: 144, y: 399, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 90, y: 399, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[183, 243], [235, 243]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pump, x: 244, y: 222, size: 44, entity: switch.er_zeewaterpomp_cooling, label: SW pump, active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[296, 243], [359, 243]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: hx, x: 361, y: 223, width: 60, height: 40, color: "#4aa3ff", active_entity: [switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea1854f] }
-          - { type: pipe, medium: seawater, points: [[424, 243], [559, 243], [559, 101]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: outlet, x: 524, y: 74, width: 70, height: 20, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: glycol, points: [[381, 268], [381, 546], [408, 546]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pump, x: 413, y: 524, size: 44, entity: switch.0x781c9dfffea1854f, label: Glycol pump, active_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol, points: [[435, 518], [435, 493], [538, 493]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: pipe, medium: glycol_return, points: [[542, 458], [401, 458], [401, 268]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
-          - { type: converter, x: 550, y: 442, width: 80, height: 100, entity: sensor.wago_values_drivepower_bowthruster, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1, active_abs: true, glyphs: ["=", "~"], label: DC-bus, label_position: above }
-          - { type: text, x: 566, y: 566, entity: sensor.wago_values_drivepower_bowthruster, mono: true, font_size: 14, unit: kW, decimals: 1 }
-          - { type: pipe, medium: power, points: [[632, 524], [985, 524], [985, 436]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
-          - { type: generator, x: 947, y: 359, width: 60, height: 60, letter: M, entity: sensor.wago_values_drivepower_bowthruster, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
-          - { type: pipe, medium: shaft, points: [[1000, 389], [1053, 389]], thickness: 20, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
-          - { type: text, x: 1046, y: 226, width: 82, height: 305, text: "", boxed: true, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
-          - { type: propeller, x: 1042, y: 286, width: 24, height: 110, rotation: 90, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
-          - { type: text, x: 1015, y: 546, entity: sensor.plc_bowthruster_setpoint, mono: true, font_size: 14, unit: "%", decimals: 0 }
-          - { type: fan, x: 762, y: 236, width: 110, height: 110, label: Air cooler, label_position: above, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
-          - { type: pipe, medium: coolant, points: [[946, 374], [915, 374], [915, 291], [877, 291]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
-          - { type: pipe, medium: coolant, points: [[780, 346], [780, 484], [835, 484]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
-          - { type: pump, x: 839, y: 466, size: 36, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
-          - { type: pipe, medium: coolant, points: [[875, 484], [915, 484], [915, 409], [946, 409]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: pipe, medium: seawater, points: [[159, 442], [159, 399]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 134, y: 164, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 144, y: 352, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 90, y: 352, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[183, 196], [235, 196]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pump, x: 244, y: 175, size: 44, entity: switch.er_zeewaterpomp_cooling, label: SW pump, active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[296, 196], [359, 196]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: hx, x: 361, y: 176, width: 60, height: 40, color: "#4aa3ff", active_entity: [switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea1854f] }
+          - { type: pipe, medium: seawater, points: [[424, 196], [559, 196], [559, 83]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: outlet, x: 524, y: 56, width: 70, height: 20, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: glycol, points: [[381, 221], [381, 499], [408, 499]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pump, x: 413, y: 477, size: 44, entity: switch.0x781c9dfffea1854f, label: Glycol pump, active_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol, points: [[435, 471], [435, 446], [538, 446]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: pipe, medium: glycol_return, points: [[542, 411], [401, 411], [401, 221]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
+          - { type: converter, x: 550, y: 395, width: 80, height: 100, entity: sensor.wago_values_drivepower_bowthruster, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1, active_abs: true, glyphs: ["=", "~"], label: DC-bus, label_position: above }
+          - { type: text, x: 566, y: 519, entity: sensor.wago_values_drivepower_bowthruster, mono: true, font_size: 14, unit: kW, decimals: 1 }
+          - { type: pipe, medium: power, points: [[632, 477], [985, 477], [985, 389]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
+          - { type: generator, x: 947, y: 312, width: 60, height: 60, letter: M, entity: sensor.wago_values_drivepower_bowthruster, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
+          - { type: pipe, medium: shaft, points: [[1000, 342], [1053, 342]], thickness: 20, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
+          - { type: text, x: 1046, y: 179, width: 82, height: 305, text: "", boxed: true, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
+          - { type: propeller, x: 1042, y: 239, width: 24, height: 110, rotation: 90, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
+          - { type: text, x: 1015, y: 499, entity: sensor.plc_bowthruster_setpoint, mono: true, font_size: 14, unit: "%", decimals: 0 }
+          - { type: fan, x: 762, y: 189, width: 110, height: 110, label: Air cooler, label_position: above, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
+          - { type: pipe, medium: coolant, points: [[946, 327], [915, 327], [915, 244], [877, 244]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
+          - { type: pipe, medium: coolant, points: [[780, 299], [780, 437], [835, 437]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
+          - { type: pump, x: 839, y: 419, size: 36, active_entity: sensor.wago_values_drivepower_bowthruster, active_above: 0.1 }
+          - { type: pipe, medium: coolant, points: [[875, 437], [915, 437], [915, 362], [946, 362]], thickness: 5, arrow: true, flow_entity: sensor.wago_values_drivepower_bowthruster, flow_above: 0.1 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 1240, height: 150, title: Boegschroef }
-          - { type: value, style: tile, x: 38, y: 748, width: 292, height: 76, label: Power, entity: sensor.wago_values_drivepower_bowthruster, value_size: 22, colors: [{ above: 0.1, color: green }, { color: grey }] }
-          - { type: value, style: tile, x: 342, y: 748, width: 292, height: 76, label: Drive temp, entity: sensor.wago_values_drivetemp_bowthruster, value_size: 22, colors: [{ above: 198, color: grey }, { above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
-          - { type: value, style: tile, x: 646, y: 748, width: 292, height: 76, label: Cooling flow, entity: sensor.al1590_cc_bowthruster_cooling_flow, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 748, width: 292, height: 76, label: Cooling temp, entity: sensor.al1590_cc_bowthruster_cooling_temperature, value_size: 22 }
+          - { type: panel, x: 20, y: 649, width: 1240, height: 150, title: Boegschroef }
+          - { type: value, style: tile, x: 38, y: 701, width: 292, height: 76, label: Power, entity: sensor.wago_values_drivepower_bowthruster, value_size: 22, colors: [{ above: 0.1, color: green }, { color: grey }] }
+          - { type: value, style: tile, x: 342, y: 701, width: 292, height: 76, label: Drive temp, entity: sensor.wago_values_drivetemp_bowthruster, value_size: 22, colors: [{ above: 198, color: grey }, { above: 50, color: red }, { above: 40, color: amber }, { above: 0.99, color: green }, { color: grey }] }
+          - { type: value, style: tile, x: 646, y: 701, width: 292, height: 76, label: Cooling flow, entity: sensor.al1590_cc_bowthruster_cooling_flow, value_size: 22 }
+          - { type: value, style: tile, x: 950, y: 701, width: 292, height: 76, label: Cooling temp, entity: sensor.al1590_cc_bowthruster_cooling_temperature, value_size: 22 }
 
           # ---- thrusterstatus (ER_Thruster_Status) ----
-          - { type: panel, x: 20, y: 862, width: 1240, height: 370, title: Thruster status }
-          - { type: indicator, x: 38, y: 916, entity: binary_sensor.er_thruster_status_bow_thruster_enabled, label: Bow thruster enabled, font_size: 15, tap_action: { action: more-info } }
-          - { type: indicator, x: 342, y: 916, entity: binary_sensor.er_thruster_status_bow_thruster_running, label: Bow thruster running, font_size: 15, tap_action: { action: more-info } }
-          - { type: pushbutton, x: 646, y: 904, width: 292, height: 42, label: Bow thruster on, entity: button.wago_hcs_controls_wago_controls_bowthruster_on, led: green, led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, align: left, font_size: 15 }
-          - { type: pushbutton, x: 950, y: 904, width: 292, height: 42, label: Bow thruster off, entity: button.wago_hcs_controls_wago_controls_bowthruster_off, variant: stop, font_size: 15 }
-          - { type: value, style: tile, x: 38, y: 956, width: 292, height: 76, label: Bow lever, entity: sensor.er_thruster_status_bow_thruster_lever, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 956, width: 292, height: 76, label: Bow output, entity: sensor.er_thruster_status_bow_thruster_output, value_size: 22 }
-          - { type: value, style: tile, x: 646, y: 956, width: 292, height: 76, label: Bow speed, entity: sensor.er_thruster_status_bow_thruster_speed, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 956, width: 292, height: 76, label: Jet lever, entity: sensor.er_thruster_status_jet_lever, value_size: 22 }
-          - { type: value, style: tile, x: 38, y: 1044, width: 292, height: 76, label: Jet pump 1 output, entity: sensor.er_thruster_status_jet_pump_1_output, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 1044, width: 292, height: 76, label: Jet pump 1 speed, entity: sensor.er_thruster_status_jet_pump_1_speed, value_size: 22 }
-          - { type: value, style: tile, x: 646, y: 1044, width: 292, height: 76, label: Jet pump 2 output, entity: sensor.er_thruster_status_jet_pump_2_output, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 1044, width: 292, height: 76, label: Jet pump 2 speed, entity: sensor.er_thruster_status_jet_pump_2_speed, value_size: 22 }
-          - { type: value, style: tile, x: 38, y: 1132, width: 292, height: 76, label: Jet pump 3 output, entity: sensor.er_thruster_status_jet_pump_3_output, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 1132, width: 292, height: 76, label: Jet pump 3 speed, entity: sensor.er_thruster_status_jet_pump_3_speed, value_size: 22 }
+          - { type: panel, x: 20, y: 815, width: 1240, height: 370, title: Thruster status }
+          - { type: indicator, x: 38, y: 869, entity: binary_sensor.er_thruster_status_bow_thruster_enabled, label: Bow thruster enabled, font_size: 15, tap_action: { action: more-info } }
+          - { type: indicator, x: 342, y: 869, entity: binary_sensor.er_thruster_status_bow_thruster_running, label: Bow thruster running, font_size: 15, tap_action: { action: more-info } }
+          - { type: pushbutton, x: 646, y: 857, width: 292, height: 42, label: Bow thruster on, entity: button.wago_hcs_controls_wago_controls_bowthruster_on, led: green, led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, align: left, font_size: 15 }
+          - { type: pushbutton, x: 950, y: 857, width: 292, height: 42, label: Bow thruster off, entity: button.wago_hcs_controls_wago_controls_bowthruster_off, variant: stop, font_size: 15 }
+          - { type: value, style: tile, x: 38, y: 909, width: 292, height: 76, label: Bow lever, entity: sensor.er_thruster_status_bow_thruster_lever, value_size: 22 }
+          - { type: value, style: tile, x: 342, y: 909, width: 292, height: 76, label: Bow output, entity: sensor.er_thruster_status_bow_thruster_output, value_size: 22 }
+          - { type: value, style: tile, x: 646, y: 909, width: 292, height: 76, label: Bow speed, entity: sensor.er_thruster_status_bow_thruster_speed, value_size: 22 }
+          - { type: value, style: tile, x: 950, y: 909, width: 292, height: 76, label: Jet lever, entity: sensor.er_thruster_status_jet_lever, value_size: 22 }
+          - { type: value, style: tile, x: 38, y: 997, width: 292, height: 76, label: Jet pump 1 output, entity: sensor.er_thruster_status_jet_pump_1_output, value_size: 22 }
+          - { type: value, style: tile, x: 342, y: 997, width: 292, height: 76, label: Jet pump 1 speed, entity: sensor.er_thruster_status_jet_pump_1_speed, value_size: 22 }
+          - { type: value, style: tile, x: 646, y: 997, width: 292, height: 76, label: Jet pump 2 output, entity: sensor.er_thruster_status_jet_pump_2_output, value_size: 22 }
+          - { type: value, style: tile, x: 950, y: 997, width: 292, height: 76, label: Jet pump 2 speed, entity: sensor.er_thruster_status_jet_pump_2_speed, value_size: 22 }
+          - { type: value, style: tile, x: 38, y: 1085, width: 292, height: 76, label: Jet pump 3 output, entity: sensor.er_thruster_status_jet_pump_3_output, value_size: 22 }
+          - { type: value, style: tile, x: 342, y: 1085, width: 292, height: 76, label: Jet pump 3 speed, entity: sensor.er_thruster_status_jet_pump_3_speed, value_size: 22 }
 
   - title: Zeewaterfilters
     path: sys-seawater
@@ -605,51 +605,51 @@ views:
               - { label: Vuilwater, path: sys-wastewater }
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[325, 446], [325, 403]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
-          - { type: strainer, x: 300, y: 166, width: 50, height: 196, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
-          - { type: pipe, medium: seawater, points: [[464, 555], [464, 512]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
-          - { type: strainer, x: 439, y: 277, width: 50, height: 195, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
-          - { type: pipe, medium: seawater, points: [[352, 176], [535, 176]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: text, x: 544, y: 166, text: Water maker HEM, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[700, 176], [735, 176]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: pipe, medium: seawater, points: [[352, 213], [535, 213]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: text, x: 544, y: 203, text: Cooling Electric/GB, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[700, 213], [735, 213]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[352, 251], [535, 251]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
-          - { type: text, x: 544, y: 241, text: DECK WASH, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[700, 360], [735, 360]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: seawater, points: [[490, 286], [535, 286]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: text, x: 544, y: 276, text: Waste Water Ecomar, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[700, 286], [735, 286]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: pipe, medium: seawater, points: [[490, 323], [535, 323]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
-          - { type: pipe, medium: seawater, points: [[700, 323], [735, 323]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
-          - { type: pipe, medium: seawater, points: [[490, 360], [535, 360]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: text, x: 544, y: 350, text: Generator NL, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 744, y: 139, width: 40, height: 270, text: "Main\noutlet", boxed: true, font_size: 12, active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
-          - { type: pipe, medium: seawater, points: [[764, 451], [764, 498]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
-          - { type: pipe, medium: seawater, points: [[1082, 555], [1082, 512]], thickness: 7, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm], flow_above: 100 }
-          - { type: strainer, x: 1056, y: 282, width: 50, height: 196, color: "#3cc7d6", active_entity: [sensor.engine_room_main_engine_me_rpm], active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[1055, 290], [995, 290], [995, 338]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: engine, x: 906, y: 348, width: 110, height: 77, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[916, 336], [916, 291], [849, 291], [849, 401]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: pipe, medium: seawater, points: [[849, 456], [849, 503]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: pipe, medium: bilge, points: [[1130, 531], [1130, 428], [1162, 428]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: pump, x: 1164, y: 408, size: 40, entity: switch.0xe4b063fffe6d51d8, label: ER bilge pump, active_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: pipe, medium: bilge, points: [[1184, 401], [1184, 196], [792, 196]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: text, x: 600, y: 553, width: 125, height: 80, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
-          - { type: text, x: 639, y: 608, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 13, unit: bar, decimals: 2 }
-          - { type: pipe, medium: air, points: [[619, 553], [619, 519], [619, 481], [525, 481], [495, 481]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
-          - { type: pipe, medium: air, points: [[600, 571], [367, 571], [367, 371], [340, 371]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: pipe, medium: air, points: [[727, 571], [802, 571], [802, 426], [830, 426]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: pipe, medium: air, points: [[725, 606], [1036, 606], [1036, 486], [1065, 486]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
-          - { type: butterfly_valve, medium: air, x: 1066, y: 467, active_entity: valve.er_ventielblok_1tm4_l4 }
-          - { type: butterfly_valve, x: 749, y: 409 }
-          - { type: butterfly_valve, x: 310, y: 356, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: pipe, medium: seawater, points: [[325, 399], [325, 356]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
+          - { type: strainer, x: 300, y: 119, width: 50, height: 196, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5] }
+          - { type: pipe, medium: seawater, points: [[464, 508], [464, 465]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
+          - { type: strainer, x: 439, y: 230, width: 50, height: 195, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron] }
+          - { type: pipe, medium: seawater, points: [[352, 129], [535, 129]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: text, x: 544, y: 119, text: Water maker HEM, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[700, 129], [735, 129]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: pipe, medium: seawater, points: [[352, 166], [535, 166]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: text, x: 544, y: 156, text: Cooling Electric/GB, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[700, 166], [735, 166]], thickness: 6, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[352, 204], [535, 204]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea180b5 }
+          - { type: text, x: 544, y: 194, text: DECK WASH, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[700, 313], [735, 313]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: seawater, points: [[490, 239], [535, 239]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: text, x: 544, y: 229, text: Waste Water Ecomar, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[700, 239], [735, 239]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: pipe, medium: seawater, points: [[490, 276], [535, 276]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
+          - { type: pipe, medium: seawater, points: [[700, 276], [735, 276]], thickness: 6, arrow: true, flow_entity: switch.0xccba97fffeea0e94 }
+          - { type: pipe, medium: seawater, points: [[490, 313], [535, 313]], thickness: 6, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: text, x: 544, y: 303, text: Generator NL, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 744, y: 92, width: 40, height: 270, text: "Main\noutlet", boxed: true, font_size: 12, active_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
+          - { type: pipe, medium: seawater, points: [[764, 404], [764, 451]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0xccba97fffeea0e94, binary_sensor.generatoron, switch.0xe4b063fffe7add34, switch.er_zeewaterpomp_cooling, switch.0x781c9dfffea180b5, switch.0xe4b063fffe6d51d8] }
+          - { type: pipe, medium: seawater, points: [[1082, 508], [1082, 465]], thickness: 7, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm], flow_above: 100 }
+          - { type: strainer, x: 1056, y: 235, width: 50, height: 196, color: "#3cc7d6", active_entity: [sensor.engine_room_main_engine_me_rpm], active_above: 100 }
+          - { type: pipe, medium: seawater, points: [[1055, 243], [995, 243], [995, 291]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: engine, x: 906, y: 301, width: 110, height: 77, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: pipe, medium: seawater, points: [[916, 289], [916, 244], [849, 244], [849, 354]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: seawater, points: [[849, 409], [849, 456]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: bilge, points: [[1130, 484], [1130, 381], [1162, 381]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: pump, x: 1164, y: 361, size: 40, entity: switch.0xe4b063fffe6d51d8, label: ER bilge pump, active_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: pipe, medium: bilge, points: [[1184, 354], [1184, 149], [792, 149]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: text, x: 600, y: 506, width: 125, height: 80, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
+          - { type: text, x: 639, y: 561, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 13, unit: bar, decimals: 2 }
+          - { type: pipe, medium: air, points: [[619, 506], [619, 472], [619, 434], [525, 434], [495, 434]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: pipe, medium: air, points: [[600, 524], [367, 524], [367, 324], [340, 324]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: pipe, medium: air, points: [[727, 524], [802, 524], [802, 379], [830, 379]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: pipe, medium: air, points: [[725, 559], [1036, 559], [1036, 439], [1065, 439]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: butterfly_valve, medium: air, x: 1066, y: 420, active_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: butterfly_valve, x: 749, y: 362 }
+          - { type: butterfly_valve, x: 310, y: 309, active_entity: valve.er_ventielblok_1tm4_l2 }
           - {
               type: text,
               x: 400,
-              y: 461,
+              y: 414,
               text: INLET V4
 
                 Wierpot FRONT,
@@ -659,15 +659,15 @@ views:
               width: 80,
               height: 30
             }
-          - { type: butterfly_valve, x: 450, y: 465, active_entity: valve.er_ventielblok_1tm4_l1 }
-          - { type: butterfly_valve, x: 835, y: 411, active_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: text, x: 825, y: 515, text: OUTLET V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 1015, y: 455, text: INLET V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 544, y: 313, text: HVAC Webasto, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: butterfly_valve, x: 450, y: 418, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: butterfly_valve, x: 835, y: 364, active_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: text, x: 825, y: 468, text: OUTLET V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 1015, y: 408, text: INLET V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 544, y: 266, text: HVAC Webasto, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
           - {
               type: text,
               x: 230,
-              y: 361,
+              y: 314,
               text: INLET V3
 
                 Wierpot AFT,
@@ -677,14 +677,14 @@ views:
               width: 80,
               height: 30
             }
-          - { type: jet_thruster, x: 65, y: 406, active_entity: valve.er_ventielblok_5tm7_l4 }
-          - { type: pipe, medium: seawater, points: [[90, 584], [90, 541]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l4 }
-          - { type: butterfly_valve, x: 75, y: 494, active_entity: valve.er_ventielblok_5tm7_l4 }
-          - { type: pipe, medium: air, points: [[600, 621], [115, 621], [115, 506], [105, 506]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: jet_thruster, x: 65, y: 359, active_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: pipe, medium: seawater, points: [[90, 537], [90, 494]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: butterfly_valve, x: 75, y: 447, active_entity: valve.er_ventielblok_5tm7_l4 }
+          - { type: pipe, medium: air, points: [[600, 574], [115, 574], [115, 459], [105, 459]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l4 }
           - {
               type: text,
               x: 28,
-              y: 501,
+              y: 454,
               text: INLET V5
 
                 Jet 1,
@@ -694,14 +694,14 @@ views:
               width: 50,
               height: 30
             }
-          - { type: jet_thruster, x: 160, y: 406, active_entity: valve.er_ventielblok_5tm7_l3 }
-          - { type: pipe, medium: seawater, points: [[185, 584], [185, 541]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l3 }
-          - { type: butterfly_valve, x: 170, y: 494, active_entity: valve.er_ventielblok_5tm7_l3 }
-          - { type: pipe, medium: air, points: [[600, 606], [210, 606], [210, 506], [200, 506]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: jet_thruster, x: 160, y: 359, active_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: pipe, medium: seawater, points: [[185, 537], [185, 494]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: butterfly_valve, x: 170, y: 447, active_entity: valve.er_ventielblok_5tm7_l3 }
+          - { type: pipe, medium: air, points: [[600, 559], [210, 559], [210, 459], [200, 459]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l3 }
           - {
               type: text,
               x: 123,
-              y: 501,
+              y: 454,
               text: INLET V6
 
                 Jet 2,
@@ -711,14 +711,14 @@ views:
               width: 50,
               height: 30
             }
-          - { type: jet_thruster, x: 255, y: 406, active_entity: valve.er_ventielblok_5tm7_l2 }
-          - { type: pipe, medium: seawater, points: [[280, 584], [280, 541]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l2 }
-          - { type: butterfly_valve, x: 265, y: 494, active_entity: valve.er_ventielblok_5tm7_l2 }
-          - { type: pipe, medium: air, points: [[600, 591], [305, 591], [305, 506], [295, 506]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: jet_thruster, x: 255, y: 359, active_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: pipe, medium: seawater, points: [[280, 537], [280, 494]], thickness: 7, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: butterfly_valve, x: 265, y: 447, active_entity: valve.er_ventielblok_5tm7_l2 }
+          - { type: pipe, medium: air, points: [[600, 544], [305, 544], [305, 459], [295, 459]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_5tm7_l2 }
           - {
               type: text,
               x: 218,
-              y: 501,
+              y: 454,
               text: INLET V7
 
                 Jet 3,
@@ -746,51 +746,51 @@ views:
             tabs: *water_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: text, x: 37, y: 374, width: 57, height: 79, text: "Shore\ntap", boxed: true, font_size: 12, active_entity: binary_sensor.plc_shore_water_valve_open }
-          - { type: valve, x: 95, y: 407, width: 30, height: 18, entity: binary_sensor.plc_shore_water_valve_open, color: "#4aa3ff", active_entity: binary_sensor.plc_shore_water_valve_open }
-          - { type: pipe, medium: freshwater, points: [[124, 418], [974, 418]], thickness: 7, arrow: true, flow_entity: [switch.0x781c9dfffeb6cfcd, binary_sensor.plc_shore_water_valve_open] }
-          - { type: text, x: 977, y: 251, width: 197, height: 170, text: Boiler, boxed: true, font_size: 18, active_entity: switch.0xa4c138dd3d53bb57 }
-          - { type: pipe, medium: seawater, points: [[395, 399], [395, 356]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: strainer, x: 370, y: 121, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.0xe4b063fffe7add34 }
-          - { type: butterfly_valve, x: 380, y: 309, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 326, y: 259, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[419, 163], [493, 163]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: text, x: 497, y: 121, width: 60, height: 85, text: "Water\nmaker", boxed: true, font_size: 12, active_entity: switch.0xe4b063fffe7add34 }
-          - { type: pipe, medium: freshwater, points: [[557, 163], [787, 163]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
-          - { type: text, x: 793, y: 141, width: 106, height: 257, text: "Fresh water\ntank", boxed: true, medium: freshwater, level_entity: sensor.wago_values_lr_fresh_water_level, font_size: 14 }
-          - { type: text, x: 815, y: 336, entity: sensor.wago_values_lr_fresh_water_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
-          - { type: pipe, medium: freshwater, points: [[594, 416], [594, 269], [692, 269]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
-          - { type: valve, x: 690, y: 257, width: 40, height: 24, entity: valve.lr_dwp_wal_vulpunt, color: "#4aa3ff", label: M, label_position: above, active_entity: valve.lr_dwp_wal_vulpunt }
-          - { type: pipe, medium: freshwater, points: [[728, 269], [787, 269]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
-          - { type: pipe, medium: freshwater, points: [[791, 376], [732, 376]], thickness: 6, flow_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: pump, x: 693, y: 356, size: 40, rotation: 180, entity: switch.0x781c9dfffeb6cfcd, active_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: pipe, medium: freshwater, points: [[694, 376], [638, 376], [638, 412]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: text, x: 345, y: 451, width: 100, height: 65, text: Bad, boxed: true, font_size: 13 }
-          - { type: text, x: 511, y: 456, width: 70, height: 63, text: Wastafel, boxed: true, font_size: 13 }
-          - { type: pipe, medium: freshwater, points: [[316, 420], [316, 551], [393, 551], [393, 520]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: pipe, medium: freshwater, points: [[475, 420], [475, 546], [547, 546], [547, 523]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: pipe, medium: hotwater, points: [[1076, 421], [1076, 566], [417, 566], [417, 520]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: pipe, medium: hotwater, points: [[558, 566], [558, 523]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
-          - { type: text, x: 1015, y: 356, entity: sensor.boiler_water_temp_temperature, mono: true, font_size: 15, unit: "°C", decimals: 0 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: text, x: 37, y: 327, width: 57, height: 79, text: "Shore\ntap", boxed: true, font_size: 12, active_entity: binary_sensor.plc_shore_water_valve_open }
+          - { type: valve, x: 95, y: 360, width: 30, height: 18, entity: binary_sensor.plc_shore_water_valve_open, color: "#4aa3ff", active_entity: binary_sensor.plc_shore_water_valve_open }
+          - { type: pipe, medium: freshwater, points: [[124, 371], [974, 371]], thickness: 7, arrow: true, flow_entity: [switch.0x781c9dfffeb6cfcd, binary_sensor.plc_shore_water_valve_open] }
+          - { type: text, x: 977, y: 204, width: 197, height: 170, text: Boiler, boxed: true, font_size: 18, active_entity: switch.0xa4c138dd3d53bb57 }
+          - { type: pipe, medium: seawater, points: [[395, 352], [395, 309]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: strainer, x: 370, y: 74, width: 50, height: 195, color: "#3cc7d6", active_entity: switch.0xe4b063fffe7add34 }
+          - { type: butterfly_valve, x: 380, y: 262, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 326, y: 212, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[419, 116], [493, 116]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: text, x: 497, y: 74, width: 60, height: 85, text: "Water\nmaker", boxed: true, font_size: 12, active_entity: switch.0xe4b063fffe7add34 }
+          - { type: pipe, medium: freshwater, points: [[557, 116], [787, 116]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
+          - { type: text, x: 793, y: 94, width: 106, height: 257, text: "Fresh water\ntank", boxed: true, medium: freshwater, level_entity: sensor.wago_values_lr_fresh_water_level, font_size: 14 }
+          - { type: text, x: 815, y: 289, entity: sensor.wago_values_lr_fresh_water_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
+          - { type: pipe, medium: freshwater, points: [[594, 369], [594, 222], [692, 222]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
+          - { type: valve, x: 690, y: 210, width: 40, height: 24, entity: valve.lr_dwp_wal_vulpunt, color: "#4aa3ff", label: M, label_position: above, active_entity: valve.lr_dwp_wal_vulpunt }
+          - { type: pipe, medium: freshwater, points: [[728, 222], [787, 222]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
+          - { type: pipe, medium: freshwater, points: [[791, 329], [732, 329]], thickness: 6, flow_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: pump, x: 693, y: 309, size: 40, rotation: 180, entity: switch.0x781c9dfffeb6cfcd, active_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: pipe, medium: freshwater, points: [[694, 329], [638, 329], [638, 365]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: text, x: 345, y: 404, width: 100, height: 65, text: Bad, boxed: true, font_size: 13 }
+          - { type: text, x: 511, y: 409, width: 70, height: 63, text: Wastafel, boxed: true, font_size: 13 }
+          - { type: pipe, medium: freshwater, points: [[316, 373], [316, 504], [393, 504], [393, 473]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: pipe, medium: freshwater, points: [[475, 373], [475, 499], [547, 499], [547, 476]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: pipe, medium: hotwater, points: [[1076, 374], [1076, 519], [417, 519], [417, 473]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: pipe, medium: hotwater, points: [[558, 519], [558, 476]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffeb6cfcd }
+          - { type: text, x: 1015, y: 309, entity: sensor.boiler_water_temp_temperature, mono: true, font_size: 15, unit: "°C", decimals: 0 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 400, height: 440, title: Vul automaat }
-          - { type: text, x: 38, y: 748, width: 364, text: "LET OP! Vooraf kraantje onder de bank open zetten!", font_size: 13, color: "#f5a524", weight: 600 }
-          - { type: pushbutton, x: 38, y: 780, width: 364, height: 44, label: Zoetwater vul automaat, entity: automation.zoetwater_vul_automaat, led: green, align: left, font_size: 15 }
-          - { type: value, x: 38, y: 836, width: 364, height: 36, label: Vullen tot, entity: input_number.tank_vul_level, font_size: 15, decimals: 0 }
-          - { type: text, x: 38, y: 882, width: 364, text: Bedient het vulventiel en schakelt de zoetwaterpomp uit. Vult de tank tot het ingestelde niveau., font_size: 13, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 38, y: 958, width: 364, text: Alarm level, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: pushbutton, x: 38, y: 984, width: 364, height: 44, label: Tank level alarm, entity: automation.tank_level_alarm_notifications, led: green, align: left, font_size: 15 }
-          - { type: value, x: 38, y: 1040, width: 364, height: 36, label: Alarm onder, entity: input_number.zoetwater_tank_laag_level_alarm, font_size: 15, decimals: 0 }
-          - { type: panel, x: 436, y: 696, width: 824, height: 440, title: Water systems }
-          - { type: pushbutton, x: 454, y: 748, width: 440, height: 44, label: Drinkwaterpomp, entity: switch.0x781c9dfffeb6cfcd, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 804, width: 440, height: 44, label: Boiler, entity: switch.fp_boiler, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 860, width: 440, height: 44, label: "Watertank vullen (walwater)", entity: switch.lr_dwp_wal_vulpunt, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 916, width: 440, height: 44, label: Zeewaterpomp dekspoelinstallatie, entity: switch.0x781c9dfffea180b5, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 972, width: 440, height: 44, label: "Vuilwatertank legen (bypass)", entity: switch.0x781c9dfffea18816, led: green, align: left, font_size: 15 }
-          - { type: value, style: tile, x: 914, y: 748, width: 328, height: 76, label: Boiler watertemperatuur, entity: sensor.boiler_water_temp_temperature, value_size: 22, colors: [{ below: 40, color: blue }, { color: green }] }
-          - { type: value, style: tile, x: 914, y: 836, width: 328, height: 76, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, value_size: 22, decimals: 0, unit: "%" }
+          - { type: panel, x: 20, y: 649, width: 400, height: 440, title: Vul automaat }
+          - { type: text, x: 38, y: 701, width: 364, text: "LET OP! Vooraf kraantje onder de bank open zetten!", font_size: 13, color: "#f5a524", weight: 600 }
+          - { type: pushbutton, x: 38, y: 733, width: 364, height: 44, label: Zoetwater vul automaat, entity: automation.zoetwater_vul_automaat, led: green, align: left, font_size: 15 }
+          - { type: value, x: 38, y: 789, width: 364, height: 36, label: Vullen tot, entity: input_number.tank_vul_level, font_size: 15, decimals: 0 }
+          - { type: text, x: 38, y: 835, width: 364, text: Bedient het vulventiel en schakelt de zoetwaterpomp uit. Vult de tank tot het ingestelde niveau., font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 38, y: 911, width: 364, text: Alarm level, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: pushbutton, x: 38, y: 937, width: 364, height: 44, label: Tank level alarm, entity: automation.tank_level_alarm_notifications, led: green, align: left, font_size: 15 }
+          - { type: value, x: 38, y: 993, width: 364, height: 36, label: Alarm onder, entity: input_number.zoetwater_tank_laag_level_alarm, font_size: 15, decimals: 0 }
+          - { type: panel, x: 436, y: 649, width: 824, height: 440, title: Water systems }
+          - { type: pushbutton, x: 454, y: 701, width: 440, height: 44, label: Drinkwaterpomp, entity: switch.0x781c9dfffeb6cfcd, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 454, y: 757, width: 440, height: 44, label: Boiler, entity: switch.fp_boiler, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 454, y: 813, width: 440, height: 44, label: "Watertank vullen (walwater)", entity: switch.lr_dwp_wal_vulpunt, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 454, y: 869, width: 440, height: 44, label: Zeewaterpomp dekspoelinstallatie, entity: switch.0x781c9dfffea180b5, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 454, y: 925, width: 440, height: 44, label: "Vuilwatertank legen (bypass)", entity: switch.0x781c9dfffea18816, led: green, align: left, font_size: 15 }
+          - { type: value, style: tile, x: 914, y: 701, width: 328, height: 76, label: Boiler watertemperatuur, entity: sensor.boiler_water_temp_temperature, value_size: 22, colors: [{ below: 40, color: blue }, { color: green }] }
+          - { type: value, style: tile, x: 914, y: 789, width: 328, height: 76, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, value_size: 22, decimals: 0, unit: "%" }
 
   - title: Vuilwater
     path: sys-wastewater
@@ -807,34 +807,34 @@ views:
             tabs: *water_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: pipe, medium: seawater, points: [[296, 524], [296, 481]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
-          - { type: strainer, x: 271, y: 184, width: 50, height: 257, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
-          - { type: butterfly_valve, x: 281, y: 434, active_entity: valve.er_ventielblok_1tm4_l1 }
-          - { type: text, x: 227, y: 384, text: Inlet V4, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[323, 291], [353, 291]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: text, x: 357, y: 198, width: 140, height: 136, text: "Ecomar\ncleaning tank", boxed: true, font_size: 14, active_entity: switch.0xe4b063fffe787644 }
-          - { type: pipe, medium: wastewater, points: [[497, 266], [565, 266]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
-          - { type: three_way_valve, x: 570, y: 252, width: 40, height: 40, color: "#9a7b5a", label: 3-weg, label_position: above, active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
-          - { type: pipe, medium: wastewater, points: [[614, 266], [628, 266], [628, 181], [628, 156], [628, 121]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
-          - { type: outlet, x: 592, y: 84, width: 70, height: 20, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
-          - { type: text, x: 694, y: 396, width: 133, height: 193, text: "Waste water\ntank", boxed: true, medium: wastewater, level_entity: sensor.wago_values_er_dirtywater_level, font_size: 14 }
-          - { type: text, x: 718, y: 546, entity: sensor.wago_values_er_dirtywater_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
-          - { type: pipe, medium: wastewater, points: [[690, 436], [615, 436]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
-          - { type: pump, x: 569, y: 417, size: 40, rotation: 270, entity: switch.0x781c9dfffea18816, active_entity: switch.0x781c9dfffea18816 }
-          - { type: pipe, medium: wastewater, points: [[590, 418], [590, 298]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
-          - { type: text, x: 481, y: 564, width: 126, height: 52, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
-          - { type: pipe, medium: air, points: [[481, 586], [258, 586], [258, 450], [281, 450]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: pipe, medium: seawater, points: [[296, 477], [296, 434]], thickness: 7, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
+          - { type: strainer, x: 271, y: 137, width: 50, height: 257, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18853] }
+          - { type: butterfly_valve, x: 281, y: 387, active_entity: valve.er_ventielblok_1tm4_l1 }
+          - { type: text, x: 227, y: 337, text: Inlet V4, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[323, 244], [353, 244]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: text, x: 357, y: 151, width: 140, height: 136, text: "Ecomar\ncleaning tank", boxed: true, font_size: 14, active_entity: switch.0xe4b063fffe787644 }
+          - { type: pipe, medium: wastewater, points: [[497, 219], [565, 219]], thickness: 6, arrow: true, flow_entity: switch.0xe4b063fffe787644 }
+          - { type: three_way_valve, x: 570, y: 205, width: 40, height: 40, color: "#9a7b5a", label: 3-weg, label_position: above, active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
+          - { type: pipe, medium: wastewater, points: [[614, 219], [628, 219], [628, 134], [628, 109], [628, 74]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
+          - { type: outlet, x: 592, y: 56, width: 70, height: 20, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
+          - { type: text, x: 694, y: 349, width: 133, height: 193, text: "Waste water\ntank", boxed: true, medium: wastewater, level_entity: sensor.wago_values_er_dirtywater_level, font_size: 14 }
+          - { type: text, x: 718, y: 499, entity: sensor.wago_values_er_dirtywater_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
+          - { type: pipe, medium: wastewater, points: [[690, 389], [615, 389]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
+          - { type: pump, x: 569, y: 370, size: 40, rotation: 270, entity: switch.0x781c9dfffea18816, active_entity: switch.0x781c9dfffea18816 }
+          - { type: pipe, medium: wastewater, points: [[590, 371], [590, 251]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
+          - { type: text, x: 481, y: 517, width: 126, height: 52, text: Compressor, boxed: true, font_size: 14, active_entity: switch.0x781c9dfffea18853 }
+          - { type: pipe, medium: air, points: [[481, 539], [258, 539], [258, 403], [281, 403]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l1 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 620, height: 360, title: Leeg automaat }
-          - { type: pushbutton, x: 38, y: 748, width: 584, height: 44, label: Vuilwater leeg automaat, entity: automation.vuilwater_leeg_automaat, led: green, align: left, font_size: 15 }
-          - { type: value, x: 38, y: 804, width: 584, height: 36, label: "Tank hoog level (start)", entity: input_number.vuilwater_tank_hoog_level_automaat, font_size: 15, decimals: 0 }
-          - { type: value, x: 38, y: 848, width: 584, height: 36, label: "Tank leeg level (stop)", entity: input_number.vuilwater_tank_leeg_level, font_size: 15, decimals: 0 }
+          - { type: panel, x: 20, y: 649, width: 620, height: 360, title: Leeg automaat }
+          - { type: pushbutton, x: 38, y: 701, width: 584, height: 44, label: Vuilwater leeg automaat, entity: automation.vuilwater_leeg_automaat, led: green, align: left, font_size: 15 }
+          - { type: value, x: 38, y: 757, width: 584, height: 36, label: "Tank hoog level (start)", entity: input_number.vuilwater_tank_hoog_level_automaat, font_size: 15, decimals: 0 }
+          - { type: value, x: 38, y: 801, width: 584, height: 36, label: "Tank leeg level (stop)", entity: input_number.vuilwater_tank_leeg_level, font_size: 15, decimals: 0 }
           - {
               type: text,
               x: 38,
-              y: 900,
+              y: 853,
               width: 584,
               text: "Zet de afvoerpomp aan zodra de tank boven \"tank hoog level\" komt en leegt tot \"tank leeg level\".
 
@@ -842,11 +842,11 @@ views:
               font_size: 13,
               color: "var(--ink-muted, #a3a29c)"
             }
-          - { type: pushbutton, x: 38, y: 992, width: 584, height: 44, label: "Legen vuilwatertank nr001 (50% > 10%, max 30 s)", entity: input_boolean.vuilwatertank_automatisch_legen_aanuit, led: green, align: left, font_size: 15 }
-          - { type: panel, x: 656, y: 696, width: 604, height: 360, title: Alarm level }
-          - { type: pushbutton, x: 674, y: 748, width: 568, height: 44, label: Vuilwater tank level alarm, entity: automation.vuilwater_tank_level_alarm_notification, led: green, align: left, font_size: 15 }
-          - { type: value, x: 674, y: 804, width: 568, height: 36, label: Alarm boven, entity: input_number.vuilwater_tank_hoog_level_alarm, font_size: 15, decimals: 0 }
-          - { type: value, style: tile, x: 674, y: 856, width: 568, height: 76, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, value_size: 22, decimals: 0, unit: "%", colors: [{ above: 80, color: red }, { above: 60, color: amber }, { color: green }] }
+          - { type: pushbutton, x: 38, y: 945, width: 584, height: 44, label: "Legen vuilwatertank nr001 (50% > 10%, max 30 s)", entity: input_boolean.vuilwatertank_automatisch_legen_aanuit, led: green, align: left, font_size: 15 }
+          - { type: panel, x: 656, y: 649, width: 604, height: 360, title: Alarm level }
+          - { type: pushbutton, x: 674, y: 701, width: 568, height: 44, label: Vuilwater tank level alarm, entity: automation.vuilwater_tank_level_alarm_notification, led: green, align: left, font_size: 15 }
+          - { type: value, x: 674, y: 757, width: 568, height: 36, label: Alarm boven, entity: input_number.vuilwater_tank_hoog_level_alarm, font_size: 15, decimals: 0 }
+          - { type: value, style: tile, x: 674, y: 809, width: 568, height: 76, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, value_size: 22, decimals: 0, unit: "%", colors: [{ above: 80, color: red }, { above: 60, color: amber }, { color: green }] }
 
   - title: Bilgepompen
     path: sys-bilge
@@ -865,53 +865,53 @@ views:
             title: Bilge
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: text, x: 117, y: 416, text: Aft peak, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: bilge, points: [[210, 531], [210, 389], [186, 389]], thickness: 5, arrow: true, flow_entity: switch.ap_bilgepumpcontrol_01 }
-          - { type: pump, x: 145, y: 369, size: 40, rotation: 270, entity: switch.ap_bilgepumpcontrol_01, active_entity: switch.ap_bilgepumpcontrol_01 }
-          - { type: indicator, x: 141, y: 476, entity: binary_sensor.0x8c65a3fffecea649_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: indicator, x: 141, y: 498, entity: binary_sensor.0x28dba7fffe752d09_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: pipe, medium: bilge, points: [[165, 361], [165, 156]], thickness: 5, arrow: true, flow_entity: switch.ap_bilgepumpcontrol_01 }
-          - { type: outlet, x: 140, y: 130, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.ap_bilgepumpcontrol_01 }
-          - { type: text, x: 379, y: 416, text: Engine room, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: bilge, points: [[473, 531], [473, 389], [448, 389]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: pump, x: 408, y: 369, size: 40, rotation: 270, entity: switch.0xe4b063fffe6d51d8, active_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: indicator, x: 404, y: 476, entity: binary_sensor.0x0ceff6fffe901b4e_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: indicator, x: 404, y: 498, entity: binary_sensor.0x8c65a3fffeda603c_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: pipe, medium: bilge, points: [[428, 361], [428, 268]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: filter, x: 413, y: 221, width: 30, height: 40, color: "#ff5b4f", label: Oil filter, label_position: above, active_entity: switch.0xe4b063fffe6d51d8, label_offset: [50, 30] }
-          - { type: pipe, medium: bilge, points: [[428, 216], [428, 191], [336, 191], [336, 401]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: butterfly_valve, x: 322, y: 409, color: "#3cc7d6", active_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: text, x: 309, y: 509, text: Main outlet, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[336, 453], [336, 493]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
-          - { type: text, x: 490, y: 416, text: Dining, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: bilge, points: [[583, 531], [583, 389], [559, 389]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeeb6ddc }
-          - { type: pump, x: 518, y: 369, size: 40, rotation: 270, entity: switch.0xccba97fffeeb6ddc, active_entity: switch.0xccba97fffeeb6ddc }
-          - { type: indicator, x: 514, y: 476, entity: binary_sensor.0x0ceff6fffe9009c8_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: indicator, x: 514, y: 498, entity: binary_sensor.0x0ceff6fffe76dcea_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: pipe, medium: bilge, points: [[538, 361], [538, 156]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeeb6ddc }
-          - { type: outlet, x: 513, y: 130, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.0xccba97fffeeb6ddc }
-          - { type: text, x: 683, y: 416, text: Anchor box, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: bilge, points: [[777, 531], [777, 389], [752, 389]], thickness: 5, arrow: true, flow_entity: binary_sensor.plc_bilge_anchor_box_running }
-          - { type: pump, x: 712, y: 369, size: 40, rotation: 270, entity: switch.0xe4b063fffe78d1e0, active_entity: switch.0xe4b063fffe78d1e0 }
-          - { type: indicator, x: 708, y: 476, entity: binary_sensor.plc_bilge_anchor_box_high, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: pipe, medium: bilge, points: [[732, 361], [732, 156]], thickness: 5, arrow: true, flow_entity: binary_sensor.plc_bilge_anchor_box_running }
-          - { type: outlet, x: 707, y: 130, width: 50, height: 16, color: "#3cc7d6", active_entity: binary_sensor.plc_bilge_anchor_box_running }
-          - { type: text, x: 818, y: 416, text: Crew cabin, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: bilge, points: [[911, 531], [911, 389], [887, 389]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeea6c90 }
-          - { type: pump, x: 846, y: 369, size: 40, rotation: 270, entity: switch.0xccba97fffeea6c90, active_entity: switch.0xccba97fffeea6c90 }
-          - { type: indicator, x: 843, y: 476, entity: binary_sensor.0x8c65a3fffee0f85d_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: indicator, x: 843, y: 498, entity: binary_sensor.0x44e2f8fffe0be6ed_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: pipe, medium: bilge, points: [[866, 361], [866, 156]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeea6c90 }
-          - { type: outlet, x: 841, y: 130, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.0xccba97fffeea6c90 }
-          - { type: text, x: 956, y: 416, text: Front peak, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: bilge, points: [[1050, 531], [1050, 389], [1025, 389]], thickness: 5, arrow: true, flow_entity: switch.fp_bilgepumpcontrol_01 }
-          - { type: pump, x: 985, y: 369, size: 40, rotation: 270, entity: switch.fp_bilgepumpcontrol_01, active_entity: switch.fp_bilgepumpcontrol_01 }
-          - { type: indicator, x: 981, y: 476, entity: binary_sensor.fp_waterleaksensor_hoog_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: indicator, x: 981, y: 498, entity: binary_sensor.fp_waterleaksensor_laag, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
-          - { type: pipe, medium: bilge, points: [[1005, 361], [1005, 156]], thickness: 5, arrow: true, flow_entity: switch.fp_bilgepumpcontrol_01 }
-          - { type: outlet, x: 980, y: 130, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.fp_bilgepumpcontrol_01 }
-          - { type: indicator, x: 708, y: 498, entity: binary_sensor.0x44e2f8fffe0be6ed_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: text, x: 117, y: 369, text: Aft peak, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: bilge, points: [[210, 484], [210, 342], [186, 342]], thickness: 5, arrow: true, flow_entity: switch.ap_bilgepumpcontrol_01 }
+          - { type: pump, x: 145, y: 322, size: 40, rotation: 270, entity: switch.ap_bilgepumpcontrol_01, active_entity: switch.ap_bilgepumpcontrol_01 }
+          - { type: indicator, x: 141, y: 429, entity: binary_sensor.0x8c65a3fffecea649_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: indicator, x: 141, y: 451, entity: binary_sensor.0x28dba7fffe752d09_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: pipe, medium: bilge, points: [[165, 314], [165, 109]], thickness: 5, arrow: true, flow_entity: switch.ap_bilgepumpcontrol_01 }
+          - { type: outlet, x: 140, y: 83, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.ap_bilgepumpcontrol_01 }
+          - { type: text, x: 379, y: 369, text: Engine room, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: bilge, points: [[473, 484], [473, 342], [448, 342]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: pump, x: 408, y: 322, size: 40, rotation: 270, entity: switch.0xe4b063fffe6d51d8, active_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: indicator, x: 404, y: 429, entity: binary_sensor.0x0ceff6fffe901b4e_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: indicator, x: 404, y: 451, entity: binary_sensor.0x8c65a3fffeda603c_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: pipe, medium: bilge, points: [[428, 314], [428, 221]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: filter, x: 413, y: 174, width: 30, height: 40, color: "#ff5b4f", label: Oil filter, label_position: above, active_entity: switch.0xe4b063fffe6d51d8, label_offset: [50, 30] }
+          - { type: pipe, medium: bilge, points: [[428, 169], [428, 144], [336, 144], [336, 354]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: butterfly_valve, x: 322, y: 362, color: "#3cc7d6", active_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: text, x: 309, y: 462, text: Main outlet, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: seawater, points: [[336, 406], [336, 446]], thickness: 5, arrow: true, flow_entity: switch.0xe4b063fffe6d51d8 }
+          - { type: text, x: 490, y: 369, text: Dining, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: bilge, points: [[583, 484], [583, 342], [559, 342]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeeb6ddc }
+          - { type: pump, x: 518, y: 322, size: 40, rotation: 270, entity: switch.0xccba97fffeeb6ddc, active_entity: switch.0xccba97fffeeb6ddc }
+          - { type: indicator, x: 514, y: 429, entity: binary_sensor.0x0ceff6fffe9009c8_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: indicator, x: 514, y: 451, entity: binary_sensor.0x0ceff6fffe76dcea_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: pipe, medium: bilge, points: [[538, 314], [538, 109]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeeb6ddc }
+          - { type: outlet, x: 513, y: 83, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.0xccba97fffeeb6ddc }
+          - { type: text, x: 683, y: 369, text: Anchor box, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: bilge, points: [[777, 484], [777, 342], [752, 342]], thickness: 5, arrow: true, flow_entity: binary_sensor.plc_bilge_anchor_box_running }
+          - { type: pump, x: 712, y: 322, size: 40, rotation: 270, entity: switch.0xe4b063fffe78d1e0, active_entity: switch.0xe4b063fffe78d1e0 }
+          - { type: indicator, x: 708, y: 429, entity: binary_sensor.plc_bilge_anchor_box_high, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: pipe, medium: bilge, points: [[732, 314], [732, 109]], thickness: 5, arrow: true, flow_entity: binary_sensor.plc_bilge_anchor_box_running }
+          - { type: outlet, x: 707, y: 83, width: 50, height: 16, color: "#3cc7d6", active_entity: binary_sensor.plc_bilge_anchor_box_running }
+          - { type: text, x: 818, y: 369, text: Crew cabin, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: bilge, points: [[911, 484], [911, 342], [887, 342]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeea6c90 }
+          - { type: pump, x: 846, y: 322, size: 40, rotation: 270, entity: switch.0xccba97fffeea6c90, active_entity: switch.0xccba97fffeea6c90 }
+          - { type: indicator, x: 843, y: 429, entity: binary_sensor.0x8c65a3fffee0f85d_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: indicator, x: 843, y: 451, entity: binary_sensor.0x44e2f8fffe0be6ed_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: pipe, medium: bilge, points: [[866, 314], [866, 109]], thickness: 5, arrow: true, flow_entity: switch.0xccba97fffeea6c90 }
+          - { type: outlet, x: 841, y: 83, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.0xccba97fffeea6c90 }
+          - { type: text, x: 956, y: 369, text: Front peak, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: bilge, points: [[1050, 484], [1050, 342], [1025, 342]], thickness: 5, arrow: true, flow_entity: switch.fp_bilgepumpcontrol_01 }
+          - { type: pump, x: 985, y: 322, size: 40, rotation: 270, entity: switch.fp_bilgepumpcontrol_01, active_entity: switch.fp_bilgepumpcontrol_01 }
+          - { type: indicator, x: 981, y: 429, entity: binary_sensor.fp_waterleaksensor_hoog_water_leak, label: Hoog, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: indicator, x: 981, y: 451, entity: binary_sensor.fp_waterleaksensor_laag, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
+          - { type: pipe, medium: bilge, points: [[1005, 314], [1005, 109]], thickness: 5, arrow: true, flow_entity: switch.fp_bilgepumpcontrol_01 }
+          - { type: outlet, x: 980, y: 83, width: 50, height: 16, color: "#3cc7d6", active_entity: switch.fp_bilgepumpcontrol_01 }
+          - { type: indicator, x: 708, y: 451, entity: binary_sensor.0x44e2f8fffe0be6ed_water_leak, label: Laag, color: red, blink: true, font_size: 13, led_size: 10 }
 
   - title: Accu's en voeding
     path: sys-power
@@ -930,46 +930,46 @@ views:
             tabs: *energie_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 76, width: 1240, height: 600 }
-          - { type: text, x: 110, y: 236, width: 191, height: 120, text: "", boxed: true, active_entity: binary_sensor.generatoron }
-          - { type: engine, x: 120, y: 264, width: 90, height: 63, active_entity: binary_sensor.generatoron }
-          - { type: generator, x: 237, y: 273, width: 50, height: 50, label: Generator, active_entity: binary_sensor.generatoron }
-          - { type: text, x: 108, y: 368, width: 193, height: 128, text: "", boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: propeller, x: 111, y: 381, width: 26, height: 100, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
-          - { type: pipe, medium: shaft, points: [[134, 431], [189, 431]], thickness: 4, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
-          - { type: engine, x: 184, y: 396, width: 100, height: 70, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: text, x: 429, y: 264, width: 102, height: 122, text: "Manual\nswitch", boxed: true, font_size: 13 }
-          - { type: pipe, medium: power, points: [[429, 296], [305, 296]], thickness: 4, arrow: true, flow_entity: binary_sensor.generatoron }
-          - { type: pipe, medium: power, points: [[429, 354], [377, 354], [377, 398], [305, 398]], thickness: 4, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: battery, x: 396, y: 506, width: 80, height: 44, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected, color: "#ff9f1c", label: "12V 180Ah" }
-          - { type: text, x: 419, y: 586, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, mono: true, font_size: 13, unit: V, decimals: 1 }
-          - { type: pipe, medium: power, points: [[363, 544], [393, 544]], thickness: 4, arrow: true, flow_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected }
-          - { type: text, x: 343, y: 506, text: Charger, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: battery, x: 547, y: 506, width: 80, height: 44, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected, color: "#ff9f1c", label: "12V 180Ah" }
-          - { type: text, x: 569, y: 586, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, mono: true, font_size: 13, unit: V, decimals: 1 }
-          - { type: pipe, medium: power, points: [[514, 544], [544, 544]], thickness: 4, arrow: true, flow_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected }
-          - { type: text, x: 493, y: 506, text: Charger, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: power, points: [[436, 502], [436, 476], [455, 476], [455, 392]], thickness: 4, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm, binary_sensor.generatoron], flow_above: 100 }
-          - { type: pipe, medium: power, points: [[587, 502], [587, 451], [505, 451], [505, 392]], thickness: 4, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm, binary_sensor.generatoron], flow_above: 100 }
-          - { type: battery, x: 628, y: 181, width: 110, height: 60, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected, color: "#ff9f1c", label: "24V 200Ah", label_position: above }
-          - { type: text, x: 752, y: 206, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, mono: true, font_size: 13, unit: V, decimals: 1 }
-          - { type: pipe, medium: power, points: [[594, 206], [625, 206]], thickness: 4, arrow: true, flow_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected }
-          - { type: text, x: 573, y: 166, text: Charger, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: power, points: [[683, 251], [683, 286]], thickness: 4, arrow: true, idle_opacity: 0.8 }
-          - { type: text, x: 631, y: 290, width: 104, height: 106, text: "24V\nswitchboard", boxed: true, font_size: 13 }
-          - { type: battery, x: 951, y: 306, width: 110, height: 150, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, active_entity: sensor.plc_battery_current, active_above: 1, active_abs: true, color: "#ff9f1c", label: "552V 900Ah", label_position: above }
-          - { type: text, x: 977, y: 471, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, mono: true, font_size: 16, unit: "%", decimals: 0 }
-          - { type: text, x: 977, y: 511, entity: sensor.plc_battery_current, mono: true, font_size: 14, unit: A, decimals: 0 }
-          - { type: pipe, medium: power, points: [[953, 441], [899, 441]], thickness: 5, arrow: true, reverse: false, flow_entity: sensor.plc_battery_current, flow_above: 1, flow_abs: true }
-          - { type: converter, x: 797, y: 426, width: 90, height: 110, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, active_entity: sensor.plc_battery_current, active_above: 1, active_abs: true, glyphs: ["=", "="], label: DC-bus, label_position: above }
-          - { type: text, x: 808, y: 551, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, mono: true, font_size: 14, unit: V, decimals: 0 }
+          - { type: hull, x: 20, y: 29, width: 1240, height: 600 }
+          - { type: text, x: 110, y: 189, width: 191, height: 120, text: "", boxed: true, active_entity: binary_sensor.generatoron }
+          - { type: engine, x: 120, y: 217, width: 90, height: 63, active_entity: binary_sensor.generatoron }
+          - { type: generator, x: 237, y: 226, width: 50, height: 50, label: Generator, active_entity: binary_sensor.generatoron }
+          - { type: text, x: 108, y: 321, width: 193, height: 128, text: "", boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: propeller, x: 111, y: 334, width: 26, height: 100, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
+          - { type: pipe, medium: shaft, points: [[134, 384], [189, 384]], thickness: 4, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
+          - { type: engine, x: 184, y: 349, width: 100, height: 70, label: Main engine, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: text, x: 429, y: 217, width: 102, height: 122, text: "Manual\nswitch", boxed: true, font_size: 13 }
+          - { type: pipe, medium: power, points: [[429, 249], [305, 249]], thickness: 4, arrow: true, flow_entity: binary_sensor.generatoron }
+          - { type: pipe, medium: power, points: [[429, 307], [377, 307], [377, 351], [305, 351]], thickness: 4, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: battery, x: 396, y: 459, width: 80, height: 44, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected, color: "#ff9f1c", label: "12V 180Ah" }
+          - { type: text, x: 419, y: 539, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, mono: true, font_size: 13, unit: V, decimals: 1 }
+          - { type: pipe, medium: power, points: [[363, 497], [393, 497]], thickness: 4, arrow: true, flow_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected }
+          - { type: text, x: 343, y: 459, text: Charger, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: battery, x: 547, y: 459, width: 80, height: 44, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected, color: "#ff9f1c", label: "12V 180Ah" }
+          - { type: text, x: 569, y: 539, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, mono: true, font_size: 13, unit: V, decimals: 1 }
+          - { type: pipe, medium: power, points: [[514, 497], [544, 497]], thickness: 4, arrow: true, flow_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected }
+          - { type: text, x: 493, y: 459, text: Charger, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: power, points: [[436, 455], [436, 429], [455, 429], [455, 345]], thickness: 4, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm, binary_sensor.generatoron], flow_above: 100 }
+          - { type: pipe, medium: power, points: [[587, 455], [587, 404], [505, 404], [505, 345]], thickness: 4, arrow: true, flow_entity: [sensor.engine_room_main_engine_me_rpm, binary_sensor.generatoron], flow_above: 100 }
+          - { type: battery, x: 628, y: 134, width: 110, height: 60, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, active_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected, color: "#ff9f1c", label: "24V 200Ah", label_position: above }
+          - { type: text, x: 752, y: 159, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, mono: true, font_size: 13, unit: V, decimals: 1 }
+          - { type: pipe, medium: power, points: [[594, 159], [625, 159]], thickness: 4, arrow: true, flow_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected }
+          - { type: text, x: 573, y: 119, text: Charger, font_size: 11, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: power, points: [[683, 204], [683, 239]], thickness: 4, arrow: true, idle_opacity: 0.8 }
+          - { type: text, x: 631, y: 243, width: 104, height: 106, text: "24V\nswitchboard", boxed: true, font_size: 13 }
+          - { type: battery, x: 951, y: 259, width: 110, height: 150, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, active_entity: sensor.plc_battery_current, active_above: 1, active_abs: true, color: "#ff9f1c", label: "552V 900Ah", label_position: above }
+          - { type: text, x: 977, y: 424, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, mono: true, font_size: 16, unit: "%", decimals: 0 }
+          - { type: text, x: 977, y: 464, entity: sensor.plc_battery_current, mono: true, font_size: 14, unit: A, decimals: 0 }
+          - { type: pipe, medium: power, points: [[953, 394], [899, 394]], thickness: 5, arrow: true, reverse: false, flow_entity: sensor.plc_battery_current, flow_above: 1, flow_abs: true }
+          - { type: converter, x: 797, y: 379, width: 90, height: 110, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, active_entity: sensor.plc_battery_current, active_above: 1, active_abs: true, glyphs: ["=", "="], label: DC-bus, label_position: above }
+          - { type: text, x: 808, y: 504, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, mono: true, font_size: 14, unit: V, decimals: 0 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 696, width: 820, height: 150, title: "Startaccu's Volvo en generator" }
-          - { type: panel, x: 856, y: 696, width: 404, height: 150, title: "24V-systeem" }
-          - { type: value, style: tile, x: 38, y: 748, width: 380, height: 76, label: Accu 277, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, value_size: 22, unit: V, decimals: 2, colors: [{ below: 12, color: red }, { below: 12.4, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 442, y: 748, width: 380, height: 76, label: Accu 278, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, value_size: 22, unit: V, decimals: 2, colors: [{ below: 12, color: red }, { below: 12.4, color: amber }, { color: green }] }
-          - { type: value, style: tile, x: 874, y: 748, width: 368, height: 76, label: Accu 279, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, value_size: 22, unit: V, decimals: 2, colors: [{ below: 24, color: red }, { below: 24.8, color: amber }, { color: green }] }
+          - { type: panel, x: 20, y: 649, width: 820, height: 150, title: "Startaccu's Volvo en generator" }
+          - { type: panel, x: 856, y: 649, width: 404, height: 150, title: "24V-systeem" }
+          - { type: value, style: tile, x: 38, y: 701, width: 380, height: 76, label: Accu 277, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_277_battery_voltage, value_size: 22, unit: V, decimals: 2, colors: [{ below: 12, color: red }, { below: 12.4, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 442, y: 701, width: 380, height: 76, label: Accu 278, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_278_battery_voltage, value_size: 22, unit: V, decimals: 2, colors: [{ below: 12, color: red }, { below: 12.4, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 874, y: 701, width: 368, height: 76, label: Accu 279, entity: sensor.victron_mqtt_c0619ab7e8cb_battery_279_battery_voltage, value_size: 22, unit: V, decimals: 2, colors: [{ below: 24, color: red }, { below: 24.8, color: amber }, { color: green }] }
 
   - title: Webasto
     path: sys-webasto
