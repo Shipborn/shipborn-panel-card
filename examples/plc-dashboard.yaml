@@ -1164,6 +1164,50 @@ views:
 
           # ---- dek: zones (gegenereerd door tools/interieur_zones.py) ----
           - type: zone
+            x: 493
+            y: 164
+            width: 153
+            height: 165
+            label: Deck lounge
+            value_entity: sensor.0x001788010df593f4_temperature
+            active_entity: [light.main_cabin_salon_rondom, light.mc_s_3a_dl_bba_d11_1, light.mc_s_3a_dl_bbm_d11_2, light.mc_s_3a_dl_bbv_d11_3, light.mc_s_3a_dl_sba_d11_7, light.mc_s_3a_dl_sbm_d11_6, light.mc_s_3a_dl_sbv_d11_5, light.mc_s_3a_dl_v_d11_4, light.mc_s_3b_trap_d9, light.mc_s_3c_dl_gang_laag_d8, light.mc_s_3c_dl_trap_d7, light.mc_s_3c_dl_zitje_d6]
+            zoom:
+              height: 1132
+              items:
+                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_decklounge_aan } } }
+                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_deck_lounge_uit } } }
+                - { type: text, x: 18, y: 106, text: Salon – verlichting, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Salon rondom, entity: light.main_cabin_salon_rondom, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Plinten, entity: light.main_cabin_plinten, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Salon hoek BB achter (2 spots), entity: light.mc_s_3a_dl_bba_d11_1, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Salon hoek BB midden (2 spots), entity: light.mc_s_3a_dl_bbm_d11_2, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 246, width: 219, height: 44, label: Salon hoek BB voor (2 spots), entity: light.mc_s_3a_dl_bbv_d11_3, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 246, width: 219, height: 44, label: Salon hoek SB achter (2 spots), entity: light.mc_s_3a_dl_sba_d11_7, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 298, width: 219, height: 44, label: Salon hoek SB midden (2 spots), entity: light.mc_s_3a_dl_sbm_d11_6, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 298, width: 219, height: 44, label: Salon hoek SB voor (2 spots), entity: light.mc_s_3a_dl_sbv_d11_5, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 350, width: 219, height: 44, label: Salon voor (2 spots), entity: light.mc_s_3a_dl_v_d11_4, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 350, width: 219, height: 44, label: Salon plinten, entity: light.mc_s_3b_trap_d9, led: green, align: left, font_size: 14 }
+                - { type: text, x: 18, y: 408, text: Webasto deck lounge, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: value, style: tile, x: 18, y: 438, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_deck_lounge_temp, value_size: 22 }
+                - { type: pushbutton, x: 247, y: 438, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_deck_lounge_ac, led: green, align: left, font_size: 15 }
+                - { type: value, x: 18, y: 512, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_deck_lounge, font_size: 15, box_width: 80 }
+                - { type: value, x: 247, y: 512, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_deck_lounge_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
+                - { type: text, x: 18, y: 564, text: Beweging en temperatuur, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: value, x: 18, y: 594, width: 448, height: 36, label: Temperatuur, entity: sensor.0x001788010df593f4_temperature, font_size: 15, box_width: 110, decimals: 1 }
+                - { type: indicator, x: 18, y: 642, entity: binary_sensor.0x001788010df593f4_occupancy, label: Beweging, color: amber, font_size: 16, tap_action: { action: more-info } }
+                - { type: value, x: 18, y: 686, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.0x001788010df593f4_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
+                - { type: text, x: 18, y: 734, text: Printer HP Smart Tank 5100, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: value, x: 18, y: 764, width: 448, height: 36, label: Status, entity: sensor.hp_smart_tank_5100_series, font_size: 15, box_width: 110 }
+                - { type: value, x: 18, y: 806, width: 448, height: 36, label: Zwart, entity: sensor.hp_smart_tank_5100_series_black_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: value, x: 18, y: 848, width: 448, height: 36, label: Cyaan, entity: sensor.hp_smart_tank_5100_series_cyan_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: value, x: 18, y: 890, width: 448, height: 36, label: Magenta, entity: sensor.hp_smart_tank_5100_series_magenta_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: value, x: 18, y: 932, width: 448, height: 36, label: Geel, entity: sensor.hp_smart_tank_5100_series_yellow_ink, font_size: 15, box_width: 110, decimals: 0 }
+                - { type: text, x: 18, y: 980, text: Overig, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+                - { type: pushbutton, x: 18, y: 1010, width: 219, height: 44, label: Dl Gang Laag, entity: light.mc_s_3c_dl_gang_laag_d8, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 247, y: 1010, width: 219, height: 44, label: Dl Trap, entity: light.mc_s_3c_dl_trap_d7, led: green, align: left, font_size: 14 }
+                - { type: pushbutton, x: 18, y: 1062, width: 219, height: 44, label: Dl Zitje, entity: light.mc_s_3c_dl_zitje_d6, led: green, align: left, font_size: 14 }
+          - type: zone
             x: 57
             y: 178
             width: 83
@@ -1338,50 +1382,6 @@ views:
                 - { type: pushbutton, x: 247, y: 1850, width: 219, height: 44, label: Gang A, entity: light.oc_s_1c2_gang_a_d20, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 18, y: 1902, width: 219, height: 44, label: Gang V, entity: light.oc_s_1c2_gang_v_d21, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 247, y: 1902, width: 219, height: 44, label: Plint Bad, entity: light.oc_s_1c3_plint_bad_d23, led: green, align: left, font_size: 14 }
-          - type: zone
-            x: 505
-            y: 402
-            width: 109
-            height: 115
-            label: Deck lounge
-            value_entity: sensor.0x001788010df593f4_temperature
-            active_entity: [light.main_cabin_salon_rondom, light.mc_s_3a_dl_bba_d11_1, light.mc_s_3a_dl_bbm_d11_2, light.mc_s_3a_dl_bbv_d11_3, light.mc_s_3a_dl_sba_d11_7, light.mc_s_3a_dl_sbm_d11_6, light.mc_s_3a_dl_sbv_d11_5, light.mc_s_3a_dl_v_d11_4, light.mc_s_3b_trap_d9, light.mc_s_3c_dl_gang_laag_d8, light.mc_s_3c_dl_trap_d7, light.mc_s_3c_dl_zitje_d6]
-            zoom:
-              height: 1132
-              items:
-                - { type: text, x: 18, y: 12, text: Scènes, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 42, width: 219, height: 48, label: Aan, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_decklounge_aan } } }
-                - { type: pushbutton, x: 247, y: 42, width: 219, height: 48, label: Uit, font_size: 15, tap_action: { action: perform-action, perform_action: scene.turn_on, data: { entity_id: scene.ctd_008673_deck_lounge_uit } } }
-                - { type: text, x: 18, y: 106, text: Salon – verlichting, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 136, width: 219, height: 44, label: Salon rondom, entity: light.main_cabin_salon_rondom, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 136, width: 219, height: 44, label: Plinten, entity: light.main_cabin_plinten, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 194, width: 219, height: 44, label: Salon hoek BB achter (2 spots), entity: light.mc_s_3a_dl_bba_d11_1, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 194, width: 219, height: 44, label: Salon hoek BB midden (2 spots), entity: light.mc_s_3a_dl_bbm_d11_2, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 246, width: 219, height: 44, label: Salon hoek BB voor (2 spots), entity: light.mc_s_3a_dl_bbv_d11_3, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 246, width: 219, height: 44, label: Salon hoek SB achter (2 spots), entity: light.mc_s_3a_dl_sba_d11_7, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 298, width: 219, height: 44, label: Salon hoek SB midden (2 spots), entity: light.mc_s_3a_dl_sbm_d11_6, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 298, width: 219, height: 44, label: Salon hoek SB voor (2 spots), entity: light.mc_s_3a_dl_sbv_d11_5, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 350, width: 219, height: 44, label: Salon voor (2 spots), entity: light.mc_s_3a_dl_v_d11_4, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 350, width: 219, height: 44, label: Salon plinten, entity: light.mc_s_3b_trap_d9, led: green, align: left, font_size: 14 }
-                - { type: text, x: 18, y: 408, text: Webasto deck lounge, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: value, style: tile, x: 18, y: 438, width: 219, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_deck_lounge_temp, value_size: 22 }
-                - { type: pushbutton, x: 247, y: 438, width: 219, height: 64, label: Airco, entity: switch.webasto_bluecool_noder_deck_lounge_ac, led: green, align: left, font_size: 15 }
-                - { type: value, x: 18, y: 512, width: 219, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_deck_lounge, font_size: 15, box_width: 80 }
-                - { type: value, x: 247, y: 512, width: 219, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_deck_lounge_fan_speed, font_size: 15, decimals: 0, box_width: 70 }
-                - { type: text, x: 18, y: 564, text: Beweging en temperatuur, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: value, x: 18, y: 594, width: 448, height: 36, label: Temperatuur, entity: sensor.0x001788010df593f4_temperature, font_size: 15, box_width: 110, decimals: 1 }
-                - { type: indicator, x: 18, y: 642, entity: binary_sensor.0x001788010df593f4_occupancy, label: Beweging, color: amber, font_size: 16, tap_action: { action: more-info } }
-                - { type: value, x: 18, y: 686, width: 448, height: 36, label: Bewegingssensor batterij, entity: sensor.0x001788010df593f4_battery, font_size: 15, box_width: 110, decimals: 0, unit: "%" }
-                - { type: text, x: 18, y: 734, text: Printer HP Smart Tank 5100, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: value, x: 18, y: 764, width: 448, height: 36, label: Status, entity: sensor.hp_smart_tank_5100_series, font_size: 15, box_width: 110 }
-                - { type: value, x: 18, y: 806, width: 448, height: 36, label: Zwart, entity: sensor.hp_smart_tank_5100_series_black_ink, font_size: 15, box_width: 110, decimals: 0 }
-                - { type: value, x: 18, y: 848, width: 448, height: 36, label: Cyaan, entity: sensor.hp_smart_tank_5100_series_cyan_ink, font_size: 15, box_width: 110, decimals: 0 }
-                - { type: value, x: 18, y: 890, width: 448, height: 36, label: Magenta, entity: sensor.hp_smart_tank_5100_series_magenta_ink, font_size: 15, box_width: 110, decimals: 0 }
-                - { type: value, x: 18, y: 932, width: 448, height: 36, label: Geel, entity: sensor.hp_smart_tank_5100_series_yellow_ink, font_size: 15, box_width: 110, decimals: 0 }
-                - { type: text, x: 18, y: 980, text: Overig, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-                - { type: pushbutton, x: 18, y: 1010, width: 219, height: 44, label: Dl Gang Laag, entity: light.mc_s_3c_dl_gang_laag_d8, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 247, y: 1010, width: 219, height: 44, label: Dl Trap, entity: light.mc_s_3c_dl_trap_d7, led: green, align: left, font_size: 14 }
-                - { type: pushbutton, x: 18, y: 1062, width: 219, height: 44, label: Dl Zitje, entity: light.mc_s_3c_dl_zitje_d6, led: green, align: left, font_size: 14 }
           - type: zone
             x: 505
             y: 517
@@ -1578,10 +1578,10 @@ views:
                 - { type: pushbutton, x: 247, y: 1628, width: 219, height: 44, label: Groep Led, entity: light.mc_led, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 18, y: 1680, width: 219, height: 44, label: Kast, entity: light.mc_s_7ah_kast_d32, led: green, align: left, font_size: 14 }
           - type: zone
-            x: 729
-            y: 534
-            width: 172
-            height: 98
+            x: 901
+            y: 419
+            width: 132
+            height: 207
             label: Crew cabin
             value_entity: sensor.motionsensorcrew_temperature
             active_entity: [light.cc_11a, light.cc_11b, light.cc_12a, light.cc_s_11a_bed_d6, light.cc_s_11a_tafel_d7, light.cc_s_11a_zitje_d5, light.cc_s_11b_gang_d11, light.cc_s_11b_kasten_d12, light.cc_s_11b_plint_d8, light.cc_s_12a_sanitair_d10, light.crew_cabin_cc_s_12a_douche_d13, light.crew_cabin_cc_s_12a_toilet_d9, light.crew_cabin_hal_en_plinten, light.crew_cabin_plafond]
@@ -1632,10 +1632,10 @@ views:
                 - { type: pushbutton, x: 247, y: 1242, width: 219, height: 44, label: Douche, entity: light.crew_cabin_cc_s_12a_douche_d13, led: green, align: left, font_size: 14 }
                 - { type: pushbutton, x: 18, y: 1294, width: 219, height: 44, label: Toilet, entity: light.crew_cabin_cc_s_12a_toilet_d9, led: green, align: left, font_size: 14 }
           - type: zone
-            x: 901
-            y: 419
-            width: 132
-            height: 207
+            x: 729
+            y: 534
+            width: 172
+            height: 98
             label: Guest cabin
             active_entity: [light.gc_10a, light.gc_9a, light.gc_9b, light.gc_s_10a_wasbak_d6, light.gc_s_10a_wc_d7, light.gc_s_9a_gang_d5, light.gc_s_9b_bed_a_d9, light.gc_s_9b_bed_v_d8, light.gc_s_9b_plint_d10, light.guest_cabin_plafond, light.guest_cabin_toilet]
             zoom:

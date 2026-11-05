@@ -351,7 +351,8 @@ def front(p):
 room("interior", "Aft peak", (63, 414, 189, 206), aft, leak="ap")
 room("interior", "Owners cabin", (258, 402, 247, 230), owners, value="sensor.temp_ownerscabin_temperature",
      active=ents(r"^light\.(oc_|owners_cabin_)"))
-room("interior", "Deck lounge", (505, 402, 109, 115), deck_lounge, value="sensor.0x001788010df593f4_temperature",
+room("deck", "Deck lounge", (493, 164, 153, 165), deck_lounge,  # the deckhouse on the deck plan
+     value="sensor.0x001788010df593f4_temperature",
      active=ents(r"^light\.(main_cabin_salon|mc_s_3)"))
 room("interior", "Engine room", (505, 517, 109, 115), engine, value="sensor.0x001788010cdae144_temperature", leak="er",
      active=ents(r"^light\.er_"), alarm=[SCHROEFAS])
@@ -359,9 +360,9 @@ room("interior", "Dining", (614, 402, 115, 127), dining, leak="d", active=ents(r
 room("interior", "Galley", (614, 529, 115, 103), galley, active=ents(r"^light\.(g_s_4|mc_4a_g$|main_cabin_aanrecht)"))
 room("interior", "Main cabin", (729, 402, 172, 132), main, value="sensor.temp_main_temperature",
      active=ents(r"^light\.(main_cabin_(lounge|workplace|gangpad|plinten)|mc_(6a|7a|7b|led)$|mc_s_(6|7))"))
-room("interior", "Crew cabin", (729, 534, 172, 98), crew, value="sensor.motionsensorcrew_temperature", leak="cc",
+room("interior", "Crew cabin", (901, 419, 132, 207), crew, value="sensor.motionsensorcrew_temperature", leak="cc",
      active=ents(r"^light\.(cc_|crew_cabin_)"))
-room("interior", "Guest cabin", (901, 419, 132, 207), guest, active=ents(r"^light\.(gc_|guest_cabin_)"))
+room("interior", "Guest cabin", (729, 534, 172, 98), guest, active=ents(r"^light\.(gc_|guest_cabin_)"))
 room("interior", "Front peak", (1039, 454, 172, 126), front, leak="fp", active=["switch.fp_boiler"])
 
 

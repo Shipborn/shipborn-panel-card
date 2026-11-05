@@ -96,6 +96,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Daarna op verzoek toch **20 px tussen romp en statusbalk**: de schemapagina's 20 px omlaag (romp-vak op `y: 49`, romplijn op 76, uitlaten op 76), gelijk aan de 20 px op de pagina's zonder romp.
 - Wijzigingen die de gebruiker in HA (Raw configuration editor) had gemaakt, overgenomen in het bestand: op Voortstuwing de hotspots Diesel (435, 200), E-motor (435, 150) en Boegschroef (770, 200); op Accu's de panelen *Startaccu's* en *24V-systeem* 30 px hoger (tegels op 691, Accu 279 op 696). Gevonden door de geplakte HA-YAML per pagina te vergelijken (HA schrijft ankers uit en maakt van `y` en `yes` `'true'`).
 - **Dekplan en interieur op één pagina** (`ship-deck`, tab *Dek en interieur*): dek boven op `y: 76`, interieur eronder op `y: 377` met zijn ruimtes en het scènepaneel *Algemeen* (alles 270 px omlaag, ook in `tools/interieur_zones.py`). De view `ship-interior` is weg; `&ship_tabs` heeft nu Zijaanzicht en Dek en interieur, de knop Schip in `&tc_nav` matcht alleen nog `ship-deck`. Inzoomen werkt op beide tekeningen.
+- **Deck lounge op het dekplan:** de zone staat nu op het dekhuis van de dektekening (493, 164, 153×165) in plaats van op het interieur. **Guest cabin en Crew cabin omgewisseld** (Crew cabin voorin aan stuurboord, Guest cabin onder de Main cabin). Aangepast in `tools/interieur_zones.py` en opnieuw gegenereerd; een proefrun vooraf gaf exact de bestaande YAML.
 
 ## Lessen en keuzes die je moet kennen
 
