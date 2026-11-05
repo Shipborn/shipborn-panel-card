@@ -135,7 +135,7 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots en de HA-export ontbreken dan.
 - Controleer of `python` werkt (anders `python3`) en pas `.claude/launch.json` daarop aan.
 
-## Stand van zaken en open punten (05-11-2026, v0.5.16)
+## Stand van zaken en open punten (05-11-2026, v0.5.17)
 
 - **Nieuw ontwerp in aanbouw:** het design system *TC90 JOAL Bediening* (claude.ai, `https://claude.ai/artifact/6kF93PXWxgEZgw4ChTWkMj`) is de basis voor alle schermen. In de kaart: `design: tc90` (thema's Nacht/Dag/Rood nacht, items `statusbar`, `navbar`, `tile`, `switch`, `hotspot`, `dial`, en het ongebruikte `alarmbar`; zie README). Alle pagina's staan in het nieuwe kader (statusbalk met subtabs, icoonbalk); de systeemschema's en hun bediening zijn verder nog de oude onderdelen, die nu wel de themakleuren volgen. Alleen `voortstuwing` is helemaal in de nieuwe stijl (schip met hotspots, tegels, schakelaars); de andere bestemmingen kunnen zo'n overzichtspagina nog krijgen. Brandstof staat onder Voortstuwing (keuze van Claude, niet van de gebruiker). De kleuren in `TC_THEMES` komen uit `tokens.json` van dat design system: verandert het ontwerp, neem ze dan opnieuw over.
 - Views: `sys-diesel`, `sys-fuel`, `sys-generator`, `sys-dcbus`, `sys-bowthruster`, `sys-seawater`, `sys-freshwater`, `sys-wastewater`, `sys-bilge`, `sys-power`, `sys-webasto`, `sys-navlights`, `voortstuwing`, `ship-side`, `ship-deck` (dekplan en interieur samen), `alarms`. De Main-pagina en de oude tabs (Main/Diesel/Electric/PMS/Tanks) zijn op 29-10 weggehaald.

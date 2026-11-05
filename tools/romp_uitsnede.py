@@ -65,7 +65,11 @@ flagc = np.zeros_like(fg); flagc[:, :FX] = (sat[:, :FX] > 40) & (lum[:, :FX] < 2
 flagc[int(deck[:FX].min()) - 10:, :] = False
 flag = ndimage.binary_closing(flagc, structure=np.ones((61, 61)), border_value=0)
 flag = ndimage.binary_fill_holes(flag | flagc)
-keep |= flag
+# the white stripe at the top of the flag has no outline: fill it by hand (crop coordinates)
+from PIL import ImageDraw
+wm = Image.new("L", (W, H), 0)
+ImageDraw.Draw(wm).polygon([(150, 99), (191, 161), (140, 188), (133, 158), (95, 149)], fill=255)
+keep |= flag | (np.asarray(wm) > 0)
 # above the old crop top: only the flag
 keep[:120, FX:] = False
 alpha = ndimage.gaussian_filter(keep.astype(float), 0.8) * 255
