@@ -1083,7 +1083,7 @@ views:
           - { type: navbar, items: *tc_nav }
 
           # ---- het schip met hotspots (tik = schema) ----
-          - { type: image, x: 24, y: 102, width: 848, height: 100, image: tc90-romp }
+          - { type: image, x: 24, y: 110, width: 848, height: 92, image: tc90-romp }
           - { type: hotspot, x: 435, y: 200, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, tap_action: { action: navigate, navigation_path: sys-diesel } }
           - { type: hotspot, x: 435, y: 150, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, tap_action: { action: navigate, navigation_path: sys-diesel } }
           - { type: hotspot, x: 236, y: 200, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
