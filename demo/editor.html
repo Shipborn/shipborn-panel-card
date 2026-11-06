@@ -49,6 +49,12 @@
   <header>
     <b>Layout-editor</b>
     <select id="view" title="View"></select>
+    <select id="room" title="Ingezoomde ruimte bewerken (zones met zoom op dit scherm)"></select>
+    <select id="layer" title="Wat je in de ruimte bewerkt" hidden>
+      <option value="lamps">Lampjes op de tekening</option>
+      <option value="items">Paneel rechts</option>
+      <option value="below">Onder de tekening (Webasto)</option>
+    </select>
     <label>Raster <select id="grid"><option>1</option><option selected>5</option><option>10</option><option>20</option></select></label>
     <label><input type="checkbox" id="sim"> Stroming tonen</label>
     <label title="Alleen voor het bekijken; aan boord kiest de bemanning het thema met de knop in de statusbalk">Thema <select id="theme"><option value="nacht">Nacht</option><option value="dag">Dag</option><option value="rood">Rood nacht</option></select></label>
@@ -93,6 +99,7 @@
       Het label onder een symbool (bijv. Inlet V3) kun je los verslepen; de tekst pas je rechts aan bij <code>label</code>.<br>
       <kbd>Alt</kbd>+klik = onderdeel eronder kiezen.<br>
       Statusbalk en icoonbalk liggen vast: klik erop om titel, subtabs of knoppen te wijzigen. Een hotspot sleep je aan het bolletje (dat is <code>x</code>/<code>y</code>); het label wijst ervan weg (<code>side: left</code> = naar links).<br>
+      <b>Ruimte</b> (bovenin): bewerk een ingezoomde ruimte – de lampjes op de tekening verslepen, of de knoppen in het paneel rechts en de Webasto-blokken onder de tekening. Een ruimte waarvan je paneel of blokken aanpast krijgt <code>edited: true</code>: het script (<code>tools/interieur_zones.py</code>) laat die dan zoals hij is; lampplekken neemt het script altijd over.<br>
       Daarna <b>Opslaan</b>, en in HA de YAML plakken (<b>Kopieer YAML</b>).
     </div>
   </aside>
@@ -193,10 +200,46 @@
     stage.insertBefore(card, ov);
 
     let doc, vi = 0, sel = [], hover = null, undo = [], redo = [], dirty = false, saved = "";
-    const itemsPath = () => ["views", vi, "cards", 0, "items"];
+    // zr: the zoomed room being edited ({ zi: index of the zone on the screen, layer: lamps | items | below }), or null.
+    let zr = null;
+    const viewItemsPath = () => ["views", vi, "cards", 0, "items"];
+    const ZOOM_PATH = { lamps: ["zoom", "lamps"], items: ["zoom", "items"], below: ["zoom", "below", "items"] };
+    const itemsPath = () => (zr ? [...viewItemsPath(), zr.zi, ...ZOOM_PATH[zr.layer]] : viewItemsPath());
     const itemsSeq = () => doc.getIn(itemsPath(), true);
     const items = () => itemsSeq().items.map((n) => n.toJSON());
-    const cardCfg = () => doc.getIn(["views", vi, "cards", 0], true).toJSON();
+    const viewCard = () => doc.getIn(["views", vi, "cards", 0], true).toJSON();
+    const cardCfg = () => (zr ? zoomCfg() : viewCard());
+    // Bounding box of a zone (its outline, or x/y/width/height).
+    function zoneBox(z) {
+      if (!z.points) return { x: z.x || 0, y: z.y ?? z.true ?? 0, w: z.width || 100, h: z.height || 100 };
+      const xs = z.points.map((p) => p[0]), ys = z.points.map((p) => p[1]);
+      return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+    }
+    // The screen the editor draws for a zoomed room: the side panel's items, the strip under the drawing, or the
+    // room's part of the drawing with its lamps (as `lamp` items; the drawing and outline come after them, so the
+    // item numbers stay those of the lamps list). Coordinates of the lamps stay page coordinates in the YAML.
+    function zoomCfg() {
+      const vc = viewCard();
+      const z = vc.items[zr.zi] || {};
+      const zc = z.zoom || {};
+      const base = { design: vc.design, dock: false, kiosk: false, fonts: vc.fonts };
+      if (zr.layer === "items") return { ...base, width: 484, height: zc.height || 400, items: zc.items || [] };
+      if (zr.layer === "below") return { ...base, width: 740, height: zc.below?.height || 236, items: zc.below?.items || [] };
+      const b = zoneBox(z), m = 30;
+      const ox = b.x - m, oy = b.y - m, w = Math.round(b.w + 2 * m), h = Math.round(b.h + 2 * m);
+      const size = Math.max(4, Math.round((26 * w) / 1280));
+      const sh = (it) => { const o = { ...it, x: (it.x || 0) - ox, y: (it.y ?? it.true ?? 0) - oy }; delete o.true; return o; };
+      const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+      const img = vc.items.filter((i) => i.type === "image").reverse()
+        .find((i) => cx >= i.x && cx <= i.x + i.width && cy >= (i.y ?? i.true ?? 0) && cy <= (i.y ?? i.true ?? 0) + i.height);
+      const its = (zc.lamps || []).map((l) => ({ type: "lamp", size, ...sh(l) }));
+      if (img) its.push(sh(img));
+      const outline = { type: "zone" }; // no label: at this zoom it would cover the lamps
+      if (z.points) outline.points = z.points.map(([x, y]) => [x - ox, y - oy]);
+      else Object.assign(outline, { x: b.x - ox, y: b.y - oy, width: b.w, height: b.h });
+      its.push(outline);
+      return { ...base, width: w, height: h, max_scale: 10, items: its };
+    }
     const W = () => cardCfg().width || 650, H = () => cardCfg().height || 340;
     const grid = () => +$("grid").value;
     const snap = (v) => Math.round(v / grid()) * grid();
@@ -255,6 +298,18 @@
       $("view").value = vi;
       const q = `?view=${views[vi].get("path")}`;
       if (location.search !== q) history.replaceState(null, "", q);
+      const its = viewCard().items || [];
+      const zones = its.map((it, i) => [it, i]).filter(([it]) => it.type === "zone" && it.zoom);
+      if (zr && !zones.some(([, i]) => i === zr.zi)) zr = null;
+      $("room").hidden = !zones.length;
+      $("room").innerHTML = `<option value="">— hele scherm —</option>` + zones.map(([it, i]) => `<option value="${i}">Ruimte: ${it.label || "#" + i}</option>`).join("");
+      $("room").value = zr ? zr.zi : "";
+      $("layer").hidden = !zr;
+      if (zr) {
+        const zc = its[zr.zi].zoom;
+        for (const o of $("layer").options) o.disabled = o.value === "below" && !zc.below;
+        $("layer").value = zr.layer;
+      }
     }
 
     function simStates(its) {
@@ -281,9 +336,11 @@
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         fillViews();
-        const cfg = { ...doc.toJS().views[vi].cards[0], kiosk: false, dock: false }; // bars stay on the canvas
+        const cfg = zr ? zoomCfg() : { ...doc.toJS().views[vi].cards[0], kiosk: false, dock: false }; // bars stay on the canvas
         card.setConfig(cfg);
-        card.hass = { states: simStates(cfg.items), locale: { language: "nl" }, callService() {} };
+        const states = simStates(cfg.items);
+        for (const it of cfg.items) if (it.type === "lamp") states[it.entity] ??= { state: "off", attributes: {} }; // not dimmed as unavailable
+        card.hass = { states, locale: { language: "nl" }, callService() {} };
         requestAnimationFrame(draw);
       });
     }
@@ -380,6 +437,8 @@
       undo.push(serialize());
       if (undo.length > 200) undo.shift();
       redo = [];
+      // A room whose panel or strip was changed here is left alone by tools/interieur_zones.py from now on.
+      if (zr && zr.layer !== "lamps") doc.setIn([...viewItemsPath(), zr.zi, "edited"], true);
     }
     function changed() {
       dirty = serialize() !== saved;
@@ -390,6 +449,7 @@
     function restore(text) {
       doc = parseDocument(text);
       vi = Math.min(vi, doc.get("views").items.length - 1);
+      if (zr && !doc.getIn(itemsPath(), true)) zr = null;
       sel = sel.filter((i) => i < itemsSeq().items.length);
       colorsShown = screenShown = null;
       changed();
@@ -668,6 +728,7 @@
       $("palette").append(h4, tiles);
     }
     function add(template) {
+      if (zr?.layer === "lamps") return alert("Lampjes komen uit het script (één per lamp van de ruimte); hier kun je ze alleen verslepen.");
       snapshot();
       const t = structuredClone(template);
       const cx = snap(W() / 2), cy = snap(H() / 2);
@@ -918,6 +979,7 @@
       view.get("cards").items.push(newCard($("v-kind").value, title, $("v-tab").value));
       views.items.push(view);
       addTab($("v-tab").value, title, path);
+      zr = null;
       vi = views.items.length - 1;
       sel = [];
       changed();
@@ -932,12 +994,19 @@
       removeTabs(view.get("path"));
       doc.get("views").items.splice(vi, 1);
       vi = Math.max(0, vi - 1);
+      zr = null;
       sel = [];
       changed();
     };
 
     // ---------- toolbar / keys ----------
-    $("view").onchange = () => { vi = +$("view").value; sel = []; hover = null; render(); };
+    $("view").onchange = () => { vi = +$("view").value; zr = null; sel = []; hover = null; render(); };
+    $("room").onchange = () => {
+      zr = $("room").value === "" ? null : { zi: +$("room").value, layer: zr?.layer || "lamps" };
+      if (zr?.layer === "below" && !viewCard().items[zr.zi].zoom.below) zr.layer = "lamps";
+      sel = []; hover = null; colorsShown = screenShown = null; render();
+    };
+    $("layer").onchange = () => { zr.layer = $("layer").value; sel = []; hover = null; colorsShown = null; render(); };
     $("sim").onchange = render;
     // Preview a theme: the same stored choice and event the card's own theme button uses.
     try { $("theme").value = localStorage.getItem("shipborn-tc-theme") || "nacht"; } catch (e) { /* private window */ }

@@ -1,7 +1,7 @@
 """Generates the room zones (zone + zoom panel) on the deck plan and the interior plan below it (view ship-deck) in examples/plc-dashboard.yaml.
 
 Usage (from the day folder): python tools/interieur_zones.py examples/Entiteiten-HA.xlsx examples/plc-dashboard.yaml
-Needs openpyxl. Replaces everything between "# ---- ruimtes:" and "# ---- algemeen:" in the interior view, and between
+Needs openpyxl and pyyaml. Replaces everything between "# ---- ruimtes:" and "# ---- algemeen:" in the interior view, and between
 "# ---- dek: zones" and "# ---- einde dek ----" in the deck view (inserted after the deck drawing on the first run).
 
 The layout per room follows the crew's own HA dashboard (sections and names per room). Entities of a room that
@@ -11,6 +11,7 @@ import re
 import sys
 
 import openpyxl
+import yaml
 
 xlsx, yaml_path = sys.argv[1], sys.argv[2]
 rows = list(openpyxl.load_workbook(xlsx, read_only=True).active.iter_rows(values_only=True))[1:]
@@ -520,8 +521,10 @@ room("deck", "Dekverlichting", (814, 144, 332, 166), deck_lights,
 # There is no lighting plan, so the place of each lamp is estimated from its name: BB (port) = top of the drawing and
 # SB (starboard) = bottom (the bow points right), A / M / V (achter / midden / voor) = left / middle / right of the
 # room. Lamps without such a code are spread evenly over the rest of the room. Correct a place in LAMP_AT
-# (entity: (x, y), page coordinates) when it is wrong; that wins over the estimate.
+# (entity: (x, y), page coordinates) when it is wrong; that wins over the estimate. A place set in the layout editor
+# (already in the YAML) wins over both, so dragging a lamp there is never undone by generating again.
 LAMP_AT = {}
+OLD = {}  # label -> the zone as it is now in the YAML (lamp places, `edited`), filled before rendering
 
 
 def inside(pt, poly):
@@ -571,9 +574,12 @@ def room_lamps(r, p):
         return side, lon
 
     placed, free = [], []
+    kept = {l["entity"]: (l["x"], l.get("y", l.get(True))) for l in OLD.get(r["label"], {}).get("zoom", {}).get("lamps", []) or []}
     for lbl, e in rows:
         side, lon = code(lbl, e)
-        if e in LAMP_AT:
+        if e in kept:
+            placed.append((lbl, e, kept[e]))
+        elif e in LAMP_AT:
             placed.append((lbl, e, LAMP_AT[e]))
         elif side or lon:
             px = x0 + w * {"a": 0.22, "m": 0.5, "v": 0.78, None: 0.5}[lon]
@@ -609,11 +615,52 @@ def room_lamps(r, p):
     return [(lbl, e, (round(px), round(py))) for lbl, e, (px, py) in out]
 
 
+def lamp_lines(lamps):
+    return ["              lamps:"] + [f"                - {{ entity: {e}, x: {x}, y: {y}, label: {q(lbl)} }}" for lbl, e, (x, y) in lamps]
+
+
+def old_blocks(segment):
+    """label -> the zone's lines as they are now in the YAML (to keep a room edited in the layout editor)."""
+    blocks, cur = {}, None
+    for line in segment.split("\n"):
+        if line == "          - type: zone":
+            cur = [line]
+        elif cur is not None and (line.startswith("            ") or not line.strip()):
+            cur.append(line)
+            m = re.match(r"^            label: (.*)$", line)
+            if m:
+                blocks[m.group(1).strip().strip('"')] = cur
+        else:
+            cur = None
+    return {k: [l for l in v if l.strip()] for k, v in blocks.items()}
+
+
+def keep_edited(block, lamps):
+    """An edited room as it is in the YAML, with its lamps list brought up to date (new lamps, removed lamps)."""
+    out, i = [], 0
+    while i < len(block):
+        if block[i] == "              lamps:":
+            i += 1
+            while i < len(block) and block[i].startswith("                "):
+                i += 1
+            continue
+        out.append(block[i])
+        i += 1
+    if lamps:
+        at = max(k for k, l in enumerate(out) if l.startswith("              ")) + 1  # end of the zoom block
+        out[at:at] = lamp_lines(lamps)
+    return out
+
+
 def render(plan):
     out = []
     for r in ROOMS[plan]:
         p = Panel()
         r["build"](p)
+        if OLD.get(r["label"], {}).get("edited") and r["label"] in BLOCKS:
+            out += keep_edited(BLOCKS[r["label"]], room_lamps(r, p))
+            print(f"{r['label']}: in de layout-editor aangepast (edited: true), alleen de lampjes bijgewerkt")
+            continue
         if r["outline"]:
             pts = r["outline"]
             lx, ly = r["label_at"] or LABEL_AT.get(r["label"]) or (min(p[0] for p in pts) + 6, min(p[1] for p in pts) + 6)
@@ -637,12 +684,17 @@ def render(plan):
             out += [f"                  - {s}" for s in p.below]
         lamps = room_lamps(r, p)
         if lamps:
-            out.append("              lamps:")
-            out += [f"                - {{ entity: {e}, x: {x}, y: {y}, label: {q(lbl)} }}" for lbl, e, (x, y) in lamps]
+            out += lamp_lines(lamps)
     return out
 
 
 text = open(yaml_path, encoding="utf-8").read()
+# The zones as they are now: lamp places from the layout editor and rooms marked `edited` are kept.
+for v in yaml.safe_load(text)["views"]:
+    for it in (v.get("cards") or [{}])[0].get("items") or []:
+        if isinstance(it, dict) and it.get("type") == "zone" and it.get("zoom"):
+            OLD[str(it.get("label"))] = it
+BLOCKS = old_blocks(text)
 
 head = ["          # ---- ruimtes: tik = inzoomen, rechts alle lampen en apparaten van die ruimte ----",
         "          # Oranje = er brandt licht, rood knipperend = lekalarm. Plaats en maat per ruimte zijn een eerste schatting.",
