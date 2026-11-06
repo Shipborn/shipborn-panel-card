@@ -93,7 +93,8 @@ views:
                 - { entity: light.mc_s_3a_dl_bbv_d11_3, x: 613, y: 181, label: BBV (2 spots) }
                 - { entity: light.mc_s_3a_dl_sbv_d11_5, x: 633, y: 301, label: SBV (2 spots) }
                 - { entity: light.mc_s_3a_dl_v_d11_4, x: 638, y: 231, label: Voor (2 spots) }
-                - { entity: light.mc_s_3b_trap_d9, points: [[560, 231], [575, 246]], label: Salon plinten }
+                - { entity: light.mc_s_3b_trap_d9, points: [[550, 231], [570, 231]], label: Salon plinten }
+                - { entity: light.mc_s_3b_trap_d9, points: [[565, 246], [585, 246]], label: Salon plinten }
                 - { entity: light.mc_s_3a_dl_bba_d11_1, x: 516, y: 186, label: BBA (2 spots) }
                 - { entity: light.mc_s_3a_dl_bbm_d11_2, x: 577, y: 181, label: BBM (2 spots) }
                 - { entity: light.mc_s_3a_dl_bbv_d11_3, x: 633, y: 196, label: BBV (2 spots) }
@@ -261,8 +262,8 @@ views:
                 - { entity: light.oc_s_1b_laag_sbm_d15, x: 319, y: 609, label: SBM (2 spots) }
                 - { entity: light.oc_s_1b_laag_bbv_d9, x: 387, y: 465, label: BBV (2 spots) }
                 - { entity: light.oc_s_1b_laag_sbv_d14, x: 387, y: 569, label: SBV (2 spots) }
-                - { entity: light.oc_s_1b2_led_bed_d12, points: [[350, 486], [350, 521]], label: Plinten bed }
-                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[270, 553], [280, 553], [290, 553], [315, 553], [355, 548], [385, 558], [385, 473], [355, 468]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_bed_d12, points: [[335, 521], [365, 521]], label: Plinten bed }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[276, 553], [284, 553]], label: Plinten trappen }
                 - { entity: light.oc_s_2a_douche_d18_1, x: 460, y: 465, label: Douche (spot) }
                 - { entity: light.oc_s_2a_wasbak_d17, x: 407, y: 448, label: Wasbak (spot) }
                 - { entity: light.oc_s_2a_wc_d18, x: 414, y: 489, label: WC (2 spots) }
@@ -272,8 +273,16 @@ views:
                 - { entity: light.oc_s_1b_laag_bba_d11, x: 302, y: 440, label: BBA (2 spots) }
                 - { entity: light.oc_s_1b_laag_bbm_d10, x: 334, y: 420, label: BBM (2 spots) }
                 - { entity: light.oc_s_1b_laag_bbv_d9, x: 352, y: 420, label: BBV (2 spots) }
+                - { entity: light.oc_s_1b2_led_bed_d12, points: [[335, 486], [365, 486]], label: Plinten bed }
                 - { entity: light.oc_s_2a_wasbak_d17, x: 432, y: 448, label: Wasbak (spot) }
                 - { entity: light.oc_s_2a_wc_d18, x: 434, y: 489, label: WC (2 spots) }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[266, 553], [274, 553]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[286, 553], [294, 553]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[341, 548], [369, 548]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[304, 553], [326, 553]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[341, 468], [369, 468]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[371, 473], [399, 473]], label: Plinten trappen }
+                - { entity: light.oc_s_1b2_led_vloer_d8, points: [[371, 558], [399, 558]], label: Plinten trappen }
                 - { entity: light.oc_1c2, x: 454, y: 560, label: Hal bad (6) }
                 - { entity: light.oc_1c2, x: 484, y: 560, label: Hal bad (6) }
                 - { entity: light.oc_1c2, x: 424, y: 595, label: Hal bad (6) }
@@ -354,7 +363,8 @@ views:
               lamps:
                 - { entity: light.mc_s_5a_d_lr_d18, x: 735, y: 465, label: Scheiding lounge }
                 - { entity: light.mc_s_5b_raam_kast_d13, x: 670, y: 399, label: Kast + patrijspoort }
-                - { entity: light.mc_s_5c_plint_d14, points: [[647, 442], [719, 442]], label: Plinten kast }
+                - { entity: light.mc_s_5c_plint_d14, points: [[704, 442], [734, 442]], label: Plinten kast }
+                - { entity: light.mc_s_5c_plint_d14, points: [[632, 442], [662, 442]], label: Plinten kast }
                 - { entity: light.mc_s_5a_d_lr_d18, x: 735, y: 505, label: Scheiding lounge }
                 - { entity: light.mc_s_5b_raam_kast_d13, x: 698, y: 401, label: Kast + patrijspoort }
           - type: zone
@@ -398,8 +408,9 @@ views:
                 - { entity: light.g_s_4a_kookplaat_d3, x: 717, y: 588, label: Kookplaat }
                 - { entity: light.g_s_4a_raam_d2, x: 652, y: 627, label: Patrijs (2) }
                 - { entity: light.g_s_4a_vaatw_d4, x: 691, y: 563, label: Vaatwasser }
-                - { entity: light.g_s_4b_led_kast_d5, points: [[611, 617], [716, 617]], label: Onder kastjes }
+                - { entity: light.g_s_4b_led_kast_d5, points: [[701, 617], [731, 617]], label: Onder kastjes }
                 - { entity: light.g_s_4a_raam_d2, x: 682, y: 627, label: Patrijs (2) }
+                - { entity: light.g_s_4b_led_kast_d5, points: [[596, 617], [626, 617]], label: Onder kastjes }
           - type: zone
             points: [[734, 397], [840, 412], [905, 424], [905, 545], [734, 545]]
             label_at: [740, 404]
@@ -460,7 +471,7 @@ views:
                 - { entity: light.mc_s_7ae_bank_4_d28, x: 787, y: 415, label: Bank 2 (spot) }
                 - { entity: light.mc_s_7af_bank_5_d27, x: 787, y: 450, label: Bank 3 (spot) }
                 - { entity: light.mc_s_7ag_bank_6_d26, x: 842, y: 450, label: Bank 4 (spot) }
-                - { entity: light.mc_s_7ak_plint_d34, points: [[777, 485], [817, 460], [857, 485]], label: Lounge plinten }
+                - { entity: light.mc_s_7ak_plint_d34, points: [[842, 485], [872, 485]], label: Lounge plinten }
                 - { entity: light.mc_s_7ai_raam_d33, x: 807, y: 415, label: Lounge patrijspoort }
                 - { entity: light.mc_s_7b_gang_d36, x: 797, y: 530, label: Gang (2) }
                 - { entity: light.mc_s_7b_kast_d35, x: 892, y: 450, label: Kast (2) }
@@ -472,6 +483,8 @@ views:
                 - { entity: light.mc_s_7aj_mast_d24, x: 751, y: 532, label: Mast }
                 - { entity: light.mc_s_7a_tafel_d25, x: 828, y: 488, label: Tafel (2 spots) }
                 - { entity: light.mc_s_7ac_bank_2_d30, x: 751, y: 471, label: Dwars 2 (spot) }
+                - { entity: light.mc_s_7ak_plint_d34, points: [[802, 460], [832, 460]], label: Lounge plinten }
+                - { entity: light.mc_s_7ak_plint_d34, points: [[762, 485], [792, 485]], label: Lounge plinten }
           - type: zone
             points: [[910, 425], [1000, 452], [1040, 462], [1040, 567], [1000, 577], [910, 602]]
             label_at: [916, 434]
@@ -520,11 +533,12 @@ views:
                 - { entity: light.cc_s_11a_zitje_d5, x: 936, y: 559, label: Zitjes (2 spots) }
                 - { entity: light.cc_s_11a_tafel_d7, x: 956, y: 557, label: Tafel (spot) }
                 - { entity: light.cc_s_11b_gang_d11, x: 931, y: 534, label: Hal (2 spots) }
-                - { entity: light.cc_s_11b_plint_d8, points: [[954, 517], [954, 542]], label: Plinten }
+                - { entity: light.cc_s_11b_plint_d8, points: [[943, 517], [965, 517]], label: Plinten }
                 - { entity: light.cc_12a, x: 1009, y: 534, label: Toilet (4 spots) }
                 - { entity: light.cc_s_11b_kasten_d12, points: [[937, 459], [967, 459]], label: Kasten ledstrip }
                 - { entity: light.cc_s_11a_bed_d6, x: 981, y: 476, label: Bed (2 spots) }
                 - { entity: light.cc_s_11a_zitje_d5, x: 976, y: 549, label: Zitjes (2 spots) }
+                - { entity: light.cc_s_11b_plint_d8, points: [[943, 542], [965, 542]], label: Plinten }
                 - { entity: light.cc_s_11b_gang_d11, x: 976, y: 524, label: Hal (2 spots) }
                 - { entity: light.cc_12a, x: 1029, y: 534, label: Toilet (4 spots) }
                 - { entity: light.cc_12a, x: 1009, y: 494, label: Toilet (4 spots) }

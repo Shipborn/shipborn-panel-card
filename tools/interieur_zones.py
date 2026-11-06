@@ -524,8 +524,9 @@ room("deck", "Dekverlichting", (814, 144, 332, 166), deck_lights,
 # (entity: (x, y), page coordinates) when it is wrong; that wins over the estimate. A place set in the layout editor
 # (already in the YAML) wins over both, so dragging a lamp there is never undone by generating again. A lamp may have
 # several entries (one light for several fittings, e.g. "BBA (2 spots)"): all of them are kept.
-# LED strips (plint / led / strip in the name) are lines, `points: [[x, y], …]`, not dots. A strip that only has dots
-# in the YAML becomes one line through them; a new strip gets a short line at its estimated place.
+# LED strips (plint / led / strip in the name) are lines, `points: [[x, y], …]`, not dots. Several entries of one
+# strip light are separate strips on the same circuit. A strip that only has dots in the YAML gets a short line at each
+# dot (to be drawn to its real length in the layout editor); a new strip gets one at its estimated place.
 LAMP_AT = {}
 STRIP = re.compile(r"plint|led|strip", re.I)
 OLD = {}  # label -> the zone as it is now in the YAML (lamp places, `edited`), filled before rendering
@@ -586,9 +587,10 @@ def room_lamps(r, p):
         strip = bool(STRIP.search(lbl + " " + e))
         if e in kept:
             ents = kept[e]
-            if strip and not any(k == "pts" for _, (k, _) in ents):
-                dots = [v for _, (_, v) in ents]
-                ents = [(ents[0][0], ("pts", strip_through(dots)))]
+            if strip:  # dots become short lines, shorter when another strip of this light is close by
+                dots = [v for _, (k, v) in ents if k == "dot"]
+                gap = lambda v: min([((v[0] - d[0]) ** 2 + (v[1] - d[1]) ** 2) ** 0.5 for d in dots if d != v] or [99])
+                ents = [(n, as_lamp(v, True, min(15, 0.45 * gap(v))) if k == "dot" else (k, v)) for n, (k, v) in ents]
             placed += [(lbl, e, v, n) for n, v in ents]
         elif e in LAMP_AT:
             placed.append((lbl, e, as_lamp(LAMP_AT[e], strip), None))
@@ -632,22 +634,9 @@ def room_lamps(r, p):
     return [(lbl, e, ("pts", rnd(v)) if kind == "pts" else ("dot", (round(v[0]), round(v[1])))) for lbl, e, (kind, v), _ in out]
 
 
-def as_lamp(pt, strip):
-    """A dot at pt, or for an LED strip a short horizontal line through it."""
-    return ("pts", [[pt[0] - 15, pt[1]], [pt[0] + 15, pt[1]]]) if strip else ("dot", pt)
-
-
-def strip_through(dots):
-    """An LED strip through dots placed by hand: from the leftmost, each time on to the nearest (one dot: a short line)."""
-    if len(dots) == 1:
-        return as_lamp(dots[0], True)[1]
-    rest = sorted(dots)
-    line = [rest.pop(0)]
-    while rest:
-        nxt = min(rest, key=lambda d: (d[0] - line[-1][0]) ** 2 + (d[1] - line[-1][1]) ** 2)
-        rest.remove(nxt)
-        line.append(nxt)
-    return [list(d) for d in line]
+def as_lamp(pt, strip, half=15):
+    """A dot at pt, or for an LED strip a short horizontal line through it (half its length either side)."""
+    return ("pts", [[pt[0] - half, pt[1]], [pt[0] + half, pt[1]]]) if strip else ("dot", pt)
 
 
 def spot(t):
