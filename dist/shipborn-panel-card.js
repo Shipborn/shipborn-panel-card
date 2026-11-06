@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.24";
+const VERSION = "0.5.25";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -528,6 +528,34 @@ const TC_STYLE =
   .tc-dock { position: fixed; z-index: 4; overflow: hidden; background: var(--surface); }
   .tc-dock-top { top: var(--header-height, 0px); }
   .tc-dock-bottom { bottom: 0; }
+  /* phone layout */
+  .ph-sec { overflow: hidden; }
+  .ph-sec.ph-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border-radius: var(--radius-md); }
+  .ph-size { position: relative; }
+  .ph-in, .ph-c { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .ph-blk { position: absolute; }
+  .tc-sb-phone { grid-template-columns: auto 1fr auto; grid-template-rows: 56px auto; padding: 0 var(--space-4); column-gap: var(--space-3); }
+  .tc-sb-phone .tc-sb-stat, .tc-sb-phone .tc-sb-time { display: none; }
+  .tc-sb-phone .tc-sb-logo { height: 20px; }
+  .tc-sb-phone .tc-sb-title { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tc-sb-phone .tc-sb-right { gap: var(--space-3); }
+  .tc-sb-phone .tc-sb-tabs { grid-column: 1 / -1; grid-row: 2; justify-self: stretch; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
+  .tc-sb-phone .tc-sb-tab { flex: 0 0 auto; height: 32px; padding: 0 var(--space-3); }
+  .tc-nb-phone .tc-nav-item { min-width: 0; gap: 3px; padding: 0; }
+  .tc-nb-phone .tc-nav-icon svg { width: 22px; height: 22px; }
+  .tc-nb-phone .nav { font-size: 9.5px; letter-spacing: 0; }
+  .ph-zoom { position: fixed; z-index: 3; display: none; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); -webkit-overflow-scrolling: touch; }
+  .ph-zpage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .ph-zh { position: absolute; left: 0; height: 56px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px 0 16px; }
+  .ph-zh .d-ph { font-size: 17px; color: var(--ink); }
+  .ph-zh .d-btn { width: auto; height: 42px; padding: 0 14px; font-size: 15px; }
+  .ph-zdraw { position: absolute; overflow: hidden; border-radius: var(--radius-md); border: 1px solid var(--line); }
+  .ph-zdraw .zi { position: absolute; left: 0; top: 0; }
+  .ph-zdraw .zm { position: absolute; box-sizing: border-box; border: 3px solid var(--accent); border-radius: 8px; pointer-events: none; }
+  .ph-zdraw .zm.poly { border: none; }
+  .ph-zdraw .zm.poly svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .ph-zdraw .zm.poly polygon { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .ph-zblk { position: absolute; transform-origin: 0 0; }
   .tc-rotate { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     padding: 24px; text-align: center; background: var(--bg); color: var(--ink); }
   .tc-rotate svg { color: var(--accent); }
@@ -685,6 +713,8 @@ const isOn = (stateObj, onStates) =>
   (onStates ? [].concat(onStates).map(String).includes(stateObj.state) : ON_STATES.includes(stateObj.state));
 const unavailable = (stateObj) => !stateObj || stateObj.state === "unavailable";
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+// Design width of the phone layout (a phone is about 390 CSS px wide upright).
+const PHONE_W = 390;
 // A phone: the short side of the window is under 600 px (tablets and laptops are wider).
 const isPhone = () => Math.min(innerWidth, innerHeight) < 600;
 // `factor` converts raw values, e.g. 0.00001 for a Wago level of 7894954 → 78.9 %.
@@ -1027,6 +1057,9 @@ class ShipbornPanelCard extends HTMLElement {
     this._themeHooks = [];
     this._docks = [];
     this._contentH = 0;
+    this._phoneTop = 56;
+    this._phoneBottom = 100;
+    this._pz = new Map(); // phone zoom views, built on first use
     this._scale = 0; // the new panel is not scaled yet (_contentBottom measures it)
     root.innerHTML = `<style>${STYLE}${this._tc ? TC_STYLE : ""}</style>`;
     this._outer = h("div", "outer");
@@ -1046,6 +1079,9 @@ class ShipbornPanelCard extends HTMLElement {
       node.dataset.i = i; // lets the layout editor (demo/editor.html) find an item's node
       this._panel.appendChild(node);
     });
+    // Phone held upright: the same nodes, rearranged into a narrow page (needs the page in the document to measure).
+    if (this._phone && this.isConnected) this._phoneLayout();
+    else this._phone = false;
 
     this._ro?.disconnect();
     this._ro = null;
@@ -1055,12 +1091,19 @@ class ShipbornPanelCard extends HTMLElement {
   _fit() {
     const w = this._outer.clientWidth;
     if (!w) return;
+    // Phone upright ⇄ anything else: rebuild with the other layout.
+    if (this._wantPhone() !== !!this._phone) {
+      this._phone = this._wantPhone();
+      this._build();
+      if (this._hass) this.hass = this._hass;
+      return;
+    }
     let s = Math.min(w / this._W, this._config.max_scale || 4);
     let H = this._H;
     // TC90 page with fixed bars: as tall as its content plus room for the icon bar; locked when it fits the screen.
     // Shrinking to fit is off by default (fit_tolerance: 1), so every page shows at the same size.
     if (this._docks.length) {
-      H = Math.min(this._H, this._contentBottom() + 12 + 88);
+      H = Math.min(this._H, this._contentBottom() + 12 + (this._phone ? 64 : 88));
       const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
       // A screen wider than the design (laptop, desktop monitor): fit a whole design screen (`screen_height`, 800) in
       // the height, so pages do not scroll and every page keeps the same size; the page sits in the middle and the
@@ -1069,7 +1112,7 @@ class ShipbornPanelCard extends HTMLElement {
       if (this._config.fit_screen !== false && !isPhone() && avail / ref < s) s = Math.max(0.3, avail / ref);
       if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1)) s = avail / H;
       this._lockScroll((!!this._kiosk && H * s <= avail + 1) || !!this._zoomLock);
-      this._rotateHint(isPhone() && innerHeight > innerWidth);
+      this._rotateHint(this._config.phone === false && isPhone() && innerHeight > innerWidth);
     }
     this._scale = s; // popups (zone) open at the same scale
     this._panel.style.transform = `scale(${s})`;
@@ -1085,6 +1128,180 @@ class ShipbornPanelCard extends HTMLElement {
       }
     }
     this._zoomRelayout?.();
+  }
+
+  // The phone layout is used on a phone held upright, for TC90 pages with fixed bars (`phone: false` turns it off).
+  _wantPhone() {
+    const c = this._config;
+    return !!(c.design === "tc90" && c.phone !== false && c.dock !== false && isPhone() && innerHeight > innerWidth);
+  }
+
+  // Phone layout: the page's own nodes (already rendered for the wide screen) are measured and moved into a narrow
+  // page (PHONE_W design px) of sections under each other. A panel, a "sheet" (a large `line`) or a loose group of items
+  // is reflowed: its columns are stacked, or put side by side two by two when they fit. A drawing (`image`) with the
+  // items on it is scaled to the width, a schema (`hull`) is a strip to swipe sideways. `phone_order` (list of
+  // section numbers, in the order of the wide page) changes the order; `phone_hide` hides sections.
+  _phoneLayout() {
+    const PW = PHONE_W;
+    const M = 10;
+    const CW = PW - 2 * M;
+    const panel = this._panel;
+    const base = panel.getBoundingClientRect();
+    const items = this._config.items;
+    const boxOf = (n) => {
+      const r = n.getBoundingClientRect();
+      return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height };
+    };
+    const all = [...panel.children]
+      .filter((n) => n.dataset?.i != null)
+      .map((n) => ({ n, it: items[+n.dataset.i], b: boxOf(n) }));
+    const area = (b) => b.w * b.h;
+    const inside = (R, b) => {
+      const cx = b.x + b.w / 2;
+      const cy = b.y + b.h / 2;
+      return cx >= R.x && cx <= R.x + R.w && cy >= R.y && cy <= R.y + R.h;
+    };
+    // Regions: containers with a background (panel, sheet) and pictures (image, hull); the smallest one holding an
+    // item's centre gets it.
+    const regions = [];
+    for (const o of all) {
+      const t = o.it.type;
+      const kind = t === "panel" ? "box" : t === "line" && o.b.h > 100 && o.b.w > 200 ? "box" : t === "image" ? "image" : t === "hull" ? "hull" : null;
+      if (kind) regions.push({ kind, b: o.b, bg: o, items: [] });
+    }
+    const loose = [];
+    for (const o of all) {
+      if (regions.some((r) => r.bg === o)) continue;
+      const own = regions.filter((r) => inside(r.b, o.b)).sort((a, b) => area(a.b) - area(b.b))[0];
+      (own ? own.items : loose).push(o);
+    }
+    // A picture inside a sheet: the sheet only gives the picture its background.
+    for (const r of regions.filter((r) => r.kind === "image" || r.kind === "hull")) {
+      const sheet = regions.filter((q) => q !== r && q.kind === "box" && inside(q.b, r.b) && !q.items.length).sort((a, b) => area(a.b) - area(b.b))[0];
+      if (sheet) {
+        r.sheet = sheet.bg;
+        sheet.drop = true;
+      }
+    }
+    // Loose items: groups of items close to each other (≤ 16 px apart).
+    const groups = [];
+    for (const o of loose) {
+      const near = (g) => g.some((q) => o.b.x < q.b.x + q.b.w + 16 && q.b.x < o.b.x + o.b.w + 16 && o.b.y < q.b.y + q.b.h + 16 && q.b.y < o.b.y + o.b.h + 16);
+      const hit = groups.filter(near);
+      const g = hit.length ? hit[0] : [];
+      if (!hit.length) groups.push(g);
+      g.push(o);
+      for (const other of hit.slice(1)) {
+        g.push(...other);
+        groups.splice(groups.indexOf(other), 1);
+      }
+    }
+    const bbox = (os) => {
+      const x = Math.min(...os.map((o) => o.b.x));
+      const y = Math.min(...os.map((o) => o.b.y));
+      return { x, y, w: Math.max(...os.map((o) => o.b.x + o.b.w)) - x, h: Math.max(...os.map((o) => o.b.y + o.b.h)) - y };
+    };
+    for (const g of groups) regions.push({ kind: "group", b: bbox(g), items: g });
+    let list = regions.filter((r) => !r.drop && (r.items.length || r.kind !== "box")).sort((a, b) => a.b.y - b.b.y || a.b.x - b.b.x);
+    if (this._config.phone_order) list = this._config.phone_order.map((k) => list[k]).filter(Boolean).concat(list.filter((r, k) => !this._config.phone_order.includes(k)));
+    const hide = this._config.phone_hide || [];
+    const keep = new Set();
+
+    // Columns of a container: items wider than 60 % of it span all columns; the rest is split where nothing overlaps
+    // horizontally, and neighbouring columns share a row while together ≤ PACK wide.
+    const PACK = 480;
+    const blocksOf = (os, R) => {
+      if (R.w <= PACK || os.length < 2) return [{ os, b: bbox(os) }];
+      const span = os.filter((o) => o.b.w > R.w * 0.6);
+      const rest = os.filter((o) => !span.includes(o)).sort((a, b) => a.b.x - b.b.x);
+      const cols = [];
+      for (const o of rest) {
+        const c = cols[cols.length - 1];
+        if (c && o.b.x < c.x1 - 4) {
+          c.os.push(o);
+          c.x1 = Math.max(c.x1, o.b.x + o.b.w);
+        } else cols.push({ x0: o.b.x, x1: o.b.x + o.b.w, os: [o] });
+      }
+      const packs = [];
+      for (const c of cols) {
+        const p = packs[packs.length - 1];
+        if (p && c.x1 - p.x0 <= PACK) {
+          p.os.push(...c.os);
+          p.x1 = c.x1;
+        } else packs.push({ x0: c.x0, x1: c.x1, os: [...c.os] });
+      }
+      const top = rest.length ? Math.min(...rest.map((o) => o.b.y)) : Infinity;
+      const blocks = packs.map((p) => ({ os: p.os, b: bbox(p.os) }));
+      const before = span.filter((o) => o.b.y < top).map((o) => ({ os: [o], b: o.b }));
+      const after = span.filter((o) => o.b.y >= top).map((o) => ({ os: [o], b: o.b }));
+      return [...before, ...blocks, ...after];
+    };
+
+    let Y = this._phoneTop + 12;
+    const frag = document.createDocumentFragment();
+    const add = (sec, hh) => {
+      sec.style.top = Y + "px";
+      frag.appendChild(sec);
+      Y += hh + 12;
+    };
+    list.forEach((r, k) => {
+      if (hide.includes(k)) return;
+      const sec = h("div", "item ph-sec", { left: M + "px", width: CW + "px" });
+      if (r.kind === "image" || r.kind === "hull" || r.b.w <= PACK) {
+        // As a whole (with what sticks out of it, e.g. hotspots): an image fits the width, a schema scrolls sideways at
+        // a readable size, and a container that is narrow enough keeps its own layout, a little larger on the phone.
+        const R = bbox(r.bg ? [r.bg, ...r.items] : r.items);
+        const sc = r.kind === "hull" ? Math.min(1, Math.max(CW / R.w, 0.55)) : Math.min(r.kind === "image" ? 1 : 1.3, CW / R.w);
+        const inner = h("div", "ph-in", { width: R.w + "px", height: R.h + "px", transform: `scale(${sc})` });
+        const cont = h("div", "ph-c", { transform: `translate(${-R.x}px, ${-R.y}px)` });
+        if (r.sheet) inner.style.background = getComputedStyle(r.sheet.n).backgroundColor || "";
+        for (const o of r.bg ? [r.bg, ...r.items] : r.items) cont.appendChild(o.n);
+        inner.appendChild(cont);
+        const sizer = h("div", "ph-size", { width: R.w * sc + "px", height: R.h * sc + "px" });
+        sizer.appendChild(inner);
+        sec.appendChild(sizer);
+        sec.style.height = R.h * sc + "px";
+        if (R.w * sc > CW + 1) sec.classList.add("ph-scroll");
+        return add(sec, R.h * sc);
+      }
+      // A container: its blocks under each other, at one scale for the whole section.
+      const R = r.b;
+      const blocks = blocksOf(r.items, R);
+      const isBox = r.kind === "box";
+      const firstY = r.items.length ? Math.min(...r.items.map((o) => o.b.y)) : R.y;
+      const head = isBox ? clamp(firstY - R.y, 0, 64) : 0;
+      const pad = isBox ? clamp(Math.min(...blocks.map((bk) => bk.b.x)) - R.x, 8, 24) : 0;
+      const widest = Math.max(...blocks.map((bk) => bk.b.w)) + 2 * pad;
+      const sc = Math.min(1, CW / widest);
+      const SW = CW / sc;
+      const inner = h("div", "ph-in", { width: SW + "px", transform: `scale(${sc})` });
+      let y = head;
+      for (const bk of blocks) {
+        const wrap = h("div", "ph-blk", { left: pad + "px", top: y + "px", width: bk.b.w + "px", height: bk.b.h + "px" });
+        const cont = h("div", "ph-c", { transform: `translate(${-bk.b.x}px, ${-bk.b.y}px)` });
+        for (const o of bk.os) cont.appendChild(o.n);
+        wrap.appendChild(cont);
+        inner.appendChild(wrap);
+        y += bk.b.h + 12;
+      }
+      const H = y - 12 + (isBox ? 18 : 0);
+      if (isBox) {
+        Object.assign(r.bg.n.style, { left: "0px", top: "0px", width: SW + "px", height: H + "px" });
+        inner.prepend(r.bg.n);
+      }
+      inner.style.height = H + "px";
+      sec.appendChild(inner);
+      sec.style.height = H * sc + "px";
+      add(sec, H * sc);
+    });
+    // Everything not placed (hidden sections, regions without a node) leaves the page.
+    for (const o of all) if (!frag.contains(o.n)) o.n.remove();
+    panel.querySelector(".shape")?.remove();
+    panel.appendChild(frag);
+    this._W = PW;
+    this._H = Y + this._phoneBottom;
+    Object.assign(panel.style, { width: PW + "px", height: this._H + "px" });
+    this._contentH = 0;
   }
 
   // Phone held upright: the 1280 px wide screens would be tiny, so suggest turning it; "Toch zo bekijken" hides the
@@ -1865,7 +2082,10 @@ class ShipbornPanelCard extends HTMLElement {
 
   // Top bar: logo, page title, status icons (lit in their tone while the entity is on), clock and theme button.
   _tStatusbar(s) {
-    const n = h("div", "tc-statusbar", { width: this._W + "px", height: "56px" });
+    // On a phone: a narrow bar (logo, title, clock, theme) with the sub-tabs on a second row that scrolls sideways.
+    const hh = this._phone ? (s.tabs ? 100 : 56) : 56;
+    if (this._phone) this._phoneTop = hh;
+    const n = h("div", "tc-statusbar" + (this._phone ? " tc-sb-phone" : ""), { width: (this._phone ? PHONE_W : this._W) + "px", height: hh + "px" });
     const ident = h("div", "tc-sb-ident");
     // The logo is a button: in kiosk mode it shows or hides HA's top bar and sidebar (the way to HA's other pages).
     const logoBtn = h("button", "tc-sb-logo-btn");
@@ -1931,8 +2151,12 @@ class ShipbornPanelCard extends HTMLElement {
       b.addEventListener("click", () => this._setTheme(TC_THEME_ORDER[(TC_THEME_ORDER.indexOf(this._theme) + 1) % TC_THEME_ORDER.length]));
       right.appendChild(b);
     }
-    n.append(ident, title, right);
-    return this._dockIt(n, "top", 56);
+    if (this._phone && s.tabs) {
+      const pt = h("div", "tc-sb-title title");
+      pt.textContent = s.title ?? "";
+      n.append(ident, pt, right, title);
+    } else n.append(ident, title, right);
+    return this._dockIt(n, "top", hh);
   }
 
   // Alarm bar: "Geen actieve alarmen" or the newest alarm on a blinking alarm surface, +N MEER; tap = alarm page.
@@ -1967,7 +2191,9 @@ class ShipbornPanelCard extends HTMLElement {
 
   // Icon navigation at the bottom; the item whose path matches the URL (or `active`) is highlighted, with an alarm badge.
   _tNavbar(nv) {
-    const n = h("nav", "tc-navbar", { width: this._W + "px", height: "88px" });
+    const hh = this._phone ? 64 : 88; // phone: smaller icons and labels, eight buttons in 390 px
+    if (this._phone) this._phoneBottom = hh + 12;
+    const n = h("nav", "tc-navbar" + (this._phone ? " tc-nb-phone" : ""), { width: (this._phone ? PHONE_W : this._W) + "px", height: hh + "px" });
     const items = (nv.items || []).map((it) => {
       const b = h("button", "tc-nav-item");
       b.type = "button";
@@ -1991,7 +2217,7 @@ class ShipbornPanelCard extends HTMLElement {
         badge.style.display = count ? "" : "none";
       }
     });
-    return this._dockIt(n, "bottom", 88);
+    return this._dockIt(n, "bottom", hh);
   }
 
   // Measured value with label, unit and a line below (sub / sub_entity); warn/alarm colours with a triangle.
@@ -2902,7 +3128,7 @@ class ShipbornPanelCard extends HTMLElement {
     if (z.label || z.value_entity) n.appendChild(chip);
     const pop = z.zoom ? this._dZoom(z) : z.popup ? this._dPopup(z.popup, z.label) : null;
     n.addEventListener("click", () =>
-      pop ? pop.open() : this._handleAction(z, z.tap_action || { action: z.entity ? "more-info" : "none" }, n)
+      this._phone && z.zoom ? this._phoneZoom(z) : pop ? pop.open() : this._handleAction(z, z.tap_action || { action: z.entity ? "more-info" : "none" }, n)
     );
     this._updaters.push((hass) => {
       const alarm = activeOf(hass, z.alarm_entity);
@@ -3110,6 +3336,102 @@ class ShipbornPanelCard extends HTMLElement {
         this._lockScroll(true);
         place(true);
         this._zoomRelayout = () => place(false);
+      },
+    };
+  }
+
+  // Zoomed room on a phone (upright): one column between the bars that scrolls – the room's part of the drawing with
+  // its lamps, then the strip under it (Webasto) and the side panel's items, each scaled to the phone's width.
+  _phoneZoom(z) {
+    this._pz ??= new Map();
+    let o = this._pz.get(z);
+    if (!o) {
+      o = this._buildPhoneZoom(z);
+      this._pz.set(z, o);
+      if (this._hass) this.hass = this._hass;
+    }
+    o.open();
+  }
+
+  _buildPhoneZoom(z) {
+    const zc = z.zoom;
+    const PW = PHONE_W;
+    const M = 10;
+    const CW = PW - 2 * M;
+    const zx = z.x || 0;
+    const zy = z.y ?? z.true ?? 0;
+    const zw = z.width || 100;
+    const zh = z.height || 100;
+    const img = [...this._images].reverse().find((i) => {
+      const iy = i.y ?? i.true ?? 0;
+      return zx + zw / 2 >= i.x && zx + zw / 2 <= i.x + i.width && zy + zh / 2 >= iy && zy + zh / 2 <= iy + i.height;
+    });
+    const ov = h("div", "tc ph-zoom");
+    ov.dataset.tcTheme = this._theme;
+    const page = h("div", "ph-zpage", { width: PW + "px" });
+    let y = 0;
+    const head = h("div", "zh ph-zh", { top: "0px", width: PW + "px" });
+    const t = h("div", "d-ph");
+    t.textContent = zc.title ?? z.label ?? "";
+    const back = h("button", "d-btn");
+    back.textContent = "← Terug";
+    head.append(t, back);
+    page.appendChild(head);
+    y += 60;
+    // The drawing, zoomed on the room.
+    const DH = Math.round(Math.min(320, Math.max(200, (CW * zh) / zw)));
+    const draw = h("div", "ph-zdraw", { left: M + "px", top: y + "px", width: CW + "px", height: DH + "px", background: zc.background ?? "var(--bg)" });
+    const inner = h("div", "zi", { width: "1px", height: "1px" });
+    if (img) inner.appendChild(this._renderItem({ ...img }));
+    const mark = h("div", "zm" + (z.points ? " poly" : ""), { left: zx + "px", top: zy + "px", width: zw + "px", height: zh + "px" });
+    if (z.points) mark.innerHTML = `<svg viewBox="0 0 ${zw} ${zh}"><polygon points="${polyPoints(z.points, zx, zy)}"/></svg>`;
+    inner.appendChild(mark);
+    for (const l of zc.lamps || [])
+      inner.appendChild(l.points?.length ? this._lampStrip(l) : this._lampDot(l, h("button", "zl", { left: l.x + "px", top: (l.y ?? l.true ?? 0) + "px" })));
+    const s = Math.min((CW / zw) * 0.9, (DH / zh) * 0.9, zc.max_scale ?? 4);
+    Object.assign(inner.style, { transformOrigin: "0 0", transform: `translate(${CW / 2 - (zx + zw / 2) * s}px, ${DH / 2 - (zy + zh / 2) * s}px) scale(${s})` });
+    mark.style.borderWidth = 3 / s + "px";
+    inner.style.setProperty("--zl", (zc.lamp_size ?? 22) / s + "px");
+    draw.appendChild(inner);
+    page.appendChild(draw);
+    y += DH + 12;
+    // A list of items in its own design width, scaled down to the phone when wider.
+    const block = (list, height) => {
+      const its = list || [];
+      if (!its.length) return;
+      const nodes = its.map((it) => this._renderItem(it)).filter(Boolean);
+      const bw = Math.max(...its.map((it) => (it.x || 0) + (it.width ?? it.size ?? 200)));
+      const sc = Math.min(1, CW / bw);
+      const box = h("div", "ph-zblk", { left: M + "px", top: y + "px", width: bw + "px", height: height + "px", transform: `scale(${sc})` });
+      box.append(...nodes);
+      page.appendChild(box);
+      y += height * sc + 12;
+    };
+    if (zc.below) block(zc.below.items, zc.below.height || 236);
+    block(zc.items, zc.height || 400);
+    page.style.height = y + "px";
+    const sizer = h("div", "ph-size");
+    sizer.appendChild(page);
+    ov.appendChild(sizer);
+    this._outer.appendChild(ov);
+    const close = () => {
+      ov.style.display = "none";
+      this._zoomLock = false;
+      this._fit();
+    };
+    back.addEventListener("click", close);
+    return {
+      open: () => {
+        const k = this._scale || 1;
+        const tops = this._docks.filter(([d]) => d.classList.contains("tc-dock-top")).map(([d]) => d.getBoundingClientRect().bottom);
+        const bots = this._docks.filter(([d]) => d.classList.contains("tc-dock-bottom")).map(([d]) => innerHeight - d.getBoundingClientRect().top);
+        const r = this._outer.getBoundingClientRect();
+        Object.assign(ov.style, { display: "block", top: Math.max(0, ...tops) + "px", bottom: Math.max(0, ...bots) + "px", left: r.left + "px", width: r.width + "px" });
+        page.style.transform = `scale(${k})`;
+        sizer.style.height = y * k + "px";
+        ov.scrollTop = 0;
+        this._zoomLock = true;
+        this._lockScroll(true);
       },
     };
   }
