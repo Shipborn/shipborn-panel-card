@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.22";
+const VERSION = "0.5.23";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -226,6 +226,17 @@ const STYLE = `
   .zl.on { background: #f7d046; box-shadow: 0 0 calc(var(--zl, 14px) * .7) calc(var(--zl, 14px) * .2) rgba(247, 208, 70, .75); }
   .zl.busy { border-style: dashed; }
   .zl:disabled { opacity: .35; cursor: default; }
+  /* LED strip (a lamp with points): a line along the wall; only the line itself is tappable */
+  .zl.strip { width: 1px; height: 1px; margin: 0; border: none; border-radius: 0; background: none; box-shadow: none; pointer-events: none; overflow: visible; }
+  .zl.strip.on { background: none; box-shadow: none; }
+  .zl.strip svg { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; }
+  .zl.strip polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .zl.strip .zs-hit { stroke: transparent; stroke-width: calc(var(--zl, 14px) * 1.2); pointer-events: stroke; cursor: pointer; }
+  .zl.strip .zs-case { stroke: #ffffff; stroke-width: calc(var(--zl, 14px) * .52); pointer-events: none; }
+  .zl.strip .zs-ln { stroke: #8b939b; stroke-width: calc(var(--zl, 14px) * .3); pointer-events: none; }
+  .zl.strip.on .zs-ln { stroke: #f7d046; filter: drop-shadow(0 0 calc(var(--zl, 14px) * .3) rgba(247, 208, 70, .9)); }
+  .zl.strip.busy .zs-ln { stroke-dasharray: calc(var(--zl, 14px) * .45) calc(var(--zl, 14px) * .35); }
+  .zl.strip:disabled .zs-hit { pointer-events: none; }
   .d-zoom .zp {
     position: absolute; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;
     opacity: 0; transform: translateX(40px); transition: opacity .35s .1s, transform .35s .1s;
@@ -2902,8 +2913,26 @@ class ShipbornPanelCard extends HTMLElement {
     return b;
   }
 
-  // Lamp as an item (x/y = its centre, `size` in px); the layout editor uses it to drag the lamps of a zoomed room.
+  // LED strip: a lamp with `points` ([[x, y], …], page coordinates) is drawn as a line through them instead of a dot.
+  _lampStrip(l) {
+    const pts = l.points;
+    const x0 = Math.min(...pts.map((p) => p[0]));
+    const y0 = Math.min(...pts.map((p) => p[1]));
+    const b = h("button", "zl strip", { left: x0 + "px", top: y0 + "px" });
+    const p = pts.map(([x, y]) => `${x - x0},${y - y0}`).join(" ");
+    b.innerHTML = `<svg><polyline class="zs-case" points="${p}"/><polyline class="zs-ln" points="${p}"/><polyline class="zs-hit" points="${p}"/></svg>`;
+    return this._lampDot(l, b);
+  }
+
+  // Lamp as an item (x/y = its centre, `size` in px; with `points` an LED strip); the layout editor uses it to drag
+  // the lamps of a zoomed room.
   _dLamp(l) {
+    if (l.points?.length) {
+      const b = this._lampStrip(l);
+      b.classList.add("item", "tc-lamp");
+      b.style.setProperty("--zl", (l.size || 14) + "px");
+      return b;
+    }
     const b = this._place(h("button", "zl tc-lamp"), { x: l.x, y: l.y ?? l.true }, null, null);
     b.style.setProperty("--zl", (l.size || 14) + "px");
     return this._lampDot(l, b);
@@ -2932,8 +2961,9 @@ class ShipbornPanelCard extends HTMLElement {
     const mark = h("div", "zm" + (z.points ? " poly" : ""), { left: zx + "px", top: zy + "px", width: zw + "px", height: zh + "px" });
     if (z.points) mark.innerHTML = `<svg viewBox="0 0 ${zw} ${zh}"><polygon points="${polyPoints(z.points, zx, zy)}"/></svg>`;
     inner.appendChild(mark);
-    // Lamps of the room on the drawing (`lamps: [{ entity, x, y, label }]`, page coordinates).
-    for (const l of zc.lamps || []) inner.appendChild(this._lampDot(l, h("button", "zl", { left: l.x + "px", top: (l.y ?? l.true ?? 0) + "px" })));
+    // Lamps of the room on the drawing (`lamps: [{ entity, x, y, label }]`, page coordinates; with `points` an LED strip).
+    for (const l of zc.lamps || [])
+      inner.appendChild(l.points?.length ? this._lampStrip(l) : this._lampDot(l, h("button", "zl", { left: l.x + "px", top: (l.y ?? l.true ?? 0) + "px" })));
     view.appendChild(inner);
     const side = h("div", "d-panel zp");
     const head = h("div", "zh");

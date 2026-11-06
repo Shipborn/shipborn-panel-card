@@ -522,8 +522,12 @@ room("deck", "Dekverlichting", (814, 144, 332, 166), deck_lights,
 # SB (starboard) = bottom (the bow points right), A / M / V (achter / midden / voor) = left / middle / right of the
 # room. Lamps without such a code are spread evenly over the rest of the room. Correct a place in LAMP_AT
 # (entity: (x, y), page coordinates) when it is wrong; that wins over the estimate. A place set in the layout editor
-# (already in the YAML) wins over both, so dragging a lamp there is never undone by generating again.
+# (already in the YAML) wins over both, so dragging a lamp there is never undone by generating again. A lamp may have
+# several entries (one light for several fittings, e.g. "BBA (2 spots)"): all of them are kept.
+# LED strips (plint / led / strip in the name) are lines, `points: [[x, y], …]`, not dots. A strip that only has dots
+# in the YAML becomes one line through them; a new strip gets a short line at its estimated place.
 LAMP_AT = {}
+STRIP = re.compile(r"plint|led|strip", re.I)
 OLD = {}  # label -> the zone as it is now in the YAML (lamp places, `edited`), filled before rendering
 
 
@@ -574,13 +578,20 @@ def room_lamps(r, p):
         return side, lon
 
     placed, free = [], []
-    kept = {l["entity"]: (l["x"], l.get("y", l.get(True))) for l in OLD.get(r["label"], {}).get("zoom", {}).get("lamps", []) or []}
+    kept = {}  # entity -> [(index in the YAML, ("dot", (x, y)) or ("pts", [[x, y], …]))]
+    for n, l in enumerate(OLD.get(r["label"], {}).get("zoom", {}).get("lamps", []) or []):
+        kept.setdefault(l["entity"], []).append((n, ("pts", l["points"]) if l.get("points") else ("dot", (l["x"], l.get("y", l.get(True))))))
     for lbl, e in rows:
         side, lon = code(lbl, e)
+        strip = bool(STRIP.search(lbl + " " + e))
         if e in kept:
-            placed.append((lbl, e, kept[e]))
+            ents = kept[e]
+            if strip and not any(k == "pts" for _, (k, _) in ents):
+                dots = [v for _, (_, v) in ents]
+                ents = [(ents[0][0], ("pts", strip_through(dots)))]
+            placed += [(lbl, e, v, n) for n, v in ents]
         elif e in LAMP_AT:
-            placed.append((lbl, e, LAMP_AT[e]))
+            placed.append((lbl, e, as_lamp(LAMP_AT[e], strip), None))
         elif side or lon:
             px = x0 + w * {"a": 0.22, "m": 0.5, "v": 0.78, None: 0.5}[lon]
             py = y0 + hh * {"bb": 0.22, "sb": 0.78, None: 0.5}[side]
@@ -589,34 +600,70 @@ def room_lamps(r, p):
                 if deep((px, py)):
                     break
                 px, py = px + (cx - px) * 0.15, py + (cy - py) * 0.15
-            placed.append((lbl, e, (px, py)))
+            placed.append((lbl, e, as_lamp((px, py), strip), None))
         else:
-            free.append((lbl, e))
+            free.append((lbl, e, strip))
     # spread the rest over a grid of points inside the room, away from the lamps already placed
     if free:
         need = len(free)
         d = max(w, hh) / 3
         while d > 6:
             pts = [(x0 + d / 2 + i * d, y0 + d / 2 + j * d) for j in range(int(hh // d) + 1) for i in range(int(w // d) + 1)]
-            pts = [pt for pt in pts if deep(pt) and all((pt[0] - q_[0]) ** 2 + (pt[1] - q_[1]) ** 2 >= (d * 0.8) ** 2 for _, _, q_ in placed)]
+            pts = [pt for pt in pts if deep(pt) and all((pt[0] - q_[0]) ** 2 + (pt[1] - q_[1]) ** 2 >= (d * 0.8) ** 2 for q_ in map(spot, placed))]
             if len(pts) >= need:
                 break
             d *= 0.85
         pts.sort(key=lambda pt: (pt[0], pt[1]))
         step = len(pts) / need
-        for k, (lbl, e) in enumerate(free):
-            placed.append((lbl, e, pts[int(k * step)] if pts else (cx, cy)))
-    # lamps that ended up on the same spot: spread them sideways
+        for k, (lbl, e, strip) in enumerate(free):
+            placed.append((lbl, e, as_lamp(pts[int(k * step)] if pts else (cx, cy), strip), None))
+    # new lamps that ended up on the spot of another: spread them sideways (places from the YAML stay as they are)
     out = []
-    for lbl, e, (px, py) in placed:
-        while any(abs(px - a) < 10 and abs(py - b) < 10 for _, _, (a, b) in out):
-            px += 12
-        out.append((lbl, e, (px, py)))
-    return [(lbl, e, (round(px), round(py))) for lbl, e, (px, py) in out]
+    for lbl, e, (kind, v), n in placed:
+        if n is None and kind == "dot":
+            px, py = v
+            while any(abs(px - a) < 10 and abs(py - b) < 10 for a, b in map(spot, out)):
+                px += 12
+            v = (px, py)
+        out.append((lbl, e, (kind, v), n))
+    # the order of the YAML first (so an unchanged room stays the same), new lamps after it
+    out.sort(key=lambda t: (t[3] is None, t[3] if t[3] is not None else 0))
+    rnd = lambda v: [[round(x), round(y)] for x, y in v]
+    return [(lbl, e, ("pts", rnd(v)) if kind == "pts" else ("dot", (round(v[0]), round(v[1])))) for lbl, e, (kind, v), _ in out]
+
+
+def as_lamp(pt, strip):
+    """A dot at pt, or for an LED strip a short horizontal line through it."""
+    return ("pts", [[pt[0] - 15, pt[1]], [pt[0] + 15, pt[1]]]) if strip else ("dot", pt)
+
+
+def strip_through(dots):
+    """An LED strip through dots placed by hand: from the leftmost, each time on to the nearest (one dot: a short line)."""
+    if len(dots) == 1:
+        return as_lamp(dots[0], True)[1]
+    rest = sorted(dots)
+    line = [rest.pop(0)]
+    while rest:
+        nxt = min(rest, key=lambda d: (d[0] - line[-1][0]) ** 2 + (d[1] - line[-1][1]) ** 2)
+        rest.remove(nxt)
+        line.append(nxt)
+    return [list(d) for d in line]
+
+
+def spot(t):
+    """A point of a placed lamp (the dot, or the first point of a strip) to keep new lamps away from it."""
+    kind, v = t[2]
+    return tuple(v) if kind == "dot" else tuple(v[0])
 
 
 def lamp_lines(lamps):
-    return ["              lamps:"] + [f"                - {{ entity: {e}, x: {x}, y: {y}, label: {q(lbl)} }}" for lbl, e, (x, y) in lamps]
+    out = ["              lamps:"]
+    for lbl, e, (kind, v) in lamps:
+        if kind == "pts":
+            out.append(f"                - {{ entity: {e}, points: [{', '.join(f'[{x}, {y}]' for x, y in v)}], label: {q(lbl)} }}")
+        else:
+            out.append(f"                - {{ entity: {e}, x: {v[0]}, y: {v[1]}, label: {q(lbl)} }}")
+    return out
 
 
 def old_blocks(segment):

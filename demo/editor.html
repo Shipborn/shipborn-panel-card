@@ -99,7 +99,7 @@
       Het label onder een symbool (bijv. Inlet V3) kun je los verslepen; de tekst pas je rechts aan bij <code>label</code>.<br>
       <kbd>Alt</kbd>+klik = onderdeel eronder kiezen.<br>
       Statusbalk en icoonbalk liggen vast: klik erop om titel, subtabs of knoppen te wijzigen. Een hotspot sleep je aan het bolletje (dat is <code>x</code>/<code>y</code>); het label wijst ervan weg (<code>side: left</code> = naar links).<br>
-      <b>Ruimte</b> (bovenin): bewerk een ingezoomde ruimte – de lampjes op de tekening verslepen, of de knoppen in het paneel rechts en de Webasto-blokken onder de tekening. Een ruimte waarvan je paneel of blokken aanpast krijgt <code>edited: true</code>: het script (<code>tools/interieur_zones.py</code>) laat die dan zoals hij is; lampplekken neemt het script altijd over.<br>
+      <b>Ruimte</b> (bovenin): bewerk een ingezoomde ruimte – de lampjes op de tekening verslepen, of de knoppen in het paneel rechts en de Webasto-blokken onder de tekening. Een ruimte waarvan je paneel of blokken aanpast krijgt <code>edited: true</code>: het script (<code>tools/interieur_zones.py</code>) laat die dan zoals hij is; lampplekken neemt het script altijd over. Een ledstrip is een lijn: versleep hem als geheel of per hoekpunt; dubbelklik op de lijn voegt een hoekpunt toe, op een hoekpunt haalt hem weg.<br>
       Daarna <b>Opslaan</b>, en in HA de YAML plakken (<b>Kopieer YAML</b>).
     </div>
   </aside>
@@ -202,13 +202,20 @@
     let doc, vi = 0, sel = [], hover = null, undo = [], redo = [], dirty = false, saved = "";
     // zr: the zoomed room being edited ({ zi: index of the zone on the screen, layer: lamps | items | below }), or null.
     let zr = null;
+    // zoff: page position of the lamps layer's origin (lamps keep page coordinates in the YAML); [0, 0] elsewhere.
+    let zoff = [0, 0];
     const viewItemsPath = () => ["views", vi, "cards", 0, "items"];
     const ZOOM_PATH = { lamps: ["zoom", "lamps"], items: ["zoom", "items"], below: ["zoom", "below", "items"] };
     const itemsPath = () => (zr ? [...viewItemsPath(), zr.zi, ...ZOOM_PATH[zr.layer]] : viewItemsPath());
     const itemsSeq = () => doc.getIn(itemsPath(), true);
     const items = () => itemsSeq().items.map((n) => n.toJSON());
     const viewCard = () => doc.getIn(["views", vi, "cards", 0], true).toJSON();
-    const cardCfg = () => (zr ? zoomCfg() : viewCard());
+    const cardCfg = () => (zr ? zoomCfg() : ((zoff = [0, 0]), viewCard()));
+    // Items drawn as a line: pipes, and LED strips (lamps with points) in the lamps layer. ptsOf gives their points
+    // in the coordinates of what the editor draws; thick is their line width.
+    const isLine = (it) => it?.type === "pipe" || (zr?.layer === "lamps" && !!it?.points);
+    const ptsOf = (it) => (it.type === "pipe" ? it.points : it.points.map(([x, y]) => [x - zoff[0], y - zoff[1]]));
+    const thick = (it) => (it.type === "pipe" ? it.thickness ?? 8 : 8);
     // Bounding box of a zone (its outline, or x/y/width/height).
     function zoneBox(z) {
       if (!z.points) return { x: z.x || 0, y: z.y ?? z.true ?? 0, w: z.width || 100, h: z.height || 100 };
@@ -228,7 +235,11 @@
       const b = zoneBox(z), m = 30;
       const ox = b.x - m, oy = b.y - m, w = Math.round(b.w + 2 * m), h = Math.round(b.h + 2 * m);
       const size = Math.max(4, Math.round((26 * w) / 1280));
-      const sh = (it) => { const o = { ...it, x: (it.x || 0) - ox, y: (it.y ?? it.true ?? 0) - oy }; delete o.true; return o; };
+      zoff = [ox, oy];
+      const sh = (it) => {
+        if (it.points) return { ...it, points: it.points.map(([x, y]) => [x - ox, y - oy]) }; // LED strip
+        const o = { ...it, x: (it.x || 0) - ox, y: (it.y ?? it.true ?? 0) - oy }; delete o.true; return o;
+      };
       const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
       const img = vc.items.filter((i) => i.type === "image").reverse()
         .find((i) => cx >= i.x && cx <= i.x + i.width && cy >= (i.y ?? i.true ?? 0) && cy <= (i.y ?? i.true ?? 0) + i.height);
@@ -376,7 +387,7 @@
     };
     const isBackground = (it, i) => {
       if (["hull", "panel"].includes(it.type)) return true;
-      const r = it.type === "pipe" ? null : rectOf(i);
+      const r = isLine(it) ? null : rectOf(i);
       return !!r && r.w * r.h > W() * H() * 0.08;
     };
     // Items under a design point, topmost first.
@@ -384,9 +395,9 @@
       const out = [];
       const tol = 6 / frame().s; // 6 screen pixels, whatever the zoom
       items().forEach((it, i) => {
-        if (it.type === "pipe") {
-          const pts = it.points || [];
-          for (let k = 1; k < pts.length; k++) if (segDist([x, y], pts[k - 1], pts[k]) <= (it.thickness ?? 8) / 2 + tol) { out.push(i); break; }
+        if (isLine(it)) {
+          const pts = ptsOf(it) || [];
+          for (let k = 1; k < pts.length; k++) if (segDist([x, y], pts[k - 1], pts[k]) <= thick(it) / 2 + tol) { out.push(i); break; }
           return;
         }
         if (inside([x, y], rectOf(i)) || (it.label && inside([x, y], labelRectOf(i)))) out.push(i);
@@ -406,15 +417,15 @@
       const box = (r, style) => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="none" ${style} pointer-events="none" vector-effect="non-scaling-stroke"/>`;
       if (hover != null && !sel.includes(hover) && its[hover]) {
         const it = its[hover];
-        if (it.type === "pipe") g += `<polyline points="${it.points.join(" ")}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="${(it.thickness ?? 8) + 6}" stroke-linejoin="round" pointer-events="none"/>`;
+        if (isLine(it)) g += `<polyline points="${ptsOf(it).join(" ")}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="${thick(it) + 6}" stroke-linejoin="round" pointer-events="none"/>`;
         else { const r = rectOf(hover); if (r) g += box(r, `stroke="#fff" stroke-opacity=".6" stroke-dasharray="4 3"`); }
       }
       for (const i of sel) {
         const it = its[i];
         if (!it) continue;
-        if (it.type === "pipe") {
-          g += `<polyline points="${it.points.join(" ")}" fill="none" stroke="var(--sel)" stroke-opacity=".55" stroke-width="${(it.thickness ?? 8) + 8}" stroke-linejoin="round" pointer-events="none"/>`;
-          if (sel.length === 1) it.points.forEach(([px, py], n) => {
+        if (isLine(it)) {
+          g += `<polyline points="${ptsOf(it).join(" ")}" fill="none" stroke="var(--sel)" stroke-opacity=".55" stroke-width="${thick(it) + 8}" stroke-linejoin="round" pointer-events="none"/>`;
+          if (sel.length === 1) ptsOf(it).forEach(([px, py], n) => {
             g += `<circle data-pt="${n}" cx="${px}" cy="${py}" r="${7 * k}" fill="#fff" stroke="var(--sel)" stroke-width="${2 * k}" style="cursor:grab"/>`;
           });
         } else {
@@ -461,13 +472,13 @@
     };
     const setIn = (i, key, v) => doc.setIn([...itemsPath(), i, key], v);
     function setPoints(i, pts) {
-      const node = doc.createNode(pts.map((p) => p.map(Math.round)));
+      const node = doc.createNode(pts.map(([x, y]) => [Math.round(x + zoff[0]), Math.round(y + zoff[1])]));
       node.flow = true;
       doc.setIn([...itemsPath(), i, "points"], node);
     }
     function moveItem(i, it, dx, dy) {
       if (FRAME.includes(it.type)) return;
-      if (it.type === "pipe") return setPoints(i, it.points.map(([x, y]) => [x + dx, y + dy]));
+      if (isLine(it)) return setPoints(i, ptsOf(it).map(([x, y]) => [x + dx, y + dy]));
       setIn(i, "x", Math.round((it.x || 0) + dx));
       if (it.true != null && it.y == null) setIn(i, "true", Math.round(it.true + dy));
       else setIn(i, "y", Math.round(yOf(it) + dy));
@@ -520,8 +531,8 @@
         const [x0, x1] = [Math.min(band.x0, band.x1), Math.max(band.x0, band.x1)];
         const [y0, y1] = [Math.min(band.y0, band.y1), Math.max(band.y0, band.y1)];
         const inside = items().map((it, i) => {
-          const r = it.type === "pipe" ? null : rectOf(i);
-          const pts = it.type === "pipe" ? it.points : r ? [[r.x, r.y], [r.x + r.w, r.y + r.h]] : [];
+          const r = isLine(it) ? null : rectOf(i);
+          const pts = isLine(it) ? ptsOf(it) : r ? [[r.x, r.y], [r.x + r.w, r.y + r.h]] : [];
           return pts.length && pts.every(([x, y]) => x >= x0 && x <= x1 && y >= y0 && y <= y1) ? i : -1;
         }).filter((i) => i >= 0);
         sel = [...new Set([...band.add, ...inside])];
@@ -541,7 +552,7 @@
       }
       if (drag.kind === "move") for (const [i, it] of drag.orig) moveItem(i, it, snap(dx), snap(dy));
       else if (drag.kind === "point") {
-        const pts = drag.orig.points.map((p) => [...p]);
+        const pts = ptsOf(drag.orig).map((p) => [...p]);
         let [x, y] = [snap(pts[drag.n][0] + dx), snap(pts[drag.n][1] + dy)];
         // Keep pipe runs straight: lock onto a neighbour's axis when close.
         for (const nb of [pts[drag.n - 1], pts[drag.n + 1]]) if (nb) {
@@ -574,11 +585,11 @@
     ov.addEventListener("pointerup", end);
     ov.addEventListener("pointercancel", end);
     ov.addEventListener("pointerleave", () => { if (!drag && hover != null) { hover = null; draw(); } });
-    // Double-click on a selected pipe: add a bend point, or remove the one under the pointer.
+    // Double-click on a selected pipe or LED strip: add a bend point, or remove the one under the pointer.
     function editPoints(e) {
       const it = items()[sel[0]];
-      if (sel.length !== 1 || it?.type !== "pipe") return false;
-      const pts = it.points.map((p) => [...p]);
+      if (sel.length !== 1 || !isLine(it)) return false;
+      const pts = ptsOf(it).map((p) => [...p]);
       if (e.target.dataset.pt != null) {
         if (pts.length <= 2) return true;
         pts.splice(+e.target.dataset.pt, 1);
@@ -586,7 +597,7 @@
         const p = toDesign(e);
         let best = 1, d = Infinity;
         for (let k = 1; k < pts.length; k++) { const dd = segDist(p, pts[k - 1], pts[k]); if (dd < d) { d = dd; best = k; } }
-        if (d > (it.thickness ?? 8) / 2 + 6 / frame().s) return false;
+        if (d > thick(it) / 2 + 6 / frame().s) return false;
         pts.splice(best, 0, [snap(p[0]), snap(p[1])]);
       }
       snapshot();
