@@ -40,7 +40,6 @@ views:
               - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel] }
               - { icon: water, label: Water, path: sys-seawater, match: [sys-freshwater, sys-wastewater] }
               - { icon: klimaat, label: Klimaat, path: sys-webasto }
-              - { icon: verlichting, label: Verlichting, path: sys-navlights }
               - { icon: bilge, label: Bilge, path: sys-bilge }
               - { icon: alarm, label: Alarmen, path: alarms, badge_entity: sensor.er_alarm_status_active_alarms, badge_attribute: alarms }
 
@@ -618,8 +617,8 @@ views:
   # ===== Systemschema's (omgezet uit Overszichtstekeningen/*.jpg) =====
   # Leidingen stromen (bewegende streepjes) zodra hun flow_entity actief is.
   # Bestemmingen: Voortstuwing (Overzicht, Diesel, Generator, Boegschroef, Brandstof), Energie (Accu's,
-  # DC-bus), Water (Zeewater, Zoetwater, Vuilwater), Schip (Zijaanzicht, Dekplan, Interieur), Klimaat,
-  # Verlichting, Bilge en Alarmen.
+  # DC-bus), Water (Zeewater, Zoetwater, Vuilwater), Schip (Dek en interieur, Zijaanzicht met de navigatieverlichting),
+  # Klimaat, Bilge en Alarmen.
 
   - title: Diesel engine
     path: sys-diesel
@@ -1610,42 +1609,6 @@ views:
           - { type: pushbutton, x: 678, y: 636, width: 284, height: 48, label: Fan naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_fan_speed } } }
           - { type: pushbutton, x: 974, y: 636, width: 268, height: 48, label: Temp naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_setpoint } } }
 
-  - title: Navigatieverlichting
-    path: sys-navlights
-    panel: true
-    cards:
-      - type: custom:shipborn-panel-card
-        design: tc90
-        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
-        width: 1280
-        height: 800
-        items:
-          - type: statusbar
-            title: Navigatieverlichting
-            status: *tc_status
-          - { type: navbar, items: *tc_nav }
-          - { type: panel, x: 20, y: 76, width: 400, height: 380, title: Navlights setting }
-          - { type: pushbutton, x: 38, y: 128, width: 364, height: 52, label: Onder motor, entity: switch.navigatieverlichting_onder_motor, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 190, width: 364, height: 52, label: Onder zeil, entity: switch.navigatieverlichting_onder_zeil, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 252, width: 364, height: 52, label: Voor anker, entity: switch.navigatieverlichting_anker, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 314, width: 364, height: 52, label: Met sleep, entity: switch.navigatieverlichting_met_sleep, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 376, width: 364, height: 52, label: Onbestuurbaar, entity: switch.navigatieverlichting_onbestuurbaar, led: green, align: left, font_size: 15 }
-          - { type: panel, x: 436, y: 76, width: 824, height: 380, title: Nav lights }
-          - { type: pushbutton, x: 454, y: 128, width: 254, height: 52, label: Front PS, entity: switch.lopolight_navigation_lights_navlight_front_ps, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 719, y: 128, width: 254, height: 52, label: Front SB, entity: switch.lopolight_navigation_lights_navlight_front_sb, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 984, y: 128, width: 254, height: 52, label: Stern, entity: switch.lopolight_navigation_lights_navlight_stern, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 191, width: 254, height: 52, label: Mast head, entity: switch.lopolight_navigation_lights_navlight_mast_head, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 719, y: 191, width: 254, height: 52, label: Anchor, entity: switch.lopolight_navigation_lights_navlight_anchor, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 984, y: 191, width: 254, height: 52, label: "360 top red", entity: switch.lopolight_navigation_lights_navlight_360_top_red, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 254, width: 254, height: 52, label: Green nav SB, entity: switch.lopolight_navigation_lights_navlight_green_nav_sb, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 719, y: 254, width: 254, height: 52, label: Green nav PS, entity: switch.lopolight_navigation_lights_navlight_green_nav_ps, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 984, y: 254, width: 254, height: 52, label: Aft towing, entity: switch.lopolight_navigation_lights_navlight_aft_towing, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 454, y: 317, width: 254, height: 52, label: Red nav SB, entity: switch.lopolight_navigation_lights_navlight_red_nav_sb, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 719, y: 317, width: 254, height: 52, label: Red nav PS, entity: switch.lopolight_navigation_lights_navlight_red_nav_ps, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 984, y: 317, width: 254, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
-
-  # ===== Voortstuwing: overzicht met het schip, tegels en schakelaars (items tile, switch, hotspot, dial) =====
-
   - title: Voortstuwing
     path: voortstuwing
     panel: true
@@ -1711,6 +1674,7 @@ views:
         kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
         width: 1280
         height: 800
+        phone_order: [2, 0, 1]   # telefoon: eerst de tekening, dan de stand en de lichten
         items:
           - type: statusbar
             title: Schip
@@ -1718,9 +1682,29 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
 
-          # ---- aanzichten: subnavigatie + tekening op een wit vel ----
-          - { type: line, x: 20, y: 76, width: 1240, height: 604, color: "#ffffff", radius: 10 }
-          - { type: image, x: 404, y: 88, width: 473, height: 580, image: tc90-zijaanzicht }
+          # ---- zijaanzicht (tekening uit de map "TC90 JOAL", transparant) met de navigatieverlichting ----
+          - { type: image, x: 394, y: 80, width: 492, height: 600, image: tc90-zijaanzicht }
+          # stand van de navigatieverlichting (Lopolight); voorheen de pagina Navigatieverlichting
+          - { type: panel, x: 20, y: 76, width: 360, height: 370, title: Stand navigatieverlichting }
+          - { type: pushbutton, x: 38, y: 128, width: 324, height: 52, label: Onder motor, entity: switch.navigatieverlichting_onder_motor, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 190, width: 324, height: 52, label: Onder zeil, entity: switch.navigatieverlichting_onder_zeil, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 252, width: 324, height: 52, label: Voor anker, entity: switch.navigatieverlichting_anker, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 314, width: 324, height: 52, label: Met sleep, entity: switch.navigatieverlichting_met_sleep, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 38, y: 376, width: 324, height: 52, label: Onbestuurbaar, entity: switch.navigatieverlichting_onbestuurbaar, led: green, align: left, font_size: 15 }
+          # de lichten afzonderlijk
+          - { type: panel, x: 900, y: 76, width: 360, height: 432, title: Navigatielichten }
+          - { type: pushbutton, x: 918, y: 128, width: 154, height: 52, label: Front PS, entity: switch.lopolight_navigation_lights_navlight_front_ps, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1088, y: 128, width: 154, height: 52, label: Front SB, entity: switch.lopolight_navigation_lights_navlight_front_sb, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 918, y: 190, width: 154, height: 52, label: Green nav PS, entity: switch.lopolight_navigation_lights_navlight_green_nav_ps, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1088, y: 190, width: 154, height: 52, label: Green nav SB, entity: switch.lopolight_navigation_lights_navlight_green_nav_sb, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 918, y: 252, width: 154, height: 52, label: Red nav PS, entity: switch.lopolight_navigation_lights_navlight_red_nav_ps, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1088, y: 252, width: 154, height: 52, label: Red nav SB, entity: switch.lopolight_navigation_lights_navlight_red_nav_sb, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 918, y: 314, width: 154, height: 52, label: Mast head, entity: switch.lopolight_navigation_lights_navlight_mast_head, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1088, y: 314, width: 154, height: 52, label: Stern, entity: switch.lopolight_navigation_lights_navlight_stern, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 918, y: 376, width: 154, height: 52, label: Anchor, entity: switch.lopolight_navigation_lights_navlight_anchor, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1088, y: 376, width: 154, height: 52, label: "360 top red", entity: switch.lopolight_navigation_lights_navlight_360_top_red, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 918, y: 438, width: 154, height: 52, label: Aft towing, entity: switch.lopolight_navigation_lights_navlight_aft_towing, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 1088, y: 438, width: 154, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
 
   - title: Alarmen
     path: alarms
