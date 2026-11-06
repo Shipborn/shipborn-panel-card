@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.25";
+const VERSION = "0.5.26";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -528,7 +528,11 @@ const TC_STYLE =
   .tc-dock { position: fixed; z-index: 4; overflow: hidden; background: var(--surface); }
   .tc-dock-top { top: var(--header-height, 0px); }
   .tc-dock-bottom { bottom: 0; }
-  /* phone layout */
+  /* phone layout; the bars and the page stay clear of the phone's own status bar / notch and home bar (safe areas) */
+  .outer.ph { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+  .outer.ph .panel { top: env(safe-area-inset-top, 0px); }
+  .outer.ph .tc-dock-top { padding-top: env(safe-area-inset-top, 0px); }
+  .outer.ph .tc-dock-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
   .ph-sec { overflow: hidden; }
   .ph-sec.ph-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border-radius: var(--radius-md); }
   .ph-size { position: relative; }
@@ -1082,6 +1086,7 @@ class ShipbornPanelCard extends HTMLElement {
     // Phone held upright: the same nodes, rearranged into a narrow page (needs the page in the document to measure).
     if (this._phone && this.isConnected) this._phoneLayout();
     else this._phone = false;
+    this._outer.classList.toggle("ph", !!this._phone);
 
     this._ro?.disconnect();
     this._ro = null;

@@ -140,7 +140,9 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
 - Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). Op 06-11 is in dagmap `261106` verder gewerkt (zie `git log`).
 
-## Stand van zaken en open punten (06-11-2026, v0.5.25)
+## Stand van zaken en open punten (06-11-2026, v0.5.26)
+
+- **Telefoon: veilige zones (v0.5.26):** in de telefoonindeling staan statusbalk en inhoud onder de klok/notch van de telefoon (`env(safe-area-inset-top)`) en de icoonbalk boven de veeg-balk (`safe-area-inset-bottom`), via de klasse `ph` op `.outer`. Daarvoor viel de statusbalk samen met die van de telefoon en was hij niet te bedienen. Op iPad en laptop blijft de veilige zone 0 (zie Kiosk).
 
 - **Telefoonindeling (v0.5.25):** een staande telefoon krijgt automatisch een smalle pagina (`_phoneLayout`): de al getekende onderdelen worden gemeten en in vakken onder elkaar gezet (panelen/groepen houden hun opbouw als ze ≤ 480 breed zijn, anders kolommen onder elkaar; schema's als veegstrook; tekeningen op de breedte). Smalle balken (`tc-sb-phone`, `tc-nb-phone`), ingezoomde ruimte als één kolom (`_phoneZoom`). Wisselen bij draaien gaat via `_fit` → `_wantPhone()` → `_build()`. Per pagina bijsturen met `phone_order`, `phone_hide`, `phone: false`. Getest in de demo op 390×844 (alle soorten pagina's), nog niet op een echte telefoon; mogelijke verbeterpunten: knoppen in smalle kolommen (Navigatieverlichting) vullen de breedte niet, en de romp met hotspots op Voortstuwing is klein.
 
