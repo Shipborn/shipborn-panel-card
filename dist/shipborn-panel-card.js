@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.23";
+const VERSION = "0.5.24";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -528,6 +528,11 @@ const TC_STYLE =
   .tc-dock { position: fixed; z-index: 4; overflow: hidden; background: var(--surface); }
   .tc-dock-top { top: var(--header-height, 0px); }
   .tc-dock-bottom { bottom: 0; }
+  .tc-rotate { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    padding: 24px; text-align: center; background: var(--bg); color: var(--ink); }
+  .tc-rotate svg { color: var(--accent); }
+  .tc-rotate .body { color: var(--ink-muted); font-size: 15px; max-width: 260px; }
+  .tc-rotate .d-btn { width: auto; height: 44px; padding: 0 18px; margin-top: 10px; font-size: 15px; }
   .tc-dock > * { transform-origin: 0 0; box-sizing: border-box; }
   .tc-navbar { display: flex; background: var(--surface); border-top: 1px solid var(--line); }
   .tc-nav-item { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: var(--touch-min); border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; }
@@ -680,6 +685,8 @@ const isOn = (stateObj, onStates) =>
   (onStates ? [].concat(onStates).map(String).includes(stateObj.state) : ON_STATES.includes(stateObj.state));
 const unavailable = (stateObj) => !stateObj || stateObj.state === "unavailable";
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+// A phone: the short side of the window is under 600 px (tablets and laptops are wider).
+const isPhone = () => Math.min(innerWidth, innerHeight) < 600;
 // `factor` converts raw values, e.g. 0.00001 for a Wago level of 7894954 → 78.9 %.
 // Only whole numeric states: "026 Jetvalve 3 …" is text, not 26.
 const num = (stateObj, factor = 1) => {
@@ -1055,8 +1062,14 @@ class ShipbornPanelCard extends HTMLElement {
     if (this._docks.length) {
       H = Math.min(this._H, this._contentBottom() + 12 + 88);
       const avail = innerHeight - Math.max(0, this._outer.getBoundingClientRect().top + scrollY);
+      // A screen wider than the design (laptop, desktop monitor): fit a whole design screen (`screen_height`, 800) in
+      // the height, so pages do not scroll and every page keeps the same size; the page sits in the middle and the
+      // bars span the full width. Not on phones (min. side < 600): there the width wins, to keep the text readable.
+      const ref = this._config.screen_height ?? 800;
+      if (this._config.fit_screen !== false && !isPhone() && avail / ref < s) s = Math.max(0.3, avail / ref);
       if (H * s > avail && H * s <= avail * (this._config.fit_tolerance ?? 1)) s = avail / H;
       this._lockScroll((!!this._kiosk && H * s <= avail + 1) || !!this._zoomLock);
+      this._rotateHint(isPhone() && innerHeight > innerWidth);
     }
     this._scale = s; // popups (zone) open at the same scale
     this._panel.style.transform = `scale(${s})`;
@@ -1067,10 +1080,46 @@ class ShipbornPanelCard extends HTMLElement {
       const r = this._outer.getBoundingClientRect();
       for (const [dock, dh] of this._docks) {
         Object.assign(dock.style, { left: r.left + "px", width: r.width + "px", height: dh * s + "px" });
-        Object.assign(dock.firstChild.style, { transform: `scale(${s})`, marginLeft: this._panel.style.left });
+        // the bar itself fills the whole width (its layout stretches), also when the page is narrower than the screen
+        Object.assign(dock.firstChild.style, { transform: `scale(${s})`, marginLeft: "0px", width: Math.max(this._W, r.width / s) + "px" });
       }
     }
     this._zoomRelayout?.();
+  }
+
+  // Phone held upright: the 1280 px wide screens would be tiny, so suggest turning it; "Toch zo bekijken" hides the
+  // hint for this browser session.
+  _rotateHint(show) {
+    let ok = false;
+    try {
+      ok = sessionStorage.getItem("shipborn-portrait-ok") === "1";
+    } catch (e) {}
+    show = show && !ok;
+    if (!show) {
+      this._rotHint?.remove();
+      this._rotHint = null;
+      return;
+    }
+    if (this._rotHint) return;
+    const n = h("div", "tc tc-rotate");
+    n.dataset.tcTheme = this._theme;
+    n.innerHTML =
+      `<svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">` +
+      `<rect x="20" y="6" width="24" height="40" rx="4"/><path d="M28 40h8"/><path d="M10 40a24 24 0 0 0 20 18"/><path d="M26 54l4 4-4 4"/>` +
+      `<rect x="34" y="46" width="24" height="14" rx="3" opacity=".45"/></svg>` +
+      `<div class="title">Draai je telefoon</div><div class="body">Deze schermen zijn gemaakt voor liggend gebruik.</div>`;
+    const b = h("button", "d-btn");
+    b.type = "button";
+    b.textContent = "Toch zo bekijken";
+    b.addEventListener("click", () => {
+      try {
+        sessionStorage.setItem("shipborn-portrait-ok", "1");
+      } catch (e) {}
+      this._rotateHint(false);
+    });
+    n.appendChild(b);
+    this._outer.appendChild(n);
+    this._rotHint = n;
   }
 
   // Lowest edge of the page content in design px (status and icon bar are in docks, not in the panel).
