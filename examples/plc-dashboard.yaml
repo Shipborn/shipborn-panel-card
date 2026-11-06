@@ -1578,49 +1578,37 @@ views:
             title: Klimaat
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: panel, x: 20, y: 76, width: 298, height: 248, title: Crew cabin }
-          - { type: value, style: tile, x: 38, y: 128, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_crew_cabin_temp, value_size: 24 }
-          - { type: pushbutton, x: 38, y: 204, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_crew_cabin_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 38, y: 252, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_crew_cabin, font_size: 15, box_width: 90 }
-          - { type: value, x: 38, y: 282, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_crew_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 334, y: 76, width: 298, height: 248, title: Deck lounge }
-          - { type: value, style: tile, x: 352, y: 128, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_deck_lounge_temp, value_size: 24 }
-          - { type: pushbutton, x: 352, y: 204, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_deck_lounge_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 352, y: 252, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_deck_lounge, font_size: 15, box_width: 90 }
-          - { type: value, x: 352, y: 282, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_deck_lounge_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 648, y: 76, width: 298, height: 248, title: Galley }
-          - { type: value, style: tile, x: 666, y: 128, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_galley_temp, value_size: 24 }
-          - { type: pushbutton, x: 666, y: 204, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_galley_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 666, y: 252, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_galley, font_size: 15, box_width: 90 }
-          - { type: value, x: 666, y: 282, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_galley_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 962, y: 76, width: 298, height: 248, title: Owners cabin bad }
-          - { type: value, style: tile, x: 980, y: 128, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp, value_size: 24 }
-          - { type: pushbutton, x: 980, y: 204, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 980, y: 252, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_owners_cabin_bad, font_size: 15, box_width: 90 }
-          - { type: value, x: 980, y: 282, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 20, y: 332, width: 298, height: 248, title: Owners cabin }
-          - { type: value, style: tile, x: 38, y: 384, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_owners_cabin_temp, value_size: 24 }
-          - { type: pushbutton, x: 38, y: 460, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 38, y: 508, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_owners_cabin, font_size: 15, box_width: 90 }
-          - { type: value, x: 38, y: 538, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_owners_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 334, y: 332, width: 298, height: 248, title: Main cabin }
-          - { type: value, style: tile, x: 352, y: 384, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_main_cabin_temp, value_size: 24 }
-          - { type: pushbutton, x: 352, y: 460, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_main_cabin_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 352, y: 508, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_main_cabin, font_size: 15, box_width: 90 }
-          - { type: value, x: 352, y: 538, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_main_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 648, y: 332, width: 298, height: 248, title: Guest cabin }
-          - { type: value, style: tile, x: 666, y: 384, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_guest_cabin_temp, value_size: 24 }
-          - { type: pushbutton, x: 666, y: 460, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_guest_cabin_ac, led: green, align: left, font_size: 15 }
-          - { type: value, x: 666, y: 508, width: 262, height: 36, label: "Instelling °C", entity: number.webasto_bluecool_noder_guest_cabin, font_size: 15, box_width: 90 }
-          - { type: value, x: 666, y: 538, width: 262, height: 36, label: "Fan (6 = auto)", entity: number.webasto_bluecool_noder_guest_cabin_fan_speed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: panel, x: 962, y: 332, width: 298, height: 248, title: Compressor ER }
-          - { type: value, style: tile, x: 980, y: 384, width: 262, height: 64, label: Temperatuur nu, entity: sensor.webasto_bluecool_noder_compressor_engine_room_temp, value_size: 24 }
-          - { type: pushbutton, x: 980, y: 460, width: 262, height: 40, label: Airco, entity: switch.webasto_bluecool_noder_compressor_engine_room_ac, led: green, align: left, font_size: 15 }
+          # ---- Webasto per ruimte: zelfde blok als onder de ingezoomde ruimtes (schakelaar in de kop, meter met − / +) ----
+          - { type: panel, x: 20, y: 76, width: 280, height: 236, title: Crew cabin }
+          - { type: toggle, style: pill, x: 236, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_crew_cabin_ac }
+          - { type: climate, x: 67, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_crew_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_crew_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_crew_cabin, fan_entity: sensor.webasto_bluecool_noder_crew_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_crew_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 340, y: 76, width: 280, height: 236, title: Deck lounge }
+          - { type: toggle, style: pill, x: 556, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_deck_lounge_ac }
+          - { type: climate, x: 387, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_deck_lounge_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_deck_lounge_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_deck_lounge, fan_entity: sensor.webasto_bluecool_noder_deck_lounge_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_deck_lounge_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 660, y: 76, width: 280, height: 236, title: Galley }
+          - { type: toggle, style: pill, x: 876, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_galley_ac }
+          - { type: climate, x: 707, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_galley_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_galley_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_galley, fan_entity: sensor.webasto_bluecool_noder_galley_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_galley_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 980, y: 76, width: 280, height: 236, title: Owners cabin bad }
+          - { type: toggle, style: pill, x: 1196, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_bad_ac }
+          - { type: climate, x: 1027, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_owners_cabin_bad_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_owners_cabin_bad, fan_entity: sensor.webasto_bluecool_noder_owners_cabin_bad_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_owners_cabin_bad_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 20, y: 328, width: 280, height: 236, title: Owners cabin }
+          - { type: toggle, style: pill, x: 236, y: 334, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_owners_cabin_ac }
+          - { type: climate, x: 67, y: 370, width: 186, entity: sensor.webasto_bluecool_noder_owners_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_owners_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_owners_cabin, fan_entity: sensor.webasto_bluecool_noder_owners_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_owners_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 340, y: 328, width: 280, height: 236, title: Main cabin }
+          - { type: toggle, style: pill, x: 556, y: 334, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_main_cabin_ac }
+          - { type: climate, x: 387, y: 370, width: 186, entity: sensor.webasto_bluecool_noder_main_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_main_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_main_cabin, fan_entity: sensor.webasto_bluecool_noder_main_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_main_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 660, y: 328, width: 280, height: 236, title: Guest cabin }
+          - { type: toggle, style: pill, x: 876, y: 334, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_guest_cabin_ac }
+          - { type: climate, x: 707, y: 370, width: 186, entity: sensor.webasto_bluecool_noder_guest_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_guest_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_guest_cabin, fan_entity: sensor.webasto_bluecool_noder_guest_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_guest_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          - { type: panel, x: 980, y: 328, width: 280, height: 236, title: Compressor ER }
+          - { type: toggle, style: pill, x: 1196, y: 334, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_compressor_engine_room_ac }
+          - { type: climate, x: 1027, y: 370, width: 186, entity: sensor.webasto_bluecool_noder_compressor_engine_room_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_compressor_engine_room_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_compressor_engine_room, fan_entity: sensor.webasto_bluecool_noder_compressor_engine_room_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_compressor_engine_room_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          # ---- alle hutten tegelijk: waarde kiezen en dan naar alle hutten sturen ----
           - { type: panel, x: 20, y: 588, width: 1240, height: 112, title: Alle hutten }
-          - { type: value, x: 38, y: 640, width: 290, height: 36, label: "Fan (6 = auto)", entity: input_number.webasto_all_fanspeed, font_size: 15, decimals: 0, box_width: 90 }
-          - { type: value, x: 348, y: 640, width: 290, height: 36, label: Temperatuur, entity: input_number.webasto_all_temperatures, font_size: 15, box_width: 90 }
-          - { type: pushbutton, x: 678, y: 634, width: 284, height: 48, label: Fan naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_fan_speed } } }
-          - { type: pushbutton, x: 974, y: 634, width: 284, height: 48, label: Temp naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_setpoint } } }
+          - { type: stepper, x: 38, y: 632, width: 300, height: 56, label: Ventilator, entity: input_number.webasto_all_fanspeed, decimals: 0, value_names: { 6: Aut } }
+          - { type: stepper, x: 354, y: 632, width: 300, height: 56, label: Temperatuur, entity: input_number.webasto_all_temperatures, unit: "°C", decimals: 1 }
+          - { type: pushbutton, x: 678, y: 636, width: 284, height: 48, label: Fan naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_fan_speed } } }
+          - { type: pushbutton, x: 974, y: 636, width: 268, height: 48, label: Temp naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_setpoint } } }
 
   - title: Navigatieverlichting
     path: sys-navlights

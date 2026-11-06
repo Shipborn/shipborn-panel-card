@@ -113,6 +113,11 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.21) **Lampen interactief op de plattegronden.** Na inzoomen op een ruimte (interieur en dekplan) staan al haar lampen als stipjes op de tekening: geel en gloeiend als ze aan zijn, grijs als ze uit zijn; tikken schakelt, lang indrukken opent het HA-venster om te dimmen; ze blijven even groot op elk zoomniveau. 76 lampen, zonder de groepen. De plekken zijn geschat (er is geen verlichtingsplan): uit de naam (BB/SB, achter/midden/voor) en verder verdeeld over de ruimte; de gebruiker corrigeert ze, en die correcties komen in `LAMP_AT` in het script.
 - (v0.5.22) **Layout-editor: ingezoomde ruimte bewerken.** Bovenin kies je een *Ruimte* en een *Laag*: de lampjes op het stuk tekening van die ruimte verslepen, of de knoppen in het paneel rechts en de Webasto-blokken onder de tekening verschuiven en hun eigenschappen aanpassen, met de gewone editorfuncties (raster, pijltjes, ongedaan maken, opslaan). Nieuw kaartitem `lamp` (het stipje als los onderdeel). Het generatorscript neemt lampplekken uit de YAML over en laat ruimtes met `edited: true` (die de editor zet bij een wijziging in paneel of strook) ongemoeid, zodat niets verloren gaat bij opnieuw genereren; het heeft daarvoor ook pyyaml nodig.
 
+## 06-11-2026 – Klimaat in de nieuwe opbouw
+
+- Dagmap `261106` (op de Mac met `nieuwe-dag.sh`). Het werk van de Windows-pc van 05-11 middag (v0.5.22, ruimtes bewerken in de editor) eerst nog in `261105` gecommit (`42ae1da`); regeleindes daarbij teruggezet naar LF.
+- **Klimaat (`sys-webasto`) met dezelfde Webasto-blokken als in de ruimtes:** acht blokken van 280×236 (vier per rij), elk met de schakelaar *Airco* in de kop en de ronde `climate`-meter met − / + (boven setpoint, onder ventilator, 6 = *Aut*): Crew cabin, Deck lounge, Galley, Owners cabin bad, Owners cabin, Main cabin, Guest cabin en Compressor ER (die kreeg er nu ook setpoint en ventilator bij). *Alle hutten* heeft `stepper`s (Ventilator met *Aut*, Temperatuur) in plaats van losse waarden, met de twee knoppen die de automatiseringen starten. Past op 1280×800 (tot `y: 700`). Alleen YAML.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

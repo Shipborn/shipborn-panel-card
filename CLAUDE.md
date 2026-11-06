@@ -138,9 +138,11 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - **Met de Dropbox-map:** open de bovenmap `18.Bestruringspagina` en maak de dagmap van vandaag: op Windows `nieuwe-dag.ps1`, op de Mac `bash nieuwe-dag.sh`. Alles (inclusief `.git` en de niet-geversioneerde bestanden) komt mee. Wacht eerst tot Dropbox klaar is met synchroniseren (anders kopieer je een halve map).
 - **Zonder Dropbox:** `git clone https://github.com/Shipborn/shipborn-panel-card.git <YYMMDD>`, git-auteur instellen (zie boven). Tekeningen, screenshots, `_ds_bron/` en de HA-export ontbreken dan.
 - Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
-- Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). De stand bij overdracht op 05-11: commit `0f4f143`, alles gepusht.
+- Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). Op 06-11 is in dagmap `261106` verder gewerkt (zie `git log`).
 
-## Stand van zaken en open punten (05-11-2026, v0.5.19)
+## Stand van zaken en open punten (06-11-2026, v0.5.22)
+
+- **Klimaat (06-11):** de pagina `sys-webasto` gebruikt nu dezelfde Webasto-blokken als de ingezoomde ruimtes (schakelaar in de kop, `climate`-meter met − / +), acht stuks in twee rijen, plus *Alle hutten* met `stepper`s. Komt er een Webasto-unit bij, voeg dan een blok van 280×236 toe (kolommen op x 20/340/660/980, rijen op y 76/328).
 
 - **Laatste werk (05-11):** dekplan en interieur samen op `ship-deck`, ruimtes met de omtrek van de kamers (v0.5.13), layout-editor volgt wijzigingen op schijf, nieuw zijaanzicht (v0.5.14) en daaruit gesneden romp op Voortstuwing met vlag en railing (v0.5.15–0.5.17). Details in `docs/GESCHIEDENIS.md`.
 - **Lampen op de plattegrond (v0.5.21):** na inzoomen staan de lampen van de ruimte als stipjes op de tekening (`zoom.lamps`, tik = aan/uit, lang = HA-venster), op het interieur én het dekplan (ook de Engine room). Er is geen verlichtingsplan: `room_lamps()` in `tools/interieur_zones.py` schat de plek uit de naam (BB = boven, SB = onder, want de boeg wijst naar rechts; A/M/V = links/midden/rechts in de ruimte) en zet de rest op een raster binnen de ruimte. Corrigeren kan in de layout-editor (zie Layout-editor); het script neemt plekken uit de YAML over. `LAMP_AT` in het script kan ook nog.
