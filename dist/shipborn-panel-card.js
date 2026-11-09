@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.28";
+const VERSION = "0.5.29";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -438,7 +438,7 @@ const TC_ICONS = {
   koelwater: "M12 3v9M12 4h3M12 7h3M12 10h3M10 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0M3 20c1.5-1 3-1 4.5 0s3 1 4.5 0 3-1 4.5 0 3 1 4.5 0",
   flow: "M3 8h13M13 4.5 16.5 8 13 11.5M3 15c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0M3 19.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0",
   uitlaat: "M2 15h11v4H2zM13 16.5h3M19 13c1.5-1.5 0-3 1.5-4.5S20.5 5.5 22 4M16 12c1.5-1.5 0-3 1.5-4.5",
-  druk: "M4 17a8 8 0 1 1 16 0M12 17l4-5M3 20h18",
+  druk: "M12 16a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM12 9.5l3-2.5M12 9.5h.01M12 16v5M9 21h6",
   koppeling: "M10 14l4-4M8.5 11.5 6 14a3 3 0 0 0 4 4l2.5-2.5M15.5 12.5 18 10a3 3 0 0 0-4-4l-2.5 2.5"
 };
 const tcIcon = (name, size = 28) =>
@@ -629,6 +629,17 @@ const TC_STYLE =
   .tc-wl.is-ok { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
   .tc-wl.is-warn { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
   .tc-wl.is-alarm { color: var(--alarm); border-color: var(--alarm); background: var(--alarm-soft); animation: tc-pulse 1.2s ease-in-out infinite; }
+  .d-btn.has-check { position: relative; }
+  .d-check { --c: var(--ok); position: absolute; right: 14px; top: 50%; margin-top: -5px; display: none; }
+  .d-btn.is-ready .d-check { display: block; }
+  .tc-check { max-width: 520px; }
+  .tc-check-list { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: var(--space-1); }
+  .tc-check-list li { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: var(--space-3);
+    padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+  .tc-check-list li .d-led { --c: var(--alarm); }
+  .tc-check-list li.is-ok .d-led { --c: var(--ok); }
+  .tc-check-list .label { color: var(--ink); text-align: left; }
+  .tc-check-st { font-family: var(--font-mono); white-space: nowrap; }
   .tc-gear { display: flex; gap: var(--space-2); }
   .tc-gear span { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line);
     border-radius: var(--radius-md); background: var(--surface); color: var(--line-strong); font: 700 22px var(--font-cond); }
@@ -2059,14 +2070,83 @@ class ShipbornPanelCard extends HTMLElement {
     if (b.led) btn.appendChild(this._dLed(b.led_entity || b.entity, b.led, b.led_state, b.led_blink));
     btn.append(b.label ?? "");
     n.appendChild(btn);
+    // checklist: a tap opens a list of steps with their live state (Uitvoeren runs tap_action); a green tick
+    // appears on the right of the button while every step is OK.
+    const steps = b.checklist?.items || [];
+    if (steps.length) {
+      btn.classList.add("has-check");
+      btn.insertAdjacentHTML("beforeend", '<span class="d-check d-led on"></span>');
+    }
     if (b.mode === "momentary") this._momentary(btn, b);
+    else if (steps.length) btn.addEventListener("click", () => this._checklist(b));
     else btn.addEventListener("click", () => this._handleAction(b, b.tap_action, btn));
     this._updaters.push((hass) => {
       const so = b.entity ? hass.states[b.entity] : null;
       btn.classList.toggle("unavailable", !!b.entity && unavailable(so));
       if (b.active_entity) btn.classList.toggle("active", isOn(hass.states[b.active_entity], b.active_state));
+      if (steps.length) btn.classList.toggle("is-ready", steps.every((s) => this._stepOk(hass, s)));
     });
     return n;
+  }
+
+  // One checklist step is OK: entity on (or `state`, e.g. open), or its value above `above` / below `below`.
+  _stepOk(hass, s) {
+    const so = hass.states[s.entity];
+    if (!so || unavailable(so)) return false;
+    return activeOf(hass, s.entity, { active_state: s.state, active_above: s.above, active_below: s.below });
+  }
+
+  // Checklist window: each step with a tick or cross and its current state, live; Uitvoeren runs the button's
+  // tap_action (the window is the confirmation), Sluiten closes.
+  _checklist(b) {
+    const c = b.checklist;
+    const dlg = h("div", "tc-dlg");
+    dlg.dataset.tcTheme = this._theme || "nacht";
+    const box = h("div", "tc-dialog tc-check");
+    box.innerHTML = '<div class="title"></div><p class="body tc-dialog-text"></p><ul class="tc-check-list"></ul>' +
+      '<div class="tc-dialog-btns"><button type="button" class="tc-btn label"></button><button type="button" class="tc-btn tc-btn-primary label"></button></div>';
+    box.querySelector(".title").textContent = c.title || b.label || "";
+    const intro = box.querySelector("p");
+    if (c.text) intro.textContent = c.text;
+    else intro.remove();
+    const list = box.querySelector("ul");
+    const rows = c.items.map((s) => {
+      const li = h("li");
+      li.innerHTML = '<span class="d-led on"></span><span class="label"></span><span class="caption tc-check-st"></span>';
+      li.children[1].textContent = s.label ?? s.entity;
+      list.appendChild(li);
+      return [li, s];
+    });
+    const [close, run] = box.querySelector(".tc-dialog-btns").children;
+    close.textContent = c.close || "Sluiten";
+    run.textContent = c.run || "Uitvoeren";
+    if (!b.tap_action || b.tap_action.action === "none") run.remove();
+    const paint = (hass) => {
+      for (const [li, s] of rows) {
+        const ok = this._stepOk(hass, s);
+        const so = hass.states[s.entity];
+        const v = num(so);
+        li.classList.toggle("is-ok", ok);
+        li.children[2].textContent = v == null ? (so ? tcWord(so.state, s) : "—") : fmt(v, s.decimals ?? (Math.abs(v) < 10 && v % 1 ? 1 : 0), hass) + (unitOf(s, so) ? " " + unitOf(s, so) : "");
+      }
+    };
+    this._updaters.push(paint);
+    if (this._hass) paint(this._hass);
+    const done = (ev) => {
+      ev?.stopPropagation();
+      dlg.remove();
+      const i = this._updaters.indexOf(paint);
+      if (i >= 0) this._updaters.splice(i, 1);
+    };
+    close.addEventListener("click", done);
+    run.addEventListener("click", (ev) => {
+      done(ev);
+      const { confirmation, ...act } = b.tap_action;
+      this._handleAction(b, act, run);
+    });
+    dlg.addEventListener("click", (ev) => ev.target === dlg && done(ev));
+    dlg.appendChild(box);
+    this.shadowRoot.appendChild(dlg);
   }
 
   // ---------- TC90 JOAL design items ----------
@@ -2431,6 +2511,10 @@ class ShipbornPanelCard extends HTMLElement {
     const n = this._place(h("div", "tc-gear"), g, 132, 44);
     n.innerHTML = "<span>D</span><span>N</span><span>R</span>";
     const [d, neutral, r] = n.children;
+    if (g.tap_action) {
+      n.style.cursor = "pointer";
+      n.addEventListener("click", () => this._handleAction(g, g.tap_action, n));
+    }
     this._updaters.push((hass) => {
       const known = [g.fwd_entity, g.aft_entity].some((e) => e && !unavailable(hass.states[e]));
       const f = activeOf(hass, g.fwd_entity);
