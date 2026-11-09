@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.27";
+const VERSION = "0.5.28";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -431,7 +431,15 @@ const TC_ICONS = {
   pijl: "M9 6l6 6-6 6",
   vink: "M5 12.5l4.5 4.5L19 7.5",
   sluit: "M6 6l12 12M18 6 6 18",
-  tank: "M6 3h12v18H6zM6 13h12M9 16h6"
+  tank: "M6 3h12v18H6zM6 13h12M9 16h6",
+  // warning lights (Voortstuwing)
+  oliedruk: "M2 12h3l2-2h6l7-3v1.5L14 15H5zM7 10V8h4v2M20 15c0 1-.5 1.6-1 1.6s-1-.6-1-1.6.5-1.6 1-2.6c.5 1 1 1.6 1 2.6z",
+  olietemp: "M8 14V4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0zM10 10v7M19 10c0 1.2-.7 2-1.5 2s-1.5-.8-1.5-2 .8-2 1.5-3.5c.7 1.5 1.5 2.3 1.5 3.5z",
+  koelwater: "M12 3v9M12 4h3M12 7h3M12 10h3M10 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0M3 20c1.5-1 3-1 4.5 0s3 1 4.5 0 3-1 4.5 0 3 1 4.5 0",
+  flow: "M3 8h13M13 4.5 16.5 8 13 11.5M3 15c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0M3 19.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0",
+  uitlaat: "M2 15h11v4H2zM13 16.5h3M19 13c1.5-1.5 0-3 1.5-4.5S20.5 5.5 22 4M16 12c1.5-1.5 0-3 1.5-4.5",
+  druk: "M4 17a8 8 0 1 1 16 0M12 17l4-5M3 20h18",
+  koppeling: "M10 14l4-4M8.5 11.5 6 14a3 3 0 0 0 4 4l2.5-2.5M15.5 12.5 18 10a3 3 0 0 0-4-4l-2.5 2.5"
 };
 const tcIcon = (name, size = 28) =>
   `<svg class="tc-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><path d="${TC_ICONS[name] || TC_ICONS.alarm}"/></svg>`;
@@ -612,6 +620,19 @@ const TC_STYLE =
   .tc-gauge-label { display: flex; justify-content: center; align-items: center; gap: var(--space-1); }
   .tc-gauge.tc-tone-warn .tc-gauge-label, .tc-gauge.tc-tone-warn .tc-gauge-center { color: var(--warn); }
   .tc-gauge-range { position: absolute; display: flex; justify-content: space-between; }
+  .tc-gauge.is-selected { outline: 3px solid var(--ok); outline-offset: 8px; border-radius: var(--radius-lg); }
+
+  /* warning light (icon only) and gearbox D N R */
+  .tc-wl { box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;
+    border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--line-strong);
+    transition: color .3s, background .3s, border-color .3s; -webkit-tap-highlight-color: transparent; }
+  .tc-wl.is-ok { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+  .tc-wl.is-warn { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+  .tc-wl.is-alarm { color: var(--alarm); border-color: var(--alarm); background: var(--alarm-soft); animation: tc-pulse 1.2s ease-in-out infinite; }
+  .tc-gear { display: flex; gap: var(--space-2); }
+  .tc-gear span { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line);
+    border-radius: var(--radius-md); background: var(--surface); color: var(--line-strong); font: 700 22px var(--font-cond); }
+  .tc-gear span.is-on { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
 
   /* row button (toggle), light group and stepper: room panels */
   .tc-row { display: flex; align-items: stretch; gap: var(--space-2); }
@@ -1449,6 +1470,8 @@ class ShipbornPanelCard extends HTMLElement {
       case "switch": return this._tSwitch(item);
       case "hotspot": return this._tHotspot(item);
       case "dial": return this._tDial(item);
+      case "warnlight": return this._tWarnlight(item);
+      case "gear": return this._tGear(item);
       case "toggle": return this._tToggle(item);
       case "light_group": return this._tLightGroup(item);
       case "stepper": return this._tStepper(item);
@@ -2373,6 +2396,47 @@ class ShipbornPanelCard extends HTMLElement {
       const warn = v != null && g.warn_above != null && v >= g.warn_above;
       n.classList.toggle("tc-tone-warn", warn);
       flag.innerHTML = warn ? tcIcon("alarm", 16) : "";
+      // selected_entity: green outline while that entity is on (e.g. the drive chosen with the sailing mode).
+      if (g.selected_entity) n.classList.toggle("is-selected", activeOf(hass, g.selected_entity, g, "selected"));
+    });
+    return n;
+  }
+
+  // Warning light, icon only: green / orange / red from the warn_* / alarm_* limits; grey while tone_entity is off
+  // (system not running) or without data. An on/off entity is green when on, grey when off. Tap = HA more-info.
+  _tWarnlight(w) {
+    const S = w.size || 44;
+    const n = this._place(h("button", "tc-wl"), w, S, S);
+    n.type = "button";
+    n.title = w.label ?? "";
+    n.setAttribute("aria-label", w.label ?? "");
+    n.innerHTML = tcIcon(w.icon || "alarm", Math.round(S * 0.6));
+    const act = w.tap_action || (w.entity ? { action: "more-info" } : null);
+    if (act) n.addEventListener("click", () => this._handleAction(w, act, n));
+    this._updaters.push((hass) => {
+      const so = w.entity ? hass.states[w.entity] : null;
+      const v = num(so, w.factor);
+      let st = "off";
+      if (so && !unavailable(so) && so.state !== "unknown" && (!w.tone_entity || activeOf(hass, w.tone_entity, w, "tone"))) {
+        const t = v == null ? null : toneOf(hass, { ...w, tone_entity: null }, v);
+        st = v == null ? (isOn(so) ? "ok" : "off") : t || "ok";
+      }
+      for (const k of ["ok", "warn", "alarm"]) n.classList.toggle("is-" + k, st === k);
+    });
+    return n;
+  }
+
+  // Gearbox D / N / R from fwd_entity and aft_entity (neither on = N); only the active letter lights green.
+  _tGear(g) {
+    const n = this._place(h("div", "tc-gear"), g, 132, 44);
+    n.innerHTML = "<span>D</span><span>N</span><span>R</span>";
+    const [d, neutral, r] = n.children;
+    this._updaters.push((hass) => {
+      const known = [g.fwd_entity, g.aft_entity].some((e) => e && !unavailable(hass.states[e]));
+      const f = activeOf(hass, g.fwd_entity);
+      const a = activeOf(hass, g.aft_entity);
+      const cur = !known ? null : f && !a ? d : a && !f ? r : !f && !a ? neutral : null;
+      for (const s of [d, neutral, r]) s.classList.toggle("is-on", s === cur);
     });
     return n;
   }

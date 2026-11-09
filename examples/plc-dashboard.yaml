@@ -958,8 +958,6 @@ views:
     #   binary_sensor.plc_jp1_alarm
     #   binary_sensor.plc_jp2_alarm
     #   binary_sensor.plc_jp3_alarm
-    #   sensor.plc_electric_speed
-    #   sensor.plc_emotor_rpm
     cards:
       - type: custom:shipborn-panel-card
         design: tc90
@@ -1040,7 +1038,7 @@ views:
           - { type: pipe, medium: glycol, points: [[733, 331], [733, 384]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pipe, medium: glycol_return, points: [[733, 424], [733, 554]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: text, x: 723, y: 384, width: 20, height: 40, text: "3", boxed: true, alarm_entity: binary_sensor.plc_jp3_alarm, font_size: 12 }
-          - { type: generator, x: 886, y: 379, width: 50, height: 50, letter: M, entity: sensor.plc_emotor_rpm, active_entity: sensor.plc_electric_speed, active_above: 5, active_abs: true, label: Engiro }
+          - { type: generator, x: 886, y: 379, width: 50, height: 50, letter: M, entity: sensor.wago_hcs_controls_wago_hcs_controls_emotor_speed, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_emotor_speed, active_above: 5, active_abs: true, label: Engiro }
           - { type: pipe, medium: glycol, points: [[899, 331], [899, 369]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: pipe, medium: glycol_return, points: [[899, 441], [899, 554]], thickness: 4, arrow: true, flow_entity: switch.0x781c9dfffea1854f }
           - { type: text, x: 386, y: 599, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, mono: true, font_size: 15, unit: V DC, decimals: 0 }
@@ -1633,28 +1631,44 @@ views:
           - { type: hotspot, x: 236, y: 200, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
           - { type: hotspot, x: 770, y: 200, side: left, icon: ventilator, label: Boegschroef, entity: binary_sensor.er_thruster_status_bow_thruster_running, active_entity: binary_sensor.er_thruster_status_bow_thruster_running, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
 
-          # ---- Volvo Penta: tegels (kleur alleen als de diesel draait; grenzen uit het oude dashboard) ----
-          - { type: tile, x: 24, y: 256, width: 203, height: 120, icon: motor, label: Oliedruk, entity: sensor.engine_room_me_oil_press, unit: bar, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 1.8, alarm_below: 1.5 }
-          - { type: tile, x: 239, y: 256, width: 203, height: 120, icon: klimaat, label: Olietemp, entity: sensor.main_engine_oil_temp, unit: "°C", decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 104, alarm_above: 110 }
-          - { type: tile, x: 454, y: 256, width: 203, height: 120, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
-          - { type: tile, x: 669, y: 256, width: 203, height: 120, icon: accu, label: Dynamo, entity: sensor.engine_room_main_engine_me_alt_v, unit: V, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 13.6, alarm_below: 12, alarm_above: 15 }
-          - { type: tile, x: 24, y: 384, width: 203, height: 120, icon: klimaat, label: Uitlaat, entity: sensor.al1590_er_volvo_exhaust_temperature, unit: "°C", decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 59, alarm_above: 89 }
-          - { type: tile, x: 239, y: 384, width: 203, height: 120, icon: water, label: Zeewaterflow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, unit: L/min, decimals: 0, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 49, alarm_below: 40 }
-          - { type: tile, x: 454, y: 384, width: 203, height: 120, icon: water, label: Schroefas koeling, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, unit: L/min, decimals: 1, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 3.5, alarm_below: 2.5 }
-          - { type: tile, x: 669, y: 384, width: 203, height: 120, icon: klimaat, label: Schroefas vet, entity: sensor.al1590_er_prop_shaft_grease_temperature, unit: "°C", decimals: 0, sub: Druk, sub_entity: sensor.al1590_er_prop_shaft_grease_pressure, sub_unit: bar, sub_decimals: 1, warn_above: 50, alarm_above: 80 }
-          - { type: tile, x: 24, y: 512, width: 203, height: 120, icon: klep, label: Manifold, entity: sensor.al1590_er_compressor_manifold_pressure, unit: bar, decimals: 1, warn_below: 3, alarm_above: 10 }
-          - { type: tile, x: 239, y: 512, width: 203, height: 120, icon: pijl, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, unit: "%", decimals: 0, sub: Instelpunt, sub_entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, sub_unit: rpm }
-          - { type: tile, x: 454, y: 512, width: 203, height: 120, icon: generator, label: Generator, entity: sensor.generator_gen_rpm, unit: rpm, decimals: 0, sub: Koelwater, sub_entity: sensor.generator_gen_coolant_temp, sub_unit: "°C", tap_action: { action: navigate, navigation_path: sys-generator } }
-          - { type: tile, x: 669, y: 512, width: 203, height: 120, icon: instellingen, label: Draaiuren, entity: sensor.engine_room_main_engine_me_hours, unit: uur, decimals: 0, sub: Generator, sub_entity: sensor.generator_gen_hours, sub_unit: uur }
+          # ---- voorbereiden: automations (Ja/Nee met de lijst van wat er gebeurt) ----
+          - { type: pushbutton, x: 24, y: 232, width: 272, height: 52, label: Prepair Volvo Start, font_size: 16, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.prepvolvostart }, confirmation: { title: "Prepair Volvo Start?", text: "Deze functie bedient de volgende aansturingen:\n\n- OPEN Volvo Zeewatervalves, IN & OUT\n- OPEN Wierpot Valves, Front & AFT\n- Compressor AAN\n- Zeewaterpomp Glycoolsystem AAN", yes: Uitvoeren } } }
+          - { type: pushbutton, x: 312, y: 232, width: 272, height: 52, label: Prepair Generator Start, font_size: 16, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.prepgenstart }, confirmation: { title: "Prepair Generator Start?", text: "Deze functie bedient de volgende aansturingen:\n\n- OPEN Wierpot Front\n- Compressor AAN\n- Zeewaterpomp Glycoolsystem AAN\n- Glycolpomp AAN", yes: Uitvoeren } } }
+          # placeholder: automation nog niet bekend
+          - { type: pushbutton, x: 600, y: 232, width: 272, height: 52, label: Prepair Energy Inverters, font_size: 16, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.plc_prep_inverters }, confirmation: { title: "Prepair Energy Inverters?", text: "Nog niet gekoppeld.", yes: Uitvoeren } } }
 
-          # ---- zijpaneel: vaarmodus, meters, status ----
+          # ---- toerentellers; groen kader = aandrijving gekozen met de vaarmodus ----
+          - { type: dial, x: 50, y: 304, width: 220, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, min: 0, max: 4000, unit: rpm, selected_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
+          - { type: dial, x: 338, y: 304, width: 220, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, unit: rpm, warn_above: 500 }
+          - { type: dial, x: 626, y: 304, width: 220, label: E-motor, entity: sensor.wago_hcs_controls_wago_hcs_controls_emotor_speed, min: -3000, max: 3000, unit: rpm, selected_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
+
+          # ---- waarschuwingslampjes diesel (grijs als de diesel niet draait; grenzen uit het HA-dashboard) ----
+          - { type: gear, x: 50, y: 532, width: 220, height: 40, fwd_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, aft_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
+          - { type: warnlight, x: 50, y: 582, size: 40, icon: oliedruk, label: Oliedruk, entity: sensor.engine_room_me_oil_press, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 1.8, alarm_below: 1.5 }
+          - { type: warnlight, x: 95, y: 582, size: 40, icon: olietemp, label: Olietemperatuur, entity: sensor.main_engine_oil_temp, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 104, alarm_above: 110 }
+          - { type: warnlight, x: 140, y: 582, size: 40, icon: flow, label: Zeewaterflow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 49.01, alarm_below: 40 }
+          - { type: warnlight, x: 185, y: 582, size: 40, icon: koelwater, label: Koelwatertemperatuur, entity: sensor.engine_room_main_engine_me_coolant_temp, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 78, alarm_above: 100 }
+          - { type: warnlight, x: 230, y: 582, size: 40, icon: uitlaat, label: Uitlaattemperatuur, entity: sensor.al1590_er_volvo_exhaust_temperature, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 59, alarm_above: 89 }
+
+          # ---- waarschuwingslampjes schroefas (grijs als de as stilstaat) ----
+          - { type: warnlight, x: 380, y: 532, size: 40, icon: flow, label: Schroefas koelwaterflow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_below: 3.5, alarm_below: 2.5 }
+          - { type: warnlight, x: 428, y: 532, size: 40, icon: klimaat, label: Schroefas vettemperatuur, entity: sensor.al1590_er_prop_shaft_grease_temperature, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_above: 50, alarm_above: 80 }
+          - { type: warnlight, x: 476, y: 532, size: 40, icon: druk, label: Schroefas vetdruk, entity: sensor.al1590_er_prop_shaft_grease_pressure, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, alarm_above: 2, alarm_below: 0.1 }
+
+          # ---- E-motor: gekoppeld (groen) of niet (grijs) ----
+          - { type: warnlight, x: 716, y: 532, size: 40, icon: koppeling, label: E-motor gekoppeld, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
+
+          # ---- waarschuwingslampjes generator (grijs onder 300 rpm) ----
+          - { type: text, x: 24, y: 652, text: Generator, style: caption }
+          - { type: warnlight, x: 140, y: 642, size: 40, icon: flow, label: Generator zeewaterflow, entity: sensor.al1590_er_generator_seawater_cooling_flow, tone_entity: sensor.generator_gen_rpm, tone_above: 300, warn_below: 28.01, alarm_below: 25 }
+          - { type: warnlight, x: 188, y: 642, size: 40, icon: oliedruk, label: Generator oliedruk, entity: sensor.generator_gen_oil_pressure, tone_entity: sensor.generator_gen_rpm, tone_above: 300, warn_below: 1.5, alarm_below: 1 }
+          - { type: warnlight, x: 236, y: 642, size: 40, icon: koelwater, label: Generator koelwatertemperatuur, entity: sensor.generator_gen_coolant_temp, tone_entity: sensor.generator_gen_rpm, tone_above: 300, warn_above: 86, alarm_above: 95 }
+
+          # ---- zijpaneel: vaarmodus, status aandrijving ----
           - { type: text, x: 896, y: 76, text: Vaarmodus, style: caption }
           - { type: switch, x: 896, y: 100, width: 112, height: 112, icon: motor, label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { title: "Dieselmodus inschakelen?", yes: Inschakelen } } }
           - { type: switch, x: 1020, y: 100, width: 112, height: 112, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { title: "Elektrische modus inschakelen?", yes: Inschakelen } } }
           - { type: switch, x: 1144, y: 100, width: 112, height: 112, icon: anker, label: Haven, entity: button.wago_hcs_controls_wago_controls_harbormode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, tap_action: { action: toggle, confirmation: { title: "Havenmodus inschakelen?", yes: Inschakelen } } }
-          - { type: text, x: 896, y: 232, text: Toerental, style: caption }
-          - { type: dial, x: 896, y: 252, width: 174, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, min: 0, max: 4000, unit: rpm }
-          - { type: dial, x: 1082, y: 252, width: 174, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, unit: rpm, warn_above: 500 }
           - { type: panel, x: 896, y: 428, width: 360, height: 212, title: Aandrijving }
           - { type: indicator, x: 912, y: 464, width: 328, label: Diesel loopt, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }
           - { type: indicator, x: 912, y: 497, width: 328, label: Koppeling vooruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, color: "var(--ok)", font_size: 16, led_size: 12, show_state: true }

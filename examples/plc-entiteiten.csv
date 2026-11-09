@@ -15,7 +15,7 @@ Main;FWD;status;binary_sensor.plc_gear_forward;binary_sensor.wago_hcs_controls_w
 Main;NEUTRAL;status;binary_sensor.plc_gear_neutral;;geen gevonden;afleiden: niet FWD en niet AFT (template)
 Main;AFT;status;binary_sensor.plc_gear_aft;binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft;waarschijnlijk;koppeling diesel AFT
 Main;Diesel Speed;meetwaarde;sensor.plc_diesel_speed;sensor.engine_room_main_engine_me_rpm;waarschijnlijk;Main Engine ME RPM (nu unavailable)
-Main;Electric Speed;meetwaarde;sensor.plc_electric_speed;;geen gevonden;alleen aan/uit: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running
+Main;Electric Speed;meetwaarde;sensor.plc_electric_speed;sensor.wago_hcs_controls_wago_hcs_controls_emotor_speed;zeker;opgegeven door de gebruiker (09-11)
 Main;Shaft Speed;meetwaarde;sensor.plc_shaft_speed;sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed;zeker;
 Main;Battery SoC;meetwaarde;sensor.plc_battery_soc;sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge;zeker;Wago Battery SoC
 Main;Charging;status;binary_sensor.plc_battery_charging;binary_sensor.wago_energy_controls_wago_energy_controls_bms_charging_mode;waarschijnlijk;
@@ -63,7 +63,7 @@ Electric / E-motor;Emotor Propeller;meetwaarde;sensor.plc_emotor_propeller;;geen
 Electric / E-motor;Encoder Actual;meetwaarde;sensor.plc_encoder_actual;;geen gevonden;
 Electric / E-motor;Encoder Propeller;meetwaarde;sensor.plc_encoder_propeller;;geen gevonden;
 Electric / E-motor;Diesel Propeller;meetwaarde;sensor.plc_diesel_propeller;;geen gevonden;
-Electric / E-motor;E-motor RPM (zelfde als Electric Speed?);meetwaarde;sensor.plc_emotor_rpm;;geen gevonden;
+Electric / E-motor;E-motor RPM (zelfde als Electric Speed?);meetwaarde;sensor.plc_emotor_rpm;sensor.wago_hcs_controls_wago_hcs_controls_emotor_speed;zeker;opgegeven door de gebruiker (09-11); toerenteller E-motor op Voortstuwing
 Electric / E-motor;E-motor normalised RPM;meetwaarde;sensor.plc_emotor_rpm_normalised;;geen gevonden;
 Electric / E-motor;Synch diff;meetwaarde;sensor.plc_synch_diff;;geen gevonden;
 Electric / Bowthruster;Manual SeaWater Pump Start;commando;button.plc_seawater_pump_start;switch.er_zeewaterpomp_cooling;waarschijnlijk;één switch voor start/stop
@@ -176,3 +176,6 @@ Systemen / Boegschroef;Jet pump 3 output;meetwaarde;;sensor.er_thruster_status_j
 Systemen / Boegschroef;Jet pump 3 speed;meetwaarde;;sensor.er_thruster_status_jet_pump_3_speed;zeker;ER_Thruster_Status
 DC-bus;PLC lifebeat (interne communicatie PLC's);status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat;zeker;door de gebruiker opgegeven
 Diesel;Diesel clutch neutraal;status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr;zeker;door de gebruiker opgegeven
+Voortstuwing;Prepair Volvo Start;knop;automation.prepvolvostart;automation.prepvolvostart;zeker;uit het HA-dashboard van de gebruiker (09-11)
+Voortstuwing;Prepair Generator Start;knop;automation.prepgenstart;automation.prepgenstart;zeker;uit het HA-dashboard van de gebruiker (09-11)
+Voortstuwing;Prepair Energy Inverters;knop;automation.plc_prep_inverters;;geen gevonden;placeholder, automation nog niet bekend
