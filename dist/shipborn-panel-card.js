@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.29";
+const VERSION = "0.5.30";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -439,7 +439,8 @@ const TC_ICONS = {
   flow: "M3 8h13M13 4.5 16.5 8 13 11.5M3 15c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0M3 19.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0",
   uitlaat: "M2 15h11v4H2zM13 16.5h3M19 13c1.5-1.5 0-3 1.5-4.5S20.5 5.5 22 4M16 12c1.5-1.5 0-3 1.5-4.5",
   druk: "M12 16a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM12 9.5l3-2.5M12 9.5h.01M12 16v5M9 21h6",
-  koppeling: "M10 14l4-4M8.5 11.5 6 14a3 3 0 0 0 4 4l2.5-2.5M15.5 12.5 18 10a3 3 0 0 0-4-4l-2.5 2.5"
+  koppeling: "M10 14l4-4M8.5 11.5 6 14a3 3 0 0 0 4 4l2.5-2.5M15.5 12.5 18 10a3 3 0 0 0-4-4l-2.5 2.5",
+  ontkoppeld: "M7.5 12.5 5 15a3 3 0 0 0 4 4l2.5-2.5M16.5 11.5 19 9a3 3 0 0 0-4-4l-2.5 2.5M4 4l2.5 2.5M20 20l-2.5-2.5M9 3v2M3 9h2M15 21v-2M21 15h-2"
 };
 const tcIcon = (name, size = 28) =>
   `<svg class="tc-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><path d="${TC_ICONS[name] || TC_ICONS.alarm}"/></svg>`;
@@ -629,9 +630,8 @@ const TC_STYLE =
   .tc-wl.is-ok { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
   .tc-wl.is-warn { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
   .tc-wl.is-alarm { color: var(--alarm); border-color: var(--alarm); background: var(--alarm-soft); animation: tc-pulse 1.2s ease-in-out infinite; }
-  .d-btn.has-check { position: relative; }
-  .d-check { --c: var(--ok); position: absolute; right: 14px; top: 50%; margin-top: -5px; display: none; }
-  .d-btn.is-ready .d-check { display: block; }
+  .d-btn.has-check { gap: 10px; }
+  .d-check { --c: var(--ok); }
   .tc-check { max-width: 520px; }
   .tc-check-list { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: var(--space-1); }
   .tc-check-list li { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: var(--space-3);
@@ -2068,15 +2068,16 @@ class ShipbornPanelCard extends HTMLElement {
     );
     if (b.font_size) btn.style.setProperty("--fs", b.font_size + "px");
     if (b.led) btn.appendChild(this._dLed(b.led_entity || b.entity, b.led, b.led_state, b.led_blink));
+    // checklist: a tap opens a list of steps with their live state (Uitvoeren runs tap_action); the dot left of
+    // the label is green while every step is OK, grey otherwise.
+    const steps = b.checklist?.items || [];
+    const ready = steps.length ? h("span", "d-led d-check") : null;
+    if (ready) {
+      btn.classList.add("has-check");
+      btn.appendChild(ready);
+    }
     btn.append(b.label ?? "");
     n.appendChild(btn);
-    // checklist: a tap opens a list of steps with their live state (Uitvoeren runs tap_action); a green tick
-    // appears on the right of the button while every step is OK.
-    const steps = b.checklist?.items || [];
-    if (steps.length) {
-      btn.classList.add("has-check");
-      btn.insertAdjacentHTML("beforeend", '<span class="d-check d-led on"></span>');
-    }
     if (b.mode === "momentary") this._momentary(btn, b);
     else if (steps.length) btn.addEventListener("click", () => this._checklist(b));
     else btn.addEventListener("click", () => this._handleAction(b, b.tap_action, btn));
@@ -2084,7 +2085,7 @@ class ShipbornPanelCard extends HTMLElement {
       const so = b.entity ? hass.states[b.entity] : null;
       btn.classList.toggle("unavailable", !!b.entity && unavailable(so));
       if (b.active_entity) btn.classList.toggle("active", isOn(hass.states[b.active_entity], b.active_state));
-      if (steps.length) btn.classList.toggle("is-ready", steps.every((s) => this._stepOk(hass, s)));
+      if (ready) ready.classList.toggle("on", steps.every((s) => this._stepOk(hass, s)));
     });
     return n;
   }
@@ -2490,7 +2491,13 @@ class ShipbornPanelCard extends HTMLElement {
     n.type = "button";
     n.title = w.label ?? "";
     n.setAttribute("aria-label", w.label ?? "");
-    n.innerHTML = tcIcon(w.icon || "alarm", Math.round(S * 0.6));
+    // icon_off: another picture while the light is grey (e.g. ontkoppeld next to koppeling).
+    let drawn = null;
+    const draw = (icon) => {
+      if (icon !== drawn) n.innerHTML = tcIcon(icon, Math.round(S * 0.6));
+      drawn = icon;
+    };
+    draw(w.icon || "alarm");
     const act = w.tap_action || (w.entity ? { action: "more-info" } : null);
     if (act) n.addEventListener("click", () => this._handleAction(w, act, n));
     this._updaters.push((hass) => {
@@ -2502,6 +2509,7 @@ class ShipbornPanelCard extends HTMLElement {
         st = v == null ? (isOn(so) ? "ok" : "off") : t || "ok";
       }
       for (const k of ["ok", "warn", "alarm"]) n.classList.toggle("is-" + k, st === k);
+      draw(st === "off" && w.icon_off ? w.icon_off : w.icon || "alarm");
     });
     return n;
   }
