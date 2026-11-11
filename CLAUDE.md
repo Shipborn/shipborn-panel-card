@@ -142,7 +142,7 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 
 ## Stand van zaken en open punten (11-11-2026, v0.5.34)
 
-- **Boegschroef aan geblokkeerd zonder Energy Inverters (v0.5.34, 11-11):** de knoppen *Aan* (Voortstuwing) en *Bow thruster on* (Boegschroef) hebben `require: *bt_require` (anker in `sys-bowthruster`): DC-bus ≥ 700 V én `switch.wago_energy_controls_wago_energy_controls_battery_connect_2` aan. Anders stuurt de knop niets en verschijnt *Eerst Energy Inverters online* met alleen *Sluiten*. "Battery drive aan" is als Battery connect opgevat (geen aparte status gevonden in de HA-export); bevestigen bij de gebruiker.
+- **Boegschroef aan geblokkeerd zonder Energy Inverters (v0.5.34, 11-11):** de knoppen *Aan* (Voortstuwing) en *Bow thruster on* (Boegschroef) hebben `require: *bt_require` (anker in `sys-bowthruster`): DC-bus ≥ 700 V én `switch.wago_energy_controls_wago_energy_controls_battery_connect_2` aan. Anders stuurt de knop niets en verschijnt *Eerst Energy Inverters online* met alleen *Sluiten*. "Battery drive aan" = Battery connect (bevestigd door de gebruiker, 11-11).
 
 - **Energy Inverters op Voortstuwing (11-11, alleen YAML):** de knop *Prepair Energy Inverters* (placeholder `automation.plc_prep_inverters`) is vervangen door dezelfde knop als op het Energie-overzicht: *Energy Inverters opstarten*, keuzevenster en bolletje bij DC-bus ≥ 700 V. Het venster is één gedeeld anker `&ei_start` (in `energie`, gebruikt als `*ei_start` op Voortstuwing): pas de keuzes daar aan, dan veranderen beide knoppen mee.
 
