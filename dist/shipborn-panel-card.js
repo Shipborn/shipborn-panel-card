@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.32";
+const VERSION = "0.5.33";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -649,6 +649,10 @@ const TC_STYLE =
   .tc-choice-note { margin: 0; min-height: 1.4em; color: var(--ink-muted); text-align: center; }
   .tc-choice-note.is-warn { color: var(--warn); }
   .tc-btn:disabled { opacity: .45; cursor: default; }
+  .tc-web { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: #fff; }
+  .tc-web iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+  .tc-web-open { position: absolute; right: 8px; bottom: 8px; padding: 6px 12px; border-radius: var(--radius-pill);
+    background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); text-decoration: none; font-size: 13px; }
   .tc-gear { display: flex; gap: var(--space-2); }
   .tc-gear span { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line);
     border-radius: var(--radius-md); background: var(--surface); color: var(--line-strong); font: 700 22px var(--font-cond); }
@@ -1492,6 +1496,7 @@ class ShipbornPanelCard extends HTMLElement {
       case "dial": return this._tDial(item);
       case "warnlight": return this._tWarnlight(item);
       case "gear": return this._tGear(item);
+      case "webpage": return this._tWebpage(item);
       case "toggle": return this._tToggle(item);
       case "light_group": return this._tLightGroup(item);
       case "stepper": return this._tStepper(item);
@@ -2602,6 +2607,29 @@ class ShipbornPanelCard extends HTMLElement {
       for (const k of ["ok", "warn", "alarm", "nodata"]) n.classList.toggle("is-" + k, st === k);
       draw(st === "off" && w.icon_off ? w.icon_off : w.icon || "alarm");
     });
+    return n;
+  }
+
+  // Web page (e.g. on the local network) in an iframe: url, x, y, width, height; scale < 1 shows more of the page
+  // (zoomed out). A small button opens it in a new window (open_button: false to hide). Only works when HA itself is
+  // opened over http, or the page is https: browsers block an http page inside an https one.
+  _tWebpage(w) {
+    const n = this._place(h("div", "tc-web"), w, 1240, 624);
+    const f = h("iframe");
+    const s = Number(w.scale) > 0 ? Number(w.scale) : 1;
+    if (s !== 1) Object.assign(f.style, { width: 100 / s + "%", height: 100 / s + "%", transform: `scale(${s})`, transformOrigin: "0 0" });
+    f.src = w.url || "about:blank";
+    f.title = w.label || w.url || "";
+    f.referrerPolicy = "no-referrer";
+    n.appendChild(f);
+    if (w.open_button !== false && w.url) {
+      const a = h("a", "tc-web-open label");
+      a.href = w.url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = w.open_label || "Open in nieuw venster";
+      n.appendChild(a);
+    }
     return n;
   }
 

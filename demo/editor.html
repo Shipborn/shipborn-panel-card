@@ -187,6 +187,7 @@
         ["Hotspot", { type: "hotspot", icon: "motor", label: "Punt", entity: "sensor.x" }, [150, 44]],
         ["Ronde meter", { type: "dial", width: 174, label: "Meter", entity: "sensor.x", min: 0, max: 100 }, [174, 172]],
         ["Waarschuwingslampje", { type: "warnlight", size: 40, icon: "oliedruk", label: "Lampje", entity: "sensor.x" }, [40, 40]],
+        ["Webpagina", { type: "webpage", width: 600, height: 400, url: "http://192.168.3.78/Details" }, [600, 400]],
         ["Keerkoppeling D N R", { type: "gear", width: 220, height: 40, fwd_entity: "binary_sensor.x", aft_entity: "binary_sensor.y" }, [220, 40]],
         ["Rijknop / lamp", { type: "toggle", width: 219, height: 48, label: "Lamp", entity: "light.x" }, [219, 48]],
         ["Lichtgroep", { type: "light_group", width: 448, height: 56, label: "Groep", entity: "light.x" }, [448, 56]],
@@ -258,7 +259,7 @@
     const snap = (v) => Math.round(v / grid()) * grid();
     const yOf = (it) => it.y ?? it.true ?? 0;
     // TC90 design items; the frame (status and icon bar) is fixed in place, only its options are edited.
-    const TC = ["statusbar", "alarmbar", "navbar", "tile", "switch", "hotspot", "dial", "warnlight", "gear", "toggle", "light_group", "stepper", "climate"];
+    const TC = ["statusbar", "alarmbar", "navbar", "tile", "switch", "hotspot", "dial", "warnlight", "gear", "webpage", "toggle", "light_group", "stepper", "climate"];
     const FRAME = ["statusbar", "alarmbar", "navbar"];
     const isTc = () => cardCfg().design === "tc90";
 

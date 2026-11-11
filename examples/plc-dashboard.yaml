@@ -39,7 +39,7 @@ views:
               - { icon: energie, label: Energie, path: energie, match: [sys-power, sys-dcbus] }
               - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel] }
               - { icon: water, label: Water, path: sys-seawater, match: [sys-freshwater, sys-wastewater] }
-              - { icon: klimaat, label: Klimaat, path: sys-webasto }
+              - { icon: klimaat, label: Klimaat, path: sys-webasto, match: [klimaat-instellingen, klimaat-browser] }
               - { icon: bilge, label: Bilge, path: sys-bilge }
               - { icon: alarm, label: Alarmen, path: alarms, badge_entity: sensor.er_alarm_status_active_alarms, badge_attribute: alarms }
 
@@ -972,8 +972,8 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
 
-          # ---- DC-bus: spanning, beschikbare bronnen en opstarten ----
-          - { type: panel, x: 20, y: 76, width: 400, height: 624, title: DC-bus }
+          # ---- Energy Inverters: DC-bus-spanning, beschikbare bronnen en opstarten ----
+          - { type: panel, x: 20, y: 76, width: 400, height: 624, title: Energy Inverters }
           - { type: dial, x: 70, y: 124, width: 300, label: Spanning, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, min: 0, max: 900, unit: V, decimals: 0 }
           - { type: text, x: 38, y: 420, text: Beschikbaar, style: caption }
           - { type: warnlight, x: 38, y: 448, size: 48, icon: walstroom, label: Walstroom beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on }
@@ -986,12 +986,12 @@ views:
             y: 620
             width: 364
             height: 60
-            label: DC-bus opstarten
+            label: Energy Inverters opstarten
             font_size: 17
             status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
             status_above: 699.9
             choice:
-              title: DC-bus opstarten
+              title: Energy Inverters opstarten
               text: "De accu (Battery connect) wordt altijd ingeschakeld. Kies daarnaast de bron."
               base: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
               options:
@@ -1637,6 +1637,10 @@ views:
         items:
           - type: statusbar
             title: Klimaat
+            tabs: &klimaat_tabs
+              - { label: Overzicht, path: sys-webasto }
+              - { label: Instellingen, path: klimaat-instellingen }
+              - { label: Browser, path: klimaat-browser }
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           # ---- Webasto per ruimte: zelfde blok als onder de ingezoomde ruimtes (schakelaar in de kop, meter met − / +) ----
@@ -1661,15 +1665,50 @@ views:
           - { type: panel, x: 660, y: 328, width: 280, height: 236, title: Guest cabin }
           - { type: toggle, style: pill, x: 876, y: 334, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_guest_cabin_ac }
           - { type: climate, x: 707, y: 370, width: 186, entity: sensor.webasto_bluecool_noder_guest_cabin_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_guest_cabin_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_guest_cabin, fan_entity: sensor.webasto_bluecool_noder_guest_cabin_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_guest_cabin_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
-          - { type: panel, x: 980, y: 328, width: 280, height: 236, title: Compressor ER }
-          - { type: toggle, style: pill, x: 1196, y: 334, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_compressor_engine_room_ac }
-          - { type: climate, x: 1027, y: 370, width: 186, entity: sensor.webasto_bluecool_noder_compressor_engine_room_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_compressor_engine_room_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_compressor_engine_room, fan_entity: sensor.webasto_bluecool_noder_compressor_engine_room_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_compressor_engine_room_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
           # ---- alle hutten tegelijk: waarde kiezen en dan naar alle hutten sturen ----
           - { type: panel, x: 20, y: 588, width: 1240, height: 112, title: Alle hutten }
           - { type: stepper, x: 38, y: 632, width: 300, height: 56, label: Ventilator, entity: input_number.webasto_all_fanspeed, decimals: 0, value_names: { 6: Aut } }
           - { type: stepper, x: 354, y: 632, width: 300, height: 56, label: Temperatuur, entity: input_number.webasto_all_temperatures, unit: "°C", decimals: 1 }
           - { type: pushbutton, x: 678, y: 636, width: 284, height: 48, label: Fan naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_fan_speed } } }
           - { type: pushbutton, x: 974, y: 636, width: 268, height: 48, label: Temp naar alle hutten, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.webasto_apply_all_setpoint } } }
+
+  - title: Klimaat instellingen
+    path: klimaat-instellingen
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Klimaat
+            tabs: *klimaat_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          # ---- compressor engine room (verhuisd van het overzicht) ----
+          - { type: panel, x: 20, y: 76, width: 280, height: 236, title: Compressor ER }
+          - { type: toggle, style: pill, x: 236, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_compressor_engine_room_ac }
+          - { type: climate, x: 67, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_compressor_engine_room_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_compressor_engine_room_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_compressor_engine_room, fan_entity: sensor.webasto_bluecool_noder_compressor_engine_room_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_compressor_engine_room_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+
+  - title: Klimaat browser
+    path: klimaat-browser
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Klimaat
+            tabs: *klimaat_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          # ---- webpagina op het lokale netwerk (werkt alleen als HA via http geopend wordt) ----
+          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.78/Details", label: Klimaat details }
 
   - title: Voortstuwing
     path: voortstuwing
