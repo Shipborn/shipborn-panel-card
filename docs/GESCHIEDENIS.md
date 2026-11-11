@@ -133,6 +133,11 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.30) Vak Aandrijving weg; onder de generator een paneel *Boegschroef* (ingeschakeld, DC-bus ≥ 700 V). Bolletje in de Prepair-knoppen links van de tekst, groen of grijs (niet meer onzichtbaar). `warnlight` kreeg `icon_off`; *E-motor gekoppeld* toont `koppeling` of `ontkoppeld` (nieuw icoon: losse schakel).
 - Nieuwe indeling (alleen YAML): grotere toerentellers (260), lampjes overal 48, *Prepair Volvo Start* onder de diesellampjes, *Prepair Generator Start* in het generatorpaneel, nieuw paneel *Energy inverters* boven de generator met zijn Prepair-knop, boegschroef aan/uit in het boegschroefpaneel. Past op 1280×800 (inhoud tot y 692).
 
+## 11-11-2026 – lampjes zonder data
+
+- Dagmap `261111` (Windows-pc van GBS).
+- Uitleg gegeven hoe de lampjes kleuren (grijs als het systeem uit staat, daarna de grenzen). Op verzoek (v0.5.31): geel als het systeem draait maar de sensor geen data heeft; het DC-bus-lampje van de boegschroef volgt nu ook "grijs als uit" (boegschroef ingeschakeld). Getest in de demo: diesel aan/uit met onbeschikbare flow, boegschroef uit / aan met 650 V / aan zonder data.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

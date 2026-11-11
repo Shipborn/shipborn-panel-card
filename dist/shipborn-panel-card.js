@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.30";
+const VERSION = "0.5.31";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -629,6 +629,7 @@ const TC_STYLE =
     transition: color .3s, background .3s, border-color .3s; -webkit-tap-highlight-color: transparent; }
   .tc-wl.is-ok { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
   .tc-wl.is-warn { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+  .tc-wl.is-nodata { color: var(--light); border-color: var(--light); background: var(--light-soft); }
   .tc-wl.is-alarm { color: var(--alarm); border-color: var(--alarm); background: var(--alarm-soft); animation: tc-pulse 1.2s ease-in-out infinite; }
   .d-btn.has-check { gap: 10px; }
   .d-check { --c: var(--ok); }
@@ -2503,12 +2504,16 @@ class ShipbornPanelCard extends HTMLElement {
     this._updaters.push((hass) => {
       const so = w.entity ? hass.states[w.entity] : null;
       const v = num(so, w.factor);
+      // System running (or no tone_entity) but the sensor has no data: yellow, so a dead sensor never looks OK.
+      const running = !w.tone_entity || activeOf(hass, w.tone_entity, w, "tone");
+      const noData = !so || unavailable(so) || so.state === "unknown";
       let st = "off";
-      if (so && !unavailable(so) && so.state !== "unknown" && (!w.tone_entity || activeOf(hass, w.tone_entity, w, "tone"))) {
+      if (running && noData) st = "nodata";
+      else if (running) {
         const t = v == null ? null : toneOf(hass, { ...w, tone_entity: null }, v);
         st = v == null ? (isOn(so) ? "ok" : "off") : t || "ok";
       }
-      for (const k of ["ok", "warn", "alarm"]) n.classList.toggle("is-" + k, st === k);
+      for (const k of ["ok", "warn", "alarm", "nodata"]) n.classList.toggle("is-" + k, st === k);
       draw(st === "off" && w.icon_off ? w.icon_off : w.icon || "alarm");
     });
     return n;

@@ -140,7 +140,9 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
 - Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). Op 06-11 is in dagmap `261106` verder gewerkt (zie `git log`).
 
-## Stand van zaken en open punten (09-11-2026, v0.5.30)
+## Stand van zaken en open punten (11-11-2026, v0.5.31)
+
+- **Lampjes geel bij geen data (v0.5.31, 11-11):** een `warnlight` is geel (`--light`) als het systeem draait maar de sensor onbeschikbaar of onbekend is; staat het systeem uit, dan blijft hij grijs. Lampjes zonder `tone_entity` (generator loopt, E-motor gekoppeld, boegschroef ingeschakeld) worden geel zodra hun entiteit geen data heeft. Het DC-bus-lampje van de boegschroef is nu grijs zolang de boegschroef niet ingeschakeld is (`tone_entity` = `binary_sensor.er_thruster_status_bow_thruster_enabled`), net als de andere lampjes. Volgorde: geen systeem → grijs; systeem aan zonder data → geel; anders rood / oranje / groen volgens de grenzen.
 
 - **Voortstuwing, indeling van 09-11 (eind van de dag, alleen YAML):** links drie kolommen van 272 breed (x 24 / 312 / 600) met toerentellers van 260 (y 232–461); onder de diesel D N R (y 490), vijf lampjes van 48 naast elkaar (y 546) en *Prepair Volvo Start* (y 610); onder schroefas en E-motor de lampjes van 48 op y 490. Rechts onder de vaarmodus drie panelen van 360 breed: *Energy inverters* (y 232, alleen de Prepair-knop, placeholder), *Generator* (y 348: lampjes van 48 en *Prepair Generator Start*), *Boegschroef* (y 536–700: lampjes en de knoppen *Aan* / *Uit* = `button.wago_hcs_controls_wago_controls_bowthruster_on` / `_off`). Alle lampjes zijn 48 groot.
 

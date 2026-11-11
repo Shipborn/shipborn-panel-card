@@ -1706,11 +1706,11 @@ views:
                 - { label: Compressor, entity: switch.0x781c9dfffea18853 }
                 - { label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, above: 3, unit: bar, decimals: 2 }
 
-          # Boegschroef: ingeschakeld + DC-bus-spanning goed (≥ 700 V; tik = Boegschroef) en de knoppen aan / uit
+          # Boegschroef: ingeschakeld + DC-bus-spanning goed (≥ 700 V, grijs als de boegschroef niet ingeschakeld is; tik = Boegschroef) en de knoppen aan / uit
           - { type: panel, x: 896, y: 536, width: 360, height: 164, title: Boegschroef }
           - { type: warnlight, x: 914, y: 580, size: 48, icon: ventilator, label: Boegschroef ingeschakeld, entity: binary_sensor.er_thruster_status_bow_thruster_enabled, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
           - { type: line, x: 976, y: 584, width: 1, height: 40, color: "var(--line, #3b4249)" }
-          - { type: warnlight, x: 990, y: 580, size: 48, icon: energie, label: "DC-bus-spanning ≥ 700 V", entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, alarm_below: 700, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
+          - { type: warnlight, x: 990, y: 580, size: 48, icon: energie, label: "DC-bus-spanning ≥ 700 V", entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, tone_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, alarm_below: 700, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
           - { type: pushbutton, x: 914, y: 640, width: 158, height: 44, label: Aan, entity: button.wago_hcs_controls_wago_controls_bowthruster_on, led: green, led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, font_size: 16 }
           - { type: pushbutton, x: 1080, y: 640, width: 158, height: 44, label: Uit, entity: button.wago_hcs_controls_wago_controls_bowthruster_off, variant: stop, font_size: 16 }
 
