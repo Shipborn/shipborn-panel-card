@@ -142,6 +142,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.33) **Klimaat in drie tabs:** Overzicht (Webasto), Instellingen (Compressor ER, verhuisd van het overzicht) en Browser (nieuw item `webpage`: een iframe met `http://192.168.3.78/Details`, plus knop *Open in nieuw venster*). Op het Energie-overzicht heten het vak en de opstartknop nu *Energy Inverters*. Gevraagd: HA wordt lokaal via http geopend (anders blokkeert de browser de http-pagina).
 - Adres van de klimaatpagina gewijzigd naar `http://192.168.3.212/web/index.html`. Besproken: van buitenaf kijken vraagt een proxy in HA (Ingress-integratie met `rewrite`-regels), een VPN of uitgelezen sensoren.
 - Knop *Prepair Energy Inverters* op Voortstuwing vervangen door een kopie van *Energy Inverters opstarten* (zelfde naam, venster en bolletje; gedeeld YAML-anker `&ei_start`). Knop *Open in nieuw venster* op Klimaat › Browser verborgen (`open_button: false`).
+- (v0.5.34) **Boegschroef aan pas met Energy Inverters online:** nieuwe `pushbutton`-optie `require`; zonder DC-bus ≥ 700 V of Battery connect aan opent een melding *Eerst Energy Inverters online* (alleen *Sluiten*) en wordt er niets gestuurd. Op Voortstuwing en Boegschroef (gedeeld anker `&bt_require`). Getest in de demo: 650 V, Battery connect uit (melding, geen commando) en 742 V + aan (`button.press`).
 
 ## Lessen en keuzes die je moet kennen
 

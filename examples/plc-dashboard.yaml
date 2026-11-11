@@ -1228,7 +1228,24 @@ views:
           - { type: panel, x: 20, y: 835, width: 1240, height: 370, title: Thruster status }
           - { type: indicator, x: 38, y: 889, entity: binary_sensor.er_thruster_status_bow_thruster_enabled, label: Bow thruster enabled, font_size: 15, tap_action: { action: more-info } }
           - { type: indicator, x: 342, y: 889, entity: binary_sensor.er_thruster_status_bow_thruster_running, label: Bow thruster running, font_size: 15, tap_action: { action: more-info } }
-          - { type: pushbutton, x: 646, y: 877, width: 292, height: 42, label: Bow thruster on, entity: button.wago_hcs_controls_wago_controls_bowthruster_on, led: green, led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, align: left, font_size: 15 }
+          # aan: alleen als de Energy Inverters online zijn (DC-bus ≥ 700 V en Battery connect aan), anders een melding met alleen Sluiten
+          - type: pushbutton
+            x: 646
+            y: 877
+            width: 292
+            height: 42
+            label: Bow thruster on
+            entity: button.wago_hcs_controls_wago_controls_bowthruster_on
+            led: green
+            led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled
+            align: left
+            font_size: 15
+            require: &bt_require       # ook gebruikt door de knop Aan op Voortstuwing
+              title: Eerst Energy Inverters online
+              text: "De boegschroef kan pas aan als de Energy Inverters online zijn. Start eerst de Energy Inverters."
+              items:
+                - { label: "DC-bus ≥ 700 V", entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, above: 699.9, unit: V, decimals: 0 }
+                - { label: Battery connect, entity: switch.wago_energy_controls_wago_energy_controls_battery_connect_2 }
           - { type: pushbutton, x: 950, y: 877, width: 292, height: 42, label: Bow thruster off, entity: button.wago_hcs_controls_wago_controls_bowthruster_off, variant: stop, font_size: 15 }
           - { type: value, style: tile, x: 38, y: 929, width: 292, height: 76, label: Bow lever, entity: sensor.er_thruster_status_bow_thruster_lever, value_size: 22 }
           - { type: value, style: tile, x: 342, y: 929, width: 292, height: 76, label: Bow output, entity: sensor.er_thruster_status_bow_thruster_output, value_size: 22 }
@@ -1823,7 +1840,7 @@ views:
           - { type: warnlight, x: 914, y: 580, size: 48, icon: ventilator, label: Boegschroef ingeschakeld, entity: binary_sensor.er_thruster_status_bow_thruster_enabled, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
           - { type: line, x: 976, y: 584, width: 1, height: 40, color: "var(--line, #3b4249)" }
           - { type: warnlight, x: 990, y: 580, size: 48, icon: energie, label: "DC-bus-spanning ≥ 700 V", entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, tone_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, alarm_below: 700, tap_action: { action: navigate, navigation_path: sys-bowthruster } }
-          - { type: pushbutton, x: 914, y: 640, width: 158, height: 44, label: Aan, entity: button.wago_hcs_controls_wago_controls_bowthruster_on, led: green, led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, font_size: 16 }
+          - { type: pushbutton, x: 914, y: 640, width: 158, height: 44, label: Aan, entity: button.wago_hcs_controls_wago_controls_bowthruster_on, led: green, led_entity: binary_sensor.er_thruster_status_bow_thruster_enabled, font_size: 16, require: *bt_require }
           - { type: pushbutton, x: 1080, y: 640, width: 158, height: 44, label: Uit, entity: button.wago_hcs_controls_wago_controls_bowthruster_off, variant: stop, font_size: 16 }
 
           # ---- zijpaneel: vaarmodus ----

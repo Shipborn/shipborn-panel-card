@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.33";
+const VERSION = "0.5.34";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2096,7 +2096,13 @@ class ShipbornPanelCard extends HTMLElement {
     if (b.mode === "momentary") this._momentary(btn, b);
     else if (steps.length) btn.addEventListener("click", () => this._checklist(b));
     else if (b.choice) btn.addEventListener("click", () => this._choice(b));
-    else btn.addEventListener("click", () => this._handleAction(b, b.tap_action, btn));
+    else btn.addEventListener("click", () => {
+      // require: every condition must hold, otherwise a window explains why (only Sluiten), nothing is sent
+      const req = b.require;
+      if (req?.items?.length && this._hass && !req.items.every((s) => this._stepOk(this._hass, s)))
+        return this._checklist({ label: b.label, checklist: { close: "Sluiten", ...req }, tap_action: { action: "none" } });
+      this._handleAction(b, b.tap_action, btn);
+    });
     this._updaters.push((hass) => {
       const so = b.entity ? hass.states[b.entity] : null;
       btn.classList.toggle("unavailable", !!b.entity && unavailable(so));
