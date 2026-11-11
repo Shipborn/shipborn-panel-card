@@ -36,7 +36,7 @@ views:
           - type: navbar
             items: &tc_nav
               - { icon: schip, label: Schip, path: ship-deck, match: [ship-side] }
-              - { icon: energie, label: Energie, path: sys-power, match: [sys-dcbus] }
+              - { icon: energie, label: Energie, path: energie, match: [sys-power, sys-dcbus] }
               - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel] }
               - { icon: water, label: Water, path: sys-seawater, match: [sys-freshwater, sys-wastewater] }
               - { icon: klimaat, label: Klimaat, path: sys-webasto }
@@ -951,6 +951,72 @@ views:
                 }
             }
 
+  # ===== Energie: overzicht (eerste tab; inhoud vooral van de DC-bus-pagina) =====
+  - title: Energie
+    path: energie
+    panel: true
+    # Nog te koppelen: het startcommando van de generator (keuze Generator zet nu alleen de accu aan, met een melding)
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Energie
+            tabs: &energie_tabs
+              - { label: Overzicht, path: energie }
+              - { label: "Accu's", path: sys-power }
+              - { label: DC-bus, path: sys-dcbus }
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+
+          # ---- DC-bus: spanning, beschikbare bronnen en opstarten ----
+          - { type: panel, x: 20, y: 76, width: 400, height: 624, title: DC-bus }
+          - { type: dial, x: 70, y: 124, width: 300, label: Spanning, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, min: 0, max: 900, unit: V, decimals: 0 }
+          - { type: text, x: 38, y: 420, text: Beschikbaar, style: caption }
+          - { type: warnlight, x: 38, y: 448, size: 48, icon: walstroom, label: Walstroom beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on }
+          - { type: text, x: 100, y: 462, text: Walstroom, style: label }
+          - { type: warnlight, x: 220, y: 448, size: 48, icon: generator, label: Generator beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on }
+          - { type: text, x: 282, y: 462, text: Generator, style: label }
+          # opstarten: venster met de keuze (alleen beschikbare bronnen te kiezen); bolletje groen als de bus ≥ 700 V is
+          - type: pushbutton
+            x: 38
+            y: 620
+            width: 364
+            height: 60
+            label: DC-bus opstarten
+            font_size: 17
+            status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+            status_above: 699.9
+            choice:
+              title: DC-bus opstarten
+              text: "De accu (Battery connect) wordt altijd ingeschakeld. Kies daarnaast de bron."
+              base: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
+              options:
+                - { label: Walstroom, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, entity: switch.wago_energy_controls_wago_energy_controls_shore_supply_2 }
+                - { label: Generator, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on, note: "Het generatorcommando is nog niet geautomatiseerd: alleen de accu wordt ingeschakeld." }
+              fallback: { label: Alleen accu, note: "Let op: de DC-bus draait dan alleen op de accu." }
+
+          # ---- Accu: SoC met max SoC (streepje op de meter) en − / + ----
+          - { type: panel, x: 440, y: 76, width: 400, height: 624, title: Accu }
+          - { type: dial, x: 490, y: 124, width: 300, label: SoC, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, min: 0, max: 100, unit: "%", decimals: 0, setpoint_entity: sensor.er_pms_status2_bms_max_soc, setpoint_label: Max SoC, setpoint_unit: "%" }
+          - { type: text, x: 458, y: 590, text: Max SoC, style: caption }
+          - { type: pushbutton, x: 458, y: 620, width: 176, height: 60, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 17 }
+          - { type: pushbutton, x: 646, y: 620, width: 176, height: 60, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 17 }
+
+          # ---- Glycolkoeling: druk en temperatuur (grijs als de glycolpomp uit staat; tik = DC-bus) en de automaten ----
+          - { type: panel, x: 860, y: 76, width: 400, height: 624, title: Glycolkoeling }
+          - { type: warnlight, x: 878, y: 128, size: 64, icon: druk, label: Glycoldruk, entity: sensor.wago_values_drivepressure_glycol, tone_entity: switch.0x781c9dfffea1854f, alarm_below: 0.5, tap_action: { action: navigate, navigation_path: sys-dcbus } }
+          - { type: text, x: 958, y: 150, text: Druk, style: label }
+          - { type: warnlight, x: 878, y: 208, size: 64, icon: koelwater, label: Glycoltemperatuur, entity: sensor.wago_values_drivetemp_glycol, tone_entity: switch.0x781c9dfffea1854f, warn_above: 40, alarm_above: 50, tap_action: { action: navigate, navigation_path: sys-dcbus } }
+          - { type: text, x: 958, y: 230, text: Temperatuur, style: label }
+          - { type: text, x: 878, y: 300, text: Automaten, style: caption }
+          - { type: pushbutton, x: 878, y: 328, width: 364, height: 48, label: Glycolpomp on automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 878, y: 384, width: 364, height: 48, label: Zeewaterpomp glycol automaat, entity: automation.zeewater_pomp_voor_glycol_on_automaat, led: green, align: left, font_size: 15 }
+          - { type: text, x: 878, y: 448, width: 364, text: "Glycolpomp start zodra de DC-bus voeding heeft; de zeewaterpomp volgt de glycolpomp.", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+
   - title: DC-bus koeling
     path: sys-dcbus
     panel: true
@@ -967,9 +1033,7 @@ views:
         items:
           - type: statusbar
             title: Energie
-            tabs: &energie_tabs
-              - { label: "Accu's", path: sys-power }
-              - { label: DC-bus, path: sys-dcbus }
+            tabs: *energie_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 49, width: 1240, height: 600 }

@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.31";
+const VERSION = "0.5.32";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -641,6 +641,14 @@ const TC_STYLE =
   .tc-check-list li.is-ok .d-led { --c: var(--ok); }
   .tc-check-list .label { color: var(--ink); text-align: left; }
   .tc-check-st { font-family: var(--font-mono); white-space: nowrap; }
+  .tc-choice li { cursor: pointer; }
+  .tc-choice li .d-led { --c: var(--line-strong); }
+  .tc-choice li.is-fallback .d-led { --c: var(--warn); }
+  .tc-choice li.is-off { opacity: .45; cursor: default; }
+  .tc-choice li.is-picked { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+  .tc-choice-note { margin: 0; min-height: 1.4em; color: var(--ink-muted); text-align: center; }
+  .tc-choice-note.is-warn { color: var(--warn); }
+  .tc-btn:disabled { opacity: .45; cursor: default; }
   .tc-gear { display: flex; gap: var(--space-2); }
   .tc-gear span { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line);
     border-radius: var(--radius-md); background: var(--surface); color: var(--line-strong); font: 700 22px var(--font-cond); }
@@ -2071,8 +2079,9 @@ class ShipbornPanelCard extends HTMLElement {
     if (b.led) btn.appendChild(this._dLed(b.led_entity || b.entity, b.led, b.led_state, b.led_blink));
     // checklist: a tap opens a list of steps with their live state (Uitvoeren runs tap_action); the dot left of
     // the label is green while every step is OK, grey otherwise.
+    // status_entity (+ status_above / _below / _state) gives the same dot without a checklist, e.g. DC-bus ≥ 700 V.
     const steps = b.checklist?.items || [];
-    const ready = steps.length ? h("span", "d-led d-check") : null;
+    const ready = steps.length || b.status_entity ? h("span", "d-led d-check") : null;
     if (ready) {
       btn.classList.add("has-check");
       btn.appendChild(ready);
@@ -2081,14 +2090,91 @@ class ShipbornPanelCard extends HTMLElement {
     n.appendChild(btn);
     if (b.mode === "momentary") this._momentary(btn, b);
     else if (steps.length) btn.addEventListener("click", () => this._checklist(b));
+    else if (b.choice) btn.addEventListener("click", () => this._choice(b));
     else btn.addEventListener("click", () => this._handleAction(b, b.tap_action, btn));
     this._updaters.push((hass) => {
       const so = b.entity ? hass.states[b.entity] : null;
       btn.classList.toggle("unavailable", !!b.entity && unavailable(so));
       if (b.active_entity) btn.classList.toggle("active", isOn(hass.states[b.active_entity], b.active_state));
-      if (ready) ready.classList.toggle("on", steps.every((s) => this._stepOk(hass, s)));
+      if (ready) ready.classList.toggle("on", steps.length ? steps.every((s) => this._stepOk(hass, s)) : activeOf(hass, b.status_entity, b, "status"));
     });
     return n;
+  }
+
+  // Choice window: the user picks one option (only options whose available_entity is on can be picked; the
+  // fallback, e.g. Alleen accu, always can); Uitvoeren switches choice.base on and then the picked option's
+  // entity (an option without entity only shows its note). Live availability; with nothing available the
+  // fallback is preselected.
+  _choice(b) {
+    const c = b.choice;
+    const dlg = h("div", "tc-dlg");
+    dlg.dataset.tcTheme = this._theme || "nacht";
+    const box = h("div", "tc-dialog tc-check");
+    box.innerHTML = '<div class="title"></div><p class="body tc-dialog-text"></p><ul class="tc-check-list tc-choice"></ul>' +
+      '<p class="body tc-choice-note"></p><div class="tc-dialog-btns"><button type="button" class="tc-btn label"></button>' +
+      '<button type="button" class="tc-btn tc-btn-primary label"></button></div>';
+    box.querySelector(".title").textContent = c.title || b.label || "";
+    const intro = box.querySelector(".tc-dialog-text");
+    if (c.text) intro.textContent = c.text;
+    else intro.remove();
+    const list = box.querySelector("ul");
+    const note = box.querySelector(".tc-choice-note");
+    const [close, run] = box.querySelector(".tc-dialog-btns").children;
+    close.textContent = c.close || "Annuleren";
+    run.textContent = c.run || "Uitvoeren";
+    const opts = [...(c.options || []), ...(c.fallback ? [{ ...c.fallback, fallback: true }] : [])];
+    let pick = null;
+    let auto = true;
+    const avail = (hass, o) => o.fallback || !o.available_entity || activeOf(hass, o.available_entity, o, "available");
+    const rows = opts.map((o) => {
+      const li = h("li");
+      li.innerHTML = '<span class="d-led on"></span><span class="label"></span><span class="caption tc-check-st"></span>';
+      li.children[1].textContent = o.label ?? o.entity ?? "";
+      li.classList.toggle("is-fallback", !!o.fallback);
+      li.addEventListener("click", () => {
+        if (!avail(this._hass, o)) return;
+        pick = o;
+        auto = false;
+        paint(this._hass);
+      });
+      list.appendChild(li);
+      return [li, o];
+    });
+    const paint = (hass) => {
+      const any = opts.some((o) => !o.fallback && avail(hass, o));
+      if (pick && !avail(hass, pick)) pick = null;
+      if (auto) pick = any ? null : opts.find((o) => o.fallback) || null;
+      for (const [li, o] of rows) {
+        const ok = avail(hass, o);
+        li.classList.toggle("is-ok", ok && !o.fallback);
+        li.classList.toggle("is-off", !ok);
+        li.classList.toggle("is-picked", pick === o);
+        li.children[2].textContent = o.fallback ? "" : ok ? o.available_text || "BESCHIKBAAR" : o.unavailable_text || "NIET BESCHIKBAAR";
+      }
+      note.textContent = pick ? pick.note || "" : c.pick_text || "Kies een bron.";
+      note.classList.toggle("is-warn", !!pick?.note);
+      run.disabled = !pick;
+    };
+    this._updaters.push(paint);
+    if (this._hass) paint(this._hass);
+    const done = (ev) => {
+      ev?.stopPropagation();
+      dlg.remove();
+      const i = this._updaters.indexOf(paint);
+      if (i >= 0) this._updaters.splice(i, 1);
+    };
+    close.addEventListener("click", done);
+    run.addEventListener("click", (ev) => {
+      if (!pick) return;
+      const chosen = pick;
+      done(ev);
+      fire(this, "haptic", "light");
+      for (const e of [].concat(c.base || [])) this._turn(e, true);
+      if (chosen.entity) this._turn(chosen.entity, true);
+    });
+    dlg.addEventListener("click", (ev) => ev.target === dlg && done(ev));
+    dlg.appendChild(box);
+    this.shadowRoot.appendChild(dlg);
   }
 
   // One checklist step is OK: entity on (or `state`, e.g. open), or its value above `above` / below `below`.

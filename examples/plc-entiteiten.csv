@@ -179,3 +179,5 @@ Diesel;Diesel clutch neutraal;status;;binary_sensor.wago_hcs_controls_wago_hcs_c
 Voortstuwing;Prepair Volvo Start;knop;automation.prepvolvostart;automation.prepvolvostart;zeker;uit het HA-dashboard van de gebruiker (09-11)
 Voortstuwing;Prepair Generator Start;knop;automation.prepgenstart;automation.prepgenstart;zeker;uit het HA-dashboard van de gebruiker (09-11)
 Voortstuwing;Prepair Energy Inverters;knop;automation.plc_prep_inverters;;geen gevonden;placeholder, automation nog niet bekend
+Energie;Generator beschikbaar;aan/uit;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on;zeker;opgegeven door de gebruiker (11-11); keuze in DC-bus opstarten
+Energie;Generator starten (DC-bus opstarten);knop;;;geen gevonden;nog niet geautomatiseerd (melding in het keuzevenster)

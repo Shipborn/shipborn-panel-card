@@ -138,6 +138,8 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Dagmap `261111` (Windows-pc van GBS).
 - Uitleg gegeven hoe de lampjes kleuren (grijs als het systeem uit staat, daarna de grenzen). Op verzoek (v0.5.31): geel als het systeem draait maar de sensor geen data heeft; het DC-bus-lampje van de boegschroef volgt nu ook "grijs als uit" (boegschroef ingeschakeld). Getest in de demo: diesel aan/uit met onbeschikbare flow, boegschroef uit / aan met 650 V / aan zonder data.
 
+- (v0.5.32) **Energie-overzicht** (pagina `energie`, eerste tab, knop Energie): DC-bus-spanning, beschikbaarheid walstroom/generator, *DC-bus opstarten* met keuzevenster (nieuw: `pushbutton` met `choice` en `status_entity`), SoC met max SoC en − / +, glycol druk/temperatuur als lampjes, de twee automaten. Keuzes van de gebruiker via vragen: venster in de kaart (geen HA-script), bron altijd zelf kiezen (ook als er maar één beschikbaar is), beschikbaarheid uit `shore_supply_is_on` / `generator_is_on`, generator voorlopig alleen een melding, glycol grijs als de pomp uit staat, bolletje bij ≥ 700 V. Getest in de demo: walstroom, alleen accu, generator (melding), niet-beschikbare bron niet te kiezen.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.
