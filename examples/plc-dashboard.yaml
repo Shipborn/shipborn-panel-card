@@ -1708,7 +1708,7 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           # ---- webpagina op het lokale netwerk (werkt alleen als HA via http geopend wordt) ----
-          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.78/Details", label: Klimaat details }
+          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.212/web/index.html", label: Klimaat details }
 
   - title: Voortstuwing
     path: voortstuwing
