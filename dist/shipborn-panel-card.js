@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.34";
+const VERSION = "0.5.35";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -623,7 +623,7 @@ const TC_STYLE =
   .tc-gauge-range { position: absolute; display: flex; justify-content: space-between; }
   .tc-gauge.is-selected { outline: 3px solid var(--ok); outline-offset: 8px; border-radius: var(--radius-lg); }
 
-  /* warning light (icon only) and gearbox D N R */
+  /* warning light (icon only) and gearbox R N D */
   .tc-wl { box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;
     border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--line-strong);
     transition: color .3s, background .3s, border-color .3s; -webkit-tap-highlight-color: transparent; }
@@ -2642,8 +2642,8 @@ class ShipbornPanelCard extends HTMLElement {
   // Gearbox D / N / R from fwd_entity and aft_entity (neither on = N); only the active letter lights green.
   _tGear(g) {
     const n = this._place(h("div", "tc-gear"), g, 132, 44);
-    n.innerHTML = "<span>D</span><span>N</span><span>R</span>";
-    const [d, neutral, r] = n.children;
+    n.innerHTML = "<span>R</span><span>N</span><span>D</span>"; // like the lever: reverse left, forward right
+    const [r, neutral, d] = n.children;
     if (g.tap_action) {
       n.style.cursor = "pointer";
       n.addEventListener("click", () => this._handleAction(g, g.tap_action, n));

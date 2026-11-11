@@ -140,7 +140,9 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
 - Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). Op 06-11 is in dagmap `261106` verder gewerkt (zie `git log`).
 
-## Stand van zaken en open punten (11-11-2026, v0.5.34)
+## Stand van zaken en open punten (11-11-2026, v0.5.35)
+
+- **Gashendel en R N D op Voortstuwing (v0.5.35, 11-11):** kleine klok *Gashendel* (`sensor.wago_hcs_controls_wago_hcs_controls_lever_position`, −100 … +100 %, 170 breed op x 363, y 548; tik = Diesel) onder de schroefaslampjes; de toerentellers bleven zo groot (keuze van de gebruiker). De keerkoppeling (`gear`) toont nu R N D (achteruit links, zoals de hendel).
 
 - **Boegschroef aan geblokkeerd zonder Energy Inverters (v0.5.34, 11-11):** de knoppen *Aan* (Voortstuwing) en *Bow thruster on* (Boegschroef) hebben `require: *bt_require` (anker in `sys-bowthruster`): DC-bus ≥ 700 V én `switch.wago_energy_controls_wago_energy_controls_battery_connect_2` aan. Anders stuurt de knop niets en verschijnt *Eerst Energy Inverters online* met alleen *Sluiten*. "Battery drive aan" = Battery connect (bevestigd door de gebruiker, 11-11).
 

@@ -143,6 +143,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Adres van de klimaatpagina gewijzigd naar `http://192.168.3.212/web/index.html`. Besproken: van buitenaf kijken vraagt een proxy in HA (Ingress-integratie met `rewrite`-regels), een VPN of uitgelezen sensoren.
 - Knop *Prepair Energy Inverters* op Voortstuwing vervangen door een kopie van *Energy Inverters opstarten* (zelfde naam, venster en bolletje; gedeeld YAML-anker `&ei_start`). Knop *Open in nieuw venster* op Klimaat › Browser verborgen (`open_button: false`).
 - (v0.5.34) **Boegschroef aan pas met Energy Inverters online:** nieuwe `pushbutton`-optie `require`; zonder DC-bus ≥ 700 V of Battery connect aan opent een melding *Eerst Energy Inverters online* (alleen *Sluiten*) en wordt er niets gestuurd. Op Voortstuwing en Boegschroef (gedeeld anker `&bt_require`). Getest in de demo: 650 V, Battery connect uit (melding, geen commando) en 742 V + aan (`button.press`).
+- (v0.5.35) Op Voortstuwing een kleine klok *Gashendel* (−100 … +100 %, zoals *Lever* op Diesel) onder de schroefas; gekozen boven vier kleinere klokken of een balk. Keerkoppeling in de volgorde R N D.
 
 ## Lessen en keuzes die je moet kennen
 
