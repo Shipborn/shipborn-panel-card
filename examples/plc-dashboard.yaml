@@ -990,7 +990,7 @@ views:
             font_size: 17
             status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
             status_above: 699.9
-            choice:
+            choice: &ei_start        # ook gebruikt door de knop op Voortstuwing
               title: Energy Inverters opstarten
               text: "De accu (Battery connect) wordt altijd ingeschakeld. Kies daarnaast de bron."
               base: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
@@ -1779,9 +1779,18 @@ views:
           - { type: warnlight, x: 712, y: 490, size: 48, icon: koppeling, icon_off: ontkoppeld, label: E-motor gekoppeld, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
 
           # ---- rechterkolom onder de vaarmodus: Energy inverters, Generator, Boegschroef ----
-          # Energy inverters: alleen de Prepair-knop (placeholder: automation nog niet bekend)
+          # Energy inverters: zelfde knop als op het Energie-overzicht (keuzevenster, bolletje groen bij DC-bus ≥ 700 V)
           - { type: panel, x: 896, y: 232, width: 360, height: 100, title: Energy inverters }
-          - { type: pushbutton, x: 914, y: 276, width: 324, height: 44, label: Prepair Energy Inverters, font_size: 16, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.plc_prep_inverters }, confirmation: { title: "Prepair Energy Inverters?", text: "Nog niet gekoppeld.", yes: Uitvoeren } } }
+          - type: pushbutton
+            x: 914
+            y: 276
+            width: 324
+            height: 44
+            label: Energy Inverters opstarten
+            font_size: 16
+            status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+            status_above: 699.9
+            choice: *ei_start
 
           # Generator: loopt + lampjes (grijs als hij niet loopt; tik = Generator) en Prepair Generator Start
           - { type: panel, x: 896, y: 348, width: 360, height: 172, title: Generator }
