@@ -149,6 +149,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 
 - Dagmap `261112`.
 - (v0.5.36) Tandwiel rechtsboven in de statusbalk (statusicoon met `path`) naar de nieuwe groep *Instellingen*: Algemeen (leeg), Klimaat (Webasto-webpagina, verhuisd van Klimaat › Browser), Navlight, Node-RED PLC-2 en Node-RED HA, elk een `webpage` van 1240×624. Getest in de demo: tandwiel navigeert en licht op, tabs actief; de lokale adressen zijn vanaf de GBS-pc niet bereikbaar (wit vak).
+- (v0.5.37) Icoon `instellingen` vervangen door een echt tandwiel (het oude leek op de zon van de themaknop).
 
 ## Lessen en keuzes die je moet kennen
 

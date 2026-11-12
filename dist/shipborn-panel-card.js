@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.36";
+const VERSION = "0.5.37";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -423,7 +423,7 @@ const TC_ICONS = {
   verwarming: "M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-3 2-4 2.5-6.5 1 1.3 2 2 2.5 2.5V3z",
   navlicht: "M12 3v3M8 6h8l-1 4H9zM9 10l-1 11h8l-1-11M6 21h12",
   interieur: "M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6",
-  instellingen: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1",
+  instellingen: "M18 9.9L20.3 10.4L20.3 13.6L18 14.1L17.7 14.8L19 16.8L16.8 19L14.8 17.7L14.1 18L13.6 20.3L10.4 20.3L9.9 18L9.2 17.7L7.2 19L5 16.8L6.3 14.8L6 14.1L3.7 13.6L3.7 10.4L6 9.9L6.3 9.2L5 7.2L7.2 5L9.2 6.3L9.9 6L10.4 3.7L13.6 3.7L14.1 6L14.8 6.3L16.8 5L19 7.2L17.7 9.2zM12 14.6a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2z", // cog with eight teeth (not the sun)
   zon: "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M5 19l1.4-1.4M17.6 6.4 19 5",
   maan: "M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z",
   lifebeat: "M2 12h4l2.5-6 4.5 12 2.5-6H22",
