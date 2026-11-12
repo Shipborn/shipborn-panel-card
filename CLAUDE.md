@@ -140,9 +140,9 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
 - Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). Op 06-11 is in dagmap `261106` verder gewerkt (zie `git log`).
 
-## Stand van zaken en open punten (12-11-2026, v0.5.37)
+## Stand van zaken en open punten (12-11-2026, v0.5.38)
 
-- **Icoon `instellingen` is een tandwiel (v0.5.37, 12-11):** acht tanden met een gat in het midden; het oude icoon leek op de zon van de themaknop.
+- **Icoon `instellingen` is een tandwiel (v0.5.37–0.5.38, 12-11):** zes brede, afgeronde tanden met een groot gat (vorm als Lucide *settings*); het oude icoon leek op de zon van de themaknop, en de eerste versie met acht smalle tanden was op 20 px nog steeds een zonnetje.
 
 - **Instellingen via het tandwiel (v0.5.36, 12-11):** in `&tc_status` staat een tandwiel (`icon: instellingen`, `path: instellingen`; statusicoon met `path` = navigatieknop, accent zolang een van zijn pagina's open is). Tabs `&inst_tabs` (anker in `instellingen`): *Algemeen* (`instellingen`, nog leeg), *Klimaat* (`inst-klimaat`, de Webasto-webpagina `http://192.168.3.212/web/index.html`), *Navlight* (`inst-navlight`, `http://192.168.3.78/Details`), *Node-RED PLC-2* (`inst-nodered-plc2`, `http://192.168.3.49:1880/#flow/d92bd8ab67f47a30`), *Node-RED HA* (`inst-nodered-ha`, `http://192.168.3.28:1880/#flow/e5f9e03aebbed838`). Klimaat heeft nu twee tabs (Overzicht, Instellingen); `klimaat-browser` is weg. Webpagina's alleen via http op het lokale netwerk; Node-RED moet inbedden toestaan (geen `X-Frame-Options`), nog niet in HA gecontroleerd.
 
