@@ -145,6 +145,11 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.34) **Boegschroef aan pas met Energy Inverters online:** nieuwe `pushbutton`-optie `require`; zonder DC-bus ≥ 700 V of Battery connect aan opent een melding *Eerst Energy Inverters online* (alleen *Sluiten*) en wordt er niets gestuurd. Op Voortstuwing en Boegschroef (gedeeld anker `&bt_require`). Getest in de demo: 650 V, Battery connect uit (melding, geen commando) en 742 V + aan (`button.press`).
 - (v0.5.35) Op Voortstuwing een kleine klok *Gashendel* (−100 … +100 %, zoals *Lever* op Diesel) onder de schroefas; gekozen boven vier kleinere klokken of een balk. Keerkoppeling in de volgorde R N D.
 
+## 12-11-2026 – instellingenpagina's
+
+- Dagmap `261112`.
+- (v0.5.36) Tandwiel rechtsboven in de statusbalk (statusicoon met `path`) naar de nieuwe groep *Instellingen*: Algemeen (leeg), Klimaat (Webasto-webpagina, verhuisd van Klimaat › Browser), Navlight, Node-RED PLC-2 en Node-RED HA, elk een `webpage` van 1240×624. Getest in de demo: tandwiel navigeert en licht op, tabs actief; de lokale adressen zijn vanaf de GBS-pc niet bereikbaar (wit vak).
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

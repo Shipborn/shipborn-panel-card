@@ -33,13 +33,14 @@ views:
               - { icon: lifebeat, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat }
               - { icon: walstroom, label: Walstroom, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, tone: accent }
               - { icon: accu, label: Accu, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, value: true, unit: "%", warn_below: 30, alarm_below: 15 }
+              - { icon: instellingen, label: Instellingen, path: instellingen, match: [inst-klimaat, inst-navlight, inst-nodered-plc2, inst-nodered-ha] }
           - type: navbar
             items: &tc_nav
               - { icon: schip, label: Schip, path: ship-deck, match: [ship-side] }
               - { icon: energie, label: Energie, path: energie, match: [sys-power, sys-dcbus] }
               - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel] }
               - { icon: water, label: Water, path: sys-seawater, match: [sys-freshwater, sys-wastewater] }
-              - { icon: klimaat, label: Klimaat, path: sys-webasto, match: [klimaat-instellingen, klimaat-browser] }
+              - { icon: klimaat, label: Klimaat, path: sys-webasto, match: [klimaat-instellingen] }
               - { icon: bilge, label: Bilge, path: sys-bilge }
               - { icon: alarm, label: Alarmen, path: alarms, badge_entity: sensor.er_alarm_status_active_alarms, badge_attribute: alarms }
 
@@ -1657,7 +1658,6 @@ views:
             tabs: &klimaat_tabs
               - { label: Overzicht, path: sys-webasto }
               - { label: Instellingen, path: klimaat-instellingen }
-              - { label: Browser, path: klimaat-browser }
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           # ---- Webasto per ruimte: zelfde blok als onder de ingezoomde ruimtes (schakelaar in de kop, meter met − / +) ----
@@ -1709,8 +1709,9 @@ views:
           - { type: toggle, style: pill, x: 236, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_compressor_engine_room_ac }
           - { type: climate, x: 67, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_compressor_engine_room_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_compressor_engine_room_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_compressor_engine_room, fan_entity: sensor.webasto_bluecool_noder_compressor_engine_room_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_compressor_engine_room_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
 
-  - title: Klimaat browser
-    path: klimaat-browser
+  # ===== Instellingen (tandwiel rechtsboven in de statusbalk): algemeen (nog leeg) en lokale webpagina's =====
+  - title: Instellingen
+    path: instellingen
     panel: true
     cards:
       - type: custom:shipborn-panel-card
@@ -1720,12 +1721,93 @@ views:
         height: 800
         items:
           - type: statusbar
-            title: Klimaat
-            tabs: *klimaat_tabs
+            title: Instellingen
+            tabs: &inst_tabs
+              - { label: Algemeen, path: instellingen }
+              - { label: Klimaat, path: inst-klimaat }
+              - { label: Navlight, path: inst-navlight }
+              - { label: Node-RED PLC-2, path: inst-nodered-plc2 }
+              - { label: Node-RED HA, path: inst-nodered-ha }
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          - { type: panel, x: 20, y: 76, width: 1240, height: 624, title: Instellingen }
+          - { type: text, x: 38, y: 124, text: "Nog leeg.", style: label }
+
+  - title: Instellingen klimaat
+    path: inst-klimaat
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Instellingen
+            tabs: *inst_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           # ---- webpagina op het lokale netwerk (werkt alleen als HA via http geopend wordt) ----
-          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.212/web/index.html", label: Klimaat details, open_button: false }
+          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.212/web/index.html", label: Klimaat (Webasto), open_button: false }
+
+
+  - title: Instellingen navlight
+    path: inst-navlight
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Instellingen
+            tabs: *inst_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          # ---- webpagina op het lokale netwerk (werkt alleen als HA via http geopend wordt) ----
+          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.78/Details", label: Navigatieverlichting, open_button: false }
+
+
+  - title: Node-RED PLC-2
+    path: inst-nodered-plc2
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Instellingen
+            tabs: *inst_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          # ---- webpagina op het lokale netwerk (werkt alleen als HA via http geopend wordt) ----
+          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.49:1880/#flow/d92bd8ab67f47a30", label: Node-RED PLC-2, open_button: false }
+
+
+  - title: Node-RED HA
+    path: inst-nodered-ha
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Instellingen
+            tabs: *inst_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          # ---- webpagina op het lokale netwerk (werkt alleen als HA via http geopend wordt) ----
+          - { type: webpage, x: 20, y: 76, width: 1240, height: 624, url: "http://192.168.3.28:1880/#flow/e5f9e03aebbed838", label: Node-RED HA, open_button: false }
+
 
   - title: Voortstuwing
     path: voortstuwing

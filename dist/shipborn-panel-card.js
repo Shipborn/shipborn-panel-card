@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.35";
+const VERSION = "0.5.36";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2327,8 +2327,12 @@ class ShipbornPanelCard extends HTMLElement {
       const val = st.value ? h("span", "tc-sb-statval") : null;
       if (val) el.appendChild(val);
       right.appendChild(el);
-      if (st.entity) el.addEventListener("click", () => this._handleAction(st, st.tap_action || { action: "more-info" }, el));
+      // path: a navigation icon (e.g. the gear to the settings pages), highlighted while one of its pages is open
+      const go = st.path ? [st.path, ...[].concat(st.match || [])] : null;
+      if (go) el.addEventListener("click", () => this._handleAction(st, { action: "navigate", navigation_path: st.path }, el));
+      else if (st.entity) el.addEventListener("click", () => this._handleAction(st, st.tap_action || { action: "more-info" }, el));
       this._updaters.push((hass) => {
+        if (go) return el.classList.toggle("tc-tone-accent", isHere(go));
         const so = hass.states[st.entity];
         const v = num(so, st.factor);
         if (val) val.textContent = fmt(v, st.decimals ?? 0, hass) + (st.unit ?? "");
