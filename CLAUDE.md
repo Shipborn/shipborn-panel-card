@@ -89,7 +89,33 @@ De gebruiker plakt vaak YAML van gewone HA-kaarten (`grid` met `tile`, `entities
 - Schema: `hull` (romp) op **precies** `{ type: hull, x: 20, y: 49, width: 1240, height: 600 }` op elke schemapagina (de omtrek moet overal gelijk zijn), met daarin `pipe`-items en symbolen; daaronder vanaf `y: 669` de `panel`s met de bediening. De getekende romplijn ligt 27,5 px onder de bovenkant van zijn vak, dus met het vak op `y: 49` ligt de romplijn 20 px onder de statusbalk (op verzoek, net als de andere pagina's). Overboord-uitlaten op de romplijn staan op `y: 76`. Pagina's zonder romp beginnen op `y: 76` (20 px onder de statusbalk). Schuif je een schema, schuif dan alle coördinaten (ook `points`) mee en laat de romp staan.
 - Kiosk: elke kaart heeft `kiosk: true` (HA-balken verborgen). Een tik op het Shipborn JOAL-logo in de statusbalk toont de balken van HA (naar andere HA-pagina's), nog een tik verbergt ze. De oude randstroken (even op de boven-/linkerrand blijven) gelden alleen nog zonder TC90-statusbalk of met `kiosk_toggle: edge`.
 - Stijl: items op één regel in flow-stijl (`- { type: …, x: …, y: … }`), opmerkingen in het Nederlands, secties met `# ---- … ----`. De editor bewaart die opmaak.
-- Entiteiten met `.plc_` in de naam zijn **placeholders** die (nog) niet in HA bestaan; ze tonen "—" of niets.
+- Entiteiten met `.plc_` in de naam zijn **placeholders** die (nog) niet in HA bestaan; ze tonen "—" of niets. Knoppen die nog niets schakelen zijn oranje placeholderknoppen; zie *Placeholders* hieronder.
+
+## Placeholders: wat nog niet gekoppeld is
+
+Er zijn twee soorten placeholders. Beide zijn bewust: ze laten zien wat de bediening moet kunnen, voordat de automations, scripts of PLC-signalen er zijn.
+
+1. **Placeholder-entiteiten** (`*.plc_*`): een entiteit die (nog) niet in HA bestaat. Het onderdeel staat er, maar toont "—", een grijs bolletje of niets. Overzicht en kandidaten in `examples/plc-entiteiten.csv` en onder *Nog niet gekoppelde placeholders* in Stand van zaken.
+2. **Placeholderknoppen** (`pushbutton` met `placeholder: true`): een knop die nog niets schakelt. Hij is **zacht oranje** (kleur `--warn`, zodat hij op elk scherm herkenbaar is) en een tik toont alleen het venster *Nog niet gekoppeld* met *Sluiten*. Een eigen tekst kan met `placeholder: "…"`. Andere opties op de knop (`choice`, `tap_action`) blijven in de YAML staan en worden genegeerd zolang `placeholder` erop staat; het bolletje (`status_entity`) werkt wel gewoon.
+
+### Placeholderknoppen (stand 13-11-2026)
+
+| Knop | Pagina › vak | Bolletje (groen als …) | Bedoeld om later te doen |
+|---|---|---|---|
+| *Energy Inverters opstarten* | Energie › Energy Inverters, en Voortstuwing › Energy inverters (zelfde keuzevenster `&ei_start`) | DC-bus ≥ 700 V (`sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage`) | Script/automation DC-bus aan: eerst battery drive (`switch.…battery_connect_2`) aan, wachten tot hij echt aan is (drive power, kandidaat `sensor.wago_values_drivepower_battery`), dan shore- of generator-drive. Het keuzevenster (walstroom / generator / alleen accu) staat klaar. |
+| *Energy Inverters afsluiten* | Energie › Energy Inverters | – | Omgekeerde volgorde: eerst shore/gen drive uit, daarna battery drive. |
+| *Batterij automatisch bijvullen* | Energie › Accu (boven Max SoC) | – | Automation die de accu bijlaadt (bijv. `switch.…charge_batteries_2`); voorwaarden nog te bepalen. |
+| *Heating only* / *Cooling only* | Klimaat › Instellingen › Compressor ER | modus = `heating` / `cooling` van `sensor.plc_compressor_er_mode` (placeholder-entiteit, dus nu altijd grijs) | De compressor van de engine room alleen laten verwarmen of alleen koelen. Entiteit en commando's nog onbekend. |
+
+De gebruiker heeft aangegeven dat bij het koppelen mogelijk bestaande automations worden gebruikt; vraag dat eerst na voordat je iets nieuws schrijft.
+
+### Een placeholderknop koppelen
+
+1. Zet de actie op de knop: `tap_action` (bijv. `perform-action` met `script.turn_on` / `automation.trigger`), of laat een bestaande `choice` / `checklist` staan.
+2. Haal `placeholder: true` weg; de knop krijgt dan de gewone kleur en voert de actie uit.
+3. Vervang een `*.plc_*` in `status_entity` door de echte entiteit en pas `status_state` / `status_above` / `status_below` aan op de waarden die die entiteit geeft.
+4. Werk `examples/plc-entiteiten.csv` (regel van de placeholder), de tabel hierboven en `docs/GESCHIEDENIS.md` bij; controleer in de demo met een nep-state in `demo/plc.html`.
+5. Alleen YAML veranderd? Dan geen nieuwe kaartversie nodig: plakken in de Raw configuration editor is genoeg.
 
 ## Opbouw van de kaart (`dist/shipborn-panel-card.js`)
 
