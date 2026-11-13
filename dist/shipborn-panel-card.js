@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.38";
+const VERSION = "0.5.39";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -250,6 +250,7 @@ const STYLE = `
   .d-zoom .zs { display: block; overflow: visible; transform: translateY(30px); }
   .d-btn:active, .d-btn.pressed { background: #333; }
   .d-btn.left { justify-content: flex-start; }
+  .d-btn.placeholder { background: var(--warn-soft, #3f2e0d); border-color: color-mix(in srgb, var(--warn, #f5a524) 60%, transparent); color: var(--warn, #f5a524); }
   .d-btn.stop { background: var(--alarm-soft, #3a1512); border-color: var(--alarm, #ff5b4f); color: var(--ink, #ffd9d6); }
   .d-btn.active { border-color: var(--accent, #f5a524); color: var(--accent, #f5a524); background: var(--accent-soft, #261f12); }
   .d-btn.static { cursor: default; color: var(--ink-muted, #a3a29c); font-size: var(--fs, 15px); }
@@ -2078,7 +2079,7 @@ class ShipbornPanelCard extends HTMLElement {
     const n = this._place(h("div", "d"), b, 200, 56);
     const btn = h(
       "button",
-      "d-btn" + (b.variant === "stop" ? " stop" : "") + (b.align === "left" ? " left" : "") + (b.tap_action?.action === "none" ? " static" : "")
+      "d-btn" + (b.placeholder ? " placeholder" : b.variant === "stop" ? " stop" : "") + (b.align === "left" ? " left" : "") + (b.tap_action?.action === "none" ? " static" : "")
     );
     if (b.font_size) btn.style.setProperty("--fs", b.font_size + "px");
     if (b.led) btn.appendChild(this._dLed(b.led_entity || b.entity, b.led, b.led_state, b.led_blink));
@@ -2093,7 +2094,10 @@ class ShipbornPanelCard extends HTMLElement {
     }
     btn.append(b.label ?? "");
     n.appendChild(btn);
-    if (b.mode === "momentary") this._momentary(btn, b);
+    // placeholder: soft orange, a tap only says it is not connected yet (other actions on the button are kept for later)
+    if (b.placeholder)
+      btn.addEventListener("click", () => this._checklist({ label: b.label, checklist: { title: b.label, text: typeof b.placeholder === "string" ? b.placeholder : "Nog niet gekoppeld: deze knop is een placeholder en schakelt nog niets.", items: [], close: "Sluiten" }, tap_action: { action: "none" } }));
+    else if (b.mode === "momentary") this._momentary(btn, b);
     else if (steps.length) btn.addEventListener("click", () => this._checklist(b));
     else if (b.choice) btn.addEventListener("click", () => this._choice(b));
     else btn.addEventListener("click", () => {

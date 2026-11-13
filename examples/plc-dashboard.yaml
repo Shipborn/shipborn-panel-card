@@ -981,14 +981,16 @@ views:
           - { type: text, x: 100, y: 462, text: Walstroom, style: label }
           - { type: warnlight, x: 220, y: 448, size: 48, icon: generator, label: Generator beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on }
           - { type: text, x: 282, y: 462, text: Generator, style: label }
-          # opstarten: venster met de keuze (alleen beschikbare bronnen te kiezen); bolletje groen als de bus ≥ 700 V is
+          # opstarten / afsluiten: placeholders (oranje, tik = "nog niet gekoppeld"); komen later via een automation/script.
+          # Het keuzevenster (choice) blijft bewaard maar werkt pas weer als `placeholder` weg is. Bolletje groen als de bus ≥ 700 V is.
           - type: pushbutton
             x: 38
-            y: 620
+            y: 552
             width: 364
             height: 60
             label: Energy Inverters opstarten
             font_size: 17
+            placeholder: true
             status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
             status_above: 699.9
             choice: &ei_start        # ook gebruikt door de knop op Voortstuwing
@@ -999,10 +1001,12 @@ views:
                 - { label: Walstroom, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, entity: switch.wago_energy_controls_wago_energy_controls_shore_supply_2 }
                 - { label: Generator, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on, note: "Het generatorcommando is nog niet geautomatiseerd: alleen de accu wordt ingeschakeld." }
               fallback: { label: Alleen accu, note: "Let op: de DC-bus draait dan alleen op de accu." }
+          - { type: pushbutton, x: 38, y: 624, width: 364, height: 60, label: Energy Inverters afsluiten, font_size: 17, placeholder: true }
 
           # ---- Accu: SoC met max SoC (streepje op de meter) en − / + ----
           - { type: panel, x: 440, y: 76, width: 400, height: 624, title: Accu }
           - { type: dial, x: 490, y: 124, width: 300, label: SoC, entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, min: 0, max: 100, unit: "%", decimals: 0, setpoint_entity: sensor.er_pms_status2_bms_max_soc, setpoint_label: Max SoC, setpoint_unit: "%" }
+          - { type: pushbutton, x: 458, y: 500, width: 364, height: 60, label: Batterij automatisch bijvullen, font_size: 17, placeholder: true }
           - { type: text, x: 458, y: 590, text: Max SoC, style: caption }
           - { type: pushbutton, x: 458, y: 620, width: 176, height: 60, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 17 }
           - { type: pushbutton, x: 646, y: 620, width: 176, height: 60, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 17 }
@@ -1892,6 +1896,7 @@ views:
             font_size: 16
             status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
             status_above: 699.9
+            placeholder: true
             choice: *ei_start
 
           # Generator: loopt + lampjes (grijs als hij niet loopt; tik = Generator) en Prepair Generator Start

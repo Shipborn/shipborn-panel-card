@@ -140,7 +140,9 @@ Eén custom element, `ShipbornPanelCard extends HTMLElement`, met shadow DOM. Ge
 - Controleer of `python` of `python3` werkt; `.claude/launch.json` heeft voor beide een configuratie (`editor` / `editor-mac` enz.).
 - Controleer met `git status` en `git log -1` dat de dagmap gelijk is aan GitHub (`git fetch` en `git status` → *up to date with origin/main*). Op 06-11 is in dagmap `261106` verder gewerkt (zie `git log`).
 
-## Stand van zaken en open punten (12-11-2026, v0.5.38)
+## Stand van zaken en open punten (13-11-2026, v0.5.39)
+
+- **Placeholderknoppen (v0.5.39, 13-11):** `pushbutton` met `placeholder: true` is zacht oranje en toont bij een tik alleen *Nog niet gekoppeld*. Op Energie: *Energy Inverters opstarten* (losgekoppeld; het keuzevenster `&ei_start` staat nog in de YAML) en nieuw *Energy Inverters afsluiten* in het vak Energy Inverters, *Batterij automatisch bijvullen* in het vak Accu boven Max SoC; op Voortstuwing is *Energy Inverters opstarten* ook placeholder. Dit is voorbereidend: eerst overzicht van wat de bediening moet kunnen, daarna pas automations/scripts (mogelijk met bestaande automations). Wens van de gebruiker voor later: DC-bus aan = eerst battery drive aan, wachten tot die echt aan is (drive power, kandidaat `sensor.wago_values_drivepower_battery`), dan shore/gen drive; uit = andersom.
 
 - **Icoon `instellingen` is een tandwiel (v0.5.37–0.5.38, 12-11):** zes brede, afgeronde tanden met een groot gat (vorm als Lucide *settings*); het oude icoon leek op de zon van de themaknop, en de eerste versie met acht smalle tanden was op 20 px nog steeds een zonnetje.
 
