@@ -181,3 +181,4 @@ Voortstuwing;Prepair Generator Start;knop;automation.prepgenstart;automation.pre
 Voortstuwing;Prepair Energy Inverters;knop;automation.plc_prep_inverters;;vervallen;11-11: vervangen door Energy Inverters opstarten (zelfde als op het Energie-overzicht)
 Energie;Generator beschikbaar;aan/uit;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on;zeker;opgegeven door de gebruiker (11-11); keuze in DC-bus opstarten
 Energie;Generator starten (DC-bus opstarten);knop;;;geen gevonden;nog niet geautomatiseerd (melding in het keuzevenster)
+Klimaat / Instellingen;Compressor ER modus (heating/cooling only);status;sensor.plc_compressor_er_mode;;geen gevonden;placeholder 13-11-2026: bolletje bij de knoppen Heating only / Cooling only, verwacht state heating of cooling

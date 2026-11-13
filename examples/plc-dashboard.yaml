@@ -1745,9 +1745,12 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           # ---- compressor engine room (verhuisd van het overzicht) ----
-          - { type: panel, x: 20, y: 76, width: 280, height: 236, title: Compressor ER }
+          - { type: panel, x: 20, y: 76, width: 280, height: 304, title: Compressor ER }
           - { type: toggle, style: pill, x: 236, y: 82, width: 52, height: 30, label: Airco, entity: switch.webasto_bluecool_noder_compressor_engine_room_ac }
           - { type: climate, x: 67, y: 118, width: 186, entity: sensor.webasto_bluecool_noder_compressor_engine_room_temp, min: 10, max: 35, unit: "°C", decimals: 1, setpoint_entity: sensor.webasto_bluecool_noder_compressor_engine_room_setpoint_feedback, setpoint_number: number.webasto_bluecool_noder_compressor_engine_room, fan_entity: sensor.webasto_bluecool_noder_compressor_engine_room_fan_speed_feedback, fan_number: number.webasto_bluecool_noder_compressor_engine_room_fan_speed, fan_min: 1, fan_max: 6, fan_names: { 6: Aut } }
+          # placeholders: bolletje = welke modus nu actief is (sensor.plc_compressor_er_mode bestaat nog niet in HA)
+          - { type: pushbutton, x: 34, y: 316, width: 122, height: 52, label: Heating only, placeholder: true, status_entity: sensor.plc_compressor_er_mode, status_state: heating, font_size: 15 }
+          - { type: pushbutton, x: 164, y: 316, width: 122, height: 52, label: Cooling only, placeholder: true, status_entity: sensor.plc_compressor_er_mode, status_state: cooling, font_size: 15 }
 
   # ===== Instellingen (tandwiel rechtsboven in de statusbalk): algemeen (nog leeg) en lokale webpagina's =====
   - title: Instellingen
