@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.39";
+const VERSION = "0.5.40";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -794,6 +794,12 @@ const activeOf = (hass, ids, cfg = {}, key = "active") =>
   });
 // First matching entry of `colors` ({above, below, state, entity, color}); an entry without conditions is the default.
 // An entry with its own `entity` tests that entity instead (e.g. grey while the pump has no pressure).
+// Tank volume from a percentage: `capacity` (litres) gives "312 L"; `capacity_free` adds "nog vrij 55 L" (joined by sep).
+const volText = (item, pct, hass, sep = " · ") => {
+  if (!item.capacity || pct == null) return "";
+  const l = (p) => fmt((clamp(p, 0, 100) / 100) * item.capacity, 0, hass) + " L";
+  return l(pct) + (item.capacity_free ? `${sep}nog vrij ${l(100 - pct)}` : "");
+};
 const colorOf = (hass, so, val, list) => {
   for (const c of list) {
     const o = c.entity ? hass.states[c.entity] : so;
@@ -1993,6 +1999,13 @@ class ShipbornPanelCard extends HTMLElement {
       k.textContent = t.kind;
       n.appendChild(k);
     }
+    // capacity (litres): the volume under the percentage; capacity_free: also the space left
+    const vol = t.capacity ? h("span", "d-lbl", { fontSize: "16px", whiteSpace: "pre-line", lineHeight: "1.3" }) : null;
+    if (vol) n.appendChild(vol);
+    if (t.tap_action) {
+      n.style.cursor = "pointer";
+      n.addEventListener("click", () => this._handleAction(t, t.tap_action, n));
+    }
     this._updaters.push((hass) => {
       const so = t.entity ? hass.states[t.entity] : null;
       const val = num(so, t.factor);
@@ -2000,6 +2013,13 @@ class ShipbornPanelCard extends HTMLElement {
       fill.style.height = (val == null ? 0 : clamp(val / max, 0, 1) * 100) + "%";
       v.textContent = fmt(val, t.decimals ?? 0, hass);
       u.textContent = t.unit ?? "%";
+      if (vol) vol.textContent = volText(t, val, hass) || "—";
+      // colors: like `value`, e.g. [{ below: 10, color: red }, { below: 25, color: amber }]; colours fill and number
+      if (t.colors) {
+        const c = val == null ? null : colorOf(hass, so, val, t.colors);
+        fill.style.background = color(c, fillColor);
+        v.style.color = c ? color(c, "") : "";
+      }
       if (mark) {
         const m = t.marker_entity ? num(hass.states[t.marker_entity]) : t.marker;
         mark.style.display = m == null ? "none" : "";
@@ -2033,7 +2053,8 @@ class ShipbornPanelCard extends HTMLElement {
       const val = num(so, item.factor);
       const unit = unitOf(item, so);
       const txt = val == null && so && !unavailable(so) ? so.state : fmt(val, item.decimals ?? 1, hass);
-      v.textContent = unit ? `${txt} ${unit}` : txt;
+      const vol = volText(item, val, hass);
+      v.textContent = (unit ? `${txt} ${unit}` : txt) + (vol ? ` · ${vol}` : "");
       if (item.colors) v.style.color = !so || unavailable(so) ? "" : color(colorOf(hass, so, val, item.colors), "");
     });
     return n;
@@ -3150,7 +3171,8 @@ class ShipbornPanelCard extends HTMLElement {
       const val = num(so, item.factor);
       const unit = unitOf(item, so);
       const txt = val == null ? (so?.state ?? "—") : fmt(val, item.decimals ?? 0, hass);
-      n.textContent = `${item.text ? item.text + " " : ""}${txt}${unit ? " " + unit : ""}`;
+      const vol = volText(item, val, hass, "\n");
+      n.textContent = `${item.text ? item.text + " " : ""}${txt}${unit ? " " + unit : ""}${vol ? "\n" + vol : ""}`;
     });
     return n;
   }

@@ -55,6 +55,9 @@
         "sensor.wago_values_aft_diesel_webasto_level_statistics": st(41, { unit_of_measurement: "%" }),
         "sensor.wago_values_lr_fresh_water_level": st(66),
         "sensor.wago_values_er_dirtywater_level": st(22),
+        "input_number.tank_vul_level": st(80, { min: 0, max: 100, step: 5, unit_of_measurement: "%" }),
+        "automation.zoetwater_vul_automaat": st("on"),
+        "automation.vuilwater_leeg_automaat": st("on"),
         "sensor.al1590_er_compressor_manifold_pressure": st(6.475, { unit_of_measurement: "bar" }),
         // Voortstuwing (design: tc90).
         "binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on": st("on"),

@@ -39,7 +39,7 @@ views:
               - { icon: schip, label: Schip, path: ship-deck, match: [ship-side] }
               - { icon: energie, label: Energie, path: energie, match: [sys-power, sys-dcbus] }
               - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel] }
-              - { icon: water, label: Water, path: sys-seawater, match: [sys-freshwater, sys-wastewater] }
+              - { icon: water, label: Water, path: water, match: [sys-seawater, sys-freshwater, sys-wastewater] }
               - { icon: klimaat, label: Klimaat, path: sys-webasto, match: [klimaat-instellingen] }
               - { icon: bilge, label: Bilge, path: sys-bilge }
               - { icon: alarm, label: Alarmen, path: alarms, badge_entity: sensor.er_alarm_status_active_alarms, badge_attribute: alarms }
@@ -1263,6 +1263,45 @@ views:
           - { type: value, style: tile, x: 38, y: 1105, width: 292, height: 76, label: Jet pump 3 output, entity: sensor.er_thruster_status_jet_pump_3_output, value_size: 22 }
           - { type: value, style: tile, x: 342, y: 1105, width: 292, height: 76, label: Jet pump 3 speed, entity: sensor.er_thruster_status_jet_pump_3_speed, value_size: 22 }
 
+  # ===== Water: overzicht (eerste tab, knop Water): automaten links, tanks rechts =====
+  # Tankinhoud: zoetwater 400 L, vuilwater 250 L (capacity; bij vuilwater ook wat er nog vrij is)
+  - title: Water
+    path: water
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Water
+            tabs: &water_tabs
+              - { label: Overzicht, path: water }
+              - { label: Zeewater, path: sys-seawater }
+              - { label: Zoetwater, path: sys-freshwater }
+              - { label: Vuilwater, path: sys-wastewater }
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+
+          # ---- Automaten: zoetwater vullen (met vul-niveau − / +) en vuilwater legen ----
+          - { type: panel, x: 20, y: 76, width: 620, height: 624, title: Automaten }
+          - { type: text, x: 38, y: 124, text: Zoetwater, style: caption }
+          - { type: text, x: 38, y: 152, width: 584, text: "LET OP! Vooraf kraantje onder de bank open zetten!", font_size: 14, color: "var(--warn, #f5a524)", weight: 600 }
+          - { type: pushbutton, x: 38, y: 182, width: 584, height: 52, label: Zoetwater vul automaat, entity: automation.zoetwater_vul_automaat, led: green, align: left, font_size: 16 }
+          - { type: stepper, x: 38, y: 246, width: 584, height: 56, label: Vullen tot, entity: input_number.tank_vul_level, unit: "%", decimals: 0 }
+          - { type: text, x: 38, y: 314, width: 584, text: Bedient het vulventiel en schakelt de zoetwaterpomp uit. Vult de tank tot het ingestelde niveau., font_size: 14, color: "var(--ink-muted, #a3a29c)" }
+          - { type: line, x: 38, y: 372, width: 584, height: 1, color: "var(--line, #3b4249)" }
+          - { type: text, x: 38, y: 392, text: Vuilwater, style: caption }
+          - { type: pushbutton, x: 38, y: 420, width: 584, height: 52, label: Vuilwater leeg automaat, entity: automation.vuilwater_leeg_automaat, led: green, align: left, font_size: 16 }
+          - { type: text, x: 38, y: 484, width: 584, text: "Zet de afvoerpomp aan zodra de tank boven \"tank hoog level\" komt en leegt tot \"tank leeg level\". Bij een onlogisch verloop gaat de automaat uit en volgt een notificatie.", font_size: 14, color: "var(--ink-muted, #a3a29c)" }
+
+          # ---- Tanks: vulling in % en liters (tik = HA-venster) ----
+          - { type: panel, x: 656, y: 76, width: 604, height: 624, title: Tanks }
+          - { type: tank, x: 700, y: 120, width: 220, height: 560, frame: false, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, capacity: 400, color: "var(--media-freshwater, #4aa3ff)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-freshwater } }
+          - { type: tank, x: 996, y: 120, width: 220, height: 560, frame: false, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, capacity: 250, capacity_free: true, color: "var(--media-wastewater, #9a7b5a)", colors: [{ above: 80, color: red }, { above: 60, color: amber }], tap_action: { action: navigate, navigation_path: sys-wastewater } }
+
   - title: Zeewaterfilters
     path: sys-seawater
     panel: true
@@ -1275,10 +1314,7 @@ views:
         items:
           - type: statusbar
             title: Water
-            tabs: &water_tabs
-              - { label: Zeewater, path: sys-seawater }
-              - { label: Zoetwater, path: sys-freshwater }
-              - { label: Vuilwater, path: sys-wastewater }
+            tabs: *water_tabs
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           - { type: hull, x: 20, y: 49, width: 1240, height: 600 }
@@ -1435,7 +1471,7 @@ views:
           - { type: text, x: 497, y: 94, width: 60, height: 85, text: "Water\nmaker", boxed: true, font_size: 12, active_entity: switch.0xe4b063fffe7add34 }
           - { type: pipe, medium: freshwater, points: [[557, 136], [787, 136]], thickness: 7, arrow: true, flow_entity: switch.0xe4b063fffe7add34 }
           - { type: text, x: 793, y: 114, width: 106, height: 257, text: "Fresh water\ntank", boxed: true, medium: freshwater, level_entity: sensor.wago_values_lr_fresh_water_level, font_size: 14 }
-          - { type: text, x: 815, y: 309, entity: sensor.wago_values_lr_fresh_water_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
+          - { type: text, x: 815, y: 296, entity: sensor.wago_values_lr_fresh_water_level, mono: true, font_size: 18, unit: "%", decimals: 0, capacity: 400 }
           - { type: pipe, medium: freshwater, points: [[594, 389], [594, 242], [692, 242]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
           - { type: valve, x: 690, y: 230, width: 40, height: 24, entity: valve.lr_dwp_wal_vulpunt, color: "#4aa3ff", label: M, label_position: above, active_entity: valve.lr_dwp_wal_vulpunt }
           - { type: pipe, medium: freshwater, points: [[728, 242], [787, 242]], thickness: 6, arrow: true, flow_entity: valve.lr_dwp_wal_vulpunt }
@@ -1466,7 +1502,7 @@ views:
           - { type: pushbutton, x: 454, y: 889, width: 440, height: 44, label: Zeewaterpomp dekspoelinstallatie, entity: switch.0x781c9dfffea180b5, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 454, y: 945, width: 440, height: 44, label: "Vuilwatertank legen (bypass)", entity: switch.0x781c9dfffea18816, led: green, align: left, font_size: 15 }
           - { type: value, style: tile, x: 914, y: 721, width: 328, height: 76, label: Boiler watertemperatuur, entity: sensor.boiler_water_temp_temperature, value_size: 22, colors: [{ below: 40, color: blue }, { color: green }] }
-          - { type: value, style: tile, x: 914, y: 809, width: 328, height: 76, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, value_size: 22, decimals: 0, unit: "%" }
+          - { type: value, style: tile, x: 914, y: 809, width: 328, height: 76, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, value_size: 22, decimals: 0, unit: "%", capacity: 400, colors: [{ below: 10, color: red }, { below: 25, color: amber }] }
 
   - title: Vuilwater
     path: sys-wastewater
@@ -1495,7 +1531,7 @@ views:
           - { type: pipe, medium: wastewater, points: [[614, 239], [628, 239], [628, 154], [628, 129], [628, 94]], thickness: 6, arrow: true, flow_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
           - { type: outlet, x: 592, y: 76, width: 70, height: 20, color: "#3cc7d6", active_entity: [switch.0xe4b063fffe787644, switch.0x781c9dfffea18816] }
           - { type: text, x: 694, y: 369, width: 133, height: 193, text: "Waste water\ntank", boxed: true, medium: wastewater, level_entity: sensor.wago_values_er_dirtywater_level, font_size: 14 }
-          - { type: text, x: 718, y: 519, entity: sensor.wago_values_er_dirtywater_level, mono: true, font_size: 18, unit: "%", decimals: 0 }
+          - { type: text, x: 706, y: 482, entity: sensor.wago_values_er_dirtywater_level, mono: true, font_size: 16, unit: "%", decimals: 0, capacity: 250, capacity_free: true }
           - { type: pipe, medium: wastewater, points: [[690, 409], [615, 409]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
           - { type: pump, x: 569, y: 390, size: 40, rotation: 270, entity: switch.0x781c9dfffea18816, active_entity: switch.0x781c9dfffea18816 }
           - { type: pipe, medium: wastewater, points: [[590, 391], [590, 271]], thickness: 6, arrow: true, flow_entity: switch.0x781c9dfffea18816 }
@@ -1522,7 +1558,7 @@ views:
           - { type: panel, x: 656, y: 669, width: 604, height: 360, title: Alarm level }
           - { type: pushbutton, x: 674, y: 721, width: 568, height: 44, label: Vuilwater tank level alarm, entity: automation.vuilwater_tank_level_alarm_notification, led: green, align: left, font_size: 15 }
           - { type: value, x: 674, y: 777, width: 568, height: 36, label: Alarm boven, entity: input_number.vuilwater_tank_hoog_level_alarm, font_size: 15, decimals: 0 }
-          - { type: value, style: tile, x: 674, y: 829, width: 568, height: 76, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, value_size: 22, decimals: 0, unit: "%", colors: [{ above: 80, color: red }, { above: 60, color: amber }, { color: green }] }
+          - { type: value, style: tile, x: 674, y: 829, width: 568, height: 76, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, value_size: 22, decimals: 0, unit: "%", capacity: 250, capacity_free: true, colors: [{ above: 80, color: red }, { above: 60, color: amber }, { color: green }] }
 
   - title: Bilgepompen
     path: sys-bilge
