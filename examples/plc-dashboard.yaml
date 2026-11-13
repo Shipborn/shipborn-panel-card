@@ -1285,22 +1285,22 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
 
-          # ---- Automaten: zoetwater vullen (met vul-niveau − / +) en vuilwater legen ----
-          - { type: panel, x: 20, y: 76, width: 620, height: 624, title: Automaten }
+          # ---- Automaten: zoetwater vullen en vuilwater legen (het vulniveau staat op Zoetwater) ----
+          - { type: panel, x: 20, y: 76, width: 620, height: 450, title: Automaten }
           - { type: text, x: 38, y: 124, text: Zoetwater, style: caption }
           - { type: text, x: 38, y: 152, width: 584, text: "LET OP! Vooraf kraantje onder de bank open zetten!", font_size: 14, color: "var(--warn, #f5a524)", weight: 600 }
           - { type: pushbutton, x: 38, y: 182, width: 584, height: 52, label: Zoetwater vul automaat, entity: automation.zoetwater_vul_automaat, led: green, align: left, font_size: 16 }
-          - { type: stepper, x: 38, y: 246, width: 584, height: 56, label: Vullen tot, entity: input_number.tank_vul_level, unit: "%", decimals: 0 }
-          - { type: text, x: 38, y: 314, width: 584, text: Bedient het vulventiel en schakelt de zoetwaterpomp uit. Vult de tank tot het ingestelde niveau., font_size: 14, color: "var(--ink-muted, #a3a29c)" }
-          - { type: line, x: 38, y: 372, width: 584, height: 1, color: "var(--line, #3b4249)" }
-          - { type: text, x: 38, y: 392, text: Vuilwater, style: caption }
-          - { type: pushbutton, x: 38, y: 420, width: 584, height: 52, label: Vuilwater leeg automaat, entity: automation.vuilwater_leeg_automaat, led: green, align: left, font_size: 16 }
-          - { type: text, x: 38, y: 484, width: 584, text: "Zet de afvoerpomp aan zodra de tank boven \"tank hoog level\" komt en leegt tot \"tank leeg level\". Bij een onlogisch verloop gaat de automaat uit en volgt een notificatie.", font_size: 14, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 38, y: 246, width: 584, text: Bedient het vulventiel en schakelt de zoetwaterpomp uit. Vult de tank tot het ingestelde niveau., font_size: 14, color: "var(--ink-muted, #a3a29c)" }
+          - { type: line, x: 38, y: 306, width: 584, height: 1, color: "var(--line, #3b4249)" }
+          - { type: text, x: 38, y: 326, text: Vuilwater, style: caption }
+          - { type: pushbutton, x: 38, y: 354, width: 584, height: 52, label: Vuilwater leeg automaat, entity: automation.vuilwater_leeg_automaat, led: green, align: left, font_size: 16 }
+          - { type: text, x: 38, y: 418, width: 584, text: "Zet de afvoerpomp aan zodra de tank boven \"tank hoog level\" komt en leegt tot \"tank leeg level\". Bij een onlogisch verloop gaat de automaat uit en volgt een notificatie.", font_size: 14, color: "var(--ink-muted, #a3a29c)" }
 
-          # ---- Tanks: vulling in % en liters (tik = HA-venster) ----
-          - { type: panel, x: 656, y: 76, width: 604, height: 624, title: Tanks }
-          - { type: tank, x: 700, y: 120, width: 220, height: 560, frame: false, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, capacity: 400, color: "var(--media-freshwater, #4aa3ff)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-freshwater } }
-          - { type: tank, x: 996, y: 120, width: 220, height: 560, frame: false, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, capacity: 250, capacity_free: true, color: "var(--media-wastewater, #9a7b5a)", colors: [{ above: 80, color: red }, { above: 60, color: amber }], tap_action: { action: navigate, navigation_path: sys-wastewater } }
+          # ---- Tanks: vulling in % en liters (tik = de pagina van de tank); onder de zoetwatertank de zoetwaterpomp ----
+          - { type: panel, x: 656, y: 76, width: 604, height: 450, title: Tanks }
+          - { type: tank, x: 700, y: 116, width: 220, height: 330, frame: false, label: Zoetwatertank, entity: sensor.wago_values_lr_fresh_water_level, capacity: 400, color: "var(--media-freshwater, #4aa3ff)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-freshwater } }
+          - { type: tank, x: 996, y: 116, width: 220, height: 330, frame: false, label: Vuilwatertank, entity: sensor.wago_values_er_dirtywater_level, capacity: 250, capacity_free: true, color: "var(--media-wastewater, #9a7b5a)", colors: [{ above: 80, color: red }, { above: 60, color: amber }], tap_action: { action: navigate, navigation_path: sys-wastewater } }
+          - { type: toggle, x: 700, y: 458, width: 220, height: 52, icon: pomp, label: Zoetwaterpomp, entity: switch.0x781c9dfffeb6cfcd, more_info: false, tap_action: { action: more-info }, states: { "on": AAN, "off": UIT } }
 
   - title: Zeewaterfilters
     path: sys-seawater

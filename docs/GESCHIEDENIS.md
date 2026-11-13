@@ -156,6 +156,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Dagmap `261113`.
 - (v0.5.39) Nieuwe `pushbutton`-optie `placeholder` (zacht oranje, tik = *Nog niet gekoppeld*). *Energy Inverters opstarten* losgekoppeld (Energie en Voortstuwing), nieuw *Energy Inverters afsluiten* en *Batterij automatisch bijvullen*. De gebruiker wil eerst overzicht van de gewenste bediening; de automations (aan: battery drive → controle drive power → shore/gen; uit: andersom) volgen later.
 - (v0.5.40) **Water-overzicht** (pagina `water`, eerste tab, knop Water): automaten links (zoetwater vullen met *Vullen tot* − / +, vuilwater legen), tanks rechts met % en liters (400 L / 250 L, vuilwater ook *nog vrij*). Keuzes via vragen: staande tanks, vuilwater alleen de automaat-knop, geen alarm-automaten, zoetwater kleurt bij laag niveau. Liters ook op Zoetwater en Vuilwater (schema en tegel). Getest in de demo (kleuren bij 8 % / 85 %).
+- Water-overzicht compacter (alleen YAML): tanks niet meer over de hele hoogte, *Vullen tot* weg, zoetwaterpomp als rij onder de zoetwatertank (AAN/UIT).
 
 ## Lessen en keuzes die je moet kennen
 
