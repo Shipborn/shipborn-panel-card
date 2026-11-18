@@ -1043,18 +1043,12 @@ views:
           - { type: pushbutton, x: 458, y: 620, width: 176, height: 60, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 17 }
           - { type: pushbutton, x: 646, y: 620, width: 176, height: 60, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 17 }
 
-          # ---- Glycolkoeling: druk en temperatuur (grijs als de glycolpomp uit staat; tik = DC-bus) en de automaten ----
+          # ---- Glycolkoeling: druk en temperatuur (grijs als de glycolpomp uit staat; tik = DC-bus); de automaten staan op DC-bus ----
           - { type: panel, x: 860, y: 76, width: 400, height: 624, title: Glycolkoeling }
           - { type: warnlight, x: 878, y: 128, size: 64, icon: druk, label: Glycoldruk, entity: sensor.wago_values_drivepressure_glycol, tone_entity: switch.0x781c9dfffea1854f, alarm_below: 0.5, tap_action: { action: navigate, navigation_path: sys-dcbus } }
           - { type: text, x: 958, y: 150, text: Druk, style: label }
           - { type: warnlight, x: 878, y: 208, size: 64, icon: koelwater, label: Glycoltemperatuur, entity: sensor.wago_values_drivetemp_glycol, tone_entity: switch.0x781c9dfffea1854f, warn_above: 40, alarm_above: 50, tap_action: { action: navigate, navigation_path: sys-dcbus } }
           - { type: text, x: 958, y: 230, text: Temperatuur, style: label }
-          - { type: text, x: 878, y: 300, text: Cooling pomp automaten, style: caption }
-          - { type: pushbutton, x: 878, y: 328, width: 364, height: 52, label: Glycolpomp aan automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 878, y: 388, width: 364, height: 52, label: "Glycolpomp uit bij lage drivetemp. en DC-bus uit", entity: automation.glycolpomp_uit_bij_lage_drivetemperatuur_en_dc_bus_uit, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 878, y: 448, width: 364, height: 52, label: Zeewaterpomp aan bij hoge drivetemp., entity: automation.zeewaterpomp_aan_bij_hoge_drivetemperatuur, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 878, y: 508, width: 364, height: 52, label: "Zeewaterpomp uit bij glycol 34 °C", entity: automation.zeewaterpomp_uit_glycol_34gr, led: green, align: left, font_size: 15 }
-          - { type: text, x: 878, y: 576, width: 364, text: "Groen lampje = automaat staat aan; een tik zet hem aan of uit.", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
 
   - title: DC-bus koeling
     path: sys-dcbus
@@ -1155,10 +1149,11 @@ views:
           - { type: value, style: tile, x: 226, y: 893, width: 176, height: 76, label: Glycol warm, entity: sensor.wago_values_drivetemp_glycol, value_size: 22, colors: [{ above: 50, color: red }, { above: 40, color: amber }, { entity: sensor.wago_values_drivepressure_glycol, below: 0.5, color: grey }, { above: 0.99, color: green }, { color: grey }] }
           - { type: value, style: tile, x: 38, y: 981, width: 176, height: 76, label: Seawater in, entity: sensor.al1590_er_generator_seawater_cooling_temperature, value_size: 22, colors: [{ entity: sensor.al1590_er_generator_seawater_cooling_flow, below: 10, color: grey }, { entity: sensor.al1590_er_prop_shaft_cooling_water_flow, below: 10, color: grey }, { below: 45, color: green }, { color: red }] }
           - { type: value, style: tile, x: 226, y: 981, width: 176, height: 76, label: Seawater out, entity: sensor.al1590_er_prop_shaft_cooling_water_temperature, value_size: 22, colors: [{ entity: sensor.al1590_er_prop_shaft_cooling_water_flow, below: 10, color: grey }, { above: 38, color: red }, { above: 30, color: amber }, { above: 0.99, color: green }, { color: red }] }
-          - { type: text, x: 38, y: 1077, width: 364, text: Automaten, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: pushbutton, x: 38, y: 1103, width: 364, height: 44, label: Glycolpomp on automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 38, y: 1155, width: 364, height: 44, label: Zeewaterpomp glycol automaat, entity: automation.zeewater_pomp_voor_glycol_on_automaat, led: green, align: left, font_size: 15 }
-          - { type: text, x: 38, y: 1209, width: 364, text: "Glycolpomp start zodra de DC-bus voeding heeft; de zeewaterpomp volgt de glycolpomp (wierpotklep gaat mee open).", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 38, y: 1069, width: 364, text: Automaten, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
+          - { type: pushbutton, x: 38, y: 1093, width: 364, height: 42, label: Glycolpomp aan, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 14 }
+          - { type: pushbutton, x: 38, y: 1139, width: 364, height: 42, label: "Glycolpomp uit (DC-bus uit)", entity: automation.glycolpomp_uit_bij_lage_drivetemperatuur_en_dc_bus_uit, led: green, align: left, font_size: 14 }
+          - { type: pushbutton, x: 38, y: 1185, width: 364, height: 42, label: "Zeewaterpomp aan (hoge temp.)", entity: automation.zeewaterpomp_aan_bij_hoge_drivetemperatuur, led: green, align: left, font_size: 14 }
+          - { type: pushbutton, x: 38, y: 1231, width: 364, height: 42, label: "Zeewaterpomp uit (glycol 34 °C)", entity: automation.zeewaterpomp_uit_glycol_34gr, led: green, align: left, font_size: 14 }
           - { type: panel, x: 436, y: 669, width: 824, height: 610, title: Drives }
           - { type: text, x: 784, y: 689, width: 120, text: Power, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
           - { type: text, x: 914, y: 689, width: 120, text: Temp, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
