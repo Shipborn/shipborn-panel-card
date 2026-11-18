@@ -166,6 +166,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.41) *Energy Inverters opstarten* (Energie en Voortstuwing) en *afsluiten* (Energie) zijn geen placeholders meer. Nieuwe map `generated automations/` met het package `energy_inverters.yaml` (statushelper + twee scripts, per stap 5 s wachten op de terugmelding) en een README over installeren. In de kaart: `choice.tap_action` met `variables` per optie, en het voortgangsvenster `progress` dat de statushelper volgt (bolletje per stap, *Startup complete* / *Shutdown complete* 1 s, waarschuwing bij geen reactie, opnieuw openen zolang het script loopt). Keuzes via vragen: script + helper (loopt door als het scherm sluit), uitzetten met dezelfde `_2`-switches, bij timeout stoppen zonder terugdraaien, bij afsluiten alleen wat gekoppeld is. Getest in de demo met nagebootste scripts (ook een drive die niet reageert); nog niet in HA.
 - Scripts ook als losse bestanden om in de UI te plakken (de TC90-HA heeft geen map `packages`).
 - (v0.5.42) Timeout 20 s per stap; daarna kiest de gebruiker *Terugdraaien* of *Blijven wachten*. Het script wacht altijd door en draait alleen terug op verzoek (de kaart schrijft `…:rollback` in de statushelper). Demo: `?ei_fail=shore&ei_speed=10`, `window.eiRespond()` voor een late reactie.
+- Glycolkoeling op Energie: vier *Cooling pomp automaten* in plaats van twee (alleen YAML).
 
 ## Lessen en keuzes die je moet kennen
 

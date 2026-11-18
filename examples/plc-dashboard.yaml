@@ -1049,10 +1049,12 @@ views:
           - { type: text, x: 958, y: 150, text: Druk, style: label }
           - { type: warnlight, x: 878, y: 208, size: 64, icon: koelwater, label: Glycoltemperatuur, entity: sensor.wago_values_drivetemp_glycol, tone_entity: switch.0x781c9dfffea1854f, warn_above: 40, alarm_above: 50, tap_action: { action: navigate, navigation_path: sys-dcbus } }
           - { type: text, x: 958, y: 230, text: Temperatuur, style: label }
-          - { type: text, x: 878, y: 300, text: Automaten, style: caption }
-          - { type: pushbutton, x: 878, y: 328, width: 364, height: 48, label: Glycolpomp on automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
-          - { type: pushbutton, x: 878, y: 384, width: 364, height: 48, label: Zeewaterpomp glycol automaat, entity: automation.zeewater_pomp_voor_glycol_on_automaat, led: green, align: left, font_size: 15 }
-          - { type: text, x: 878, y: 448, width: 364, text: "Glycolpomp start zodra de DC-bus voeding heeft; de zeewaterpomp volgt de glycolpomp.", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 878, y: 300, text: Cooling pomp automaten, style: caption }
+          - { type: pushbutton, x: 878, y: 328, width: 364, height: 52, label: Glycolpomp aan automaat, entity: automation.clycolpomponautomaat, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 878, y: 388, width: 364, height: 52, label: "Glycolpomp uit bij lage drivetemp. en DC-bus uit", entity: automation.glycolpomp_uit_bij_lage_drivetemperatuur_en_dc_bus_uit, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 878, y: 448, width: 364, height: 52, label: Zeewaterpomp aan bij hoge drivetemp., entity: automation.zeewaterpomp_aan_bij_hoge_drivetemperatuur, led: green, align: left, font_size: 15 }
+          - { type: pushbutton, x: 878, y: 508, width: 364, height: 52, label: "Zeewaterpomp uit bij glycol 34 °C", entity: automation.zeewaterpomp_uit_glycol_34gr, led: green, align: left, font_size: 15 }
+          - { type: text, x: 878, y: 576, width: 364, text: "Groen lampje = automaat staat aan; een tik zet hem aan of uit.", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
 
   - title: DC-bus koeling
     path: sys-dcbus
