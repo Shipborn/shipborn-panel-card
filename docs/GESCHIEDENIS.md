@@ -168,6 +168,9 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.42) Timeout 20 s per stap; daarna kiest de gebruiker *Terugdraaien* of *Blijven wachten*. Het script wacht altijd door en draait alleen terug op verzoek (de kaart schrijft `…:rollback` in de statushelper). Demo: `?ei_fail=shore&ei_speed=10`, `window.eiRespond()` voor een late reactie.
 - Cooling-automaten: eerst vier op het Energie-overzicht, daarna op verzoek naar DC-bus (vak *Cooling*, in plaats van de twee oude); Energie toont alleen nog druk en temperatuur (alleen YAML).
 - DC-bus: uitleg per automaat onder de knoppen; *PMS status* naar rechts onder *Drives* (smallere tegels), zodat *Cooling* links kan doorlopen (alleen YAML).
+- PMS-tegels *BMS charge* en *BMS discharge* zonder "current", zodat ze op één regel passen.
+
+- (v0.5.43) **Diesel-pagina met de aandrijflijn** op verzoek van de gebruiker: het bovenaanzicht uit de Poseidon-tekening *Trully shafting GBS 191800.800* (21-12-2020) vrijgesneden (witte achtergrond en wijslijnen weg) en als ingebouwd beeld `tc90-aandrijflijn` in de kaart. Het rompschema van `sys-diesel` is vervangen door die tekening met hotspots: afdichting (vetdruk), e-motor, diesel (toerental, alarm), koelwater, keerkoppeling vooruit/achteruit, druklager en schroefas, elk met een wijslijn naar het onderdeel. Zeewater, uitlaat en perslucht zijn daardoor uit dit schema; de bediening eronder is ongewijzigd.
 
 ## Lessen en keuzes die je moet kennen
 

@@ -643,89 +643,28 @@ views:
               - { label: Brandstof, path: sys-fuel }
             status: *tc_status
           - { type: navbar, items: *tc_nav }
-          - { type: hull, x: 20, y: 49, width: 1240, height: 600 }
-          - { type: pipe, medium: air, points: [[847, 546], [605, 546], [605, 246], [545, 246]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: pipe, medium: shaft, points: [[630, 357], [134, 357]], thickness: 10, speed: 60, flow_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, flow_above: 5, flow_abs: true }
-          - { type: propeller, x: 97, y: 270, width: 40, height: 170, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
-          - { type: text, x: 230, y: 387, text: Seal grease, font_size: 14, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: grease, points: [[221, 452], [221, 379]], thickness: 5, arrow: true, idle_opacity: 0.8 }
-          - { type: text, x: 230, y: 407, entity: sensor.al1590_er_prop_shaft_grease_pressure, mono: true, font_size: 16, unit: bar, decimals: 2 }
-          - { type: text, x: 230, y: 433, entity: sensor.al1590_er_prop_shaft_grease_temperature, mono: true, font_size: 16, unit: "°C", decimals: 1 }
-          - { type: pipe, medium: seawater, points: [[529, 296], [529, 276]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 502, y: 83, width: 50, height: 150, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: butterfly_valve, x: 514, y: 229, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 460, y: 239, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[452, 433], [496, 433]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - {
-              type: text,
-              x: 435,
-              y: 166,
-              width: 70,
-              height: 55,
-              text: Cooling
-
-                Electric/Shaft
-
-                Gearbox,
-              font_size: 13,
-              active_entity: switch.er_zeewaterpomp_cooling
-            }
-          - { type: pipe, medium: seawater, points: [[555, 126], [650, 126], [650, 176]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[625, 322], [190, 322], [190, 342]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - {
-              type: text,
-              x: 629,
-              y: 187,
-              width: 70,
-              height: 190,
-              text: Gear
-
-                box,
-              font_size: 15,
-              boxed: true,
-              active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed,
-              active_above: 5,
-              active_abs: true
-            }
-          - { type: pipe, medium: shaft, points: [[736, 327], [700, 327]], thickness: 20, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 734, y: 290, width: 200, height: 120, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: engine, x: 746, y: 290, width: 105, height: 70, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: text, x: 752, y: 362, text: Volvo D6 340, font_size: 15, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 752, y: 385, entity: sensor.engine_room_main_engine_me_rpm, mono: true, font_size: 14 }
-          - { type: text, x: 849, y: 385, entity: sensor.engine_room_main_engine_me_coolant_temp, mono: true, font_size: 14, unit: "°C" }
-          - { type: pipe, medium: seawater, points: [[1070, 612], [1070, 569]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: strainer, x: 1045, y: 374, width: 50, height: 150, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: butterfly_valve, x: 1055, y: 522, active_entity: valve.er_ventielblok_1tm4_l4 }
-          - { type: text, x: 1086, y: 532, text: Inlet V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[1044, 390], [947, 390]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: text, x: 964, y: 358, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 16, unit: L/min, decimals: 1 }
-          - { type: pipe, medium: seawater, points: [[503, 511], [503, 548]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: butterfly_valve, x: 488, y: 557, active_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: text, x: 520, y: 553, text: Outlet V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[503, 602], [503, 636]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: pipe, medium: exhaust, points: [[755, 411], [755, 440], [536, 440]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - {
-              type: text,
-              x: 337,
-              y: 534,
-              width: 75,
-              height: 65,
-              text: Exhaust
-
-                drain,
-              font_size: 15,
-              boxed: true,
-              active_entity: sensor.engine_room_main_engine_me_rpm,
-              active_above: 100
-            }
-          - { type: pipe, medium: exhaust, points: [[337, 556], [110, 556]], thickness: 12, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: smoke, x: 41, y: 534, width: 70, height: 40, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[368, 604], [368, 639]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: outlet, x: 233, y: 603, width: 80, height: 26, color: "#3cc7d6", label: Main outlet, active_entity: [sensor.engine_room_main_engine_me_rpm, switch.er_zeewaterpomp_cooling], active_above: 100 }
-          - { type: text, x: 849, y: 519, width: 130, height: 65, text: Compressor, boxed: true, font_size: 15, active_entity: switch.0x781c9dfffea18853 }
-          - { type: text, x: 889, y: 562, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 14, unit: bar, decimals: 2 }
-          - { type: pipe, medium: air, points: [[848, 575], [792, 575], [522, 575]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: pipe, medium: air, points: [[978, 537], [1005, 537], [1050, 537]], thickness: 4, arrow: true, flow_entity: valve.er_ventielblok_1tm4_l4 }
+          # ---- aandrijflijn: bovenaanzicht uit tekening "Trully shafting GBS 191800.800" (Poseidon) ----
+          # Van links naar rechts: schroef, schroefas, afdichting met vetpot, druklager, flexibele koppeling,
+          # keerkoppeling met oliekoeler en e-motor, vliegwielhuis met hydrauliekpomp, Volvo Penta D6.
+          - { type: text, x: 20, y: 76, text: "Aandrijflijn – Volvo Penta D6, keerkoppeling, e-motor, schroefas", style: caption }
+          - { type: image, x: 20, y: 250, width: 1240, height: 184, image: tc90-aandrijflijn }
+          # wijslijnen van de onderdelen naar de labels
+          - { type: line, x: 707, y: 150, width: 2, height: 146, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 990, y: 110, width: 2, height: 186, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 1156, y: 150, width: 2, height: 120, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 1156, y: 418, width: 2, height: 52, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 928, y: 414, width: 2, height: 156, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 820, y: 400, width: 2, height: 120, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 329, y: 384, width: 2, height: 136, color: "var(--line-strong, #4a4a4a)" }
+          # labels (hotspots): het bolletje is x/y, het label wijst ervan weg
+          - { type: hotspot, x: 708, y: 150, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
+          - { type: hotspot, x: 991, y: 110, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
+          - { type: hotspot, x: 1157, y: 150, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
+          - { type: hotspot, x: 1157, y: 470, side: left, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
+          - { type: hotspot, x: 929, y: 520, icon: pijl, label: Vooruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd }
+          - { type: hotspot, x: 929, y: 570, icon: pijl, label: Achteruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
+          - { type: hotspot, x: 821, y: 520, side: left, icon: instellingen, label: Druklager, tap_action: { action: none } }
+          - { type: hotspot, x: 330, y: 520, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
 
           # ---- bediening (uit het oude dashboard) ----
           - { type: panel, x: 20, y: 671, width: 620, height: 360, title: "Sensoren – bij Volvo aan alles groen" }
@@ -795,15 +734,6 @@ views:
           - { type: indicator, x: 674, y: 1207, label: Diesel clutch neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 17 }
           - { type: indicator, x: 964, y: 1099, label: E-motor clutch in, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in, font_size: 17 }
           - { type: indicator, x: 964, y: 1135, label: E-motor running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, font_size: 17 }
-          - { type: text, x: 422, y: 390, width: 95, height: 120, text: Exhaust Separator, font_size: 15, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: shaft, points: [[741, 222], [700, 222]], thickness: 20, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
-          - { type: text, x: 734, y: 165, width: 135, height: 115, text: "", boxed: true, alarm_entity: binary_sensor.plc_diesel_alarm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }
-          - { type: motor, x: 755, y: 172 }
-          - { type: text, x: 742, y: 232, text: ENGIRO E-MOTOR, font_size: 15, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[785, 411], [785, 472], [527, 472]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: pipe, medium: exhaust, points: [[470, 511], [470, 555], [425, 555]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 454, y: 476, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: °C, decimals: 1 }
-          - { type: text, x: 215, y: 302, text: COOLING PROPSHAFT, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
 
   - title: Brandstof
     path: sys-fuel
@@ -1201,8 +1131,8 @@ views:
           - { type: value, style: tile, x: 854, y: 1347, width: 188, height: 76, label: BGC current, entity: sensor.er_pms_status2_bgc_current, value_size: 22 }
           - { type: value, style: tile, x: 1054, y: 1347, width: 188, height: 76, label: BMS voltage, entity: sensor.er_pms_status2_bms_voltage, value_size: 22 }
           - { type: value, style: tile, x: 454, y: 1435, width: 188, height: 76, label: BMS current, entity: sensor.er_pms_status2_bms_current, value_size: 22 }
-          - { type: value, style: tile, x: 654, y: 1435, width: 188, height: 76, label: BMS charge current, entity: sensor.er_pms_status2_bms_charge_current, value_size: 22 }
-          - { type: value, style: tile, x: 854, y: 1435, width: 188, height: 76, label: BMS discharge current, entity: sensor.er_pms_status2_bms_discharge_current, value_size: 22 }
+          - { type: value, style: tile, x: 654, y: 1435, width: 188, height: 76, label: BMS charge, entity: sensor.er_pms_status2_bms_charge_current, value_size: 22 }
+          - { type: value, style: tile, x: 854, y: 1435, width: 188, height: 76, label: BMS discharge, entity: sensor.er_pms_status2_bms_discharge_current, value_size: 22 }
           - { type: value, style: tile, x: 1054, y: 1435, width: 188, height: 76, label: BMS max SoC, entity: sensor.er_pms_status2_bms_max_soc, value_size: 22 }
           - { type: pushbutton, x: 454, y: 1527, width: 188, height: 44, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 15 }
           - { type: pushbutton, x: 654, y: 1527, width: 188, height: 44, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 15 }
