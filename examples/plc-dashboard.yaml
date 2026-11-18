@@ -676,7 +676,7 @@ views:
           - { type: strainer, x: 1207, y: 532, width: 44, height: 80, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
           - { type: butterfly_valve, x: 1214, y: 619, active_entity: valve.er_ventielblok_1tm4_l4 }
           - { type: text, x: 1116, y: 626, text: Inlet V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 1090, y: 558, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
+          - { type: text, x: 1110, y: 598, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
 
           # koeling e-motor / schroefas / keerkoppeling (onder): inlaat V3, wierpot, naar de keerkoppeling en verder
           # naar de schroefas (stroomt als de zeewaterpomp aan staat)
@@ -695,15 +695,15 @@ views:
           - { type: line, x: 919, y: 243, width: 2, height: 45, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 535, y: 243, width: 2, height: 54, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 244, y: 243, width: 2, height: 151, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 825, y: 469, width: 2, height: 86, color: "var(--line-strong, #4a4a4a)" }
+          # keerkoppeling (het groene blok tussen de grote kast en de Volvo): vooruit / neutraal / achteruit
+          - { type: line, x: 957, y: 460, width: 2, height: 64, color: "var(--line-strong, #4a4a4a)" }
+          - { type: gear, x: 806, y: 524, width: 304, height: 44, labels: [Achteruit, Neutraal, Vooruit], fwd_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, aft_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
           # labels (hotspots): het bolletje is x/y, het label wijst ervan weg
           - { type: hotspot, x: 1230, y: 116, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
           - { type: hotspot, x: 1230, y: 150, side: left, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
           - { type: hotspot, x: 920, y: 243, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
           - { type: hotspot, x: 536, y: 243, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
           - { type: hotspot, x: 244, y: 243, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
-          - { type: hotspot, x: 826, y: 517, icon: pijl, label: Vooruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd }
-          - { type: hotspot, x: 826, y: 555, icon: pijl, label: Achteruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
 
           # ---- bediening (uit het oude dashboard) ----
           - { type: panel, x: 20, y: 671, width: 620, height: 360, title: "Sensoren – bij Volvo aan alles groen" }

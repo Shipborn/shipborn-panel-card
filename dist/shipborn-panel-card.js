@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.44";
+const VERSION = "0.5.45";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2817,8 +2817,10 @@ class ShipbornPanelCard extends HTMLElement {
   // Gearbox D / N / R from fwd_entity and aft_entity (neither on = N); only the active letter lights green.
   _tGear(g) {
     const n = this._place(h("div", "tc-gear"), g, 132, 44);
-    n.innerHTML = "<span>R</span><span>N</span><span>D</span>"; // like the lever: reverse left, forward right
+    n.innerHTML = "<span></span><span></span><span></span>"; // like the lever: reverse left, forward right
     const [r, neutral, d] = n.children;
+    // labels: words instead of R N D, e.g. [Achteruit, Neutraal, Vooruit] next to a drawing.
+    [r, neutral, d].forEach((s, k) => (s.textContent = (g.labels || ["R", "N", "D"])[k] ?? ""));
     if (g.tap_action) {
       n.style.cursor = "pointer";
       n.addEventListener("click", () => this._handleAction(g, g.tap_action, n));
