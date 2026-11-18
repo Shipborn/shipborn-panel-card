@@ -4,16 +4,26 @@
 # "Energy Inverters opstarten" (Energie en Voortstuwing) en "Energy Inverters
 # afsluiten" (Energie) in de Shipborn Panel Card starten deze scripts en tonen de
 # voortgang live in een venster, aan de hand van input_text.energy_inverters_status.
+# Zonder packages: de losse bestanden script_energy_inverters_*.yaml in de UI plakken
+# en de helper in de UI maken (zie README.md). Houd die bestanden gelijk met dit bestand.
 #
-# Installeren: zie README.md in deze map.
+# Per stap wordt 20 s op de terugmelding gewacht. Komt die niet, dan zet het script de
+# status op "timeout" maar BLIJFT het wachten. De kaart vraagt dan: terugdraaien of
+# blijven wachten. Komt de terugmelding alsnog, dan gaat het script gewoon verder.
+# Kiest de gebruiker "terugdraaien", dan schrijft de kaart "<plan>:<stap>:rollback" in de
+# status; het script draait dan alle stappen van deze run terug (ook de huidige), in
+# omgekeerde volgorde, en stopt.
 #
 # Status (input_text.energy_inverters_status) = "<plan>:<stap>:<toestand>"
 #   plan      de stappen van deze run, in volgorde, bijv. "battery,shore"
 #   stap      battery | shore | generator (leeg bij complete)
-#   toestand  busy        stap loopt, wacht op de terugmelding
-#             timeout     geen terugmelding binnen 5 s: gestopt, wat al geschakeld is blijft staan
-#             unavailable gekozen bron is niet beschikbaar: niets geschakeld
-#             complete    alle stappen gelukt
+#   toestand  busy         stap loopt, wacht op de terugmelding
+#             timeout      geen terugmelding binnen 20 s; het script wacht door
+#             rollback     (geschreven door de kaart) de gebruiker wil terugdraaien
+#             rolling_back het script draait terug
+#             rolled_back  teruggedraaid, script gestopt
+#             unavailable  gekozen bron is niet beschikbaar: niets geschakeld
+#             complete     alle stappen gelukt
 # Voorbeelden: "battery,shore:battery:busy", "battery,generator:generator:timeout",
 #              "battery,shore::complete", "shore,battery:shore:busy" (afsluiten).
 
@@ -21,7 +31,7 @@ input_text:
   energy_inverters_status:
     name: Energy Inverters status
     max: 100
-    initial: ""          # na een herstart leeg, zodat er nooit een oude "busy" blijft staan
+    initial: ""          # na een herstart leeg
 
 script:
   # ---------- opstarten: accu → (walstroom of generator) ----------
@@ -29,8 +39,8 @@ script:
     alias: Energy Inverters opstarten
     description: >-
       Koppelt eerst de accu (battery connect) en wacht tot het BMS aan is, daarna
-      (naar keuze) walstroom of generator en wacht tot die gekoppeld is. Per stap 5 s;
-      reageert een drive niet, dan stopt het script en blijft staan wat al aan is.
+      (naar keuze) walstroom of generator en wacht tot die gekoppeld is. Na 20 s zonder
+      terugmelding vraagt de kaart: terugdraaien of blijven wachten.
     icon: mdi:flash
     mode: single
     max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
@@ -48,69 +58,73 @@ script:
               - battery
     variables:
       status: input_text.energy_inverters_status
-      accu_switch: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
-      accu_online: binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on
-      bron_switch:
+      schakelaar:
+        battery: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
         shore: switch.wago_energy_controls_wago_energy_controls_shore_supply_2
         generator: switch.wago_energy_controls_wago_energy_controls_generator_2
-      bron_beschikbaar:
-        shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on
-        generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
-      bron_gekoppeld:
+      terugmelding:
+        battery: binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on
         shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected
         generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected
+      beschikbaar:
+        shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on
+        generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
       extern: "{{ bron in ['shore', 'generator'] }}"
-      plan: "{{ 'battery,' ~ bron if extern else 'battery' }}"
+      stappen: "{{ ['battery'] + ([bron] if extern else []) }}"
+      plan: "{{ stappen | join(',') }}"
     sequence:
       # gekozen bron moet beschikbaar zijn (de kaart laat alleen beschikbare bronnen kiezen; dit is de tweede controle)
       - if:
           - condition: template
-            value_template: "{{ extern and not is_state(bron_beschikbaar[bron], 'on') }}"
+            value_template: "{{ extern and not is_state(beschikbaar[bron], 'on') }}"
         then:
           - action: input_text.set_value
             target: { entity_id: "{{ status }}" }
             data: { value: "{{ plan }}:{{ bron }}:unavailable" }
           - stop: Gekozen bron is niet beschikbaar
 
-      # stap 1: accu koppelen en wachten op het BMS
-      - action: input_text.set_value
-        target: { entity_id: "{{ status }}" }
-        data: { value: "{{ plan }}:battery:busy" }
-      - action: switch.turn_on
-        target: { entity_id: "{{ accu_switch }}" }
-      - wait_template: "{{ is_state(accu_online, 'on') }}"
-        timeout: "00:00:05"
-        continue_on_timeout: true
-      - if:
-          - condition: template
-            value_template: "{{ not wait.completed }}"
-        then:
-          - action: input_text.set_value
-            target: { entity_id: "{{ status }}" }
-            data: { value: "{{ plan }}:battery:timeout" }
-          - stop: Accu-drive reageert niet
-
-      # stap 2: walstroom of generator koppelen en wachten tot hij gekoppeld is
-      - if:
-          - condition: template
-            value_template: "{{ extern }}"
-        then:
-          - action: input_text.set_value
-            target: { entity_id: "{{ status }}" }
-            data: { value: "{{ plan }}:{{ bron }}:busy" }
-          - action: switch.turn_on
-            target: { entity_id: "{{ bron_switch[bron] }}" }
-          - wait_template: "{{ is_state(bron_gekoppeld[bron], 'on') }}"
-            timeout: "00:00:05"
-            continue_on_timeout: true
-          - if:
-              - condition: template
-                value_template: "{{ not wait.completed }}"
-            then:
-              - action: input_text.set_value
-                target: { entity_id: "{{ status }}" }
-                data: { value: "{{ plan }}:{{ bron }}:timeout" }
-              - stop: Drive van de bron reageert niet
+      - repeat:
+          for_each: "{{ stappen }}"
+          sequence:
+            - variables:
+                stap: "{{ repeat.item }}"
+                nr: "{{ repeat.index }}"
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:{{ stap }}:busy" }
+            - action: switch.turn_on
+              target: { entity_id: "{{ schakelaar[stap] }}" }
+            - wait_template: "{{ is_state(terugmelding[stap], 'on') }}"
+              timeout: "00:00:20"
+              continue_on_timeout: true
+            - if:
+                - condition: template
+                  value_template: "{{ not wait.completed }}"
+              then:
+                # geen reactie binnen 20 s: melden en doorwachten tot de terugmelding of tot de gebruiker terugdraait
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:{{ stap }}:timeout" }
+                - wait_template: >-
+                    {{ is_state(terugmelding[stap], 'on')
+                       or states(status) == plan ~ ':' ~ stap ~ ':rollback' }}
+                - if:
+                    - condition: template
+                      value_template: "{{ not is_state(terugmelding[stap], 'on') }}"
+                  then:
+                    # terugdraaien: alles van deze run uit, laatste eerst (dus de bron vóór de accu)
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:{{ stap }}:rolling_back" }
+                    - repeat:
+                        for_each: "{{ stappen[:nr] | reverse | list }}"
+                        sequence:
+                          - action: switch.turn_off
+                            target: { entity_id: "{{ schakelaar[repeat.item] }}" }
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:{{ stap }}:rolled_back" }
+                    - stop: Teruggedraaid op verzoek van de gebruiker
 
       - action: input_text.set_value
         target: { entity_id: "{{ status }}" }
@@ -122,37 +136,40 @@ script:
     description: >-
       Ontkoppelt eerst de externe voeding die gekoppeld is (walstroom en/of generator)
       en wacht tot die offline is, daarna de accu (battery connect) en wacht tot het BMS
-      uit is. Per stap 5 s; reageert een drive niet, dan stopt het script.
+      uit is. Na 20 s zonder terugmelding vraagt de kaart: terugdraaien of blijven wachten.
     icon: mdi:flash-off
     mode: single
     max_exceeded: silent
     variables:
       status: input_text.energy_inverters_status
-      accu_switch: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
-      accu_online: binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on
-      bron_switch:
+      schakelaar:
+        battery: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
         shore: switch.wago_energy_controls_wago_energy_controls_shore_supply_2
         generator: switch.wago_energy_controls_wago_energy_controls_generator_2
-      bron_gekoppeld:
+      terugmelding:
+        battery: binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on
         shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected
         generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected
-      # alleen wat gekoppeld is (of waarvan de switch nog aan staat)
-      bronnen: >-
-        {{ (['shore'] if is_state(bron_gekoppeld.shore, 'on') or is_state(bron_switch.shore, 'on') else [])
-           + (['generator'] if is_state(bron_gekoppeld.generator, 'on') or is_state(bron_switch.generator, 'on') else []) }}
-      plan: "{{ (bronnen + ['battery']) | join(',') }}"
+      # alleen wat gekoppeld is (of waarvan de switch nog aan staat), daarna altijd de accu
+      stappen: >-
+        {{ (['shore'] if is_state(terugmelding.shore, 'on') or is_state(schakelaar.shore, 'on') else [])
+           + (['generator'] if is_state(terugmelding.generator, 'on') or is_state(schakelaar.generator, 'on') else [])
+           + ['battery'] }}
+      plan: "{{ stappen | join(',') }}"
     sequence:
-      # stap 1..n: externe voeding ontkoppelen en wachten tot hij offline is
       - repeat:
-          for_each: "{{ bronnen }}"
+          for_each: "{{ stappen }}"
           sequence:
+            - variables:
+                stap: "{{ repeat.item }}"
+                nr: "{{ repeat.index }}"
             - action: input_text.set_value
               target: { entity_id: "{{ status }}" }
-              data: { value: "{{ plan }}:{{ repeat.item }}:busy" }
+              data: { value: "{{ plan }}:{{ stap }}:busy" }
             - action: switch.turn_off
-              target: { entity_id: "{{ bron_switch[repeat.item] }}" }
-            - wait_template: "{{ is_state(bron_gekoppeld[repeat.item], 'off') }}"
-              timeout: "00:00:05"
+              target: { entity_id: "{{ schakelaar[stap] }}" }
+            - wait_template: "{{ is_state(terugmelding[stap], 'off') }}"
+              timeout: "00:00:20"
               continue_on_timeout: true
             - if:
                 - condition: template
@@ -160,26 +177,27 @@ script:
               then:
                 - action: input_text.set_value
                   target: { entity_id: "{{ status }}" }
-                  data: { value: "{{ plan }}:{{ repeat.item }}:timeout" }
-                - stop: Drive van de bron reageert niet
-
-      # laatste stap: accu ontkoppelen en wachten tot het BMS uit is
-      - action: input_text.set_value
-        target: { entity_id: "{{ status }}" }
-        data: { value: "{{ plan }}:battery:busy" }
-      - action: switch.turn_off
-        target: { entity_id: "{{ accu_switch }}" }
-      - wait_template: "{{ is_state(accu_online, 'off') }}"
-        timeout: "00:00:05"
-        continue_on_timeout: true
-      - if:
-          - condition: template
-            value_template: "{{ not wait.completed }}"
-        then:
-          - action: input_text.set_value
-            target: { entity_id: "{{ status }}" }
-            data: { value: "{{ plan }}:battery:timeout" }
-          - stop: Accu-drive reageert niet
+                  data: { value: "{{ plan }}:{{ stap }}:timeout" }
+                - wait_template: >-
+                    {{ is_state(terugmelding[stap], 'off')
+                       or states(status) == plan ~ ':' ~ stap ~ ':rollback' }}
+                - if:
+                    - condition: template
+                      value_template: "{{ not is_state(terugmelding[stap], 'off') }}"
+                  then:
+                    # terugdraaien: alles van deze run weer aan, laatste eerst (dus de accu vóór de bron)
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:{{ stap }}:rolling_back" }
+                    - repeat:
+                        for_each: "{{ stappen[:nr] | reverse | list }}"
+                        sequence:
+                          - action: switch.turn_on
+                            target: { entity_id: "{{ schakelaar[repeat.item] }}" }
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:{{ stap }}:rolled_back" }
+                    - stop: Teruggedraaid op verzoek van de gebruiker
 
       - action: input_text.set_value
         target: { entity_id: "{{ status }}" }

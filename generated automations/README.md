@@ -15,14 +15,14 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 1. In het venster kies je *Walstroom* of *Generator* (alleen te kiezen als `…shore_supply_is_on` / `…generator_is_on` aan is) of *Alleen accu* (met waarschuwing).
 2. Het script zet `switch.…battery_connect_2` aan en wacht tot `binary_sensor.…bms_is_on` aan is.
 3. Daarna zet het `switch.…shore_supply_2` of `switch.…generator_2` aan en wacht tot `binary_sensor.…shore_supply_is_connected` / `…generator_is_connected` aan is.
-4. Per stap wacht het maximaal 5 s. Reageert een drive niet, dan stopt het script, toont het venster een waarschuwing en blijft staan wat al aan is.
+4. Reageert een drive na **20 s** nog niet, dan vraagt het venster: **Terugdraaien** of **Blijven wachten**. Het script wacht intussen gewoon door. Komt de terugmelding alsnog, dan gaat het verder met de volgende stap. Na *Blijven wachten* blijft het venster open (stap staat op WACHT) en kan je nog steeds terugdraaien. *Terugdraaien* zet alles van deze opdracht terug, laatste stap eerst (de kaart schrijft `…:rollback` in de statushelper, het script ziet dat en draait terug).
 5. Lukt alles, dan toont het venster 1 s *Startup complete* en sluit daarna.
 
 **Afsluiten** (knop op Energie, met Ja/Nee):
 
 1. Eerst gaat de externe voeding af die gekoppeld is: walstroom en/of generator (`…_is_connected` aan of de switch aan). Het script wacht tot `…_is_connected` uit is.
 2. Daarna gaat `switch.…battery_connect_2` uit, en het script wacht tot `…bms_is_on` uit is.
-3. Ook hier geldt per stap maximaal 5 s; bij geen reactie stopt het script met een waarschuwing.
+3. Ook hier geldt per stap 20 s, met dezelfde keuze; terugdraaien zet weer aan wat bij dit afsluiten is uitgezet.
 
 Het groene bolletje in de knop *Energy Inverters opstarten* staat los van het script: het is groen zolang de DC-bus > 700 V is.
 

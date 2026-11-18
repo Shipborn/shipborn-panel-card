@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.41";
+const VERSION = "0.5.42";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -656,6 +656,10 @@ const TC_STYLE =
   .tc-progress li.is-busy .d-led { --c: var(--accent); animation: tc-pulse 1s ease-in-out infinite; }
   .tc-progress li.is-fail .d-led { --c: var(--alarm); }
   .tc-progress li.is-fail { border-color: var(--alarm); }
+  .tc-progress li.is-late .d-led { --c: var(--warn); animation: tc-pulse 1s ease-in-out infinite; }
+  .tc-progress li.is-late { border-color: var(--warn); }
+  .tc-progress li.is-back .d-led { --c: var(--warn); }
+  .tc-dialog-btns > [hidden] { display: none; }
   .tc-btn:disabled { opacity: .45; cursor: default; }
   .tc-web { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: #fff; }
   .tc-web iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
@@ -2249,16 +2253,22 @@ class ShipbornPanelCard extends HTMLElement {
     dlg.dataset.tcTheme = this._theme || "nacht";
     const box = h("div", "tc-dialog tc-check");
     box.innerHTML = '<div class="title"></div><ul class="tc-check-list tc-progress"></ul><p class="body tc-choice-note"></p>' +
-      '<div class="tc-dialog-btns"><button type="button" class="tc-btn label"></button></div>';
+      '<div class="tc-dialog-btns"><button type="button" class="tc-btn label"></button><button type="button" class="tc-btn tc-btn-danger label" hidden></button>' +
+      '<button type="button" class="tc-btn tc-btn-primary label" hidden></button></div>';
     box.querySelector(".title").textContent = p.title || b.choice?.title || b.label || "";
     const list = box.querySelector("ul");
     const note = box.querySelector(".tc-choice-note");
-    const close = box.querySelector(".tc-dialog-btns button");
+    const [close, rollback, wait] = box.querySelector(".tc-dialog-btns").children;
     close.textContent = p.close || "Sluiten";
+    rollback.textContent = p.rollback || "Terugdraaien";
+    wait.textContent = p.keep_waiting || "Blijven wachten";
     const t0 = Date.now();
     let started = !prev;
     let shownPlan = null;
     let closing = null;
+    let choosing = false;
+    let cur_ = {};
+    const waited = new Set(); // "plan:step" for which the user chose to keep waiting
     const steps = p.steps || {};
     const paint = (hass) => {
       const so = hass.states[p.entity];
@@ -2281,22 +2291,36 @@ class ShipbornPanelCard extends HTMLElement {
         }));
       }
       const at = st === "complete" ? keys.length : keys.indexOf(cur);
+      const back = /^roll/.test(st); // rollback (asked), rolling_back, rolled_back
+      const late = st === "timeout" && waited.has(plan + ":" + cur);
       [...list.children].forEach((li, i) => {
-        const s = i < at ? "ok" : i > at ? "wait" : st === "busy" ? "busy" : "fail";
+        const s = back ? (i <= at ? "back" : "wait") : i < at ? "ok" : i > at ? "wait" : st === "busy" ? "busy" : st === "timeout" ? (late ? "late" : "fail") : "fail";
         li.className = "is-" + s;
-        li.children[2].textContent = { ok: "OK", wait: "", busy: "BEZIG", fail: st === "unavailable" ? "NIET BESCHIKBAAR" : "GEEN REACTIE" }[s];
+        li.children[2].textContent = { ok: "OK", wait: "", busy: "BEZIG", late: "WACHT", back: st === "rolled_back" ? "TERUG" : "…",
+          fail: st === "unavailable" ? "NIET BESCHIKBAAR" : "GEEN REACTIE" }[s];
       });
       const step = steps[cur] || {};
       const label = step.label || cur;
       const msg = {
         busy: step.busy || "",
-        timeout: step.fail || `${label}: de drive reageert niet binnen 5 s. Gestopt; wat al geschakeld is, blijft staan.`,
+        timeout: late ? step.late || p.late || "Wacht op reactie … Terugdraaien kan nog steeds."
+          : step.fail || `${label}: geen reactie binnen ${p.timeout ?? 20} s. Terugdraaien of blijven wachten?`,
+        rollback: p.rolling_back || "Wordt teruggedraaid …",
+        rolling_back: p.rolling_back || "Wordt teruggedraaid …",
+        rolled_back: p.rolled_back || "Teruggedraaid: alles van deze opdracht staat weer zoals het was.",
         unavailable: step.unavailable || `${label}: niet beschikbaar. Er is niets geschakeld.`,
         complete: p.done || "Gereed",
       }[st] ?? (keys.length ? "" : p.idle || "Geen lopende opdracht.");
       note.textContent = msg;
-      note.className = "body tc-choice-note" + (st === "complete" ? " is-ok" : st === "timeout" || st === "unavailable" ? " is-bad" : "");
+      note.className = "body tc-choice-note" + (st === "complete" ? " is-ok" : (st === "timeout" && !late) || st === "unavailable" ? " is-bad" : late || back ? " is-warn" : "");
+      // timeout: first a choice (no Sluiten), after "Blijven wachten" Sluiten + Terugdraaien
+      choosing = st === "timeout" && !late;
+      close.hidden = choosing;
+      rollback.hidden = st !== "timeout";
+      wait.hidden = !choosing;
+      rollback.disabled = false;
       if (st === "complete" && !closing) closing = setTimeout(done, p.done_ms ?? 1000);
+      cur_ = { plan, cur };
     };
     // repaint every second too, so "wordt gestart" turns into a warning without a state change
     const tick = setInterval(() => this._hass && paint(this._hass), 1000);
@@ -2311,7 +2335,21 @@ class ShipbornPanelCard extends HTMLElement {
       if (i >= 0) this._updaters.splice(i, 1);
     };
     close.addEventListener("click", done);
-    dlg.addEventListener("click", (ev) => ev.target === dlg && done(ev));
+    // Blijven wachten: nothing is sent, the script keeps waiting; the window stays and shows WACHT
+    wait.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      waited.add(cur_.plan + ":" + cur_.cur);
+      if (this._hass) paint(this._hass);
+    });
+    // Terugdraaien: the running script waits for "<plan>:<step>:rollback" in the status helper and undoes the run
+    rollback.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      if (!this._hass || !cur_.cur) return;
+      fire(this, "haptic", "light");
+      rollback.disabled = true;
+      this._hass.callService("input_text", "set_value", { entity_id: p.entity, value: `${cur_.plan}:${cur_.cur}:rollback` });
+    });
+    dlg.addEventListener("click", (ev) => ev.target === dlg && !choosing && done(ev));
     dlg.appendChild(box);
     this.shadowRoot.appendChild(dlg);
   }

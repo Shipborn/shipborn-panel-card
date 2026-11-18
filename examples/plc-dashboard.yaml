@@ -1006,10 +1006,11 @@ views:
               script: script.energy_inverters_opstarten
               title: Energy Inverters opstarten
               done: Startup complete
+              rolled_back: "Teruggedraaid: wat bij dit opstarten is aangezet, staat weer uit."
               steps:
-                battery: { label: Accu koppelen, busy: "Wacht tot het BMS aan is …", fail: "De accu-drive reageert niet: het BMS is niet binnen 5 s aan. Opstarten gestopt." }
-                shore: { label: Walstroom koppelen, busy: "Wacht tot de walstroom gekoppeld is …", fail: "De walstroom-drive reageert niet: niet binnen 5 s gekoppeld. Opstarten gestopt; de accu blijft gekoppeld." }
-                generator: { label: Generator koppelen, busy: "Wacht tot de generator gekoppeld is …", fail: "De generator-drive reageert niet: niet binnen 5 s gekoppeld. Opstarten gestopt; de accu blijft gekoppeld." }
+                battery: { label: Accu koppelen, busy: "Wacht tot het BMS aan is …", fail: "De accu-drive reageert niet: het BMS is na 20 s nog niet aan. Terugdraaien of blijven wachten?" }
+                shore: { label: Walstroom koppelen, busy: "Wacht tot de walstroom gekoppeld is …", fail: "De walstroom-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien (walstroom en accu uit) of blijven wachten?" }
+                generator: { label: Generator koppelen, busy: "Wacht tot de generator gekoppeld is …", fail: "De generator-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien (generator en accu uit) of blijven wachten?" }
           # Afsluiten: Ja/Nee → script.energy_inverters_afsluiten (eerst walstroom/generator, dan de accu) → voortgangsvenster
           - type: pushbutton
             x: 38
@@ -1028,10 +1029,11 @@ views:
               script: script.energy_inverters_afsluiten
               title: Energy Inverters afsluiten
               done: Shutdown complete
+              rolled_back: "Teruggedraaid: wat bij dit afsluiten is uitgezet, staat weer aan."
               steps:
-                shore: { label: Walstroom ontkoppelen, busy: "Wacht tot de walstroom offline is …", fail: "De walstroom-drive reageert niet: niet binnen 5 s offline. Afsluiten gestopt." }
-                generator: { label: Generator ontkoppelen, busy: "Wacht tot de generator offline is …", fail: "De generator-drive reageert niet: niet binnen 5 s offline. Afsluiten gestopt." }
-                battery: { label: Accu ontkoppelen, busy: "Wacht tot het BMS uit is …", fail: "De accu-drive reageert niet: het BMS is niet binnen 5 s uit. Afsluiten gestopt." }
+                shore: { label: Walstroom ontkoppelen, busy: "Wacht tot de walstroom offline is …", fail: "De walstroom-drive reageert niet: na 20 s nog niet offline. Terugdraaien (weer aan) of blijven wachten?" }
+                generator: { label: Generator ontkoppelen, busy: "Wacht tot de generator offline is …", fail: "De generator-drive reageert niet: na 20 s nog niet offline. Terugdraaien (weer aan) of blijven wachten?" }
+                battery: { label: Accu ontkoppelen, busy: "Wacht tot het BMS uit is …", fail: "De accu-drive reageert niet: het BMS is na 20 s nog niet uit. Terugdraaien (alles weer aan) of blijven wachten?" }
 
           # ---- Accu: SoC met max SoC (streepje op de meter) en − / + ----
           - { type: panel, x: 440, y: 76, width: 400, height: 624, title: Accu }
