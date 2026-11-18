@@ -4,7 +4,9 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 
 | Bestand | Inhoud |
 |---|---|
-| `energy_inverters.yaml` | Package: `input_text.energy_inverters_status` + scripts `script.energy_inverters_opstarten` (veld `bron`: `shore` / `generator` / `battery`) en `script.energy_inverters_afsluiten`. |
+| `script_energy_inverters_opstarten.yaml` | Het script *opstarten*, klaar om te plakken in de script-editor van HA (YAML-modus). |
+| `script_energy_inverters_afsluiten.yaml` | Het script *afsluiten*, idem. |
+| `energy_inverters.yaml` | Alles in één package (alleen nodig als HA packages gebruikt): `input_text.energy_inverters_status` + scripts `script.energy_inverters_opstarten` (veld `bron`: `shore` / `generator` / `battery`) en `script.energy_inverters_afsluiten`. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
 
@@ -26,23 +28,27 @@ Het groene bolletje in de knop *Energy Inverters opstarten* staat los van het sc
 
 ## Installeren in Home Assistant
 
-**Als package (aanbevolen):**
+**Via de UI (zo staat het nu op de TC90, zonder map `packages`):**
 
-1. Zet in `configuration.yaml` (eenmalig):
-   ```yaml
-   homeassistant:
-     packages: !include_dir_named packages
-   ```
-2. Kopieer `energy_inverters.yaml` naar `/config/packages/energy_inverters.yaml` (bijv. met de File editor- of Studio Code Server-add-on).
-3. Kies **Ontwikkelaarshulpmiddelen → YAML → Configuratie controleren** en daarna **Herstarten**. Alleen *Scripts herladen* is niet genoeg: de `input_text` is nieuw.
+1. **Helper:** ga naar *Instellingen → Apparaten en diensten → Helpers → + Helper maken → Tekst*.
+   - Naam: `Energy Inverters status`.
+   - Bij *Geavanceerde instellingen*: maximale lengte `100`.
+   - Na het opslaan moet de entiteit `input_text.energy_inverters_status` heten. Controleer dat, en pas de entiteits-ID zo nodig aan.
+2. **Script opstarten:** ga naar *Instellingen → Automatiseringen en scènes → Scripts → + Script toevoegen → Nieuw script maken*.
+   - Kies rechtsboven *⋮ → Bewerken in YAML* en vervang alles door de inhoud van `script_energy_inverters_opstarten.yaml`. De regels met `#` mogen mee.
+   - Sla op. Vraagt HA om een naam of ID, gebruik dan `energy_inverters_opstarten`.
+   - Controleer daarna in de lijst of het script `script.energy_inverters_opstarten` heet.
+3. **Script afsluiten:** doe hetzelfde met `script_energy_inverters_afsluiten.yaml`. De ID is `energy_inverters_afsluiten`.
 
-**Zonder packages (via de UI):**
+Herstarten is niet nodig. Een UI-helper onthoudt zijn laatste waarde na een herstart; dat is geen probleem, want de kaart kijkt of het script nog loopt (`script.…` aan) voordat hij een oude "busy" volgt.
 
-1. Ga naar **Instellingen → Apparaten en diensten → Helpers → Helper maken → Tekst**. Naam *Energy Inverters status*, max. lengte 100. Controleer dat de entiteit `input_text.energy_inverters_status` heet.
-2. Ga naar **Instellingen → Automatiseringen en scènes → Scripts → Script toevoegen → ⋮ → Bewerken in YAML**. Plak daar alles onder `energy_inverters_opstarten:`, één niveau minder ingesprongen (dus vanaf `alias:`), en sla op met script-ID `energy_inverters_opstarten`.
-3. Doe hetzelfde voor `energy_inverters_afsluiten`.
+**Als package (alleen als HA packages gebruikt):**
 
-De entiteitnamen moeten precies zo heten, want de kaart gebruikt ze (`examples/plc-dashboard.yaml`, ankers `&ei_start`, `&ei_progress_on` en `&ei_progress_off`).
+1. Zet in `configuration.yaml` `homeassistant: packages: !include_dir_named packages` en maak de map `/config/packages/`.
+2. Kopieer `energy_inverters.yaml` erin, kies *Configuratie controleren* en herstart.
+3. Gebruik niet beide manieren tegelijk: dan bestaan de scripts twee keer.
+
+Verander je iets aan een script, pas dan zowel het losse bestand als `energy_inverters.yaml` aan, zodat ze gelijk blijven.
 
 ## Testen
 

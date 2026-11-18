@@ -1,0 +1,71 @@
+# Plakken in HA: Instellingen → Automatiseringen en scènes → Scripts → + Script toevoegen →
+# Nieuw script maken → ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# De entiteit moet script.energy_inverters_afsluiten heten (volgt uit de alias; controleer na opslaan).
+# Bron: energy_inverters.yaml (package). Pas beide aan als je iets verandert.
+
+alias: Energy Inverters afsluiten
+description: >-
+  Ontkoppelt eerst de externe voeding die gekoppeld is (walstroom en/of generator)
+  en wacht tot die offline is, daarna de accu (battery connect) en wacht tot het BMS
+  uit is. Per stap 5 s; reageert een drive niet, dan stopt het script.
+icon: mdi:flash-off
+mode: single
+max_exceeded: silent
+variables:
+  status: input_text.energy_inverters_status
+  accu_switch: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
+  accu_online: binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on
+  bron_switch:
+    shore: switch.wago_energy_controls_wago_energy_controls_shore_supply_2
+    generator: switch.wago_energy_controls_wago_energy_controls_generator_2
+  bron_gekoppeld:
+    shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected
+    generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected
+  # alleen wat gekoppeld is (of waarvan de switch nog aan staat)
+  bronnen: >-
+    {{ (['shore'] if is_state(bron_gekoppeld.shore, 'on') or is_state(bron_switch.shore, 'on') else [])
+       + (['generator'] if is_state(bron_gekoppeld.generator, 'on') or is_state(bron_switch.generator, 'on') else []) }}
+  plan: "{{ (bronnen + ['battery']) | join(',') }}"
+sequence:
+  # stap 1..n: externe voeding ontkoppelen en wachten tot hij offline is
+  - repeat:
+      for_each: "{{ bronnen }}"
+      sequence:
+        - action: input_text.set_value
+          target: { entity_id: "{{ status }}" }
+          data: { value: "{{ plan }}:{{ repeat.item }}:busy" }
+        - action: switch.turn_off
+          target: { entity_id: "{{ bron_switch[repeat.item] }}" }
+        - wait_template: "{{ is_state(bron_gekoppeld[repeat.item], 'off') }}"
+          timeout: "00:00:05"
+          continue_on_timeout: true
+        - if:
+            - condition: template
+              value_template: "{{ not wait.completed }}"
+          then:
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:{{ repeat.item }}:timeout" }
+            - stop: Drive van de bron reageert niet
+
+  # laatste stap: accu ontkoppelen en wachten tot het BMS uit is
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}:battery:busy" }
+  - action: switch.turn_off
+    target: { entity_id: "{{ accu_switch }}" }
+  - wait_template: "{{ is_state(accu_online, 'off') }}"
+    timeout: "00:00:05"
+    continue_on_timeout: true
+  - if:
+      - condition: template
+        value_template: "{{ not wait.completed }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:battery:timeout" }
+      - stop: Accu-drive reageert niet
+
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}::complete" }

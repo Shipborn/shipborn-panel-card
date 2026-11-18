@@ -1,0 +1,94 @@
+# Plakken in HA: Instellingen → Automatiseringen en scènes → Scripts → + Script toevoegen →
+# Nieuw script maken → ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# De entiteit moet script.energy_inverters_opstarten heten (volgt uit de alias; controleer na opslaan).
+# Bron: energy_inverters.yaml (package). Pas beide aan als je iets verandert.
+
+alias: Energy Inverters opstarten
+description: >-
+  Koppelt eerst de accu (battery connect) en wacht tot het BMS aan is, daarna
+  (naar keuze) walstroom of generator en wacht tot die gekoppeld is. Per stap 5 s;
+  reageert een drive niet, dan stopt het script en blijft staan wat al aan is.
+icon: mdi:flash
+mode: single
+max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
+fields:
+  bron:
+    name: Bron
+    description: "shore = walstroom, generator = generator, battery = alleen accu"
+    required: true
+    default: battery
+    selector:
+      select:
+        options:
+          - shore
+          - generator
+          - battery
+variables:
+  status: input_text.energy_inverters_status
+  accu_switch: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
+  accu_online: binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on
+  bron_switch:
+    shore: switch.wago_energy_controls_wago_energy_controls_shore_supply_2
+    generator: switch.wago_energy_controls_wago_energy_controls_generator_2
+  bron_beschikbaar:
+    shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on
+    generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
+  bron_gekoppeld:
+    shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected
+    generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected
+  extern: "{{ bron in ['shore', 'generator'] }}"
+  plan: "{{ 'battery,' ~ bron if extern else 'battery' }}"
+sequence:
+  # gekozen bron moet beschikbaar zijn (de kaart laat alleen beschikbare bronnen kiezen; dit is de tweede controle)
+  - if:
+      - condition: template
+        value_template: "{{ extern and not is_state(bron_beschikbaar[bron], 'on') }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:{{ bron }}:unavailable" }
+      - stop: Gekozen bron is niet beschikbaar
+
+  # stap 1: accu koppelen en wachten op het BMS
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}:battery:busy" }
+  - action: switch.turn_on
+    target: { entity_id: "{{ accu_switch }}" }
+  - wait_template: "{{ is_state(accu_online, 'on') }}"
+    timeout: "00:00:05"
+    continue_on_timeout: true
+  - if:
+      - condition: template
+        value_template: "{{ not wait.completed }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:battery:timeout" }
+      - stop: Accu-drive reageert niet
+
+  # stap 2: walstroom of generator koppelen en wachten tot hij gekoppeld is
+  - if:
+      - condition: template
+        value_template: "{{ extern }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:{{ bron }}:busy" }
+      - action: switch.turn_on
+        target: { entity_id: "{{ bron_switch[bron] }}" }
+      - wait_template: "{{ is_state(bron_gekoppeld[bron], 'on') }}"
+        timeout: "00:00:05"
+        continue_on_timeout: true
+      - if:
+          - condition: template
+            value_template: "{{ not wait.completed }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:{{ bron }}:timeout" }
+          - stop: Drive van de bron reageert niet
+
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}::complete" }
