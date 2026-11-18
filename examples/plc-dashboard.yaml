@@ -646,21 +646,28 @@ views:
           # ---- aandrijflijn: bovenaanzicht uit tekening "Trully shafting GBS 191800.800" (Poseidon) ----
           # Van links naar rechts: schroef, schroefas, afdichting met vetpot, druklager, flexibele koppeling,
           # keerkoppeling met oliekoeler en e-motor, vliegwielhuis met hydrauliekpomp, Volvo Penta D6.
+          # Erboven de uitlaat (turbo → separator → overboord), als leiding over de tekening.
           - { type: text, x: 20, y: 76, text: "Aandrijflijn – Volvo Penta D6, keerkoppeling, e-motor, schroefas", style: caption }
           - { type: image, x: 20, y: 96, width: 1240, height: 520, image: tc90-aandrijflijn, phone: swipe }
           # het vak is hoger dan de tekening (die staat in het midden, y 264–448), zodat labels en wijslijnen erbinnen
           # vallen: op een telefoon blijft het één strook om opzij te vegen (phone: swipe)
           # wijslijnen van de onderdelen naar de labels
-          - { type: line, x: 707, y: 164, width: 2, height: 146, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 990, y: 124, width: 2, height: 186, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 707, y: 236, width: 2, height: 74, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 990, y: 236, width: 2, height: 74, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 1156, y: 164, width: 2, height: 120, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 1156, y: 432, width: 2, height: 52, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 928, y: 428, width: 2, height: 156, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 820, y: 414, width: 2, height: 120, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 329, y: 398, width: 2, height: 136, color: "var(--line-strong, #4a4a4a)" }
+          # uitlaat: van de turbo omhoog en langs de bovenkant naar de separator en overboord (stroomt bij > 100 rpm)
+          - { type: pipe, medium: exhaust, points: [[1066, 276], [1066, 200], [472, 200]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: text, x: 360, y: 174, width: 112, height: 52, text: "Uitlaat\nseparator", font_size: 14, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: text, x: 362, y: 232, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: "°C", decimals: 1, tap_action: { action: more-info } }
+          - { type: pipe, medium: exhaust, points: [[360, 200], [100, 200]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: smoke, x: 30, y: 180, width: 70, height: 40, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
           # labels (hotspots): het bolletje is x/y, het label wijst ervan weg
-          - { type: hotspot, x: 708, y: 164, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
-          - { type: hotspot, x: 991, y: 124, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
+          - { type: hotspot, x: 708, y: 236, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
+          - { type: hotspot, x: 991, y: 236, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
           - { type: hotspot, x: 1157, y: 164, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
           - { type: hotspot, x: 1157, y: 484, side: left, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
           - { type: hotspot, x: 929, y: 534, icon: pijl, label: Vooruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd }

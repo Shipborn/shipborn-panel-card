@@ -171,6 +171,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - PMS-tegels *BMS charge* en *BMS discharge* zonder "current", zodat ze op één regel passen.
 
 - (v0.5.43) **Diesel-pagina met de aandrijflijn** op verzoek van de gebruiker: het bovenaanzicht uit de Poseidon-tekening *Trully shafting GBS 191800.800* (21-12-2020) vrijgesneden (witte achtergrond en wijslijnen weg) en als ingebouwd beeld `tc90-aandrijflijn` in de kaart. Het rompschema van `sys-diesel` is vervangen door die tekening met hotspots: afdichting (vetdruk), e-motor, diesel (toerental, alarm), koelwater, keerkoppeling vooruit/achteruit, druklager en schroefas, elk met een wijslijn naar het onderdeel. Zeewater, uitlaat en perslucht zijn daardoor uit dit schema; de bediening eronder is ongewijzigd. Op een telefoon viel de tekening uiteen (elk label een eigen vak); nu is het vak van de afbeelding hoger dan de tekening (labels vallen erbinnen) en zet de nieuwe optie `phone: swipe` op een `image` hem als veegstrook neer, net als een rompschema.
+- Op verzoek de **uitlaat terug** op de Diesel-pagina: leiding van de turbo omhoog en langs de bovenkant van de tekening naar de uitlaatseparator (met uitlaattemperatuur) en overboord (rook), stromend bij > 100 rpm. De labels E-motor en Afdichting staan daarvoor lager, onder de leiding. Alleen YAML.
 
 ## Lessen en keuzes die je moet kennen
 
