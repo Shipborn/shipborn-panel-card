@@ -1141,7 +1141,7 @@ views:
           - { type: text, x: 386, y: 599, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, mono: true, font_size: 15, unit: V DC, decimals: 0 }
 
           # ---- bediening (uit het oude dashboard) ----
-          - { type: panel, x: 20, y: 669, width: 400, height: 610, title: Cooling }
+          - { type: panel, x: 20, y: 669, width: 400, height: 922, title: Cooling }
           - { type: pushbutton, x: 38, y: 721, width: 364, height: 48, label: Main reset, entity: button.wago_energy_controls_wago_energy_controls_reset_main_2 }
           - { type: pushbutton, x: 38, y: 781, width: 364, height: 44, label: Glycolpomp, entity: switch.0x781c9dfffea1854f, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 38, y: 833, width: 364, height: 44, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, led: green, align: left, font_size: 15 }
@@ -1154,6 +1154,10 @@ views:
           - { type: pushbutton, x: 38, y: 1139, width: 364, height: 42, label: "Glycolpomp uit (DC-bus uit)", entity: automation.glycolpomp_uit_bij_lage_drivetemperatuur_en_dc_bus_uit, led: green, align: left, font_size: 14 }
           - { type: pushbutton, x: 38, y: 1185, width: 364, height: 42, label: "Zeewaterpomp aan (hoge temp.)", entity: automation.zeewaterpomp_aan_bij_hoge_drivetemperatuur, led: green, align: left, font_size: 14 }
           - { type: pushbutton, x: 38, y: 1231, width: 364, height: 42, label: "Zeewaterpomp uit (glycol 34 °C)", entity: automation.zeewaterpomp_uit_glycol_34gr, led: green, align: left, font_size: 14 }
+          - { type: text, x: 38, y: 1281, width: 364, text: "Glycolpomp On Automaat; activeert Glycolpomp wanneer voeding voor de DC bus wordt opgemerkt", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 38, y: 1321, width: 364, text: "Glycol (& zeewaterpomp) uit; bij lage drivetemperatuur en DC-bus Uit, zeewaterpomp ook uit als diesel en e-motor uit zijn", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 38, y: 1361, width: 364, text: "Zeewaterpomp aan; bij hoge drive Temp of E-motor/Diesel motor aan", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 38, y: 1401, width: 364, text: "Zeewaterpomp uit; als drive Temps laag en E-motor/Diesel motor uit", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
           - { type: panel, x: 436, y: 669, width: 824, height: 610, title: Drives }
           - { type: text, x: 784, y: 689, width: 120, text: Power, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
           - { type: text, x: 914, y: 689, width: 120, text: Temp, font_size: 13, color: "var(--ink-muted, #a3a29c)", uppercase: true }
@@ -1191,19 +1195,19 @@ views:
           - { type: indicator, x: 1054, y: 1087, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat, font_size: 15 }
 
           # ---- PMS-status (ER_PMS_Status2: BMS & BGC) ----
-          - { type: panel, x: 20, y: 1295, width: 1240, height: 296, title: PMS status (BMS & BGC) }
-          - { type: value, style: tile, x: 38, y: 1347, width: 292, height: 76, label: DC-bus voltage, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 1347, width: 292, height: 76, label: BGC voltage, entity: sensor.er_pms_status2_bgc_voltage, value_size: 22 }
-          - { type: value, style: tile, x: 646, y: 1347, width: 292, height: 76, label: BGC current, entity: sensor.er_pms_status2_bgc_current, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 1347, width: 292, height: 76, label: BMS voltage, entity: sensor.er_pms_status2_bms_voltage, value_size: 22 }
-          - { type: value, style: tile, x: 38, y: 1435, width: 292, height: 76, label: BMS current, entity: sensor.er_pms_status2_bms_current, value_size: 22 }
-          - { type: value, style: tile, x: 342, y: 1435, width: 292, height: 76, label: BMS charge current, entity: sensor.er_pms_status2_bms_charge_current, value_size: 22 }
-          - { type: value, style: tile, x: 646, y: 1435, width: 292, height: 76, label: BMS discharge current, entity: sensor.er_pms_status2_bms_discharge_current, value_size: 22 }
-          - { type: value, style: tile, x: 950, y: 1435, width: 292, height: 76, label: BMS max SoC, entity: sensor.er_pms_status2_bms_max_soc, value_size: 22 }
-          - { type: pushbutton, x: 38, y: 1527, width: 292, height: 44, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 15 }
-          - { type: pushbutton, x: 342, y: 1527, width: 292, height: 44, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 15 }
-          - { type: pushbutton, x: 646, y: 1527, width: 292, height: 44, label: "Shore current −", entity: button.wago_hcs_controls_wago_controls_shorecurrent_dn, font_size: 15 }
-          - { type: pushbutton, x: 950, y: 1527, width: 292, height: 44, label: "Shore current +", entity: button.wago_hcs_controls_wago_controls_shorecurrent_up, font_size: 15 }
+          - { type: panel, x: 436, y: 1295, width: 824, height: 296, title: PMS status (BMS & BGC) }
+          - { type: value, style: tile, x: 454, y: 1347, width: 188, height: 76, label: DC-bus voltage, entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage, value_size: 22 }
+          - { type: value, style: tile, x: 654, y: 1347, width: 188, height: 76, label: BGC voltage, entity: sensor.er_pms_status2_bgc_voltage, value_size: 22 }
+          - { type: value, style: tile, x: 854, y: 1347, width: 188, height: 76, label: BGC current, entity: sensor.er_pms_status2_bgc_current, value_size: 22 }
+          - { type: value, style: tile, x: 1054, y: 1347, width: 188, height: 76, label: BMS voltage, entity: sensor.er_pms_status2_bms_voltage, value_size: 22 }
+          - { type: value, style: tile, x: 454, y: 1435, width: 188, height: 76, label: BMS current, entity: sensor.er_pms_status2_bms_current, value_size: 22 }
+          - { type: value, style: tile, x: 654, y: 1435, width: 188, height: 76, label: BMS charge current, entity: sensor.er_pms_status2_bms_charge_current, value_size: 22 }
+          - { type: value, style: tile, x: 854, y: 1435, width: 188, height: 76, label: BMS discharge current, entity: sensor.er_pms_status2_bms_discharge_current, value_size: 22 }
+          - { type: value, style: tile, x: 1054, y: 1435, width: 188, height: 76, label: BMS max SoC, entity: sensor.er_pms_status2_bms_max_soc, value_size: 22 }
+          - { type: pushbutton, x: 454, y: 1527, width: 188, height: 44, label: "Max SoC −", entity: button.wago_hcs_controls_wago_controls_maxsoc_dn, font_size: 15 }
+          - { type: pushbutton, x: 654, y: 1527, width: 188, height: 44, label: "Max SoC +", entity: button.wago_hcs_controls_wago_controls_maxsoc_up, font_size: 15 }
+          - { type: pushbutton, x: 854, y: 1527, width: 188, height: 44, label: "Shore current −", entity: button.wago_hcs_controls_wago_controls_shorecurrent_dn, font_size: 15 }
+          - { type: pushbutton, x: 1054, y: 1527, width: 188, height: 44, label: "Shore current +", entity: button.wago_hcs_controls_wago_controls_shorecurrent_up, font_size: 15 }
 
   - title: Boegschroef
     path: sys-bowthruster

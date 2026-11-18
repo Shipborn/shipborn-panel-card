@@ -167,6 +167,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Scripts ook als losse bestanden om in de UI te plakken (de TC90-HA heeft geen map `packages`).
 - (v0.5.42) Timeout 20 s per stap; daarna kiest de gebruiker *Terugdraaien* of *Blijven wachten*. Het script wacht altijd door en draait alleen terug op verzoek (de kaart schrijft `…:rollback` in de statushelper). Demo: `?ei_fail=shore&ei_speed=10`, `window.eiRespond()` voor een late reactie.
 - Cooling-automaten: eerst vier op het Energie-overzicht, daarna op verzoek naar DC-bus (vak *Cooling*, in plaats van de twee oude); Energie toont alleen nog druk en temperatuur (alleen YAML).
+- DC-bus: uitleg per automaat onder de knoppen; *PMS status* naar rechts onder *Drives* (smallere tegels), zodat *Cooling* links kan doorlopen (alleen YAML).
 
 ## Lessen en keuzes die je moet kennen
 
