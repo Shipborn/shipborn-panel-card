@@ -174,6 +174,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Op verzoek de **uitlaat terug** op de Diesel-pagina: leiding van de turbo omhoog en langs de bovenkant van de tekening naar de uitlaatseparator (met uitlaattemperatuur) en overboord (rook), stromend bij > 100 rpm. De labels E-motor en Afdichting staan daarvoor lager, onder de leiding. Alleen YAML.
 - Op verzoek ook het **koelwater** terug, zoals op het oude schema: de zeewaterkring van de motor (V1 en wierpot onder de Volvo met de flow, via de motor met de uitlaat mee naar de separator en via V2 overboord) en de koeling van keerkoppeling en schroefasafdichting (V3 en de zeewaterpomp, met de propshaft-flow). Het label Diesel staat hoger, *Druklager* (zonder sensor) is weg. Alleen YAML.
 - Daarna op aanwijzing van de gebruiker het **leidingwerk gelijkgetrokken met het oude schema**: de uitlaat loopt motor → Exhaust separator → **Exhaust drain** (ontbrak) → rook, met drainwater naar de Main outlet en separatorwater via Outlet V2; het motorkoelwater gaat van V1 en de wierpot de motor in en vandaar naar de separator (niet met de uitlaat mee); de koeling via V3 en de wierpot gaat naar de keerkoppeling en verder naar *Cooling propshaft* (geen aparte pomp, geen aftakking naar de afdichting). Labels herschikt zodat niets kruist. Alleen YAML.
+- Op verzoek **uitlaat boven, koeling onder** omgedraaid (zelfde leidingloop); de labels Schroefas, Afdichting en E-motor staan nu boven de tekening, Diesel en Koelwater rechtsboven. Alleen YAML.
 
 ## Lessen en keuzes die je moet kennen
 

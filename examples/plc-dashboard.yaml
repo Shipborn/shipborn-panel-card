@@ -646,62 +646,64 @@ views:
           # ---- aandrijflijn: bovenaanzicht uit tekening "Trully shafting GBS 191800.800" (Poseidon) ----
           # Van links naar rechts: schroef, schroefas, afdichting met vetpot, druklager, flexibele koppeling,
           # keerkoppeling met oliekoeler en e-motor, vliegwielhuis met hydrauliekpomp, Volvo Penta D6.
-          # Leidingwerk zoals op het oude schema: boven de koeling van e-motor, keerkoppeling en schroefas (V3),
-          # onder de zeewaterkring van de motor (V1), de uitlaat via separator en drain en de uitlaten (V2, main outlet).
+          # Leidingwerk zoals op het oude schema (op verzoek uitlaat boven, koeling onder): boven de uitlaat via
+          # separator en drain met de uitlaten (V2, main outlet), onder de zeewaterinlaat van de motor (V1) en de koeling
+          # van e-motor, keerkoppeling en schroefas (V3).
           # Het vak van de afbeelding is hoger dan de tekening (die staat in het midden, y 284–468), zodat alles erbinnen
           # valt: op een telefoon blijft het één strook om opzij te vegen (phone: swipe).
           - { type: text, x: 20, y: 76, text: "Aandrijflijn – Volvo Penta D6, keerkoppeling, e-motor, schroefas", style: caption }
           - { type: image, x: 20, y: 96, width: 1240, height: 560, image: tc90-aandrijflijn, phone: swipe }
 
-          # koeling e-motor / schroefas / keerkoppeling: inlaat V3, wierpot, naar de keerkoppeling en verder naar de schroefas
-          - { type: pipe, medium: seawater, points: [[492, 284], [492, 230]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[492, 120], [492, 108], [915, 108], [915, 303]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[878, 330], [760, 330], [760, 304], [190, 304], [190, 384]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 470, y: 120, width: 44, height: 110, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: butterfly_valve, x: 477, y: 236, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 416, y: 246, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 368, y: 124, width: 96, height: 55, text: "Cooling\nElectric/Shaft\nGearbox", font_size: 13, active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: text, x: 200, y: 282, text: Cooling propshaft, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 200, y: 312, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
+          # uitlaat (boven): motor → exhaust separator → exhaust drain → achter overboord (rook); drainwater naar de main
+          # outlet, separatorwater via outlet V2 overboord; het koelwater van de motor gaat ook de separator in (> 100 rpm)
+          - { type: pipe, medium: exhaust, points: [[1180, 296], [1180, 196], [800, 196]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: seawater, points: [[1150, 296], [1150, 222], [800, 222]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
+          - { type: text, x: 700, y: 166, width: 100, height: 68, text: "Exhaust\nseparator", font_size: 14, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: text, x: 706, y: 238, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: "°C", decimals: 1, tap_action: { action: more-info } }
+          - { type: pipe, medium: seawater, points: [[750, 166], [750, 104]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: butterfly_valve, x: 735, y: 118, active_entity: valve.er_ventielblok_1tm4_l3 }
+          - { type: text, x: 772, y: 128, text: Outlet V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pipe, medium: exhaust, points: [[700, 196], [520, 196]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: text, x: 440, y: 168, width: 80, height: 56, text: "Exhaust\ndrain", font_size: 14, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: pipe, medium: exhaust, points: [[440, 196], [100, 196]], thickness: 12, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: smoke, x: 30, y: 176, width: 70, height: 40, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
+          - { type: pipe, medium: seawater, points: [[480, 168], [480, 150], [420, 150]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
+          - { type: outlet, x: 340, y: 138, width: 80, height: 24, color: "#3cc7d6", active_entity: [sensor.engine_room_main_engine_me_rpm, switch.er_zeewaterpomp_cooling], active_above: 100 }
+          - { type: text, x: 340, y: 116, text: Main outlet, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
 
-          # zeewater motor: inlaat V1 en wierpot, de motor in; uit de motor naar de exhaust separator (stroomt bij > 100 rpm)
+          # zeewater motor (onder): inlaat V1 en wierpot, de motor in (> 100 rpm)
           - { type: pipe, medium: seawater, points: [[1236, 656], [1236, 470]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: strainer, x: 1214, y: 516, width: 44, height: 84, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
           - { type: butterfly_valve, x: 1221, y: 612, active_entity: valve.er_ventielblok_1tm4_l4 }
           - { type: text, x: 1150, y: 620, text: Inlet V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
           - { type: text, x: 1130, y: 540, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
-          - { type: pipe, medium: seawater, points: [[1120, 468], [1120, 630], [800, 630]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
 
-          # uitlaat: motor → exhaust separator → exhaust drain → achter overboord (rook); drainwater naar de main outlet,
-          # separatorwater via outlet V2 overboord
-          - { type: pipe, medium: exhaust, points: [[1090, 468], [1090, 600], [800, 600]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 700, y: 580, width: 100, height: 68, text: "Exhaust\nseparator", font_size: 14, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: text, x: 706, y: 556, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 14, unit: "°C", decimals: 1, tap_action: { action: more-info } }
-          - { type: pipe, medium: exhaust, points: [[700, 600], [520, 600]], thickness: 12, arrow: true, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: text, x: 440, y: 572, width: 80, height: 56, text: "Exhaust\ndrain", font_size: 14, boxed: true, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: exhaust, points: [[440, 600], [100, 600]], thickness: 12, speed: 70, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: smoke, x: 30, y: 580, width: 70, height: 40, active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: pipe, medium: seawater, points: [[480, 628], [480, 644], [420, 644]], thickness: 6, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 1 }
-          - { type: outlet, x: 340, y: 632, width: 80, height: 24, color: "#3cc7d6", active_entity: [sensor.engine_room_main_engine_me_rpm, switch.er_zeewaterpomp_cooling], active_above: 100 }
-          - { type: text, x: 340, y: 612, text: Main outlet, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: pipe, medium: seawater, points: [[700, 630], [560, 630], [560, 656]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
-          - { type: butterfly_valve, x: 612, y: 613, rotation: 90, active_entity: valve.er_ventielblok_1tm4_l3 }
-          - { type: text, x: 488, y: 642, text: Outlet V2, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          # koeling e-motor / schroefas / keerkoppeling (onder): inlaat V3, wierpot, naar de keerkoppeling en verder
+          # naar de schroefas (stroomt als de zeewaterpomp aan staat)
+          - { type: pipe, medium: seawater, points: [[492, 656], [492, 606]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[492, 496], [492, 484], [905, 484], [905, 449]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[878, 436], [760, 436], [760, 456], [190, 456], [190, 412]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 470, y: 496, width: 44, height: 110, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 477, y: 612, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 416, y: 622, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 368, y: 520, width: 96, height: 55, text: "Cooling\nElectric/Shaft\nGearbox", font_size: 13, active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: text, x: 200, y: 464, width: 170, text: Cooling propshaft, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 200, y: 484, width: 110, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
 
           # wijslijnen van de onderdelen naar de labels
-          - { type: line, x: 1200, y: 130, width: 2, height: 166, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 1000, y: 240, width: 2, height: 69, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 1236, y: 120, width: 2, height: 176, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 1000, y: 270, width: 2, height: 39, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 707, y: 270, width: 2, height: 46, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 329, y: 270, width: 2, height: 120, color: "var(--line-strong, #4a4a4a)" }
           - { type: line, x: 928, y: 447, width: 2, height: 89, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 707, y: 420, width: 2, height: 50, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 329, y: 405, width: 2, height: 65, color: "var(--line-strong, #4a4a4a)" }
           # labels (hotspots): het bolletje is x/y, het label wijst ervan weg
-          - { type: hotspot, x: 1201, y: 130, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
-          - { type: hotspot, x: 1201, y: 180, side: left, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
-          - { type: hotspot, x: 1001, y: 240, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
+          - { type: hotspot, x: 1237, y: 120, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
+          - { type: hotspot, x: 1237, y: 160, side: left, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
+          - { type: hotspot, x: 1001, y: 270, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
+          - { type: hotspot, x: 708, y: 270, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
+          - { type: hotspot, x: 330, y: 270, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
           - { type: hotspot, x: 929, y: 492, icon: pijl, label: Vooruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd }
           - { type: hotspot, x: 929, y: 536, icon: pijl, label: Achteruit, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
-          - { type: hotspot, x: 708, y: 470, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
-          - { type: hotspot, x: 330, y: 470, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
 
           # ---- bediening (uit het oude dashboard) ----
           - { type: panel, x: 20, y: 671, width: 620, height: 360, title: "Sensoren – bij Volvo aan alles groen" }
