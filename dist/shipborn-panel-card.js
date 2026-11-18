@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.40";
+const VERSION = "0.5.41";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -649,6 +649,13 @@ const TC_STYLE =
   .tc-choice li.is-picked { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
   .tc-choice-note { margin: 0; min-height: 1.4em; color: var(--ink-muted); text-align: center; }
   .tc-choice-note.is-warn { color: var(--warn); }
+  .tc-choice-note.is-ok { color: var(--ok); }
+  .tc-choice-note.is-bad { color: var(--alarm); }
+  .tc-progress li.is-ok .d-led { --c: var(--ok); }
+  .tc-progress li.is-wait .d-led { --c: var(--line-strong); }
+  .tc-progress li.is-busy .d-led { --c: var(--accent); animation: tc-pulse 1s ease-in-out infinite; }
+  .tc-progress li.is-fail .d-led { --c: var(--alarm); }
+  .tc-progress li.is-fail { border-color: var(--alarm); }
   .tc-btn:disabled { opacity: .45; cursor: default; }
   .tc-web { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: #fff; }
   .tc-web iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
@@ -2120,13 +2127,16 @@ class ShipbornPanelCard extends HTMLElement {
       btn.addEventListener("click", () => this._checklist({ label: b.label, checklist: { title: b.label, text: typeof b.placeholder === "string" ? b.placeholder : "Nog niet gekoppeld: deze knop is een placeholder en schakelt nog niets.", items: [], close: "Sluiten" }, tap_action: { action: "none" } }));
     else if (b.mode === "momentary") this._momentary(btn, b);
     else if (steps.length) btn.addEventListener("click", () => this._checklist(b));
-    else if (b.choice) btn.addEventListener("click", () => this._choice(b));
-    else btn.addEventListener("click", () => {
+    // progress: while its script is still running, a tap reopens the progress window instead of starting again
+    else if (b.choice) btn.addEventListener("click", () => (this._progressBusy(b) ? this._progress(b, null) : this._choice(b)));
+    else btn.addEventListener("click", async () => {
+      if (this._progressBusy(b)) return this._progress(b, null);
       // require: every condition must hold, otherwise a window explains why (only Sluiten), nothing is sent
       const req = b.require;
       if (req?.items?.length && this._hass && !req.items.every((s) => this._stepOk(this._hass, s)))
         return this._checklist({ label: b.label, checklist: { close: "Sluiten", ...req }, tap_action: { action: "none" } });
-      this._handleAction(b, b.tap_action, btn);
+      const prev = b.progress && this._hass?.states[b.progress.entity];
+      if ((await this._handleAction(b, b.tap_action, btn)) !== false && b.progress) this._progress(b, prev);
     });
     this._updaters.push((hass) => {
       const so = b.entity ? hass.states[b.entity] : null;
@@ -2200,14 +2210,107 @@ class ShipbornPanelCard extends HTMLElement {
       if (i >= 0) this._updaters.splice(i, 1);
     };
     close.addEventListener("click", done);
-    run.addEventListener("click", (ev) => {
+    run.addEventListener("click", async (ev) => {
       if (!pick) return;
       const chosen = pick;
       done(ev);
+      // tap_action (e.g. script.turn_on): the picked option's `variables` go along as data.variables
+      if (c.tap_action) {
+        const { confirmation, ...act } = c.tap_action;
+        const data = { ...(act.data || {}) };
+        if (chosen.variables) data.variables = { ...(data.variables || {}), ...chosen.variables };
+        const prev = b.progress && this._hass?.states[b.progress.entity];
+        if ((await this._handleAction(b, { ...act, data }, run)) !== false && b.progress) this._progress(b, prev);
+        return;
+      }
       fire(this, "haptic", "light");
       for (const e of [].concat(c.base || [])) this._turn(e, true);
       if (chosen.entity) this._turn(chosen.entity, true);
     });
+    dlg.addEventListener("click", (ev) => ev.target === dlg && done(ev));
+    dlg.appendChild(box);
+    this.shadowRoot.appendChild(dlg);
+  }
+
+  // True while the button's progress script is running (its script entity is on).
+  _progressBusy(b) {
+    const s = b.progress?.script;
+    return !!(s && this._hass && isOn(this._hass.states[s]));
+  }
+
+  // Progress window: follows a status helper written by an HA script, "<plan>:<step>:<state>" (plan = step keys
+  // in order, state busy / timeout / unavailable / complete). Each step of the plan gets a dot: green = done,
+  // pulsing = busy, red = no response, grey = still to come. complete shows `done` for done_ms (1 s) and closes.
+  // prev = the status before the script was started: until the status changes the window says "wordt gestart"
+  // (no clock comparison, so a tablet with the wrong time still works); prev null = follow the current status.
+  _progress(b, prev) {
+    const p = b.progress;
+    const dlg = h("div", "tc-dlg");
+    dlg.dataset.tcTheme = this._theme || "nacht";
+    const box = h("div", "tc-dialog tc-check");
+    box.innerHTML = '<div class="title"></div><ul class="tc-check-list tc-progress"></ul><p class="body tc-choice-note"></p>' +
+      '<div class="tc-dialog-btns"><button type="button" class="tc-btn label"></button></div>';
+    box.querySelector(".title").textContent = p.title || b.choice?.title || b.label || "";
+    const list = box.querySelector("ul");
+    const note = box.querySelector(".tc-choice-note");
+    const close = box.querySelector(".tc-dialog-btns button");
+    close.textContent = p.close || "Sluiten";
+    const t0 = Date.now();
+    let started = !prev;
+    let shownPlan = null;
+    let closing = null;
+    const steps = p.steps || {};
+    const paint = (hass) => {
+      const so = hass.states[p.entity];
+      if (!started && so && (so.state !== prev?.state || so.last_changed !== prev?.last_changed)) started = true;
+      if (!started) {
+        const late = Date.now() - t0 > (p.start_timeout ?? 4) * 1000;
+        note.textContent = late ? p.no_start || "Het script reageert niet. Bestaat het in Home Assistant?" : p.starting || "Wordt gestart …";
+        note.className = "body tc-choice-note" + (late ? " is-bad" : "");
+        return;
+      }
+      const [plan = "", cur = "", st = ""] = String(so?.state ?? "").split(":");
+      const keys = plan ? plan.split(",") : [];
+      if (plan !== shownPlan) {
+        shownPlan = plan;
+        list.replaceChildren(...keys.map((k) => {
+          const li = h("li");
+          li.innerHTML = '<span class="d-led on"></span><span class="label"></span><span class="caption tc-check-st"></span>';
+          li.children[1].textContent = steps[k]?.label || k;
+          return li;
+        }));
+      }
+      const at = st === "complete" ? keys.length : keys.indexOf(cur);
+      [...list.children].forEach((li, i) => {
+        const s = i < at ? "ok" : i > at ? "wait" : st === "busy" ? "busy" : "fail";
+        li.className = "is-" + s;
+        li.children[2].textContent = { ok: "OK", wait: "", busy: "BEZIG", fail: st === "unavailable" ? "NIET BESCHIKBAAR" : "GEEN REACTIE" }[s];
+      });
+      const step = steps[cur] || {};
+      const label = step.label || cur;
+      const msg = {
+        busy: step.busy || "",
+        timeout: step.fail || `${label}: de drive reageert niet binnen 5 s. Gestopt; wat al geschakeld is, blijft staan.`,
+        unavailable: step.unavailable || `${label}: niet beschikbaar. Er is niets geschakeld.`,
+        complete: p.done || "Gereed",
+      }[st] ?? (keys.length ? "" : p.idle || "Geen lopende opdracht.");
+      note.textContent = msg;
+      note.className = "body tc-choice-note" + (st === "complete" ? " is-ok" : st === "timeout" || st === "unavailable" ? " is-bad" : "");
+      if (st === "complete" && !closing) closing = setTimeout(done, p.done_ms ?? 1000);
+    };
+    // repaint every second too, so "wordt gestart" turns into a warning without a state change
+    const tick = setInterval(() => this._hass && paint(this._hass), 1000);
+    this._updaters.push(paint);
+    if (this._hass) paint(this._hass);
+    const done = (ev) => {
+      ev?.stopPropagation?.();
+      clearInterval(tick);
+      clearTimeout(closing);
+      dlg.remove();
+      const i = this._updaters.indexOf(paint);
+      if (i >= 0) this._updaters.splice(i, 1);
+    };
+    close.addEventListener("click", done);
     dlg.addEventListener("click", (ev) => ev.target === dlg && done(ev));
     dlg.appendChild(box);
     this.shadowRoot.appendChild(dlg);

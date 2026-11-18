@@ -981,8 +981,9 @@ views:
           - { type: text, x: 100, y: 462, text: Walstroom, style: label }
           - { type: warnlight, x: 220, y: 448, size: 48, icon: generator, label: Generator beschikbaar, entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on }
           - { type: text, x: 282, y: 462, text: Generator, style: label }
-          # opstarten / afsluiten: placeholders (oranje, tik = "nog niet gekoppeld"); komen later via een automation/script.
-          # Het keuzevenster (choice) blijft bewaard maar werkt pas weer als `placeholder` weg is. Bolletje groen als de bus ≥ 700 V is.
+          # opstarten / afsluiten via de HA-scripts in `generated automations/energy_inverters.yaml`.
+          # Opstarten: keuzevenster (bron) → script.energy_inverters_opstarten → voortgangsvenster (status uit
+          # input_text.energy_inverters_status). Bolletje groen als de bus ≥ 700 V is.
           - type: pushbutton
             x: 38
             y: 552
@@ -990,18 +991,47 @@ views:
             height: 60
             label: Energy Inverters opstarten
             font_size: 17
-            placeholder: true
             status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
             status_above: 699.9
             choice: &ei_start        # ook gebruikt door de knop op Voortstuwing
               title: Energy Inverters opstarten
-              text: "De accu (Battery connect) wordt altijd ingeschakeld. Kies daarnaast de bron."
-              base: switch.wago_energy_controls_wago_energy_controls_battery_connect_2
+              text: "Eerst wordt de accu gekoppeld, daarna de gekozen bron. Kies de bron."
+              tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.energy_inverters_opstarten } }
               options:
-                - { label: Walstroom, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, entity: switch.wago_energy_controls_wago_energy_controls_shore_supply_2 }
-                - { label: Generator, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on, note: "Het generatorcommando is nog niet geautomatiseerd: alleen de accu wordt ingeschakeld." }
-              fallback: { label: Alleen accu, note: "Let op: de DC-bus draait dan alleen op de accu." }
-          - { type: pushbutton, x: 38, y: 624, width: 364, height: 60, label: Energy Inverters afsluiten, font_size: 17, placeholder: true }
+                - { label: Walstroom, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, variables: { bron: shore } }
+                - { label: Generator, available_entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on, variables: { bron: generator } }
+              fallback: { label: Alleen accu, note: "Let op: de DC-bus draait dan alleen op de accu, zonder walstroom of generator. De accu raakt leeg en wordt niet bijgeladen.", variables: { bron: battery } }
+            progress: &ei_progress_on
+              entity: input_text.energy_inverters_status
+              script: script.energy_inverters_opstarten
+              title: Energy Inverters opstarten
+              done: Startup complete
+              steps:
+                battery: { label: Accu koppelen, busy: "Wacht tot het BMS aan is …", fail: "De accu-drive reageert niet: het BMS is niet binnen 5 s aan. Opstarten gestopt." }
+                shore: { label: Walstroom koppelen, busy: "Wacht tot de walstroom gekoppeld is …", fail: "De walstroom-drive reageert niet: niet binnen 5 s gekoppeld. Opstarten gestopt; de accu blijft gekoppeld." }
+                generator: { label: Generator koppelen, busy: "Wacht tot de generator gekoppeld is …", fail: "De generator-drive reageert niet: niet binnen 5 s gekoppeld. Opstarten gestopt; de accu blijft gekoppeld." }
+          # Afsluiten: Ja/Nee → script.energy_inverters_afsluiten (eerst walstroom/generator, dan de accu) → voortgangsvenster
+          - type: pushbutton
+            x: 38
+            y: 624
+            width: 364
+            height: 60
+            label: Energy Inverters afsluiten
+            font_size: 17
+            tap_action:
+              action: perform-action
+              perform_action: script.turn_on
+              data: { entity_id: script.energy_inverters_afsluiten }
+              confirmation: { title: "Energy Inverters afsluiten?", text: "Eerst gaan walstroom en/of generator van de DC-bus, daarna de accu.", yes: Afsluiten }
+            progress: &ei_progress_off
+              entity: input_text.energy_inverters_status
+              script: script.energy_inverters_afsluiten
+              title: Energy Inverters afsluiten
+              done: Shutdown complete
+              steps:
+                shore: { label: Walstroom ontkoppelen, busy: "Wacht tot de walstroom offline is …", fail: "De walstroom-drive reageert niet: niet binnen 5 s offline. Afsluiten gestopt." }
+                generator: { label: Generator ontkoppelen, busy: "Wacht tot de generator offline is …", fail: "De generator-drive reageert niet: niet binnen 5 s offline. Afsluiten gestopt." }
+                battery: { label: Accu ontkoppelen, busy: "Wacht tot het BMS uit is …", fail: "De accu-drive reageert niet: het BMS is niet binnen 5 s uit. Afsluiten gestopt." }
 
           # ---- Accu: SoC met max SoC (streepje op de meter) en − / + ----
           - { type: panel, x: 440, y: 76, width: 400, height: 624, title: Accu }
@@ -1935,8 +1965,8 @@ views:
             font_size: 16
             status_entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
             status_above: 699.9
-            placeholder: true
             choice: *ei_start
+            progress: *ei_progress_on
 
           # Generator: loopt + lampjes (grijs als hij niet loopt; tik = Generator) en Prepair Generator Start
           - { type: panel, x: 896, y: 348, width: 360, height: 172, title: Generator }

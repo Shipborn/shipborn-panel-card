@@ -160,6 +160,11 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Klimaat › Instellingen, vak *Compressor ER*: placeholders *Heating only* en *Cooling only* met een bolletje voor de actieve modus (`status_entity: sensor.plc_compressor_er_mode`, `status_state` heating/cooling; bestaat nog niet in HA, dus beide grijs). Alleen YAML.
 - Documentatie over placeholders: in `CLAUDE.md` een eigen sectie *Placeholders* (twee soorten, tabel met alle placeholderknoppen en hun bedoeling, stappenplan om te koppelen), in `README.md` een stukje *Placeholders* met voorbeeld.
 
+## 18-11-2026 – Energy Inverters via HA-scripts
+
+- Dagmap `261118`.
+- (v0.5.41) *Energy Inverters opstarten* (Energie en Voortstuwing) en *afsluiten* (Energie) zijn geen placeholders meer. Nieuwe map `generated automations/` met het package `energy_inverters.yaml` (statushelper + twee scripts, per stap 5 s wachten op de terugmelding) en een README over installeren. In de kaart: `choice.tap_action` met `variables` per optie, en het voortgangsvenster `progress` dat de statushelper volgt (bolletje per stap, *Startup complete* / *Shutdown complete* 1 s, waarschuwing bij geen reactie, opnieuw openen zolang het script loopt). Keuzes via vragen: script + helper (loopt door als het scherm sluit), uitzetten met dezelfde `_2`-switches, bij timeout stoppen zonder terugdraaien, bij afsluiten alleen wat gekoppeld is. Getest in de demo met nagebootste scripts (ook een drive die niet reageert); nog niet in HA.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

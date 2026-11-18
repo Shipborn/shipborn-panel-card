@@ -62,6 +62,13 @@
         "sensor.al1590_er_compressor_manifold_pressure": st(6.475, { unit_of_measurement: "bar" }),
         // Voortstuwing (design: tc90).
         "binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on": st("on"),
+        // Energy Inverters: scripts + status (gesimuleerd in callService; ?ei_fail=generator laat die stap niet reageren)
+        "input_text.energy_inverters_status": st(""),
+        "script.energy_inverters_opstarten": st("off"),
+        "script.energy_inverters_afsluiten": st("off"),
+        "binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on": st("off"),
+        "binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected": st("off"),
+        "binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected": st("off"),
         "sensor.engine_room_me_oil_press": st(3.4, { unit_of_measurement: "bar" }),
         "sensor.main_engine_oil_temp": st(92, { unit_of_measurement: "°C" }),
         "sensor.engine_room_main_engine_me_alt_v": st(14.1, { unit_of_measurement: "V" }),
@@ -135,6 +142,32 @@
             const fb = id.replace(/^number\.(.*?)(_fan_speed)?$/, (m, b, f) => `sensor.${b}${f ? "_fan_speed" : "_setpoint"}_feedback`);
             setTimeout(() => { if (states[fb]) states[fb] = st(data.value, states[fb].attributes); push(); }, 1500);
             push();
+          }
+          // Energy Inverters scripts: same steps as generated automations/energy_inverters.yaml, 1.2 s per drive
+          const eiScript = /^script\.energy_inverters_(opstarten|afsluiten)$/.exec(id);
+          if (domain === "script" && service === "turn_on" && eiScript && states[id].state !== "on") {
+            const E = "wago_energy_controls_wago_energy_controls_";
+            const conn = { battery: `binary_sensor.${E}bms_is_on`, shore: `binary_sensor.${E}shore_supply_is_connected`, generator: `binary_sensor.${E}generator_is_connected` };
+            const fail = new URLSearchParams(location.search).get("ei_fail");
+            const on = eiScript[1] === "opstarten";
+            const bron = data.variables?.bron || "battery";
+            const plan = on ? (bron === "battery" ? ["battery"] : ["battery", bron])
+              : [...["shore", "generator"].filter((k) => states[conn[k]].state === "on"), "battery"];
+            const set = (v) => { states["input_text.energy_inverters_status"] = st(v); push(); };
+            states[id] = st("on");
+            (async () => {
+              const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+              for (const k of plan) {
+                set(`${plan}:${k}:busy`);
+                if (fail === k) { await wait(5000); set(`${plan}:${k}:timeout`); states[id] = st("off"); return push(); }
+                await wait(1200);
+                states[conn[k]] = st(on ? "on" : "off");
+                if (k === "battery") states["sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage"] = st(on ? 760 : 0, { unit_of_measurement: "V" });
+              }
+              set(`${plan}::complete`);
+              states[id] = st("off");
+              push();
+            })();
           }
           const mode = /^button\.wago_hcs_controls_wago_controls_(diesel|electric|harbor)mode$/.exec(data.entity_id || "");
           if (mode) {
