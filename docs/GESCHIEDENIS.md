@@ -187,6 +187,8 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 
 - Compressor ER: *Heating only* / *Cooling only* gekoppeld aan de Webasto-select (`F2 Heating` / `F1 Cooling`), bolletje op de terugmelding; − / + op de klimaatmeter weg (alleen YAML). Demo: `select.select_option` werkt de `…_feedback`-sensor na 1 s bij.
 
+- Nieuwe pagina *Hydrauliek* (`sys-hydraulics`) onder Voortstuwing, alleen placeholderknoppen: zwemplatform uit/in, en voor de zeilbediening furlen giek, voorzeil en stagspanning (alleen YAML).
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

@@ -38,7 +38,7 @@ views:
             items: &tc_nav
               - { icon: schip, label: Schip, path: ship-deck, match: [ship-side] }
               - { icon: energie, label: Energie, path: energie, match: [sys-power, sys-dcbus] }
-              - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel] }
+              - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel, sys-hydraulics] }
               - { icon: water, label: Water, path: water, match: [sys-seawater, sys-freshwater, sys-wastewater] }
               - { icon: klimaat, label: Klimaat, path: sys-webasto, match: [klimaat-instellingen] }
               - { icon: bilge, label: Bilge, path: sys-bilge }
@@ -617,7 +617,7 @@ views:
 
   # ===== Systemschema's (omgezet uit Overszichtstekeningen/*.jpg) =====
   # Leidingen stromen (bewegende streepjes) zodra hun flow_entity actief is.
-  # Bestemmingen: Voortstuwing (Overzicht, Diesel, Generator, Boegschroef, Brandstof), Energie (Accu's,
+  # Bestemmingen: Voortstuwing (Overzicht, Diesel, Generator, Boegschroef, Brandstof, Hydrauliek), Energie (Accu's,
   # DC-bus), Water (Zeewater, Zoetwater, Vuilwater), Schip (Dek en interieur, Zijaanzicht met de navigatieverlichting),
   # Klimaat, Bilge en Alarmen.
 
@@ -641,6 +641,7 @@ views:
               - { label: Generator, path: sys-generator }
               - { label: Boegschroef, path: sys-bowthruster }
               - { label: Brandstof, path: sys-fuel }
+              - { label: Hydrauliek, path: sys-hydraulics }
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           # ---- aandrijflijn: bovenaanzicht uit tekening "Trully shafting GBS 191800.800" (Poseidon) ----
@@ -1979,6 +1980,38 @@ views:
           - { type: switch, x: 896, y: 100, width: 112, height: 112, icon: motor, label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { title: "Dieselmodus inschakelen?", yes: Inschakelen } } }
           - { type: switch, x: 1020, y: 100, width: 112, height: 112, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { title: "Elektrische modus inschakelen?", yes: Inschakelen } } }
           - { type: switch, x: 1144, y: 100, width: 112, height: 112, icon: anker, label: Haven, entity: button.wago_hcs_controls_wago_controls_harbormode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, tap_action: { action: toggle, confirmation: { title: "Havenmodus inschakelen?", yes: Inschakelen } } }
+
+  # ===== Hydrauliek (tab onder Voortstuwing): voorlopig alleen placeholderknoppen =====
+  - title: Hydrauliek
+    path: sys-hydraulics
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Voortstuwing
+            tabs: *voort_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+          # ---- zwemplatform: placeholders (nog niet gekoppeld) ----
+          - { type: panel, x: 20, y: 76, width: 400, height: 624, title: Zwemplatform }
+          - { type: pushbutton, x: 38, y: 128, width: 364, height: 60, font_size: 17, placeholder: true, label: Zwemplatform uit }
+          - { type: pushbutton, x: 38, y: 204, width: 364, height: 60, font_size: 17, placeholder: true, label: Zwemplatform in }
+          # ---- zeilbediening: placeholders (nog niet gekoppeld) ----
+          - { type: panel, x: 436, y: 76, width: 824, height: 624, title: Zeilbediening }
+          - { type: text, x: 454, y: 124, text: Furlen giek, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pushbutton, x: 454, y: 148, width: 384, height: 60, font_size: 17, placeholder: true, label: Giek uitrollen }
+          - { type: pushbutton, x: 858, y: 148, width: 384, height: 60, font_size: 17, placeholder: true, label: Giek inrollen }
+          - { type: text, x: 454, y: 244, text: Voorzeil, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pushbutton, x: 454, y: 268, width: 384, height: 60, font_size: 17, placeholder: true, label: Voorzeil uitrollen }
+          - { type: pushbutton, x: 858, y: 268, width: 384, height: 60, font_size: 17, placeholder: true, label: Voorzeil inrollen }
+          - { type: text, x: 454, y: 364, text: Stagspanning, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pushbutton, x: 454, y: 388, width: 384, height: 60, font_size: 17, placeholder: true, label: Stag spannen }
+          - { type: pushbutton, x: 858, y: 388, width: 384, height: 60, font_size: 17, placeholder: true, label: Stag vieren }
 
   # ===== Aanzichten van het schip (canvas "TC 90 aanzichten") =====
   # De tekeningen zitten in de kaart zelf (image: tc90-…), HA heeft geen extra bestanden nodig.
