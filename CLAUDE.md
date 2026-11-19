@@ -64,7 +64,7 @@ Twee aparte stappen, in deze volgorde:
 
 Een YAML met een nieuw item-type of nieuwe optie vóór de JS-update plakken geeft een rood vak `? type (vX)` of een leeg onderdeel.
 
-**Bron van waarheid is `examples/plc-dashboard.yaml`**, niet de configuratie in HA. Wijzigingen die iemand direct in HA maakt, gaan bij de volgende keer plakken verloren; haal ze eerst op (raw config kopiëren) en voeg ze samen.
+**Bron van waarheid is `examples/plc-dashboard.yaml`**, niet de configuratie in HA. Wijzigingen die iemand direct in HA maakt, gaan bij de volgende keer plakken verloren; haal ze eerst op (raw config kopiëren) en voeg ze samen. Samenvoegen: de raw config uit HA niet zomaar over het bestand zetten (HA schrijft alles in blokstijl, zonder opmerkingen en ankers, en `y` als `'true'`), maar de inhoudelijke verschillen bepalen (bijv. met PyYAML, `'true'` → `y`) en alleen die regels in de bestaande YAML aanpassen; zo is het op 19-11 gedaan.
 
 ### Nieuwe bediening uit het "normale" HA-dashboard overnemen
 

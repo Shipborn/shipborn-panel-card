@@ -183,6 +183,8 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 
 - Dagmap `261119` gemaakt met `nieuwe-dag.sh` (kopie van `261118`, gelijk aan GitHub `6e4a341`). Overdracht in `CLAUDE.md` bijgewerkt (v0.5.45, Diesel-pagina, uitrollijst) met een waarschuwing: op 18-11 werkten de Mac en de GBS-pc tegelijk in `261118`, waardoor Dropbox conflictkopieën in `.git` maakte en een commit van de ene pc het ongecommitte werk van de andere meenam. Opgelost met merge `6e4a341`; de conflictkopieën zijn verwijderd, `git fetch` werkt weer.
 
+- Diesel-pagina in HA bijgeschoven door de gebruiker (koeling V3/zeef naar het midden, labels, keerkoppeling, hotspots). De raw config uit HA was de juiste versie maar zonder opmerkingen, ankers en compacte regels; de 19 gewijzigde regels zijn overgenomen in de bestaande YAML (inhoud gelijk aan de HA-versie, opmerkingen behouden). Les: de HA-export schrijft `y` als `'true'` en alles in blokstijl; nooit zo terugzetten, maar de wijzigingen overnemen.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

@@ -672,38 +672,38 @@ views:
           - { type: text, x: 244, y: 113, text: Main outlet, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
 
           # zeewater motor (onder): inlaat V1 en wierpot, de motor in (> 100 rpm)
-          - { type: pipe, medium: seawater, points: [[1229, 656], [1229, 499]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
+          - { type: pipe, medium: seawater, points: [[1229, 530], [1229, 450]], thickness: 7, arrow: true, flow_entity: sensor.engine_room_main_engine_me_rpm, flow_above: 100 }
           - { type: strainer, x: 1207, y: 532, width: 44, height: 80, color: "#3cc7d6", active_entity: sensor.engine_room_main_engine_me_rpm, active_above: 100 }
-          - { type: butterfly_valve, x: 1214, y: 619, active_entity: valve.er_ventielblok_1tm4_l4 }
+          - { type: butterfly_valve, x: 1214, y: 618, active_entity: valve.er_ventielblok_1tm4_l4 }
           - { type: text, x: 1116, y: 626, text: Inlet V1, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
           - { type: text, x: 1110, y: 598, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
 
           # koeling e-motor / schroefas / keerkoppeling (onder): inlaat V3, wierpot, naar de keerkoppeling en verder
           # naar de schroefas (stroomt als de zeewaterpomp aan staat)
-          - { type: pipe, medium: seawater, points: [[338, 656], [338, 614]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[338, 521], [338, 511], [794, 511], [794, 472]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: pipe, medium: seawater, points: [[759, 455], [604, 455], [604, 481], [243, 481], [243, 423]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
-          - { type: strainer, x: 316, y: 521, width: 44, height: 90, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
-          - { type: butterfly_valve, x: 323, y: 619, active_entity: valve.er_ventielblok_1tm4_l2 }
-          - { type: text, x: 250, y: 627, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 214, y: 534, width: 96, height: 55, text: "Cooling\nElectric/Shaft\nGearbox", font_size: 13, active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[783, 655], [783, 613]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[783, 526], [783, 496], [904, 496], [904, 380], [874, 380]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: pipe, medium: seawater, points: [[765, 380], [604, 380], [537, 380], [537, 403]], thickness: 7, arrow: true, flow_entity: switch.er_zeewaterpomp_cooling }
+          - { type: strainer, x: 761, y: 532, width: 44, height: 80, color: "#3cc7d6", active_entity: switch.er_zeewaterpomp_cooling }
+          - { type: butterfly_valve, x: 768, y: 618, active_entity: valve.er_ventielblok_1tm4_l2 }
+          - { type: text, x: 695, y: 626, text: Inlet V3, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 659, y: 533, width: 96, height: 55, text: "Cooling\nElectric/Shaft\nGearbox", font_size: 13, active_entity: switch.er_zeewaterpomp_cooling }
           - { type: text, x: 60, y: 502, width: 170, text: Cooling propshaft, font_size: 12, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
           - { type: text, x: 60, y: 520, width: 110, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, mono: true, font_size: 14, unit: L/min, decimals: 1, tap_action: { action: more-info } }
 
           # wijslijnen van de onderdelen naar de labels
           - { type: line, x: 1229, y: 116, width: 2, height: 155, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 919, y: 243, width: 2, height: 45, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 535, y: 243, width: 2, height: 54, color: "var(--line-strong, #4a4a4a)" }
-          - { type: line, x: 244, y: 243, width: 2, height: 151, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 919, y: 255, width: 2, height: 35, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 537, y: 250, width: 2, height: 54, color: "var(--line-strong, #4a4a4a)" }
+          - { type: line, x: 244, y: 293, width: 2, height: 100, color: "var(--line-strong, #4a4a4a)" }
           # keerkoppeling (het groene blok tussen de grote kast en de Volvo): vooruit / neutraal / achteruit
-          - { type: line, x: 957, y: 460, width: 2, height: 64, color: "var(--line-strong, #4a4a4a)" }
-          - { type: gear, x: 806, y: 524, width: 304, height: 44, labels: [Achteruit, Neutraal, Vooruit], fwd_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, aft_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
+          - { type: line, x: 990, y: 460, width: 2, height: 64, color: "var(--line-strong, #4a4a4a)" }
+          - { type: gear, x: 840, y: 524, width: 304, height: 44, labels: [Achteruit, Neutraal, Vooruit], fwd_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, aft_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft }
           # labels (hotspots): het bolletje is x/y, het label wijst ervan weg
-          - { type: hotspot, x: 1230, y: 116, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
+          - { type: hotspot, x: 1230, y: 100, side: left, icon: motor, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, unit: rpm, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, alarm_entity: binary_sensor.plc_diesel_alarm }
           - { type: hotspot, x: 1230, y: 150, side: left, icon: klimaat, label: Koelwater, entity: sensor.engine_room_main_engine_me_coolant_temp, unit: "°C", tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 90, alarm_above: 100 }
-          - { type: hotspot, x: 920, y: 243, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
-          - { type: hotspot, x: 536, y: 243, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
-          - { type: hotspot, x: 244, y: 243, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
+          - { type: hotspot, x: 920, y: 255, side: left, icon: energie, label: E-motor, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_running }
+          - { type: hotspot, x: 538, y: 250, side: left, icon: klep, label: Afdichting, entity: sensor.al1590_er_prop_shaft_grease_pressure, unit: bar, decimals: 2, warn_above: 2, alarm_below: 0.1 }
+          - { type: hotspot, x: 245, y: 293, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
 
           # ---- bediening (uit het oude dashboard) ----
           - { type: panel, x: 20, y: 671, width: 620, height: 360, title: "Sensoren – bij Volvo aan alles groen" }
@@ -757,7 +757,7 @@ views:
                 }
             }
           - { type: pushbutton, x: 812, y: 965, width: 126, height: 48, label: Close valves, font_size: 14, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.closevolvovalves }, confirmation: { text: "Deze functie bedient de volgende aansturingen: close Volvo zeewatervalves, IN & OUT" } }, variant: stop }
-          - { type: panel, x: 972, y: 671, width: 288, height: 360, title: Propulsion mode }
+          - { type: panel, x: 972, y: 670, width: 288, height: 360, title: Propulsion mode }
           - { type: pushbutton, x: 990, y: 723, width: 252, height: 56, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
           - { type: pushbutton, x: 990, y: 789, width: 252, height: 56, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
           - { type: pushbutton, x: 990, y: 855, width: 252, height: 56, label: Harbor, align: left, entity: button.wago_hcs_controls_wago_controls_harbormode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode }
