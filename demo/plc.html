@@ -68,6 +68,8 @@
         "binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on": st("on"),
         // Energy Inverters: scripts + status (gesimuleerd in callService; ?ei_fail=shore laat die stap niet reageren (&ei_speed=10 = timeout na 2 s; window.eiRespond() = toch reactie))
         "input_text.energy_inverters_status": st(""),
+        "select.webasto_bluecool_connect_compressor_engine_room_operation_mode": st("F2 Heating", { options: ["F1 Cooling", "F2 Heating"] }),
+        "sensor.webasto_bluecool_connect_compressor_engine_room_operation_mode_feedback": st("F2 Heating"),
         "script.energy_inverters_opstarten": st("off"),
         "script.energy_inverters_afsluiten": st("off"),
         "binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on": st("off"),
@@ -190,6 +192,13 @@
             })();
           }
           if (domain === "input_text" && service === "set_value" && states[id]) { states[id] = st(data.value); push(); }
+          // select: option set at once, a "<select>_feedback" sensor follows after 1 s (like the Webasto compressor mode)
+          if (domain === "select" && service === "select_option" && states[id]) {
+            states[id] = st(data.option, states[id].attributes);
+            const fb = id.replace(/^select\./, "sensor.") + "_feedback";
+            setTimeout(() => { if (states[fb]) states[fb] = st(data.option); push(); }, 1000);
+            push();
+          }
           const mode = /^button\.wago_hcs_controls_wago_controls_(diesel|electric|harbor)mode$/.exec(data.entity_id || "");
           if (mode) {
             for (const m of ["diesel", "electric", "harbor"]) states[`binary_sensor.wago_hcs_controls_wago_hcs_controls_${m}_mode`] = st(m === mode[1] ? "on" : "off");

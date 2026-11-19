@@ -185,6 +185,8 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 
 - Diesel-pagina in HA bijgeschoven door de gebruiker (koeling V3/zeef naar het midden, labels, keerkoppeling, hotspots). De raw config uit HA was de juiste versie maar zonder opmerkingen, ankers en compacte regels; de 19 gewijzigde regels zijn overgenomen in de bestaande YAML (inhoud gelijk aan de HA-versie, opmerkingen behouden). Les: de HA-export schrijft `y` als `'true'` en alles in blokstijl; nooit zo terugzetten, maar de wijzigingen overnemen.
 
+- Compressor ER: *Heating only* / *Cooling only* gekoppeld aan de Webasto-select (`F2 Heating` / `F1 Cooling`), bolletje op de terugmelding; − / + op de klimaatmeter weg (alleen YAML). Demo: `select.select_option` werkt de `…_feedback`-sensor na 1 s bij.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.
