@@ -179,6 +179,10 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - (v0.5.44) Op verzoek de **schroefas ingekort** in `tc90-aandrijflijn`: twee stukken eruit (in de dunne as tussen twee verbindingen en in de kokerbuis na het breekteken van de tekening), samen 24 % van de lengte, zodat keerkoppeling, e-motor en diesel 1,3× groter zijn. Leidingen, labels en wijslijnen zijn meegeschaald; links onder zijn wierpot, klep en teksten opnieuw geplaatst.
 - (v0.5.45) Op verzoek staat de stand van de keerkoppeling bij het **groene blok** (de keerkoppeling tussen de grote kast en de Volvo), met **Neutraal** erbij: het item `gear` met de nieuwe optie `labels` (*Achteruit · Neutraal · Vooruit*; neutraal = geen van beide koppelingen in) en een wijslijn, in plaats van de twee losse labels Vooruit/Achteruit bij de grote kast.
 
+## 19-11-2026 – overdracht na werk op twee computers
+
+- Dagmap `261119` gemaakt met `nieuwe-dag.sh` (kopie van `261118`, gelijk aan GitHub `6e4a341`). Overdracht in `CLAUDE.md` bijgewerkt (v0.5.45, Diesel-pagina, uitrollijst) met een waarschuwing: op 18-11 werkten de Mac en de GBS-pc tegelijk in `261118`, waardoor Dropbox conflictkopieën in `.git` maakte en een commit van de ene pc het ongecommitte werk van de andere meenam. Opgelost met merge `6e4a341`; de conflictkopieën zijn verwijderd, `git fetch` werkt weer.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.
