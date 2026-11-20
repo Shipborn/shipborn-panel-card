@@ -1809,7 +1809,9 @@ views:
             status: *tc_status
           - { type: navbar, items: *tc_nav }
           - { type: panel, x: 20, y: 76, width: 1240, height: 624, title: Instellingen }
-          - { type: text, x: 38, y: 124, text: "Nog leeg.", style: label }
+          # ---- apps in HA (ingress-pad = /hassio/ingress/<slug van de app>) ----
+          - { type: text, x: 38, y: 124, text: Apps, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pushbutton, x: 38, y: 152, width: 300, height: 56, label: Shipborn app, font_size: 15, tap_action: { action: navigate, navigation_path: /hassio/ingress/7070e057_shipborn_app } }
 
   - title: Instellingen klimaat
     path: inst-klimaat

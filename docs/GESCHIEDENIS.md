@@ -194,6 +194,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Dagmap `261120` gemaakt. De gebruiker bevestigt dat alles in HA staat: kaart v0.5.45, de Energy Inverters-helper en -scripts (versie 18-11) en het dashboard t/m de Hydrauliek-pagina.
 
 - **Generator opstarten** (v0.5.46): zelfde opzet als de Energy Inverters (HA-script + statushelper, de kaart toont alleen), maar met handelingen van de bediener. Het voortgangsvenster kreeg daarvoor toestanden die op de bediener wachten (`confirm` / `fix` / `manual`) met per stap tekst, foto en knoppen; een knop schrijft zijn antwoord in de helper (`<plan>:<stap>:done`) of opent een ander venster (*Start DC-bus* = het Energy Inverters-venster). De zeewaterpomp glycol staat de hele tijd bovenin (`watch`). Eerst de opzet met de gebruiker doorgesproken (vragen over handstappen, controles, timeouts, knopplaats, stap 7). Getest in de demo: hele doorloop, handmatige start, timeout met terugdraaien, afbreken. De demo-server serveert `/local/` uit `www/`. View `energie` vóór de systeemschema's gezet (anker `&ei_start` wordt nu op Generator gebruikt).
+- **Shipborn app op Instellingen** (alleen YAML): op Instellingen › Algemeen staat onder *Apps* de knop *Shipborn app*; een tik gaat naar de HA-app (voorheen add-on) via `/hassio/ingress/7070e057_shipborn_app`. In de demo geeft dat een 404 (geen HA); in HA nog te controleren.
 
 ## Lessen en keuzes die je moet kennen
 
