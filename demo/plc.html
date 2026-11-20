@@ -76,6 +76,7 @@
         // ?gen_fail=gen laat die stap niet reageren (&gen_speed=10 = timeout sneller; window.genRespond() = toch reactie))
         "input_text.generator_opstarten_status": st(""),
         "script.generator_opstarten": st("off"),
+        "script.generator_afsluiten": st("off"),
         "switch.wago_energy_controls_wago_energy_controls_charge_batteries_2": st("on"),
         "switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2": st("off"),
         "switch.wago_energy_controls_wago_energy_controls_shore_supply_2": st("on"),
@@ -253,6 +254,55 @@
                 const d = aan[k] ? "on" : "off";
                 return !is(sw[k], d) || !is(fb[k], d);
               });
+              for (const [i, k] of steps.entries()) {
+                const d = aan[k] ? "on" : "off";
+                set(`${plan}:${k}:busy`);
+                drive(k, aan[k]);
+                if (!(await until(() => is(fb[k], d), (tmo[k] * 1000) / (+q.get("gen_speed") || 1)))) {
+                  set(`${plan}:${k}:timeout`);
+                  window.genRespond = () => { states[fb[k]] = st(d); push(); };
+                  await until(() => is(fb[k], d) || now() === `${plan}:${k}:rollback`);
+                  if (!is(fb[k], d)) {
+                    set(`${plan}:${k}:rolling_back`);
+                    await wait(800);
+                    for (const j of steps.slice(0, i + 1).reverse()) { states[sw[j]] = st(aan[j] ? "off" : "on"); states[fb[j]] = st(aan[j] ? "off" : "on"); }
+                    set(`${plan}:${k}:rolled_back`);
+                    return end();
+                  }
+                }
+                set(`${plan}:${k}:ok`);
+                await wait(2000);
+              }
+              set(`${plan}::complete`);
+              end();
+            })();
+          }
+          // Generator afsluiten: same steps as generated automations/generator_afsluiten.yaml (shorter waits; ?gen_fail=<step> works here too)
+          if (domain === "script" && service === "turn_on" && id === "script.generator_afsluiten" && states[id].state !== "on") {
+            const E = "wago_energy_controls_wago_energy_controls_";
+            const S = "input_text.generator_opstarten_status";
+            const q = new URLSearchParams(location.search);
+            const plan = "wal,lad_uit,accu,gen_uit,stop,wal_aan";
+            const sw = { gen_uit: `switch.${E}generator_2`, stop: `switch.${E}manual_start_aux_generator_2`, wal_aan: `switch.${E}shore_supply_2` };
+            const fb = { gen_uit: `binary_sensor.${E}generator_is_connected`, stop: `binary_sensor.${E}generator_is_on`, wal_aan: `binary_sensor.${E}shore_supply_is_connected` };
+            const aan = { gen_uit: false, stop: false, wal_aan: true };
+            const tmo = { gen_uit: 20, stop: 60, wal_aan: 20 };
+            const is = (e, v) => states[e]?.state === v;
+            const now = () => states[S].state;
+            const set = (v) => { states[S] = st(v); push(); };
+            const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+            const until = async (fn, ms = Infinity) => { const t = Date.now(); while (!fn()) { if (Date.now() - t > ms) return false; await wait(200); } return true; };
+            const end = () => { states[id] = st("off"); push(); };
+            states[id] = st("on");
+            const drive = (k, on) => { states[sw[k]] = st(on ? "on" : "off"); push(); if (q.get("gen_fail") !== k) setTimeout(() => { states[fb[k]] = st(on ? "on" : "off"); push(); }, k === "stop" ? 3000 : 1200); };
+            (async () => {
+              const check = async (k, ok) => { if (ok()) return true; set(`${plan}:${k}:fix`); await until(() => ok() || now() === `${plan}:${k}:abort`); return ok(); };
+              const abort = (k) => { set(`${plan}:${k}:aborted`); end(); };
+              if (!(await check("wal", () => is(`binary_sensor.${E}shore_supply_is_on`, "on")))) return abort("wal");
+              if (!(await check("lad_uit", () => is(`switch.${E}charge_batteries_2`, "off")))) return abort("lad_uit");
+              // demo: the Koppelen button only switches battery_connect_2, so that counts as connected too
+              if (!(await check("accu", () => is(`binary_sensor.${E}bms_is_on`, "on") || is(`switch.${E}battery_connect_2`, "on")))) return abort("accu");
+              const steps = ["gen_uit", "stop", "wal_aan"].filter((k) => { const d = aan[k] ? "on" : "off"; return !is(sw[k], d) || !is(fb[k], d); });
               for (const [i, k] of steps.entries()) {
                 const d = aan[k] ? "on" : "off";
                 set(`${plan}:${k}:busy`);

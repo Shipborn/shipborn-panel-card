@@ -1025,11 +1025,11 @@ views:
                 }
             }
           # Generator opstarten: script.generator_opstarten (generated automations/generator_opstarten.yaml) met een
-          # stappenvenster (status in input_text.generator_opstarten_status); foto's in /config/www/Pictures/Instructions.
+          # stappenvenster (status in input_text.generator_opstarten_status); foto's in HA in /homeassistant/www/Pictures/Instructions.
           # Het venster (&gen_progress) wordt ook gebruikt door de knop op Voortstuwing. Bolletje groen = generator gekoppeld.
           - type: pushbutton
             x: 940
-            y: 873
+            y: 815
             width: 300
             height: 48
             label: Generator opstarten
@@ -1053,6 +1053,34 @@ views:
                 gen: { label: Generator-drive aan, busy: "Wacht tot de generator gekoppeld is …", ok: "Generator gekoppeld.", fail: "De generator-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien of blijven wachten?" }
                 laden: { label: Accu laden aan, busy: "Wacht tot het BMS laadt …", ok: "Accu laadt.", fail: "Het BMS gaat na 20 s nog niet laden. Terugdraaien of blijven wachten?" }
 
+          # Generator afsluiten: script.generator_afsluiten (generated automations/generator_afsluiten.yaml), zelfde statushelper.
+          # Het venster (&gen_off_progress) wordt ook gebruikt door de knop op Voortstuwing.
+          - type: pushbutton
+            x: 940
+            y: 873
+            width: 300
+            height: 48
+            label: Generator afsluiten
+            font_size: 14
+            tap_action:
+              action: perform-action
+              perform_action: script.turn_on
+              data: { entity_id: script.generator_afsluiten }
+              confirmation: &gen_off_confirm { title: "Generator afsluiten?", text: "De boot gaat terug op walstroom: eerst de generator-drive uit, dan de generator uit, daarna de walstroom-drive aan.", yes: Afsluiten }
+            progress: &gen_off_progress
+              entity: input_text.generator_opstarten_status
+              script: script.generator_afsluiten
+              title: Generator afsluiten
+              done: Generator uit, walstroom gekoppeld
+              aborted: "Afgebroken. Het script heeft niets geschakeld."
+              rolled_back: "Teruggedraaid: wat bij dit afsluiten is geschakeld, staat weer zoals het was."
+              steps:
+                wal: { label: Walstroom aanwezig, fix: "Er is geen walstroom. Sluit de walstroom aan; daarna gaat het afsluiten vanzelf verder.", caption: { fix: GEEN }, buttons: [{ label: Afbreken, value: abort, style: plain }] }
+                lad_uit: { label: Charge batteries uit, fix: "Charge batteries staat aan en moet uit. Zet hem uit; daarna gaat het afsluiten verder.", caption: { fix: AAN }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Uitzetten, tap_action: { action: perform-action, perform_action: switch.turn_off, data: { entity_id: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2 } } }] }
+                accu: { label: Accu gekoppeld, fix: "De accu is niet gekoppeld (BMS uit). Koppel de accu; daarna gaat het afsluiten verder.", caption: { fix: UIT }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Koppelen, tap_action: { action: perform-action, perform_action: switch.turn_on, data: { entity_id: switch.wago_energy_controls_wago_energy_controls_battery_connect_2 } } }] }
+                gen_uit: { label: Generator-drive uit, busy: "Wacht tot de generator ontkoppeld is …", ok: "Generator ontkoppeld: de boot draait nu op de accu.", fail: "De generator-drive reageert niet: na 20 s nog gekoppeld. Terugdraaien of blijven wachten?" }
+                stop: { label: Generator uit, timeout: 60, busy: "Generator wordt uitgezet … wacht tot hij stilstaat.", ok: "Generator staat uit.", fail: "De generator draait na 60 s nog. Is hij handmatig gestart, zet hem dan uit aan het lokale paneel. Terugdraaien (generator weer aan) of blijven wachten?" }
+                wal_aan: { label: Walstroom-drive aan, busy: "Wacht tot de walstroom gekoppeld is …", ok: "Walstroom gekoppeld.", fail: "De walstroom-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien of blijven wachten?" }
   - title: DC-bus koeling
     path: sys-dcbus
     panel: true
@@ -1976,7 +2004,7 @@ views:
             choice: *ei_start
             progress: *ei_progress_on
 
-          # Generator: loopt + lampjes (grijs als hij niet loopt; tik = Generator) en Generator opstarten (venster &gen_progress, op Generator)
+          # Generator: loopt + lampjes (grijs als hij niet loopt; tik = Generator) en Opstarten / Afsluiten (vensters &gen_progress / &gen_off_progress, op Generator)
           - { type: panel, x: 896, y: 348, width: 360, height: 172, title: Generator }
           - { type: warnlight, x: 914, y: 392, size: 48, icon: generator, label: Generator loopt, entity: binary_sensor.generatoron, tap_action: { action: navigate, navigation_path: sys-generator } }
           - { type: line, x: 976, y: 396, width: 1, height: 40, color: "var(--line, #3b4249)" }
@@ -1986,13 +2014,22 @@ views:
           - type: pushbutton
             x: 914
             y: 456
-            width: 324
+            width: 156
             height: 48
-            label: Generator opstarten
+            label: Opstarten
             font_size: 16
             status_entity: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected
             tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.generator_opstarten } }
             progress: *gen_progress
+          - type: pushbutton
+            x: 1082
+            y: 456
+            width: 156
+            height: 48
+            label: Afsluiten
+            font_size: 16
+            tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.generator_afsluiten }, confirmation: *gen_off_confirm }
+            progress: *gen_off_progress
 
           # Boegschroef: ingeschakeld + DC-bus-spanning goed (≥ 700 V, grijs als de boegschroef niet ingeschakeld is; tik = Boegschroef) en de knoppen aan / uit
           - { type: panel, x: 896, y: 536, width: 360, height: 164, title: Boegschroef }

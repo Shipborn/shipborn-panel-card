@@ -9,6 +9,8 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 | `energy_inverters.yaml` | Alles in één package (alleen nodig als HA packages gebruikt): `input_text.energy_inverters_status` + scripts `script.energy_inverters_opstarten` (veld `bron`: `shore` / `generator` / `battery`) en `script.energy_inverters_afsluiten`. |
 | `script_generator_opstarten.yaml` | Het script *Generator opstarten*, klaar om te plakken. |
 | `generator_opstarten.yaml` | Package: `input_text.generator_opstarten_status` + `script.generator_opstarten`, met bovenaan de uitleg van stappen en status. |
+| `script_generator_afsluiten.yaml` | Het script *Generator afsluiten*, klaar om te plakken (geen eigen helper). |
+| `generator_afsluiten.yaml` | Package: `script.generator_afsluiten` (gebruikt `input_text.generator_opstarten_status`), met bovenaan de uitleg. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
 
@@ -48,6 +50,22 @@ In stap 1–4 kan de bediener *Afbreken* (het script heeft dan nog niets geschak
 **Foto's:** in HA in `www/Pictures/Instructions/` naast `configuration.yaml`. In de add-ons (File editor, Samba, Studio Code Server, SSH) is dat `/homeassistant/www/…`; een map `/config` in de root hoort bij de add-on zelf en wordt door HA niet gezien. Maak je `www` voor het eerst aan, herstart HA dan één keer (adres `/local/Pictures/Instructions/…`; hoofdlettergevoelig). Zet kopieën in `www/Pictures/Instructions/` in de dagmap: de demo (`demo/edit_server.py`) serveert `/local/` uit die map, zoals HA.
 
 **Installeren:** helper *Tekst* met naam `Generator opstarten status`, maximale lengte **255**, entiteit `input_text.generator_opstarten_status`; daarna een nieuw script met de inhoud van `script_generator_opstarten.yaml` (entiteit `script.generator_opstarten`), zoals hieronder bij de Energy Inverters.
+
+## Generator afsluiten
+
+Knop *Generator afsluiten* op de pagina Generator (onder *Generator opstarten*) en *Afsluiten* op Voortstuwing (vak Generator, naast *Opstarten*), met eerst een Ja/Nee. Het script zet de boot terug op walstroom:
+
+1. **Walstroom aanwezig** (`…shore_supply_is_on`, nog niet gekoppeld): zo niet, dan wacht het script tot hij er is (alleen *Afbreken*).
+2. **Charge batteries uit**: staat hij aan, dan zet *Uitzetten* hem uit.
+3. **Accu gekoppeld** (`…bms_is_on`): zo niet, dan zet *Koppelen* `switch.…battery_connect_2` aan.
+4. **Generator-drive uit** (`switch.…generator_2` uit), wacht tot `…generator_is_connected` uit is, dan 2 s. De boot draait nu op de accu.
+5. **Generator uit** (`switch.…manual_start_aux_generator_2` uit), wacht tot `…generator_is_on` uit is (60 s), dan 2 s. Is de generator handmatig gestart, dan zet je hem uit aan het lokale paneel; het venster zegt dat na 60 s en het script wacht door.
+6. **Walstroom-drive aan** (`switch.…shore_supply_2` aan), wacht op `…shore_supply_is_connected`, dan 2 s.
+7. 1 s *Generator uit, walstroom gekoppeld*, daarna sluit het venster.
+
+In stap 1–3 kan de bediener afbreken (er is dan niets geschakeld). Bij 4–6 volgt na 20 s (60 s) zonder terugmelding *Terugdraaien* of *Blijven wachten*; terugdraaien zet terug wat het script schakelde, laatste eerst. Stappen die al goed staan worden overgeslagen.
+
+**Installeren:** alleen een nieuw script met de inhoud van `script_generator_afsluiten.yaml` (entiteit `script.generator_afsluiten`). Het gebruikt de helper van Generator opstarten.
 
 ## Installeren in Home Assistant
 
