@@ -189,6 +189,10 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 
 - Nieuwe pagina *Hydrauliek* (`sys-hydraulics`) onder Voortstuwing, alleen placeholderknoppen: zwemplatform uit/in, en voor de zeilbediening furlen giek, voorzeil en stagspanning (alleen YAML).
 
+## 20-11-2026 – uitgerold
+
+- Dagmap `261120` gemaakt. De gebruiker bevestigt dat alles in HA staat: kaart v0.5.45, de Energy Inverters-helper en -scripts (versie 18-11) en het dashboard t/m de Hydrauliek-pagina.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.
