@@ -670,7 +670,9 @@ views:
               title: Energy Inverters opstarten
               done: Startup complete
               rolled_back: "Teruggedraaid: wat bij dit opstarten is aangezet, staat weer uit."
+              aborted: "Afgebroken. Er is niets geschakeld."
               steps:
+                lad_uit: { label: Charge batteries uit, fix: "Charge batteries staat aan en moet uit. Zet hem uit; daarna gaat het opstarten verder.", caption: { fix: AAN }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Uitzetten, tap_action: { action: perform-action, perform_action: switch.turn_off, data: { entity_id: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2 } } }] }
                 battery: { label: Accu koppelen, busy: "Wacht tot het BMS aan is …", fail: "De accu-drive reageert niet: het BMS is na 20 s nog niet aan. Terugdraaien of blijven wachten?" }
                 shore: { label: Walstroom koppelen, busy: "Wacht tot de walstroom gekoppeld is …", fail: "De walstroom-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien (walstroom en accu uit) of blijven wachten?" }
                 generator: { label: Generator koppelen, busy: "Wacht tot de generator gekoppeld is …", fail: "De generator-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien (generator en accu uit) of blijven wachten?" }
@@ -693,7 +695,9 @@ views:
               title: Energy Inverters afsluiten
               done: Shutdown complete
               rolled_back: "Teruggedraaid: wat bij dit afsluiten is uitgezet, staat weer aan."
+              aborted: "Afgebroken. Er is niets geschakeld."
               steps:
+                lad_uit: { label: Charge batteries uit, fix: "Charge batteries staat aan en moet uit. Zet hem uit; daarna gaat het afsluiten verder.", caption: { fix: AAN }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Uitzetten, tap_action: { action: perform-action, perform_action: switch.turn_off, data: { entity_id: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2 } } }] }
                 shore: { label: Walstroom ontkoppelen, busy: "Wacht tot de walstroom offline is …", fail: "De walstroom-drive reageert niet: na 20 s nog niet offline. Terugdraaien (weer aan) of blijven wachten?" }
                 generator: { label: Generator ontkoppelen, busy: "Wacht tot de generator offline is …", fail: "De generator-drive reageert niet: na 20 s nog niet offline. Terugdraaien (weer aan) of blijven wachten?" }
                 battery: { label: Accu ontkoppelen, busy: "Wacht tot het BMS uit is …", fail: "De accu-drive reageert niet: het BMS is na 20 s nog niet uit. Terugdraaien (alles weer aan) of blijven wachten?" }
@@ -1039,14 +1043,11 @@ views:
               done: Generator online
               aborted: "Afgebroken. Het script heeft niets geschakeld."
               rolled_back: "Teruggedraaid: wat bij dit opstarten is geschakeld, staat weer zoals het was."
-              watch:
-                - { label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling }
               steps:
                 main: { label: "Mainswitch: direct van wal", image: /local/Pictures/Instructions/DirectvanWal.png, confirm: "Controleer de mainswitch: hij moet staan zoals op de foto (direct van wal). Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
                 dc: { label: DC-bus aan, fix: "De DC-bus staat nog uit. Start de DC-bus; daarna gaat het opstarten vanzelf verder.", caption: { fix: UIT }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Start DC-bus, choice: *ei_start, progress: *ei_progress_on }] }
                 lad_uit: { label: Charge batteries uit, fix: "Charge batteries staat aan en moet uit. Zet hem uit; daarna gaat het opstarten verder.", caption: { fix: AAN }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Uitzetten, tap_action: { action: perform-action, perform_action: switch.turn_off, data: { entity_id: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2 } } }] }
                 omv: { label: Switches naar de omvormers, image: /local/Pictures/Instructions/VanafOmvormerPLC.png, confirm: "Zet de switches naar de omvormers, zoals op de foto. Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
-                pomp: { label: Zeewaterpomp glycol aan, fix: "De zeewaterpomp glycol staat uit en moet aan. Zet hem aan; daarna gaat het opstarten verder.", caption: { fix: UIT }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Aanzetten, tap_action: { action: perform-action, perform_action: switch.turn_on, data: { entity_id: switch.er_zeewaterpomp_cooling } } }] }
                 start: { label: Generator starten, timeout: 60, confirm: "Hoe start je de generator? Via HA zet de startopdracht (Gen. requested) aan; handmatig start je hem zelf aan het lokale paneel.", manual: "Start de generator aan het lokale paneel. Het opstarten gaat verder zodra hij draait.", busy: "Generator wordt gestart … wacht tot hij draait.", ok: "Generator draait.", caption: { confirm: KEUZE, manual: HANDMATIG }, fail: "De generator draait na 60 s nog niet. Terugdraaien (startopdracht uit) of blijven wachten?", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Handmatig, value: manual }, { label: Via HA, value: ha }, { label: Afbreken, value: abort, style: plain, when: manual }] }
                 wal_uit: { label: Walstroom-drive uit, busy: "Wacht tot de walstroom ontkoppeld is …", ok: "Walstroom ontkoppeld: de boot draait nu op de accu.", fail: "De walstroom-drive reageert niet: na 20 s nog gekoppeld. Terugdraaien of blijven wachten?" }
                 gen: { label: Generator-drive aan, busy: "Wacht tot de generator gekoppeld is …", ok: "Generator gekoppeld.", fail: "De generator-drive reageert niet: na 20 s nog niet gekoppeld. Terugdraaien of blijven wachten?" }

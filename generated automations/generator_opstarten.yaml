@@ -11,7 +11,6 @@
 #   dc       DC-bus aan (≥ 700 V)                            zo niet: knop Start DC-bus (Energy Inverters-venster)
 #   lad_uit  Charge batteries uit                            zo niet: knop Uitzetten
 #   omv      switches naar de omvormers                      bediener tikt Gedaan (foto VanafOmvormerPLC.png)
-#   pomp     zeewaterpomp glycol aan                         zo niet: knop Aanzetten
 #   start    generator starten: keuze Via HA of Handmatig    wacht op generator_is_on (+2 s)
 #            Via HA: manual_start_aux_generator_2 aan (blijft aan), 60 s; Handmatig: onbeperkt wachten
 #   wal_uit  walstroom-drive uit (shore_supply_2 uit)        wacht tot shore_supply_is_connected uit (+2 s), 20 s
@@ -47,16 +46,15 @@ script:
     alias: Generator opstarten
     description: >-
       Loopt met de bediener de opstart van de generator door: mainswitch, DC-bus, laden uit, switches naar de
-      omvormers, zeewaterpomp glycol, generator starten (via HA of handmatig), walstroom-drive uit,
+      omvormers, generator starten (via HA of handmatig), walstroom-drive uit,
       generator-drive aan en accu laden aan. Status in input_text.generator_opstarten_status.
     icon: mdi:engine
     mode: single
     max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
     variables:
       status: input_text.generator_opstarten_status
-      plan: "main,dc,lad_uit,omv,pomp,start,wal_uit,gen,laden"
+      plan: "main,dc,lad_uit,omv,start,wal_uit,gen,laden"
       dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
-      pomp: switch.er_zeewaterpomp_cooling
       generator_aan: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
       schakelaar:
         start: switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2
@@ -143,25 +141,7 @@ script:
             data: { value: "{{ plan }}:omv:aborted" }
           - stop: Afgebroken door de bediener
 
-      # ---------- 4. zeewaterpomp glycol moet aan staan (de kaart toont hem de hele tijd) ----------
-      - if:
-          - condition: template
-            value_template: "{{ not is_state(pomp, 'on') }}"
-        then:
-          - action: input_text.set_value
-            target: { entity_id: "{{ status }}" }
-            data: { value: "{{ plan }}:pomp:fix" }
-          - wait_template: "{{ is_state(pomp, 'on') or states(status) == plan ~ ':pomp:abort' }}"
-          - if:
-              - condition: template
-                value_template: "{{ states(status) == plan ~ ':pomp:abort' }}"
-            then:
-              - action: input_text.set_value
-                target: { entity_id: "{{ status }}" }
-                data: { value: "{{ plan }}:pomp:aborted" }
-              - stop: Afgebroken door de bediener
-
-      # ---------- 5. generator starten: keuze via HA of handmatig (overgeslagen als hij al draait) ----------
+      # ---------- 4. generator starten: keuze via HA of handmatig (overgeslagen als hij al draait) ----------
       - if:
           - condition: template
             value_template: "{{ not is_state(generator_aan, 'on') }}"
@@ -203,7 +183,7 @@ script:
             data: { value: "{{ plan }}:start:ok" }
           - delay: 2
 
-      # ---------- 5 (via HA) t/m 8: schakelen en wachten op de terugmelding ----------
+      # ---------- 4 (via HA) t/m 7: schakelen en wachten op de terugmelding ----------
       # Alleen de stappen die echt iets veranderen; die worden bij terugdraaien ook teruggezet.
       - variables:
           stappen: >-

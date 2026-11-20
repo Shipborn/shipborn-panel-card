@@ -5,7 +5,7 @@
 
 alias: Energy Inverters opstarten
 description: >-
-  Koppelt eerst de accu (battery connect) en wacht tot het BMS aan is, daarna
+  Controleert dat Charge batteries uit staat. Koppelt dan de accu (battery connect) en wacht tot het BMS aan is, daarna
   (naar keuze) walstroom of generator en wacht tot die gekoppeld is. Na 20 s zonder
   terugmelding vraagt de kaart: terugdraaien of blijven wachten.
 icon: mdi:flash
@@ -36,9 +36,10 @@ variables:
   beschikbaar:
     shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on
     generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
+  laden: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2
   extern: "{{ bron in ['shore', 'generator'] }}"
   stappen: "{{ ['battery'] + ([bron] if extern else []) }}"
-  plan: "{{ stappen | join(',') }}"
+  plan: "{{ (['lad_uit'] + stappen) | join(',') }}"
 sequence:
   # gekozen bron moet beschikbaar zijn (de kaart laat alleen beschikbare bronnen kiezen; dit is de tweede controle)
   - if:
@@ -49,6 +50,24 @@ sequence:
         target: { entity_id: "{{ status }}" }
         data: { value: "{{ plan }}:{{ bron }}:unavailable" }
       - stop: Gekozen bron is niet beschikbaar
+
+  # Charge batteries moet uit zijn (alleen tijdens het opstarten gecontroleerd)
+  - if:
+      - condition: template
+        value_template: "{{ is_state(laden, 'on') }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:lad_uit:fix" }
+      - wait_template: "{{ is_state(laden, 'off') or states(status) == plan ~ ':lad_uit:abort' }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':lad_uit:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:lad_uit:aborted" }
+          - stop: Afgebroken door de bediener
 
   - repeat:
       for_each: "{{ stappen }}"

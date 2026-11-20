@@ -7,6 +7,11 @@
 # Zonder packages: de losse bestanden script_energy_inverters_*.yaml in de UI plakken
 # en de helper in de UI maken (zie README.md). Houd die bestanden gelijk met dit bestand.
 #
+# Beide scripts controleren eerst (stap lad_uit) dat Charge batteries (charge_batteries_2) uit staat. Staat
+# hij aan, dan zet het script de status op "fix" en wacht het tot hij uit is (de kaart biedt een knop
+# Uitzetten) of tot de bediener afbreekt ("<plan>:lad_uit:abort" → "aborted", er is dan niets geschakeld).
+# Dit is alleen een controle bij het opstarten en afsluiten, geen blijvende vergrendeling.
+#
 # Per stap wordt 20 s op de terugmelding gewacht. Komt die niet, dan zet het script de
 # status op "timeout" maar BLIJFT het wachten. De kaart vraagt dan: terugdraaien of
 # blijven wachten. Komt de terugmelding alsnog, dan gaat het script gewoon verder.
@@ -15,17 +20,20 @@
 # omgekeerde volgorde, en stopt.
 #
 # Status (input_text.energy_inverters_status) = "<plan>:<stap>:<toestand>"
-#   plan      de stappen van deze run, in volgorde, bijv. "battery,shore"
-#   stap      battery | shore | generator (leeg bij complete)
-#   toestand  busy         stap loopt, wacht op de terugmelding
+#   plan      de stappen van deze run, in volgorde, bijv. "lad_uit,battery,shore"
+#   stap      lad_uit | battery | shore | generator (leeg bij complete)
+#   toestand  fix          (lad_uit) Charge batteries staat aan; wacht tot hij uit is of op abort
+#             aborted      afgebroken door de bediener in stap lad_uit, script gestopt
+#             busy         stap loopt, wacht op de terugmelding
 #             timeout      geen terugmelding binnen 20 s; het script wacht door
 #             rollback     (geschreven door de kaart) de gebruiker wil terugdraaien
 #             rolling_back het script draait terug
 #             rolled_back  teruggedraaid, script gestopt
 #             unavailable  gekozen bron is niet beschikbaar: niets geschakeld
 #             complete     alle stappen gelukt
-# Voorbeelden: "battery,shore:battery:busy", "battery,generator:generator:timeout",
-#              "battery,shore::complete", "shore,battery:shore:busy" (afsluiten).
+# Voorbeelden: "lad_uit,battery,shore:lad_uit:fix", "lad_uit,battery,shore:battery:busy",
+#              "lad_uit,battery,generator:generator:timeout", "lad_uit,battery,shore::complete",
+#              "lad_uit,shore,battery:shore:busy" (afsluiten).
 
 input_text:
   energy_inverters_status:
@@ -38,7 +46,7 @@ script:
   energy_inverters_opstarten:
     alias: Energy Inverters opstarten
     description: >-
-      Koppelt eerst de accu (battery connect) en wacht tot het BMS aan is, daarna
+      Controleert dat Charge batteries uit staat. Koppelt dan de accu (battery connect) en wacht tot het BMS aan is, daarna
       (naar keuze) walstroom of generator en wacht tot die gekoppeld is. Na 20 s zonder
       terugmelding vraagt de kaart: terugdraaien of blijven wachten.
     icon: mdi:flash
@@ -69,9 +77,10 @@ script:
       beschikbaar:
         shore: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on
         generator: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
+      laden: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2
       extern: "{{ bron in ['shore', 'generator'] }}"
       stappen: "{{ ['battery'] + ([bron] if extern else []) }}"
-      plan: "{{ stappen | join(',') }}"
+      plan: "{{ (['lad_uit'] + stappen) | join(',') }}"
     sequence:
       # gekozen bron moet beschikbaar zijn (de kaart laat alleen beschikbare bronnen kiezen; dit is de tweede controle)
       - if:
@@ -82,6 +91,24 @@ script:
             target: { entity_id: "{{ status }}" }
             data: { value: "{{ plan }}:{{ bron }}:unavailable" }
           - stop: Gekozen bron is niet beschikbaar
+
+      # Charge batteries moet uit zijn (alleen tijdens het opstarten gecontroleerd)
+      - if:
+          - condition: template
+            value_template: "{{ is_state(laden, 'on') }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:lad_uit:fix" }
+          - wait_template: "{{ is_state(laden, 'off') or states(status) == plan ~ ':lad_uit:abort' }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':lad_uit:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:lad_uit:aborted" }
+              - stop: Afgebroken door de bediener
 
       - repeat:
           for_each: "{{ stappen }}"
@@ -134,7 +161,7 @@ script:
   energy_inverters_afsluiten:
     alias: Energy Inverters afsluiten
     description: >-
-      Ontkoppelt eerst de externe voeding die gekoppeld is (walstroom en/of generator)
+      Controleert dat Charge batteries uit staat. Ontkoppelt dan de externe voeding die gekoppeld is (walstroom en/of generator)
       en wacht tot die offline is, daarna de accu (battery connect) en wacht tot het BMS
       uit is. Na 20 s zonder terugmelding vraagt de kaart: terugdraaien of blijven wachten.
     icon: mdi:flash-off
@@ -155,8 +182,27 @@ script:
         {{ (['shore'] if is_state(terugmelding.shore, 'on') or is_state(schakelaar.shore, 'on') else [])
            + (['generator'] if is_state(terugmelding.generator, 'on') or is_state(schakelaar.generator, 'on') else [])
            + ['battery'] }}
-      plan: "{{ stappen | join(',') }}"
+      laden: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2
+      plan: "{{ (['lad_uit'] + stappen) | join(',') }}"
     sequence:
+      # Charge batteries moet uit zijn (alleen tijdens het afsluiten gecontroleerd)
+      - if:
+          - condition: template
+            value_template: "{{ is_state(laden, 'on') }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:lad_uit:fix" }
+          - wait_template: "{{ is_state(laden, 'off') or states(status) == plan ~ ':lad_uit:abort' }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':lad_uit:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:lad_uit:aborted" }
+              - stop: Afgebroken door de bediener
+
       - repeat:
           for_each: "{{ stappen }}"
           sequence:

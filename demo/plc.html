@@ -80,7 +80,6 @@
         "switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2": st("off"),
         "switch.wago_energy_controls_wago_energy_controls_shore_supply_2": st("on"),
         "switch.wago_energy_controls_wago_energy_controls_generator_2": st("off"),
-        "switch.er_zeewaterpomp_cooling": st("off"),
         "binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on": st("off"),
         "binary_sensor.wago_energy_controls_wago_energy_controls_bms_charging_mode": st("off"),
         "binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on": st("off"),
@@ -168,14 +167,22 @@
             const fail = new URLSearchParams(location.search).get("ei_fail");
             const on = eiScript[1] === "opstarten";
             const bron = data.variables?.bron || "battery";
-            const plan = on ? (bron === "battery" ? ["battery"] : ["battery", bron])
+            const steps = on ? (bron === "battery" ? ["battery"] : ["battery", bron])
               : [...["shore", "generator"].filter((k) => states[conn[k]].state === "on"), "battery"];
+            const plan = ["lad_uit", ...steps];
+            const laden = `switch.${E}charge_batteries_2`;
             const set = (v) => { states["input_text.energy_inverters_status"] = st(v); push(); };
             states[id] = st("on");
             (async () => {
               const wait = (ms) => new Promise((r) => setTimeout(r, ms));
               const want = on ? "on" : "off";
-              for (const [i, k] of plan.entries()) {
+              // Charge batteries must be off first; wait for it (button Uitzetten) or for abort
+              if (states[laden]?.state === "on") {
+                set(`${plan}:lad_uit:fix`);
+                while (states[laden].state === "on" && states["input_text.energy_inverters_status"].state !== `${plan}:lad_uit:abort`) await wait(200);
+                if (states[laden].state === "on") { set(`${plan}:lad_uit:aborted`); states[id] = st("off"); return push(); }
+              }
+              for (const [i, k] of steps.entries()) {
                 set(`${plan}:${k}:busy`);
                 if (fail === k) {
                   await wait(20000 / (+new URLSearchParams(location.search).get("ei_speed") || 1));
@@ -187,7 +194,7 @@
                   if (!respond) {
                     set(`${plan}:${k}:rolling_back`);
                     await wait(800);
-                    for (const j of plan.slice(0, i + 1).reverse()) { states[conn[j]] = st(on ? "off" : "on"); if (j === "battery") states["sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage"] = st(on ? 0 : 760, { unit_of_measurement: "V" }); }
+                    for (const j of steps.slice(0, i + 1).reverse()) { states[conn[j]] = st(on ? "off" : "on"); if (j === "battery") states["sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage"] = st(on ? 0 : 760, { unit_of_measurement: "V" }); }
                     set(`${plan}:${k}:rolled_back`);
                     states[id] = st("off");
                     return push();
@@ -207,7 +214,7 @@
             const E = "wago_energy_controls_wago_energy_controls_";
             const S = "input_text.generator_opstarten_status";
             const q = new URLSearchParams(location.search);
-            const plan = "main,dc,lad_uit,omv,pomp,start,wal_uit,gen,laden";
+            const plan = "main,dc,lad_uit,omv,start,wal_uit,gen,laden";
             const sw = { start: `switch.${E}manual_start_aux_generator_2`, wal_uit: `switch.${E}shore_supply_2`, gen: `switch.${E}generator_2`, laden: `switch.${E}charge_batteries_2` };
             const fb = { start: `binary_sensor.${E}generator_is_on`, wal_uit: `binary_sensor.${E}shore_supply_is_connected`, gen: `binary_sensor.${E}generator_is_connected`, laden: `binary_sensor.${E}bms_charging_mode` };
             const aan = { start: true, wal_uit: false, gen: true, laden: true };
@@ -229,7 +236,6 @@
               if (!(await check("dc", () => +states[`sensor.${E}dc_bus_voltage`]?.state >= 700))) return abort("dc");
               if (!(await check("lad_uit", () => is(sw.laden, "off")))) return abort("lad_uit");
               if ((await ask("omv", ["done", "abort"])) === "abort") return abort("omv");
-              if (!(await check("pomp", () => is("switch.er_zeewaterpomp_cooling", "on")))) return abort("pomp");
               let keuze = "al_aan";
               if (!is(fb.start, "on")) {
                 keuze = await ask("start", ["ha", "manual", "abort"]);

@@ -5,7 +5,7 @@
 
 alias: Energy Inverters afsluiten
 description: >-
-  Ontkoppelt eerst de externe voeding die gekoppeld is (walstroom en/of generator)
+  Controleert dat Charge batteries uit staat. Ontkoppelt dan de externe voeding die gekoppeld is (walstroom en/of generator)
   en wacht tot die offline is, daarna de accu (battery connect) en wacht tot het BMS
   uit is. Na 20 s zonder terugmelding vraagt de kaart: terugdraaien of blijven wachten.
 icon: mdi:flash-off
@@ -26,8 +26,27 @@ variables:
     {{ (['shore'] if is_state(terugmelding.shore, 'on') or is_state(schakelaar.shore, 'on') else [])
        + (['generator'] if is_state(terugmelding.generator, 'on') or is_state(schakelaar.generator, 'on') else [])
        + ['battery'] }}
-  plan: "{{ stappen | join(',') }}"
+  laden: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2
+  plan: "{{ (['lad_uit'] + stappen) | join(',') }}"
 sequence:
+  # Charge batteries moet uit zijn (alleen tijdens het afsluiten gecontroleerd)
+  - if:
+      - condition: template
+        value_template: "{{ is_state(laden, 'on') }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:lad_uit:fix" }
+      - wait_template: "{{ is_state(laden, 'off') or states(status) == plan ~ ':lad_uit:abort' }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':lad_uit:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:lad_uit:aborted" }
+          - stop: Afgebroken door de bediener
+
   - repeat:
       for_each: "{{ stappen }}"
       sequence:
