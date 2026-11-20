@@ -177,7 +177,8 @@ Systemen / Boegschroef;Jet pump 3 speed;meetwaarde;;sensor.er_thruster_status_je
 DC-bus;PLC lifebeat (interne communicatie PLC's);status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat;zeker;door de gebruiker opgegeven
 Diesel;Diesel clutch neutraal;status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr;zeker;door de gebruiker opgegeven
 Voortstuwing;Prepair Volvo Start;knop;automation.prepvolvostart;automation.prepvolvostart;zeker;uit het HA-dashboard van de gebruiker (09-11)
-Voortstuwing;Prepair Generator Start;knop;automation.prepgenstart;automation.prepgenstart;zeker;uit het HA-dashboard van de gebruiker (09-11)
+Generator;Prepare generator start;knop;automation.prepgenstart;automation.prepgenstart;zeker;uit het HA-dashboard van de gebruiker (09-11); op Voortstuwing sinds 20-11 vervangen door Generator opstarten
+Voortstuwing + Generator;Generator opstarten;knop;script.generator_opstarten;script.generator_opstarten;zeker;generated automations/generator_opstarten.yaml (20-11); status input_text.generator_opstarten_status
 Voortstuwing;Prepair Energy Inverters;knop;automation.plc_prep_inverters;;vervallen;11-11: vervangen door Energy Inverters opstarten (zelfde als op het Energie-overzicht)
 Energie;Generator beschikbaar;aan/uit;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on;binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on;zeker;opgegeven door de gebruiker (11-11); keuze in DC-bus opstarten
 Energie;Generator starten (DC-bus opstarten);knop;;;geen gevonden;nog niet geautomatiseerd (melding in het keuzevenster)

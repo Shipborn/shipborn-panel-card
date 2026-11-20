@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.45";
+const VERSION = "0.5.46";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -660,6 +660,20 @@ const TC_STYLE =
   .tc-progress li.is-late { border-color: var(--warn); }
   .tc-progress li.is-back .d-led { --c: var(--warn); }
   .tc-dialog-btns > [hidden] { display: none; }
+  .tc-progress li.is-act .d-led { --c: var(--warn); animation: tc-pulse 1s ease-in-out infinite; }
+  .tc-progress li.is-act { border-color: var(--warn); }
+  .tc-progress-watch li.is-fail .d-led { --c: var(--alarm); }
+  .tc-progress-watch li.is-fail { border-color: var(--alarm); }
+  .tc-progress-watch { margin-bottom: var(--space-2); }
+  .tc-pw, .tc-pw-l, .tc-pw-r { display: flex; flex-direction: column; gap: var(--space-3); width: 100%; align-items: center; }
+  .tc-pw-l { gap: 0; }
+  .tc-progress-acts[hidden], .tc-progress-img[hidden] { display: none; }
+  .tc-progress-img { max-width: 100%; max-height: 38vh; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface); }
+  .tc-dialog.tc-progress-wide { width: 900px; max-width: calc(100% - 32px); max-height: calc(100% - 32px); overflow: auto; }
+  .tc-progress-wide .tc-pw { display: grid; grid-template-columns: 320px 1fr; align-items: start; gap: var(--space-4); }
+  .tc-progress-wide .tc-progress li { padding: 6px var(--space-3); }
+  .tc-progress-wide .tc-progress-img { max-height: 46vh; }
+  @media (max-width: 700px) { .tc-progress-wide .tc-pw { grid-template-columns: 1fr; } }
   .tc-btn:disabled { opacity: .45; cursor: default; }
   .tc-web { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: #fff; }
   .tc-web iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
@@ -2248,34 +2262,60 @@ class ShipbornPanelCard extends HTMLElement {
   }
 
   // Progress window: follows a status helper written by an HA script, "<plan>:<step>:<state>" (plan = step keys
-  // in order, state busy / timeout / unavailable / complete). Each step of the plan gets a dot: green = done,
-  // pulsing = busy, red = no response, grey = still to come. complete shows `done` for done_ms (1 s) and closes.
-  // prev = the status before the script was started: until the status changes the window says "wordt gestart"
-  // (no clock comparison, so a tablet with the wrong time still works); prev null = follow the current status.
+  // in order). States: busy / ok (step done, short pause) / timeout / unavailable / complete, plus states that wait
+  // for the user (confirm, fix, manual, …: the step's own text, photo and buttons) and aborted. Each step of the plan
+  // gets a dot: green = done, pulsing = busy, red = no response, grey = still to come. complete shows `done` for
+  // done_ms (1 s) and closes. prev = the status before the script was started: until the status changes the window
+  // says "wordt gestart" (no clock comparison, so a tablet with the wrong time still works); prev null = follow the
+  // current status. Step buttons (steps.<key>.buttons): `value` writes "<plan>:<step>:<value>" into the helper (the
+  // script waits for it), `choice` / `tap_action` work as on a pushbutton (e.g. open another start window);
+  // `when` = the states in which the button shows (default confirm, fix). `watch` = lines that stay visible
+  // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
   _progress(b, prev) {
     const p = b.progress;
+    const steps = p.steps || {};
+    const wide = !!p.wide || Object.values(steps).some((s) => s?.image);
     const dlg = h("div", "tc-dlg");
     dlg.dataset.tcTheme = this._theme || "nacht";
-    const box = h("div", "tc-dialog tc-check");
-    box.innerHTML = '<div class="title"></div><ul class="tc-check-list tc-progress"></ul><p class="body tc-choice-note"></p>' +
+    const box = h("div", "tc-dialog tc-check" + (wide ? " tc-progress-wide" : ""));
+    box.innerHTML = '<div class="title"></div><div class="tc-pw"><div class="tc-pw-l"><ul class="tc-check-list tc-progress-watch"></ul>' +
+      '<ul class="tc-check-list tc-progress"></ul></div><div class="tc-pw-r"><img class="tc-progress-img" alt="" hidden>' +
+      '<p class="body tc-choice-note"></p><div class="tc-dialog-btns tc-progress-acts" hidden></div>' +
       '<div class="tc-dialog-btns"><button type="button" class="tc-btn label"></button><button type="button" class="tc-btn tc-btn-danger label" hidden></button>' +
-      '<button type="button" class="tc-btn tc-btn-primary label" hidden></button></div>';
+      '<button type="button" class="tc-btn tc-btn-primary label" hidden></button></div></div></div>';
     box.querySelector(".title").textContent = p.title || b.choice?.title || b.label || "";
-    const list = box.querySelector("ul");
+    const list = box.querySelector(".tc-progress");
+    const watchList = box.querySelector(".tc-progress-watch");
+    const img = box.querySelector(".tc-progress-img");
     const note = box.querySelector(".tc-choice-note");
-    const [close, rollback, wait] = box.querySelector(".tc-dialog-btns").children;
+    const acts = box.querySelector(".tc-progress-acts");
+    const [close, rollback, wait] = box.querySelector(".tc-dialog-btns:not(.tc-progress-acts)").children;
     close.textContent = p.close || "Sluiten";
     rollback.textContent = p.rollback || "Terugdraaien";
     wait.textContent = p.keep_waiting || "Blijven wachten";
+    const watch = (p.watch || []).map((w) => {
+      const li = h("li");
+      li.innerHTML = '<span class="d-led on"></span><span class="label"></span><span class="caption tc-check-st"></span>';
+      li.children[1].textContent = w.label || w.entity;
+      watchList.appendChild(li);
+      return [li, w];
+    });
+    if (!watch.length) watchList.remove();
     const t0 = Date.now();
     let started = !prev;
     let shownPlan = null;
+    let shownActs = null;
     let closing = null;
     let choosing = false;
     let cur_ = {};
     const waited = new Set(); // "plan:step" for which the user chose to keep waiting
-    const steps = p.steps || {};
+    const BUILTIN = ["busy", "ok", "timeout", "unavailable", "complete", "aborted", "rollback", "rolling_back", "rolled_back"];
     const paint = (hass) => {
+      for (const [li, w] of watch) {
+        const on = activeOf(hass, w.entity, w);
+        li.className = on ? "is-ok" : "is-fail";
+        li.children[2].textContent = on ? w.text_on || "AAN" : w.text_off || "UIT";
+      }
       const so = hass.states[p.entity];
       if (!started && so && (so.state !== prev?.state || so.last_changed !== prev?.last_changed)) started = true;
       if (!started) {
@@ -2298,26 +2338,62 @@ class ShipbornPanelCard extends HTMLElement {
       const at = st === "complete" ? keys.length : keys.indexOf(cur);
       const back = /^roll/.test(st); // rollback (asked), rolling_back, rolled_back
       const late = st === "timeout" && waited.has(plan + ":" + cur);
-      [...list.children].forEach((li, i) => {
-        const s = back ? (i <= at ? "back" : "wait") : i < at ? "ok" : i > at ? "wait" : st === "busy" ? "busy" : st === "timeout" ? (late ? "late" : "fail") : "fail";
-        li.className = "is-" + s;
-        li.children[2].textContent = { ok: "OK", wait: "", busy: "BEZIG", late: "WACHT", back: st === "rolled_back" ? "TERUG" : "…",
-          fail: st === "unavailable" ? "NIET BESCHIKBAAR" : "GEEN REACTIE" }[s];
-      });
+      const user = !!st && !BUILTIN.includes(st); // waits for the user: confirm, fix, manual, …
       const step = steps[cur] || {};
+      [...list.children].forEach((li, i) => {
+        const s = back ? (i <= at ? "back" : "wait") : i < at || (i === at && st === "ok") ? "ok" : i > at ? "wait"
+          : st === "busy" ? "busy" : user ? "act" : st === "timeout" ? (late ? "late" : "fail") : "fail";
+        li.className = "is-" + s;
+        li.children[2].textContent = { ok: "OK", wait: "", busy: "BEZIG", act: step.caption?.[st] || "ACTIE", late: "WACHT",
+          back: st === "rolled_back" ? "TERUG" : "…", fail: st === "unavailable" ? "NIET BESCHIKBAAR" : st === "aborted" ? "AFGEBROKEN" : "GEEN REACTIE" }[s];
+      });
       const label = step.label || cur;
+      const tmo = step.timeout ?? p.timeout ?? 20;
       const msg = {
         busy: step.busy || "",
+        ok: step.ok || "",
         timeout: late ? step.late || p.late || "Wacht op reactie … Terugdraaien kan nog steeds."
-          : step.fail || `${label}: geen reactie binnen ${p.timeout ?? 20} s. Terugdraaien of blijven wachten?`,
+          : step.fail || `${label}: geen reactie binnen ${tmo} s. Terugdraaien of blijven wachten?`,
         rollback: p.rolling_back || "Wordt teruggedraaid …",
         rolling_back: p.rolling_back || "Wordt teruggedraaid …",
         rolled_back: p.rolled_back || "Teruggedraaid: alles van deze opdracht staat weer zoals het was.",
         unavailable: step.unavailable || `${label}: niet beschikbaar. Er is niets geschakeld.`,
+        aborted: p.aborted || "Afgebroken.",
         complete: p.done || "Gereed",
-      }[st] ?? (keys.length ? "" : p.idle || "Geen lopende opdracht.");
+      }[st] ?? (user ? step[st] || "" : keys.length ? "" : p.idle || "Geen lopende opdracht.");
       note.textContent = msg;
-      note.className = "body tc-choice-note" + (st === "complete" ? " is-ok" : (st === "timeout" && !late) || st === "unavailable" ? " is-bad" : late || back ? " is-warn" : "");
+      note.className = "body tc-choice-note" + (st === "complete" || st === "ok" ? " is-ok" : (st === "timeout" && !late) || st === "unavailable" || st === "aborted" ? " is-bad" : late || back || user ? " is-warn" : "");
+      // photo of the current step (not after the end)
+      const src = st !== "complete" && st !== "aborted" && !back ? step.image : null;
+      if (src) { if (img.getAttribute("src") !== src) img.src = src; img.hidden = false; }
+      else img.hidden = true;
+      // step buttons for this state; rebuilt only when plan, step or state changes
+      const actKey = plan + ":" + cur + ":" + st;
+      if (actKey !== shownActs) {
+        shownActs = actKey;
+        const btns = (step.buttons || []).filter((x) => [].concat(x.when || ["confirm", "fix"]).includes(st));
+        acts.replaceChildren(...btns.map((x) => {
+          const el = h("button", "tc-btn label" + (x.style === "danger" ? " tc-btn-danger" : x.style === "plain" ? "" : " tc-btn-primary"));
+          el.type = "button";
+          el.textContent = x.label || x.value || "";
+          el.addEventListener("click", async (ev) => {
+            ev.stopPropagation();
+            if (!this._hass) return;
+            fire(this, "haptic", "light");
+            if (x.value) {
+              [...acts.children].forEach((c) => (c.disabled = true));
+              this._hass.callService("input_text", "set_value", { entity_id: p.entity, value: `${plan}:${cur}:${x.value}` });
+            } else if (x.choice) this._progressBusy(x) ? this._progress(x, null) : this._choice(x);
+            else if (x.tap_action) {
+              const prev2 = x.progress && this._hass.states[x.progress.entity];
+              if ((await this._handleAction(x, x.tap_action, el)) !== false && x.progress) this._progress(x, prev2);
+            }
+          });
+          return el;
+        }));
+        acts.style.gridTemplateColumns = btns.length ? `repeat(${Math.min(btns.length, 3)}, 1fr)` : "";
+        acts.hidden = !btns.length;
+      }
       // timeout: first a choice (no Sluiten), after "Blijven wachten" Sluiten + Terugdraaien
       choosing = st === "timeout" && !late;
       close.hidden = choosing;

@@ -31,6 +31,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(204)
         self.end_headers()
 
+    # /local/… is HA's /config/www/…: served from www/ in the repo (copies of the photos), like in HA
+    def translate_path(self, path):
+        if path.startswith("/local/"):
+            path = "/www/" + path[len("/local/"):]
+        return super().translate_path(path)
+
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
         super().end_headers()

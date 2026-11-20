@@ -1,0 +1,282 @@
+# Generator opstarten – TC90
+#
+# Package voor Home Assistant: een statushelper en een script. De knop "Generator opstarten" (Voortstuwing en
+# Generator) in de Shipborn Panel Card start dit script en toont de stappen live in een venster, met foto's bij
+# de handelingen, aan de hand van input_text.generator_opstarten_status.
+# Zonder packages: script_generator_opstarten.yaml in de UI plakken en de helper in de UI maken (zie README.md).
+# Houd dat bestand gelijk met dit bestand.
+#
+# Stappen (plan, vaste volgorde):
+#   main     mainswitch staat op "Direct van wal"            bediener tikt Gedaan (foto DirectvanWal.png)
+#   dc       DC-bus aan (≥ 700 V)                            zo niet: knop Start DC-bus (Energy Inverters-venster)
+#   lad_uit  Charge batteries uit                            zo niet: knop Uitzetten
+#   omv      switches naar de omvormers                      bediener tikt Gedaan (foto VanafOmvormerPLC.png)
+#   pomp     zeewaterpomp glycol aan                         zo niet: knop Aanzetten
+#   start    generator starten: keuze Via HA of Handmatig    wacht op generator_is_on (+2 s)
+#            Via HA: manual_start_aux_generator_2 aan (blijft aan), 60 s; Handmatig: onbeperkt wachten
+#   wal_uit  walstroom-drive uit (shore_supply_2 uit)        wacht tot shore_supply_is_connected uit (+2 s), 20 s
+#   gen      generator-drive aan (generator_2 aan)           wacht op generator_is_connected (+2 s), 20 s
+#   laden    accu laden aan (charge_batteries_2 aan)         wacht op bms_charging_mode (+2 s), 20 s
+# In de stappen main t/m start kan de bediener afbreken (dan is er door het script nog niets geschakeld).
+# Bij een timeout (start via HA, wal_uit, gen, laden) wacht het script door; de kaart vraagt terugdraaien of
+# blijven wachten. Terugdraaien zet terug wat het script in deze run geschakeld heeft, laatste eerst
+# (laden uit, generator-drive uit, walstroom-drive aan, generator-request uit). Een DC-bus die in stap dc via
+# het Energy Inverters-venster is opgestart, blijft aan (dat is een eigen script).
+#
+# Status (input_text.generator_opstarten_status) = "<plan>:<stap>:<toestand>"
+#   toestand  confirm      wacht op de bediener (Gedaan / keuze); de kaart schrijft "<plan>:<stap>:<antwoord>"
+#                          terug: done, ha, manual of abort
+#             fix          controle klopt niet; wacht tot hij klopt (de kaart biedt een knop) of op abort
+#             manual       wacht tot de generator handmatig gestart is (geen timeout)
+#             busy         stap loopt, wacht op de terugmelding
+#             ok           terugmelding binnen; 2 s pauze zodat het zichtbaar is
+#             timeout      geen terugmelding binnen de wachttijd; het script wacht door
+#             rollback     (geschreven door de kaart) de gebruiker wil terugdraaien
+#             rolling_back / rolled_back   het script draait terug / is teruggedraaid en gestopt
+#             aborted      afgebroken door de bediener, script gestopt
+#             complete     alle stappen gelukt (stap leeg)
+
+input_text:
+  generator_opstarten_status:
+    name: Generator opstarten status
+    max: 255
+    initial: ""          # na een herstart leeg
+
+script:
+  generator_opstarten:
+    alias: Generator opstarten
+    description: >-
+      Loopt met de bediener de opstart van de generator door: mainswitch, DC-bus, laden uit, switches naar de
+      omvormers, zeewaterpomp glycol, generator starten (via HA of handmatig), walstroom-drive uit,
+      generator-drive aan en accu laden aan. Status in input_text.generator_opstarten_status.
+    icon: mdi:engine
+    mode: single
+    max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
+    variables:
+      status: input_text.generator_opstarten_status
+      plan: "main,dc,lad_uit,omv,pomp,start,wal_uit,gen,laden"
+      dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+      pomp: switch.er_zeewaterpomp_cooling
+      generator_aan: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
+      schakelaar:
+        start: switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2
+        wal_uit: switch.wago_energy_controls_wago_energy_controls_shore_supply_2
+        gen: switch.wago_energy_controls_wago_energy_controls_generator_2
+        laden: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2
+      terugmelding:
+        start: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
+        wal_uit: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_connected
+        gen: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_connected
+        laden: binary_sensor.wago_energy_controls_wago_energy_controls_bms_charging_mode
+      aanzetten:           # true = de stap zet zijn schakelaar aan, false = uit
+        start: true
+        wal_uit: false
+        gen: true
+        laden: true
+      wachttijd:           # seconden tot de kaart terugdraaien / blijven wachten aanbiedt
+        start: 60
+        wal_uit: 20
+        gen: 20
+        laden: 20
+    sequence:
+      # ---------- 1. mainswitch op "Direct van wal" (handeling, met foto) ----------
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:main:confirm" }
+      - wait_template: "{{ states(status) in [plan ~ ':main:done', plan ~ ':main:abort'] }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':main:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:main:aborted" }
+          - stop: Afgebroken door de bediener
+
+      # ---------- 2a. DC-bus aan (≥ 700 V); anders start de bediener hem via het Energy Inverters-venster ----------
+      - if:
+          - condition: template
+            value_template: "{{ states(dc_bus) | float(0) < 700 }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:dc:fix" }
+          - wait_template: "{{ states(dc_bus) | float(0) >= 700 or states(status) == plan ~ ':dc:abort' }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':dc:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:dc:aborted" }
+              - stop: Afgebroken door de bediener
+
+      # ---------- 2b. Charge batteries moet uit zijn ----------
+      - if:
+          - condition: template
+            value_template: "{{ is_state(schakelaar.laden, 'on') }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:lad_uit:fix" }
+          - wait_template: "{{ is_state(schakelaar.laden, 'off') or states(status) == plan ~ ':lad_uit:abort' }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':lad_uit:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:lad_uit:aborted" }
+              - stop: Afgebroken door de bediener
+
+      # ---------- 3. switches naar de omvormers (handeling, met foto) ----------
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:omv:confirm" }
+      - wait_template: "{{ states(status) in [plan ~ ':omv:done', plan ~ ':omv:abort'] }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':omv:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:omv:aborted" }
+          - stop: Afgebroken door de bediener
+
+      # ---------- 4. zeewaterpomp glycol moet aan staan (de kaart toont hem de hele tijd) ----------
+      - if:
+          - condition: template
+            value_template: "{{ not is_state(pomp, 'on') }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:pomp:fix" }
+          - wait_template: "{{ is_state(pomp, 'on') or states(status) == plan ~ ':pomp:abort' }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':pomp:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:pomp:aborted" }
+              - stop: Afgebroken door de bediener
+
+      # ---------- 5. generator starten: keuze via HA of handmatig (overgeslagen als hij al draait) ----------
+      - if:
+          - condition: template
+            value_template: "{{ not is_state(generator_aan, 'on') }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:start:confirm" }
+          - wait_template: "{{ states(status) in [plan ~ ':start:ha', plan ~ ':start:manual', plan ~ ':start:abort'] }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':start:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:start:aborted" }
+              - stop: Afgebroken door de bediener
+      # ha / manual, of "al_aan" als de keuze niet gevraagd is
+      - variables:
+          keuze: "{{ states(status).split(':')[2] if states(status).split(':')[1] == 'start' else 'al_aan' }}"
+      # handmatig: onbeperkt wachten tot de generator draait (afbreken kan)
+      - if:
+          - condition: template
+            value_template: "{{ keuze == 'manual' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:start:manual" }
+          - wait_template: "{{ is_state(generator_aan, 'on') or states(status) == plan ~ ':start:abort' }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':start:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:start:aborted" }
+              - stop: Afgebroken door de bediener
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:start:ok" }
+          - delay: 2
+
+      # ---------- 5 (via HA) t/m 8: schakelen en wachten op de terugmelding ----------
+      # Alleen de stappen die echt iets veranderen; die worden bij terugdraaien ook teruggezet.
+      - variables:
+          stappen: >-
+            {%- set ns = namespace(l=[]) -%}
+            {%- for s in (['start'] if keuze == 'ha' else []) + ['wal_uit', 'gen', 'laden'] -%}
+              {%- set doel = 'on' if aanzetten[s] else 'off' -%}
+              {%- if not is_state(schakelaar[s], doel) or not is_state(terugmelding[s], doel) -%}
+                {%- set ns.l = ns.l + [s] -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ ns.l }}
+      - repeat:
+          for_each: "{{ stappen }}"
+          sequence:
+            - variables:
+                stap: "{{ repeat.item }}"
+                nr: "{{ repeat.index }}"
+                doel: "{{ 'on' if aanzetten[repeat.item] else 'off' }}"
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:{{ stap }}:busy" }
+            - if:
+                - condition: template
+                  value_template: "{{ aanzetten[stap] }}"
+              then:
+                - action: switch.turn_on
+                  target: { entity_id: "{{ schakelaar[stap] }}" }
+              else:
+                - action: switch.turn_off
+                  target: { entity_id: "{{ schakelaar[stap] }}" }
+            - wait_template: "{{ is_state(terugmelding[stap], doel) }}"
+              timeout: "{{ wachttijd[stap] }}"
+              continue_on_timeout: true
+            - if:
+                - condition: template
+                  value_template: "{{ not wait.completed }}"
+              then:
+                # geen reactie: melden en doorwachten tot de terugmelding of tot de gebruiker terugdraait
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:{{ stap }}:timeout" }
+                - wait_template: >-
+                    {{ is_state(terugmelding[stap], doel)
+                       or states(status) == plan ~ ':' ~ stap ~ ':rollback' }}
+                - if:
+                    - condition: template
+                      value_template: "{{ not is_state(terugmelding[stap], doel) }}"
+                  then:
+                    # terugdraaien: alles wat dit script schakelde terug, laatste eerst
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:{{ stap }}:rolling_back" }
+                    - repeat:
+                        for_each: "{{ stappen[:nr] | reverse | list }}"
+                        sequence:
+                          - if:
+                              - condition: template
+                                value_template: "{{ aanzetten[repeat.item] }}"
+                            then:
+                              - action: switch.turn_off
+                                target: { entity_id: "{{ schakelaar[repeat.item] }}" }
+                            else:
+                              - action: switch.turn_on
+                                target: { entity_id: "{{ schakelaar[repeat.item] }}" }
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:{{ stap }}:rolled_back" }
+                    - stop: Teruggedraaid op verzoek van de gebruiker
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:{{ stap }}:ok" }
+            - delay: 2
+
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}::complete" }

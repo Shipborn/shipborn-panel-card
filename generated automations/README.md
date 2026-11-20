@@ -7,6 +7,8 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 | `script_energy_inverters_opstarten.yaml` | Het script *opstarten*, klaar om te plakken in de script-editor van HA (YAML-modus). |
 | `script_energy_inverters_afsluiten.yaml` | Het script *afsluiten*, idem. |
 | `energy_inverters.yaml` | Alles in één package (alleen nodig als HA packages gebruikt): `input_text.energy_inverters_status` + scripts `script.energy_inverters_opstarten` (veld `bron`: `shore` / `generator` / `battery`) en `script.energy_inverters_afsluiten`. |
+| `script_generator_opstarten.yaml` | Het script *Generator opstarten*, klaar om te plakken. |
+| `generator_opstarten.yaml` | Package: `input_text.generator_opstarten_status` + `script.generator_opstarten`, met bovenaan de uitleg van stappen en status. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
 
@@ -25,6 +27,26 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 3. Ook hier geldt per stap 20 s, met dezelfde keuze; terugdraaien zet weer aan wat bij dit afsluiten is uitgezet.
 
 Het groene bolletje in de knop *Energy Inverters opstarten* staat los van het script: het is groen zolang de DC-bus > 700 V is.
+
+## Generator opstarten
+
+Knop *Generator opstarten* op Voortstuwing (vak Generator, in plaats van *Prepair Generator Start*) en op de pagina Generator (naast *Prepare generator start*). Het script loopt de stappen door; het venster toont ze, met de zeewaterpomp glycol bovenaan (AAN/UIT, de hele tijd zichtbaar):
+
+1. **Mainswitch op direct van wal**: foto `DirectvanWal.png`, de bediener tikt *Gedaan*.
+2. **DC-bus aan** (≥ 700 V): staat hij uit, dan opent *Start DC-bus* het gewone Energy Inverters-venster; daarna gaat het vanzelf verder. **Charge batteries uit**: staat hij aan, dan zet *Uitzetten* hem uit.
+3. **Switches naar de omvormers**: foto `VanafOmvormerPLC.png`, *Gedaan*.
+4. **Zeewaterpomp glycol aan**: staat hij uit, dan zet *Aanzetten* hem aan.
+5. **Generator starten**: keuze *Via HA* (`switch.…manual_start_aux_generator_2` aan, blijft aan; 60 s) of *Handmatig* (aan het lokale paneel; geen tijdslimiet). Wacht op `…generator_is_on`, dan 2 s.
+6. **Walstroom-drive uit** (`switch.…shore_supply_2` uit), wacht tot `…shore_supply_is_connected` uit is, dan 2 s. De boot draait nu op de accu.
+7. **Generator-drive aan** (`switch.…generator_2` aan), wacht op `…generator_is_connected`, dan 2 s.
+8. **Accu laden aan** (`switch.…charge_batteries_2` aan), wacht op `…bms_charging_mode`, dan 2 s.
+9. 1 s *Generator online*, daarna sluit het venster.
+
+In stap 1–5 kan de bediener *Afbreken* (het script heeft dan nog niets geschakeld). Bij 6–8 (en de start via HA) volgt na 20 s (60 s) zonder terugmelding de keuze *Terugdraaien* of *Blijven wachten*; terugdraaien zet terug wat het script in deze run schakelde, laatste eerst. Stappen die al goed staan worden overgeslagen; draait de generator al, dan vervalt de keuze in stap 5.
+
+**Foto's:** in HA in `/config/www/Pictures/Instructions/` (adres `/local/Pictures/Instructions/…`; hoofdlettergevoelig). Zet kopieën in `www/Pictures/Instructions/` in de dagmap: de demo (`demo/edit_server.py`) serveert `/local/` uit die map, zoals HA.
+
+**Installeren:** helper *Tekst* met naam `Generator opstarten status`, maximale lengte **255**, entiteit `input_text.generator_opstarten_status`; daarna een nieuw script met de inhoud van `script_generator_opstarten.yaml` (entiteit `script.generator_opstarten`), zoals hieronder bij de Energy Inverters.
 
 ## Installeren in Home Assistant
 
