@@ -176,7 +176,7 @@ Systemen / Boegschroef;Jet pump 3 output;meetwaarde;;sensor.er_thruster_status_j
 Systemen / Boegschroef;Jet pump 3 speed;meetwaarde;;sensor.er_thruster_status_jet_pump_3_speed;zeker;ER_Thruster_Status
 DC-bus;PLC lifebeat (interne communicatie PLC's);status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat;zeker;door de gebruiker opgegeven
 Diesel;Diesel clutch neutraal;status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr;zeker;door de gebruiker opgegeven
-Voortstuwing en Diesel;Start Volvo (was Prepair Volvo Start);knop;script.diesel_opstarten;script.diesel_opstarten;zeker;begeleid opstarten (23-11); stap Voorbereiden start automation.prepvolvostart
+Voortstuwing en Diesel;Start Diesel (was Prepair Volvo Start);knop;script.diesel_opstarten;script.diesel_opstarten;zeker;begeleid opstarten (23-11); stap Voorbereiden start automation.prepvolvostart
 Generator;Prepare generator start;knop;automation.prepgenstart;automation.prepgenstart;zeker;uit het HA-dashboard van de gebruiker (09-11); op Voortstuwing sinds 20-11 vervangen door Generator opstarten
 Voortstuwing + Generator;Generator opstarten;knop;script.generator_opstarten;script.generator_opstarten;zeker;generated automations/generator_opstarten.yaml (20-11); status input_text.generator_opstarten_status
 Voortstuwing;Prepair Energy Inverters;knop;automation.plc_prep_inverters;;vervallen;11-11: vervangen door Energy Inverters opstarten (zelfde als op het Energie-overzicht)
@@ -185,3 +185,5 @@ Energie;Generator starten (DC-bus opstarten);knop;;;geen gevonden;nog niet geaut
 Klimaat / Instellingen;Compressor ER modus (heating/cooling only);status;sensor.plc_compressor_er_mode;sensor.webasto_bluecool_connect_compressor_engine_room_operation_mode_feedback;zeker;opgegeven door gebruiker 19-11-2026; knoppen zetten select.webasto_bluecool_connect_compressor_engine_room_operation_mode op F2 Heating / F1 Cooling
 Energie / Energy Inverters;Status opstarten/afsluiten (voortgangsvenster);status;;input_text.energy_inverters_status;zeker;aangemaakt door generated automations/energy_inverters.yaml (18-11-2026); moet nog in HA geïnstalleerd worden
 Energie / Energy Inverters;Accu online (opstarten/afsluiten);status;;binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on;zeker;opgegeven door gebruiker 18-11-2026
+Voortstuwing en Diesel;Stop Diesel;knop;script.diesel_stoppen;script.diesel_stoppen;zeker;begeleid stoppen (23-11)
+Voortstuwing en Diesel;Vaarmodus Haven / Anker / Zeilen;status;input_select.vaarmodus_haven;input_select.vaarmodus_haven;zeker;alleen in HA; op de PLC alle drie havenmodus (23-11)

@@ -11,8 +11,10 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 | `generator_opstarten.yaml` | Package: `input_text.generator_opstarten_status` + `script.generator_opstarten`, met bovenaan de uitleg van stappen en status. |
 | `script_generator_afsluiten.yaml` | Het script *Generator afsluiten*, klaar om te plakken (geen eigen helper). |
 | `generator_afsluiten.yaml` | Package: `script.generator_afsluiten` (gebruikt `input_text.generator_opstarten_status`), met bovenaan de uitleg. |
-| `script_diesel_opstarten.yaml` | Het script achter *Start Volvo*, klaar om te plakken. |
+| `script_diesel_opstarten.yaml` | Het script achter *Start Diesel*, klaar om te plakken. |
 | `diesel_opstarten.yaml` | Package: `input_text.diesel_opstarten_status` + `script.diesel_opstarten`, met bovenaan de uitleg. |
+| `script_diesel_stoppen.yaml` / `diesel_stoppen.yaml` | Het script achter *Stop Diesel*: om te plakken / als package. |
+| `script_vaarmodus_kiezen.yaml`, `automation_vaarmodus_haven.yaml` / `vaarmodus.yaml` | Vaarmodus Haven, Anker en Zeilen: script en automation om te plakken / alles als package met de helper. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
 
@@ -70,21 +72,36 @@ In stap 1–3 kan de bediener afbreken (er is dan niets geschakeld). Bij 4–6 v
 
 **Installeren:** alleen een nieuw script met de inhoud van `script_generator_afsluiten.yaml` (entiteit `script.generator_afsluiten`). Het gebruikt de helper van Generator opstarten.
 
-## Start Volvo (diesel opstarten)
+## Vaarmodus Haven, Anker en Zeilen
 
-Knop *Start Volvo* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op de pagina Diesel (vak *Propulsion mode*). Zolang het script loopt is er geen *Sluiten*.
+De PLC kent alleen havenmodus. Anker en Zeilen bestaan alleen in HA: alle drie zetten de PLC in havenmodus, en `input_select.vaarmodus_haven` onthoudt de keuze (`Geen` = de PLC staat niet in havenmodus). `script.vaarmodus_kiezen` zet de keuze en drukt zo nodig de havenknop in; de automation *Vaarmodus haven volgt PLC* houdt de helper gelijk aan de PLC.
+
+**Installeren:** helper *Keuzelijst* met naam `Vaarmodus haven` en opties `Geen`, `Haven`, `Anker`, `Zeilen` (entiteit `input_select.vaarmodus_haven`); een nieuw script met `script_vaarmodus_kiezen.yaml`; een nieuwe automatisering met `automation_vaarmodus_haven.yaml`.
+
+## Start Diesel
+
+Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op de pagina Diesel (vak *Propulsion mode*). Zolang het script loopt is er geen *Sluiten*.
 
 1. **Systemen voorbereiden**: het venster toont inlaat, uitlaat, wierpot aft en front, zeewaterpomp glycol, koelwaterflow (≥ 2,5), compressor en compressordruk (≥ 3 bar). Staat niet alles goed, dan start *Voorbereiden* `automation.prepvolvostart`; het script gaat verder zodra alles groen is.
 2. **Motor starten**: foto `VolvoAanUit.jpeg`. Het script wacht onbeperkt op `…diesel_running`, dan 2 s.
 3. **Noodstop en handle**: foto `Volvohandle.jpeg`, de bediener tikt *Gedaan*.
-4. **Vaarmodus diesel**: alleen via de knop *Diesel selecteren* (verplicht). Wacht op `…diesel_mode`, na 20 s *Opnieuw* of *Afbreken*.
-5. 1 s *Volvo online*, daarna sluit het venster.
+4. **Vaarmodus kiezen**: *Diesel*, *Zeilen* of *Anker* (verplicht). Na 20 s zonder terugmelding opnieuw kiezen of afbreken.
+5. 1 s *Diesel online*, daarna sluit het venster.
 
-*Afbreken* kan in elke stap en zet niets terug: open kleppen, pompen en een draaiende motor blijven zoals ze zijn.
+*Afbreken* kan in elke stap en zet niets terug. Staat de motor dan zeker stil (`diesel_running` uit en < 50 rpm) en is inlaat of uitlaat open, dan biedt het venster *Inlaat en uitlaat dicht* (alleen `…_l4` en `…_l3`).
 
-**Foto's:** `VolvoAanUit.jpeg` en `Volvohandle.jpeg` in `/homeassistant/www/Pictures/Instructions/` (hoofdlettergevoelig).
+**Installeren:** helper *Tekst* met naam `Diesel opstarten status`, maximale lengte **255**, entiteit `input_text.diesel_opstarten_status`; daarna een nieuw script met `script_diesel_opstarten.yaml` (entiteit `script.diesel_opstarten`). Foto's `VolvoAanUit.jpeg` en `Volvohandle.jpeg` in `/homeassistant/www/Pictures/Instructions/` (hoofdlettergevoelig).
 
-**Installeren:** helper *Tekst* met naam `Diesel opstarten status`, maximale lengte **255**, entiteit `input_text.diesel_opstarten_status`; daarna een nieuw script met de inhoud van `script_diesel_opstarten.yaml` (entiteit `script.diesel_opstarten`).
+## Stop Diesel
+
+Knop *Stop Diesel* onder *Start Diesel*, op Voortstuwing en Diesel. Zelfde helper als Start Diesel.
+
+1. **Stopknop**: foto `VolvoAanUit.jpeg`. Het script wacht tot `…diesel_running` uit is en de motor onder 50 rpm draait, dan 2 s.
+2. **Contact uit**: zelfde foto, de bediener tikt *Gedaan* (hiervoor is geen sensor).
+3. **Vaarmodus kiezen**: *Haven*, *Anker* of *Zeilen*.
+4. Het venster blijft open met *Diesel gestopt*. Na Haven of Anker is er de knop *Inlaat en uitlaat dicht*, na Zeilen niet. De bediener sluit het venster zelf.
+
+**Installeren:** een nieuw script met `script_diesel_stoppen.yaml` (entiteit `script.diesel_stoppen`).
 
 ## Installeren in Home Assistant
 

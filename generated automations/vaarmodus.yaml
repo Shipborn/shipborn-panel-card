@@ -1,0 +1,99 @@
+# Vaarmodus Haven / Anker / Zeilen – TC90
+#
+# De PLC kent alleen havenmodus. Anker en Zeilen bestaan alleen in Home Assistant: alle drie zetten de PLC in
+# havenmodus, en input_select.vaarmodus_haven onthoudt welke van de drie gekozen is.
+#   Geen    de PLC staat niet in havenmodus (diesel of elektrisch)
+#   Haven / Anker / Zeilen    de PLC staat in havenmodus, met deze keuze
+# Het script zet de keuze en drukt zo nodig de havenknop van de PLC in. De automation houdt de helper gelijk aan
+# de PLC: gaat de havenmodus uit, dan wordt het Geen; gaat hij aan zonder keuze (bijv. via de PLC), dan Haven.
+# Zonder packages: de helper in de UI maken en script_vaarmodus_kiezen.yaml en automation_vaarmodus_haven.yaml
+# plakken (zie README.md). Houd die bestanden gelijk met dit bestand.
+
+input_select:
+  vaarmodus_haven:
+    name: Vaarmodus haven
+    options:
+      - Geen
+      - Haven
+      - Anker
+      - Zeilen
+
+script:
+  vaarmodus_kiezen:
+    alias: Vaarmodus kiezen
+    description: >-
+      Kiest Haven, Anker of Zeilen: onthoudt de keuze in input_select.vaarmodus_haven en zet de PLC in havenmodus.
+      Komt er binnen 20 s geen terugmelding, dan gaat de keuze terug naar Geen.
+    icon: mdi:anchor
+    mode: single
+    max_exceeded: silent
+    fields:
+      modus:
+        name: Modus
+        required: true
+        default: Haven
+        selector:
+          select:
+            options:
+              - Haven
+              - Anker
+              - Zeilen
+    variables:
+      keuze: input_select.vaarmodus_haven
+      havenmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+      havenknop: button.wago_hcs_controls_wago_controls_harbormode
+    sequence:
+      # eerst de keuze, dan de PLC: zo ziet de automation bij "haven aan" al de juiste keuze
+      - action: input_select.select_option
+        target: { entity_id: "{{ keuze }}" }
+        data: { option: "{{ modus }}" }
+      - if:
+          - condition: template
+            value_template: "{{ not is_state(havenmodus, 'on') }}"
+        then:
+          - action: button.press
+            target: { entity_id: "{{ havenknop }}" }
+          - wait_template: "{{ is_state(havenmodus, 'on') }}"
+            timeout: 20
+            continue_on_timeout: true
+          - if:
+              - condition: template
+                value_template: "{{ not is_state(havenmodus, 'on') }}"
+            then:
+              - action: input_select.select_option
+                target: { entity_id: "{{ keuze }}" }
+                data: { option: Geen }
+
+automation:
+  - id: vaarmodus_haven_volgt_plc
+    alias: Vaarmodus haven volgt PLC
+    description: Houdt input_select.vaarmodus_haven gelijk aan de havenmodus van de PLC.
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+        to: ["on", "off"]
+        not_from: [unavailable, unknown]   # een korte storing mag de keuze Anker / Zeilen niet wissen
+      - trigger: homeassistant
+        event: start
+    actions:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+                state: "off"
+            sequence:
+              - action: input_select.select_option
+                target: { entity_id: input_select.vaarmodus_haven }
+                data: { option: Geen }
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+                state: "on"
+              - condition: state
+                entity_id: input_select.vaarmodus_haven
+                state: Geen
+            sequence:
+              - action: input_select.select_option
+                target: { entity_id: input_select.vaarmodus_haven }
+                data: { option: Haven }

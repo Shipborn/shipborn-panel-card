@@ -1,0 +1,50 @@
+# Plakken in HA: Instellingen → Automatiseringen en scènes → Scripts → + Script toevoegen →
+# Nieuw script maken → ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# De entiteit moet script.vaarmodus_kiezen heten (volgt uit de alias; controleer na opslaan).
+# Eerst de helper maken: Keuzelijst, naam "Vaarmodus haven", opties Geen, Haven, Anker, Zeilen
+# (entiteit input_select.vaarmodus_haven).
+# Bron: vaarmodus.yaml (package). Pas beide aan.
+
+alias: Vaarmodus kiezen
+description: >-
+  Kiest Haven, Anker of Zeilen: onthoudt de keuze in input_select.vaarmodus_haven en zet de PLC in havenmodus.
+  Komt er binnen 20 s geen terugmelding, dan gaat de keuze terug naar Geen.
+icon: mdi:anchor
+mode: single
+max_exceeded: silent
+fields:
+  modus:
+    name: Modus
+    required: true
+    default: Haven
+    selector:
+      select:
+        options:
+          - Haven
+          - Anker
+          - Zeilen
+variables:
+  keuze: input_select.vaarmodus_haven
+  havenmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+  havenknop: button.wago_hcs_controls_wago_controls_harbormode
+sequence:
+  # eerst de keuze, dan de PLC: zo ziet de automation bij "haven aan" al de juiste keuze
+  - action: input_select.select_option
+    target: { entity_id: "{{ keuze }}" }
+    data: { option: "{{ modus }}" }
+  - if:
+      - condition: template
+        value_template: "{{ not is_state(havenmodus, 'on') }}"
+    then:
+      - action: button.press
+        target: { entity_id: "{{ havenknop }}" }
+      - wait_template: "{{ is_state(havenmodus, 'on') }}"
+        timeout: 20
+        continue_on_timeout: true
+      - if:
+          - condition: template
+            value_template: "{{ not is_state(havenmodus, 'on') }}"
+        then:
+          - action: input_select.select_option
+            target: { entity_id: "{{ keuze }}" }
+            data: { option: Geen }

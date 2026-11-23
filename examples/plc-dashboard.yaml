@@ -862,29 +862,42 @@ views:
             }
           - { type: pushbutton, x: 812, y: 965, width: 126, height: 48, label: Close valves, font_size: 14, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.closevolvovalves }, confirmation: { text: "Deze functie bedient de volgende aansturingen: close Volvo zeewatervalves, IN & OUT" } }, variant: stop }
           - { type: panel, x: 972, y: 670, width: 288, height: 360, title: Propulsion mode }
-          - { type: pushbutton, x: 990, y: 723, width: 252, height: 56, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
-          - { type: pushbutton, x: 990, y: 789, width: 252, height: 56, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
-          - { type: pushbutton, x: 990, y: 855, width: 252, height: 56, label: Harbor, align: left, entity: button.wago_hcs_controls_wago_controls_harbormode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode }
-          # Start Volvo: script.diesel_opstarten (generated automations/diesel_opstarten.yaml) met een stappenvenster
+          - { type: pushbutton, x: 990, y: 723, width: 104, height: 48, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
+          - { type: pushbutton, x: 1102, y: 723, width: 140, height: 48, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
+          # Haven, Anker en Zeilen zetten de PLC alle drie in havenmodus; de keuze staat in input_select.vaarmodus_haven (vaarmodus.yaml)
+          - { type: pushbutton, x: 990, y: 779, width: 121, height: 48, label: Haven, align: left, font_size: 13, led: green, led_entity: input_select.vaarmodus_haven, led_state: Haven, active_entity: input_select.vaarmodus_haven, active_state: Haven, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Haven } }, confirmation: { title: "Haven inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
+          - { type: pushbutton, x: 1121, y: 779, width: 121, height: 48, label: Anker, align: left, font_size: 13, led: green, led_entity: input_select.vaarmodus_haven, led_state: Anker, active_entity: input_select.vaarmodus_haven, active_state: Anker, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Anker } }, confirmation: { title: "Anker inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
+          - { type: pushbutton, x: 990, y: 835, width: 252, height: 48, label: Zeilen, align: left, font_size: 13, led: green, led_entity: input_select.vaarmodus_haven, led_state: Zeilen, active_entity: input_select.vaarmodus_haven, active_state: Zeilen, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Zeilen } }, confirmation: { title: "Zeilen inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
+          # Start Diesel: script.diesel_opstarten (generated automations/diesel_opstarten.yaml) met een stappenvenster
           # (status in input_text.diesel_opstarten_status); foto's in HA in /homeassistant/www/Pictures/Instructions.
           # Het venster (&diesel_progress) wordt ook gebruikt door de knop op Voortstuwing. Bolletje groen = diesel draait.
           - type: pushbutton
             x: 990
-            y: 965
+            y: 909
             width: 252
             height: 48
-            label: Start Volvo
+            label: Start Diesel
             font_size: 15
             status_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
             tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.diesel_opstarten } }
             progress: &diesel_progress
               entity: input_text.diesel_opstarten_status
               script: script.diesel_opstarten
-              title: Start Volvo
+              title: Start Diesel
               wide: true
               closable: false        # geen Sluiten zolang het script loopt; stoppen kan met Afbreken
-              done: Volvo online
+              done: Diesel online
               aborted: "Afgebroken. Er is niets teruggezet: kleppen, pompen en een draaiende motor blijven zoals ze zijn."
+              # na afbreken, alleen als de motor zeker stilstaat en inlaat of uitlaat open is
+              ended:
+                when: aborted
+                if:
+                  - { entity: [valve.er_ventielblok_1tm4_l4, valve.er_ventielblok_1tm4_l3], active_state: open }
+                  - { entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, active_state: "off" }
+                  - { entity: sensor.engine_room_main_engine_me_rpm, active_below: 50 }
+                text: "De motor draait niet. Dieselmotor inlaat en uitlaat weer dichtzetten?"
+                buttons: &diesel_valves_btn
+                  - { label: Inlaat en uitlaat dicht, style: danger, tap_action: { action: perform-action, perform_action: valve.close_valve, data: { entity_id: [valve.er_ventielblok_1tm4_l4, valve.er_ventielblok_1tm4_l3] } } }
               steps:
                 prep:
                   label: Systemen voorbereiden
@@ -906,7 +919,40 @@ views:
                     - { label: Voorbereiden, value: start, when: fix }
                 motor: { label: Motor starten, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Achter kan nu de motor worden aangezet. Eerst Ignition, dan hoor je een piep, en dan op Aan/Uit.", ok: "Motor draait.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
                 handle: { label: Noodstop en handle, image: /local/Pictures/Instructions/Volvohandle.jpeg, confirm: "Staat de noodstopknop weer in? Staat de handle in de rechte stand?", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
-                vaar: { label: Vaarmodus diesel, confirm: "Selecteer de vaarmodus diesel.", opnieuw: "De vaarmodus reageert niet: na 20 s staat diesel nog niet aan. Opnieuw proberen of afbreken?", busy: "Wacht tot de vaarmodus diesel actief is …", ok: "Vaarmodus diesel actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }, { label: Diesel selecteren, value: select, when: confirm }, { label: Opnieuw, value: select, when: opnieuw }] }
+                vaar: { label: Vaarmodus kiezen, confirm: "Kies de vaarmodus.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Diesel, value: diesel, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
+          # Stop Diesel: script.diesel_stoppen (generated automations/diesel_stoppen.yaml), zelfde statushelper als Start Diesel.
+          # Het venster (&diesel_stop_progress) wordt ook gebruikt door de knop op Voortstuwing.
+          - type: pushbutton
+            x: 990
+            y: 965
+            width: 252
+            height: 48
+            label: Stop Diesel
+            font_size: 15
+            tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.diesel_stoppen } }
+            progress: &diesel_stop_progress
+              entity: input_text.diesel_opstarten_status
+              script: script.diesel_stoppen
+              title: Stop Diesel
+              wide: true
+              closable: false        # geen Sluiten zolang het script loopt; stoppen kan met Afbreken
+              stay: true             # blijft na afloop open: de bediener sluit zelf
+              done: Diesel gestopt.
+              aborted: "Afgebroken. Het script heeft niets geschakeld."
+              # na Haven of Anker (niet na Zeilen): inlaat en uitlaat dicht, alleen als de motor zeker stilstaat
+              ended:
+                when: complete
+                if:
+                  - { entity: input_select.vaarmodus_haven, active_state: [Haven, Anker] }
+                  - { entity: [valve.er_ventielblok_1tm4_l4, valve.er_ventielblok_1tm4_l3], active_state: open }
+                  - { entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, active_state: "off" }
+                  - { entity: sensor.engine_room_main_engine_me_rpm, active_below: 50 }
+                text: "Dieselmotor inlaat en uitlaat ook dichtzetten?"
+                buttons: *diesel_valves_btn
+              steps:
+                stop: { label: Stopknop, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Druk achter op de stopknop. Het stoppen gaat verder zodra de sensoren melden dat de motor uit is.", ok: "Motor staat stil.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
+                contact: { label: Contact uit, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, confirm: "Zet nu het contact (Ignition) uit. Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
+                modus: { label: Vaarmodus kiezen, confirm: "Kies de vaarmodus.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Haven, value: haven, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
           - { type: panel, x: 20, y: 1047, width: 620, height: 330, title: Wago HCS controls }
           - { type: gauge, x: 38, y: 1099, width: 280, label: Lever, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%" }
           - { type: gauge, x: 342, y: 1099, width: 280, label: Shaft speed, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, warn_above: 500, warn_below: -500 }
@@ -2006,17 +2052,26 @@ views:
           - { type: warnlight, x: 192, y: 546, size: 48, icon: koelwater, label: Koelwatertemperatuur, entity: sensor.engine_room_main_engine_me_coolant_temp, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 78, alarm_above: 100, tap_action: { action: navigate, navigation_path: sys-diesel } }
           - { type: warnlight, x: 248, y: 546, size: 48, icon: uitlaat, label: Uitlaattemperatuur, entity: sensor.al1590_er_volvo_exhaust_temperature, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 59, alarm_above: 89, tap_action: { action: navigate, navigation_path: sys-diesel } }
 
-          # ---- Start Volvo, vervangt Prepair Volvo Start (onder de diesellampjes): venster &diesel_progress, op Diesel; bolletje groen = diesel draait ----
+          # ---- Start Diesel (vervangt Prepair Volvo Start) en Stop Diesel, onder de diesellampjes: venster &diesel_progress, op Diesel; bolletje groen = diesel draait ----
           - type: pushbutton
             x: 24
-            y: 610
+            y: 602
             width: 272
-            height: 56
-            label: Start Volvo
+            height: 46
+            label: Start Diesel
             font_size: 16
             status_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
             tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.diesel_opstarten } }
             progress: *diesel_progress
+          - type: pushbutton
+            x: 24
+            y: 652
+            width: 272
+            height: 46
+            label: Stop Diesel
+            font_size: 16
+            tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.diesel_stoppen } }
+            progress: *diesel_stop_progress
 
           # ---- waarschuwingslampjes schroefas (grijs als de as stilstaat; tik = Diesel) ----
           - { type: warnlight, x: 368, y: 490, size: 48, icon: flow, label: Schroefas koelwaterflow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_below: 3.5, alarm_below: 2.5, tap_action: { action: navigate, navigation_path: sys-diesel } }
@@ -2081,9 +2136,12 @@ views:
 
           # ---- zijpaneel: vaarmodus ----
           - { type: text, x: 896, y: 76, text: Vaarmodus, style: caption }
-          - { type: switch, x: 896, y: 100, width: 112, height: 112, icon: motor, label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { title: "Dieselmodus inschakelen?", yes: Inschakelen } } }
-          - { type: switch, x: 1020, y: 100, width: 112, height: 112, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { title: "Elektrische modus inschakelen?", yes: Inschakelen } } }
-          - { type: switch, x: 1144, y: 100, width: 112, height: 112, icon: anker, label: Haven, entity: button.wago_hcs_controls_wago_controls_harbormode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, tap_action: { action: toggle, confirmation: { title: "Havenmodus inschakelen?", yes: Inschakelen } } }
+          - { type: switch, x: 896, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: motor, label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { title: "Dieselmodus inschakelen?", yes: Inschakelen } } }
+          - { type: switch, x: 970, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { title: "Elektrische modus inschakelen?", yes: Inschakelen } } }
+          # Haven, Anker en Zeilen: alle drie havenmodus op de PLC; de keuze staat in input_select.vaarmodus_haven
+          - { type: switch, x: 1043, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: haven, label: Haven, state_entity: input_select.vaarmodus_haven, on_state: Haven, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Haven } }, confirmation: { title: "Haven inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
+          - { type: switch, x: 1117, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: anker, label: Anker, state_entity: input_select.vaarmodus_haven, on_state: Anker, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Anker } }, confirmation: { title: "Anker inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
+          - { type: switch, x: 1190, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: schip, label: Zeilen, state_entity: input_select.vaarmodus_haven, on_state: Zeilen, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Zeilen } }, confirmation: { title: "Zeilen inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
 
   # ===== Hydrauliek (tab onder Voortstuwing): voorlopig alleen placeholderknoppen =====
   - title: Hydrauliek

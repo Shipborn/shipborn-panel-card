@@ -1,0 +1,99 @@
+# Plakken in HA: Instellingen → Automatiseringen en scènes → Scripts → + Script toevoegen →
+# Nieuw script maken → ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# De entiteit moet script.diesel_stoppen heten (volgt uit de alias; controleer na opslaan).
+# Gebruikt de helper van Start Diesel (input_text.diesel_opstarten_status) en script.vaarmodus_kiezen.
+# Bron: diesel_stoppen.yaml (package; daar staat ook de uitleg van de stappen en de status). Pas beide aan.
+
+alias: Diesel stoppen
+description: >-
+  Loopt met de bediener het stoppen van de Volvo door: stopknop, contact uit (met controle op de sensoren) en
+  de keuze Haven, Anker of Zeilen. Status in input_text.diesel_opstarten_status.
+icon: mdi:engine-off
+mode: single
+max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
+variables:
+  status: input_text.diesel_opstarten_status
+  plan: "stop,contact,modus"
+  draait: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
+  toeren: sensor.engine_room_main_engine_me_rpm
+  keuze_haven: input_select.vaarmodus_haven
+  havenmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+sequence:
+  # ---------- 1. stopknop: wacht tot de sensoren zeggen dat de motor uit is ----------
+  - if:
+      - condition: template
+        value_template: "{{ not (is_state(draait, 'off') and states(toeren) | float(9999) < 50) }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:stop:manual" }
+      - wait_template: >-
+          {{ (is_state(draait, 'off') and states(toeren) | float(9999) < 50)
+             or states(status) == plan ~ ':stop:abort' }}
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':stop:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:stop:aborted" }
+          - stop: Afgebroken door de bediener
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:stop:ok" }
+      - delay: 2
+
+  # ---------- 2. contact uit (geen sensor: de bediener bevestigt) ----------
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}:contact:confirm" }
+  - wait_template: "{{ states(status) in [plan ~ ':contact:done', plan ~ ':contact:abort'] }}"
+  - if:
+      - condition: template
+        value_template: "{{ states(status) == plan ~ ':contact:abort' }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:contact:aborted" }
+      - stop: Afgebroken door de bediener
+
+  # ---------- 3. keuze Haven, Anker of Zeilen ----------
+  - repeat:
+      until: "{{ states(status) in [plan ~ ':modus:ok', plan ~ ':modus:abort'] }}"
+      sequence:
+        - action: input_text.set_value
+          target: { entity_id: "{{ status }}" }
+          data: { value: "{{ plan }}:modus:{{ 'confirm' if repeat.first else 'opnieuw' }}" }
+        - wait_template: >-
+            {{ states(status) in [plan ~ ':modus:haven', plan ~ ':modus:anker', plan ~ ':modus:zeilen', plan ~ ':modus:abort'] }}
+        - variables:
+            gekozen: "{{ states(status).split(':')[2] }}"
+        - if:
+            - condition: template
+              value_template: "{{ gekozen != 'abort' }}"
+          then:
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:modus:busy" }
+            - action: script.vaarmodus_kiezen
+              data: { modus: "{{ gekozen | capitalize }}" }
+            - if:
+                - condition: template
+                  value_template: "{{ is_state(havenmodus, 'on') and is_state(keuze_haven, gekozen | capitalize) }}"
+              then:
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:modus:ok" }
+  - if:
+      - condition: template
+        value_template: "{{ states(status) == plan ~ ':modus:abort' }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:modus:aborted" }
+      - stop: Afgebroken door de bediener
+  - delay: 2
+
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}::complete" }

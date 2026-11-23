@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.48";
+const VERSION = "0.5.49";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -413,6 +413,7 @@ const TC_ICONS = {
   verlichting: "M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.8.6 1.5 1.6 1.5 2.6V17h4v-.5c0-1 .7-2 1.5-2.6A6 6 0 0 0 12 3z",
   bilge: "M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0",
   alarm: "M12 3 22 21H2zM12 10v5M12 18v.5",
+  haven: "M8 4h8M10 4v6a4 4 0 0 1-3 4v6h10v-6a4 4 0 0 1-3-4V4M4 20h16",
   anker: "M12 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM12 6v15M8 10h8M4 14a8 8 0 0 0 16 0M2.5 14H5M19 14h2.5",
   diesel: "M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M7 8h4M14 10h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3",
   accu: "M3 7h16v10H3zM21 10v4M6.5 10v4M10 10v4",
@@ -2273,7 +2274,9 @@ class ShipbornPanelCard extends HTMLElement {
   // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
   // `watch` on a step = lines shown only while that step is current (instead of the window's `watch`).
   // `closable: false` = no Sluiten while the script runs. `ended` = extra text and buttons after aborted / rolled_back
-  // while its `entity` is active (e.g. offer to switch the DC-bus off); a button with `close: true` closes this window.
+  // while its `entity` is active, or while all conditions in `if` ({ entity, active_state / _above / _below }) hold;
+  // `when` sets the end states (e.g. complete). A button with `close: true` closes this window. `stay: true` = the
+  // window stays open after complete until the user closes it.
   _progress(b, prev) {
     const p = b.progress;
     const steps = p.steps || {};
@@ -2378,7 +2381,7 @@ class ShipbornPanelCard extends HTMLElement {
         complete: p.done || "Gereed",
       }[st] ?? (user ? step[st] || "" : keys.length ? "" : p.idle || "Geen lopende opdracht.");
       const endCfg = p.ended;
-      const ended = !!endCfg && [].concat(endCfg.when || ["aborted", "rolled_back"]).includes(st) && activeOf(hass, endCfg.entity, endCfg);
+      const ended = !!endCfg && [].concat(endCfg.when || ["aborted", "rolled_back"]).includes(st) && [].concat(endCfg.if || endCfg).every((c) => activeOf(hass, c.entity, c));
       note.textContent = ended && endCfg.text ? `${msg} ${endCfg.text}` : msg;
       note.className = "body tc-choice-note" + (st === "complete" || st === "ok" ? " is-ok" : (st === "timeout" && !late) || st === "unavailable" || st === "aborted" ? " is-bad" : late || back || user ? " is-warn" : "");
       // photo of the current step (not after the end)
@@ -2421,7 +2424,7 @@ class ShipbornPanelCard extends HTMLElement {
       rollback.hidden = st !== "timeout";
       wait.hidden = !choosing;
       rollback.disabled = false;
-      if (st === "complete" && !closing) closing = setTimeout(done, p.done_ms ?? 1000);
+      if (st === "complete" && !closing && !p.stay) closing = setTimeout(done, p.done_ms ?? 1000);
       cur_ = { plan, cur };
     };
     // repaint every second too, so "wordt gestart" turns into a warning without a state change
@@ -2742,6 +2745,7 @@ class ShipbornPanelCard extends HTMLElement {
     n.innerHTML = '<span class="ic"></span><span class="tc-switch-label label"></span><span class="tc-switch-state caption"></span>';
     const [ic, lbl, word] = n.children;
     lbl.textContent = s.label ?? "";
+    if (s.compact) { n.style.padding = "4px 2px"; n.style.gap = "2px"; lbl.style.fontSize = "13px"; }
     const stEnt = s.state_entity || s.entity;
     let busy = 0;
     let last = null;

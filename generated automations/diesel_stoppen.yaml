@@ -1,0 +1,116 @@
+# Stop Diesel – TC90
+#
+# Package voor Home Assistant: een script. De knop "Stop Diesel" (Voortstuwing en Diesel) start dit script en toont
+# de stappen live in een venster. Gebruikt dezelfde statushelper als Start Diesel
+# (input_text.diesel_opstarten_status, uit diesel_opstarten.yaml) en script.vaarmodus_kiezen (vaarmodus.yaml).
+# Zonder packages: script_diesel_stoppen.yaml in de UI plakken (zie README.md). Houd dat bestand gelijk met dit bestand.
+#
+# Stappen (plan, vaste volgorde):
+#   stop     bediener drukt op Stop (foto VolvoAanUit.jpeg)  wacht tot diesel_running uit en < 50 rpm (+2 s), onbeperkt
+#   contact  bediener zet het contact uit (zelfde foto)      bediener tikt Gedaan
+#   modus    keuze Haven, Anker of Zeilen                    wacht op de terugmelding (+2 s), daarna opnieuw kiezen
+# Daarna is het script klaar. Na Haven of Anker biedt het venster (niet het script) aan om inlaat en uitlaat
+# dicht te zetten; na Zeilen niet. De bediener sluit het venster zelf.
+# In elke stap kan de bediener afbreken; het script heeft dan niets geschakeld.
+#
+# Status (input_text.diesel_opstarten_status) = "<plan>:<stap>:<toestand>"
+#   toestand  manual    (stop) wacht tot de motor uit is of op abort
+#             confirm   wacht op de bediener; de kaart schrijft done (contact), haven / anker / zeilen (modus) of abort
+#             opnieuw   (modus) geen terugmelding; opnieuw kiezen of afbreken
+#             busy / ok / aborted / complete   zoals bij Start Diesel
+
+script:
+  diesel_stoppen:
+    alias: Diesel stoppen
+    description: >-
+      Loopt met de bediener het stoppen van de Volvo door: stopknop, contact uit (met controle op de sensoren) en
+      de keuze Haven, Anker of Zeilen. Status in input_text.diesel_opstarten_status.
+    icon: mdi:engine-off
+    mode: single
+    max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
+    variables:
+      status: input_text.diesel_opstarten_status
+      plan: "stop,contact,modus"
+      draait: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
+      toeren: sensor.engine_room_main_engine_me_rpm
+      keuze_haven: input_select.vaarmodus_haven
+      havenmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+    sequence:
+      # ---------- 1. stopknop: wacht tot de sensoren zeggen dat de motor uit is ----------
+      - if:
+          - condition: template
+            value_template: "{{ not (is_state(draait, 'off') and states(toeren) | float(9999) < 50) }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:stop:manual" }
+          - wait_template: >-
+              {{ (is_state(draait, 'off') and states(toeren) | float(9999) < 50)
+                 or states(status) == plan ~ ':stop:abort' }}
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':stop:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:stop:aborted" }
+              - stop: Afgebroken door de bediener
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:stop:ok" }
+          - delay: 2
+
+      # ---------- 2. contact uit (geen sensor: de bediener bevestigt) ----------
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:contact:confirm" }
+      - wait_template: "{{ states(status) in [plan ~ ':contact:done', plan ~ ':contact:abort'] }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':contact:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:contact:aborted" }
+          - stop: Afgebroken door de bediener
+
+      # ---------- 3. keuze Haven, Anker of Zeilen ----------
+      - repeat:
+          until: "{{ states(status) in [plan ~ ':modus:ok', plan ~ ':modus:abort'] }}"
+          sequence:
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:modus:{{ 'confirm' if repeat.first else 'opnieuw' }}" }
+            - wait_template: >-
+                {{ states(status) in [plan ~ ':modus:haven', plan ~ ':modus:anker', plan ~ ':modus:zeilen', plan ~ ':modus:abort'] }}
+            - variables:
+                gekozen: "{{ states(status).split(':')[2] }}"
+            - if:
+                - condition: template
+                  value_template: "{{ gekozen != 'abort' }}"
+              then:
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:modus:busy" }
+                - action: script.vaarmodus_kiezen
+                  data: { modus: "{{ gekozen | capitalize }}" }
+                - if:
+                    - condition: template
+                      value_template: "{{ is_state(havenmodus, 'on') and is_state(keuze_haven, gekozen | capitalize) }}"
+                  then:
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:modus:ok" }
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':modus:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:modus:aborted" }
+          - stop: Afgebroken door de bediener
+      - delay: 2
+
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}::complete" }

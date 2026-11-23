@@ -8,7 +8,7 @@
 alias: Diesel opstarten
 description: >-
   Loopt met de bediener de opstart van de Volvo door: systemen rond de diesel voorbereiden, motor starten,
-  noodstop en handle controleren en vaarmodus diesel kiezen. Status in input_text.diesel_opstarten_status.
+  noodstop en handle controleren en de vaarmodus kiezen (Diesel, Zeilen of Anker). Status in input_text.diesel_opstarten_status.
 icon: mdi:engine
 mode: single
 max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
@@ -26,6 +26,7 @@ variables:
   draait: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
   dieselmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode
   dieselknop: button.wago_hcs_controls_wago_controls_dieselmode
+  keuze_haven: input_select.vaarmodus_haven
 sequence:
   # ---------- 1. systemen rond de diesel; de knop Voorbereiden start de bestaande automation ----------
   - if:
@@ -107,23 +108,25 @@ sequence:
         data: { value: "{{ plan }}:handle:aborted" }
       - stop: Afgebroken door de bediener
 
-  # ---------- 4. vaarmodus diesel: alleen na een tik op de knop in het venster ----------
+  # ---------- 4. vaarmodus: Diesel, Zeilen of Anker, alleen na een tik op een knop in het venster ----------
   - if:
       - condition: template
         value_template: "{{ not is_state(dieselmodus, 'on') }}"
     then:
       - repeat:
-          until: "{{ is_state(dieselmodus, 'on') or states(status) == plan ~ ':vaar:abort' }}"
+          until: "{{ states(status) in [plan ~ ':vaar:ok', plan ~ ':vaar:abort'] }}"
           sequence:
             - action: input_text.set_value
               target: { entity_id: "{{ status }}" }
               data: { value: "{{ plan }}:vaar:{{ 'confirm' if repeat.first else 'opnieuw' }}" }
             - wait_template: >-
                 {{ is_state(dieselmodus, 'on')
-                   or states(status) in [plan ~ ':vaar:select', plan ~ ':vaar:abort'] }}
+                   or states(status) in [plan ~ ':vaar:diesel', plan ~ ':vaar:zeilen', plan ~ ':vaar:anker', plan ~ ':vaar:abort'] }}
+            - variables:
+                gekozen: "{{ states(status).split(':')[2] }}"
             - if:
                 - condition: template
-                  value_template: "{{ states(status) == plan ~ ':vaar:select' }}"
+                  value_template: "{{ gekozen == 'diesel' }}"
               then:
                 - action: input_text.set_value
                   target: { entity_id: "{{ status }}" }
@@ -133,6 +136,25 @@ sequence:
                 - wait_template: "{{ is_state(dieselmodus, 'on') }}"
                   timeout: 20
                   continue_on_timeout: true
+            - if:
+                - condition: template
+                  value_template: "{{ gekozen in ['zeilen', 'anker'] }}"
+              then:
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:vaar:busy" }
+                - action: script.vaarmodus_kiezen
+                  data: { modus: "{{ gekozen | capitalize }}" }
+            # gelukt: ok beëindigt de herhaling; anders volgt "opnieuw" (bij abort stopt de herhaling vanzelf)
+            - if:
+                - condition: template
+                  value_template: >-
+                    {{ gekozen != 'abort' and (is_state(keuze_haven, gekozen | capitalize)
+                       if gekozen in ['zeilen', 'anker'] else is_state(dieselmodus, 'on')) }}
+              then:
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:vaar:ok" }
       - if:
           - condition: template
             value_template: "{{ states(status) == plan ~ ':vaar:abort' }}"
@@ -141,9 +163,6 @@ sequence:
             target: { entity_id: "{{ status }}" }
             data: { value: "{{ plan }}:vaar:aborted" }
           - stop: Afgebroken door de bediener
-      - action: input_text.set_value
-        target: { entity_id: "{{ status }}" }
-        data: { value: "{{ plan }}:vaar:ok" }
       - delay: 2
 
   - action: input_text.set_value

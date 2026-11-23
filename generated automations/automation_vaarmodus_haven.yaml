@@ -1,0 +1,36 @@
+# Plakken in HA: Instellingen → Automatiseringen en scènes → + Automatisering maken → Nieuwe automatisering →
+# ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# Bron: vaarmodus.yaml (package). Pas beide aan.
+
+id: vaarmodus_haven_volgt_plc
+alias: Vaarmodus haven volgt PLC
+description: Houdt input_select.vaarmodus_haven gelijk aan de havenmodus van de PLC.
+mode: queued
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+    to: ["on", "off"]
+    not_from: [unavailable, unknown]   # een korte storing mag de keuze Anker / Zeilen niet wissen
+  - trigger: homeassistant
+    event: start
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+            state: "off"
+        sequence:
+          - action: input_select.select_option
+            target: { entity_id: input_select.vaarmodus_haven }
+            data: { option: Geen }
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
+            state: "on"
+          - condition: state
+            entity_id: input_select.vaarmodus_haven
+            state: Geen
+        sequence:
+          - action: input_select.select_option
+            target: { entity_id: input_select.vaarmodus_haven }
+            data: { option: Haven }
