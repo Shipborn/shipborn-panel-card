@@ -203,6 +203,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - Dagmap `261123`. Kaart v0.5.47: `progress` kreeg `closable: false` (geen *Sluiten* zolang het script loopt) en `ended` (extra tekst en knoppen na afbreken of terugdraaien). *Generator opstarten* heeft een nieuwe stap *Wierpot front open* tussen mainswitch en DC-bus, en biedt na afbreken of terugdraaien *DC-bus uitzetten* als de bus nog aan staat.
 - **Start Volvo** (v0.5.48): begeleid opstarten van de diesel via `script.diesel_opstarten`: voorbereiden met de bestaande automation, motor starten en noodstop/handle met foto's, en als laatste de vaarmodus diesel via een knop. Vervangt *Prepair Volvo Start* op Voortstuwing. De kaart kreeg `watch` per stap.
 - **Start Diesel en Stop Diesel** (v0.5.49): *Start Volvo* hernoemd; nieuw script *Stop Diesel* (stopknop, contact uit, vaarmodus). Anker en Zeilen zijn vaarmodi die alleen in HA bestaan en op de PLC havenmodus activeren (helper, script en automation). Inlaat en uitlaat kunnen na afbreken of stoppen dicht, alleen als de sensoren zeggen dat de motor stilstaat; een dichte zeewaterinlaat op een draaiende motor moet uitgesloten zijn.
+- **Stop Diesel, nieuwe volgorde**: eerst motor stoppen, dan de vaarmodus (Elektrisch, Haven, Anker, Zeilen). Alleen bij Haven en Anker gaat het contact uit en wordt voorgesteld om inlaat en uitlaat te sluiten; bij Elektrisch en Zeilen blijft het contact aan.
 
 ## Lessen en keuzes die je moet kennen
 

@@ -351,7 +351,7 @@
           // Stop Diesel: same steps as generated automations/diesel_stoppen.yaml (shorter waits)
           if (domain === "script" && service === "turn_on" && id === "script.diesel_stoppen" && states[id].state !== "on") {
             const S = "input_text.diesel_opstarten_status";
-            const plan = "stop,contact,modus";
+            const plan = "stop,modus,contact";
             const run = "binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running", rpm = "sensor.engine_room_main_engine_me_rpm";
             const now = () => states[S].state;
             const set = (v) => { states[S] = st(v); el.hass = { ...hass, states: { ...states } }; };
@@ -370,18 +370,22 @@
                 if (isAb("stop")) return abort("stop");
                 set(`${plan}:stop:ok`); await wait(2000);
               }
-              set(`${plan}:contact:confirm`);
-              await until(() => now() === `${plan}:contact:done` || isAb("contact"));
-              if (isAb("contact")) return abort("contact");
               set(`${plan}:modus:confirm`);
-              await until(() => ["haven", "anker", "zeilen", "abort"].some((k) => now() === `${plan}:modus:${k}`));
+              await until(() => ["elektrisch", "haven", "anker", "zeilen", "abort"].some((k) => now() === `${plan}:modus:${k}`));
               const k = now().split(":")[2];
               if (k === "abort") return abort("modus");
               set(`${plan}:modus:busy`);
               await wait(800);
-              window.__kiesModus(k[0].toUpperCase() + k.slice(1));
+              if (k === "elektrisch") window.__pressMode("electric");
+              else window.__kiesModus(k[0].toUpperCase() + k.slice(1));
               set(`${plan}:modus:ok`); await wait(2000);
-              set(`${plan}::complete`);
+              const contactUit = k === "haven" || k === "anker";
+              if (contactUit) {
+                set(`${plan}:contact:confirm`);
+                await until(() => now() === `${plan}:contact:done` || isAb("contact"));
+                if (isAb("contact")) return abort("contact");
+              }
+              set(`${contactUit ? plan : "stop,modus"}::complete`);
               end();
             })();
           }

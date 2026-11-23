@@ -938,21 +938,22 @@ views:
               closable: false        # geen Sluiten zolang het script loopt; stoppen kan met Afbreken
               stay: true             # blijft na afloop open: de bediener sluit zelf
               done: Diesel gestopt.
-              aborted: "Afgebroken. Het script heeft niets geschakeld."
-              # na Haven of Anker (niet na Zeilen): inlaat en uitlaat dicht, alleen als de motor zeker stilstaat
+              aborted: "Afgebroken. Wat al gedaan is, blijft zo."
+              # na Haven of Anker (niet na Elektrisch of Zeilen): inlaat en uitlaat dicht, alleen als de motor zeker stilstaat
               ended:
                 when: complete
                 if:
                   - { entity: input_select.vaarmodus_haven, active_state: [Haven, Anker] }
+                  - { entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_state: "off" }
                   - { entity: [valve.er_ventielblok_1tm4_l4, valve.er_ventielblok_1tm4_l3], active_state: open }
                   - { entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, active_state: "off" }
                   - { entity: sensor.engine_room_main_engine_me_rpm, active_below: 50 }
                 text: "Dieselmotor inlaat en uitlaat ook dichtzetten?"
                 buttons: *diesel_valves_btn
               steps:
-                stop: { label: Stopknop, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Druk achter op de stopknop. Het stoppen gaat verder zodra de sensoren melden dat de motor uit is.", ok: "Motor staat stil.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
+                stop: { label: Motor stoppen, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Stop de motor met de Start/Stop-knop. Het stoppen gaat verder zodra de sensoren melden dat de motor uit is.", ok: "Motor staat stil.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
+                modus: { label: Vaarmodus kiezen, confirm: "Kies de nieuwe vaarmodus. Bij Elektrisch en Zeilen blijft het contact aan; bij Haven en Anker gaat het contact uit.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Elektrisch, value: elektrisch, when: [confirm, opnieuw] }, { label: Haven, value: haven, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
                 contact: { label: Contact uit, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, confirm: "Zet nu het contact (Ignition) uit. Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
-                modus: { label: Vaarmodus kiezen, confirm: "Kies de vaarmodus.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Haven, value: haven, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
           - { type: panel, x: 20, y: 1047, width: 620, height: 330, title: Wago HCS controls }
           - { type: gauge, x: 38, y: 1099, width: 280, label: Lever, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%" }
           - { type: gauge, x: 342, y: 1099, width: 280, label: Shaft speed, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, warn_above: 500, warn_below: -500 }

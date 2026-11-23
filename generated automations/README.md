@@ -96,10 +96,10 @@ Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op 
 
 Knop *Stop Diesel* onder *Start Diesel*, op Voortstuwing en Diesel. Zelfde helper als Start Diesel.
 
-1. **Stopknop**: foto `VolvoAanUit.jpeg`. Het script wacht tot `…diesel_running` uit is en de motor onder 50 rpm draait, dan 2 s.
-2. **Contact uit**: zelfde foto, de bediener tikt *Gedaan* (hiervoor is geen sensor).
-3. **Vaarmodus kiezen**: *Haven*, *Anker* of *Zeilen*.
-4. Het venster blijft open met *Diesel gestopt*. Na Haven of Anker is er de knop *Inlaat en uitlaat dicht*, na Zeilen niet. De bediener sluit het venster zelf.
+1. **Motor stoppen** met de Start/Stop-knop: foto `VolvoAanUit.jpeg`. Het script wacht tot `…diesel_running` uit is en de motor onder 50 rpm draait, dan 2 s.
+2. **Vaarmodus kiezen**: *Elektrisch*, *Haven*, *Anker* of *Zeilen*.
+3. **Contact uit**, alleen bij Haven of Anker: zelfde foto, de bediener tikt *Gedaan* (hiervoor is geen sensor). Bij Elektrisch en Zeilen blijft het contact aan en vervalt deze stap.
+4. Het venster blijft open met *Diesel gestopt*. Na Haven of Anker is er de knop *Inlaat en uitlaat dicht*, na Elektrisch of Zeilen niet. De bediener sluit het venster zelf.
 
 **Installeren:** een nieuw script met `script_diesel_stoppen.yaml` (entiteit `script.diesel_stoppen`).
 
