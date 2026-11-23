@@ -1,0 +1,81 @@
+# Plakken in HA: Instellingen → Automatiseringen en scènes → Scripts → + Script toevoegen →
+# Nieuw script maken → ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# De entiteit moet script.vaarmodus_elektrisch heten (volgt uit de alias; controleer na opslaan).
+# Eerst de helper maken: Tekst, naam "Vaarmodus elektrisch status", maximale lengte 255
+# (entiteit input_text.vaarmodus_elektrisch_status).
+# Bron: vaarmodus.yaml (package). Pas beide aan.
+
+alias: Vaarmodus elektrisch
+description: >-
+  Controleert of de DC-bus aan staat (minstens 700 V). Staat hij uit, dan start de bediener eerst de Energy Inverters.
+  Daarna gaat de PLC in elektrische modus. Status in input_text.vaarmodus_elektrisch_status.
+icon: mdi:flash
+mode: single
+max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
+variables:
+  status: input_text.vaarmodus_elektrisch_status
+  plan: "dc,modus"
+  dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+  elektrisch: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
+  elektrischknop: button.wago_hcs_controls_wago_controls_electricmode
+sequence:
+  # ---------- 1. DC-bus aan (>= 700 V); anders start de bediener hem via het Energy Inverters-venster ----------
+  - if:
+      - condition: template
+        value_template: "{{ states(dc_bus) | float(0) < 700 }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:dc:fix" }
+      - wait_template: "{{ states(dc_bus) | float(0) >= 700 or states(status) == plan ~ ':dc:abort' }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':dc:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:dc:aborted" }
+          - stop: Afgebroken door de bediener
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:dc:ok" }
+      - delay: 1
+
+  # ---------- 2. elektrische modus; na 20 s zonder terugmelding opnieuw of afbreken ----------
+  - if:
+      - condition: template
+        value_template: "{{ not is_state(elektrisch, 'on') }}"
+    then:
+      - repeat:
+          until: "{{ is_state(elektrisch, 'on') or states(status) == plan ~ ':modus:abort' }}"
+          sequence:
+            - action: input_text.set_value
+              target: { entity_id: "{{ status }}" }
+              data: { value: "{{ plan }}:modus:busy" }
+            - action: button.press
+              target: { entity_id: "{{ elektrischknop }}" }
+            - wait_template: "{{ is_state(elektrisch, 'on') }}"
+              timeout: 20
+              continue_on_timeout: true
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state(elektrisch, 'on') }}"
+              then:
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:modus:opnieuw" }
+                - wait_template: >-
+                    {{ is_state(elektrisch, 'on')
+                       or states(status) in [plan ~ ':modus:retry', plan ~ ':modus:abort'] }}
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':modus:abort' and not is_state(elektrisch, 'on') }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:modus:aborted" }
+          - stop: Afgebroken door de bediener
+
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}::complete" }

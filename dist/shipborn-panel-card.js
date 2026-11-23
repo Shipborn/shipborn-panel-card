@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.49";
+const VERSION = "0.5.50";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2751,8 +2751,12 @@ class ShipbornPanelCard extends HTMLElement {
     let last = null;
     let drawn = null;
     n.addEventListener("click", async () => {
+      // progress: same window as on a pushbutton; while its script runs a tap reopens the window
+      if (this._progressBusy(s)) return this._progress(s, null);
+      const prev = s.progress && this._hass?.states[s.progress.entity];
       const before = this._hass?.states[stEnt]?.state;
       if ((await this._handleAction(s, s.tap_action || { action: "toggle" }, n)) === false) return;
+      if (s.progress) return this._progress(s, prev);
       if (this._hass?.states[stEnt]?.state !== before) return; // feedback already arrived
       busy = Date.now();
       this.hass = this._hass;

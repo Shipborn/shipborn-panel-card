@@ -863,7 +863,29 @@ views:
           - { type: pushbutton, x: 812, y: 965, width: 126, height: 48, label: Close valves, font_size: 14, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.closevolvovalves }, confirmation: { text: "Deze functie bedient de volgende aansturingen: close Volvo zeewatervalves, IN & OUT" } }, variant: stop }
           - { type: panel, x: 972, y: 670, width: 288, height: 360, title: Propulsion mode }
           - { type: pushbutton, x: 990, y: 723, width: 104, height: 48, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
-          - { type: pushbutton, x: 1102, y: 723, width: 140, height: 48, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
+          # Elektrisch: script.vaarmodus_elektrisch controleert eerst de DC-bus (generated automations/vaarmodus.yaml)
+          - type: pushbutton
+            x: 1102
+            y: 723
+            width: 140
+            height: 48
+            label: Electric
+            align: left
+            entity: button.wago_hcs_controls_wago_controls_electricmode
+            led: green
+            led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
+            active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
+            tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_elektrisch } }
+            progress: &elektrisch_progress
+              entity: input_text.vaarmodus_elektrisch_status
+              script: script.vaarmodus_elektrisch
+              title: Elektrische modus
+              closable: false
+              done: Elektrische modus actief.
+              aborted: "Afgebroken. De vaarmodus is niet veranderd."
+              steps:
+                dc: { label: DC-bus aan, fix: "De DC-bus staat uit. Start de DC-bus; daarna gaat het vanzelf verder.", ok: "DC-bus staat aan.", caption: { fix: UIT }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Start DC-bus, choice: *ei_start, progress: *ei_progress_on }] }
+                modus: { label: Elektrische modus, busy: "Wacht tot de elektrische modus actief is …", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Probeer opnieuw of breek af.", caption: { opnieuw: GEEN REACTIE }, buttons: [{ label: Afbreken, value: abort, style: plain, when: opnieuw }, { label: Opnieuw, value: retry, when: opnieuw }] }
           # Haven, Anker en Zeilen zetten de PLC alle drie in havenmodus; de keuze staat in input_select.vaarmodus_haven (vaarmodus.yaml)
           - { type: pushbutton, x: 990, y: 779, width: 121, height: 48, label: Haven, align: left, font_size: 13, led: green, led_entity: input_select.vaarmodus_haven, led_state: Haven, active_entity: input_select.vaarmodus_haven, active_state: Haven, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Haven } }, confirmation: { title: "Haven inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
           - { type: pushbutton, x: 1121, y: 779, width: 121, height: 48, label: Anker, align: left, font_size: 13, led: green, led_entity: input_select.vaarmodus_haven, led_state: Anker, active_entity: input_select.vaarmodus_haven, active_state: Anker, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Anker } }, confirmation: { title: "Anker inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
@@ -952,7 +974,7 @@ views:
                 buttons: *diesel_valves_btn
               steps:
                 stop: { label: Motor stoppen, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Stop de motor met de Start/Stop-knop. Het stoppen gaat verder zodra de sensoren melden dat de motor uit is.", ok: "Motor staat stil.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
-                modus: { label: Vaarmodus kiezen, confirm: "Kies de nieuwe vaarmodus. Bij Elektrisch en Zeilen blijft het contact aan; bij Haven en Anker gaat het contact uit.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Elektrisch, value: elektrisch, when: [confirm, opnieuw] }, { label: Haven, value: haven, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
+                modus: { label: Vaarmodus kiezen, confirm: "Kies de nieuwe vaarmodus. Bij Elektrisch en Zeilen blijft het contact aan; bij Haven en Anker gaat het contact uit.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", dc: "Voor Elektrisch moet de DC-bus aan. Start de DC-bus; daarna gaat het vanzelf verder.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE, dc: DC-BUS UIT }, buttons: [{ label: Elektrisch, value: elektrisch, when: [confirm, opnieuw] }, { label: Haven, value: haven, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw, dc] }, { label: Start DC-bus, when: dc, choice: *ei_start, progress: *ei_progress_on }] }
                 contact: { label: Contact uit, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, confirm: "Zet nu het contact (Ignition) uit. Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
           - { type: panel, x: 20, y: 1047, width: 620, height: 330, title: Wago HCS controls }
           - { type: gauge, x: 38, y: 1099, width: 280, label: Lever, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%" }
@@ -2138,7 +2160,7 @@ views:
           # ---- zijpaneel: vaarmodus ----
           - { type: text, x: 896, y: 76, text: Vaarmodus, style: caption }
           - { type: switch, x: 896, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: motor, label: Diesel, entity: button.wago_hcs_controls_wago_controls_dieselmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, tap_action: { action: toggle, confirmation: { title: "Dieselmodus inschakelen?", yes: Inschakelen } } }
-          - { type: switch, x: 970, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: toggle, confirmation: { title: "Elektrische modus inschakelen?", yes: Inschakelen } } }
+          - { type: switch, x: 970, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: energie, label: Elektrisch, entity: button.wago_hcs_controls_wago_controls_electricmode, state_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_elektrisch }, confirmation: { title: "Elektrische modus inschakelen?", text: "Staat de DC-bus uit, dan start je eerst de Energy Inverters.", yes: Inschakelen } }, progress: *elektrisch_progress }
           # Haven, Anker en Zeilen: alle drie havenmodus op de PLC; de keuze staat in input_select.vaarmodus_haven
           - { type: switch, x: 1043, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: haven, label: Haven, state_entity: input_select.vaarmodus_haven, on_state: Haven, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Haven } }, confirmation: { title: "Haven inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }
           - { type: switch, x: 1117, y: 100, width: 66, height: 112, compact: true, icon_size: 26, icon: anker, label: Anker, state_entity: input_select.vaarmodus_haven, on_state: Anker, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.vaarmodus_kiezen, variables: { modus: Anker } }, confirmation: { title: "Anker inschakelen?", text: "De PLC gaat in havenmodus.", yes: Inschakelen } } }

@@ -15,6 +15,7 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 | `diesel_opstarten.yaml` | Package: `input_text.diesel_opstarten_status` + `script.diesel_opstarten`, met bovenaan de uitleg. |
 | `script_diesel_stoppen.yaml` / `diesel_stoppen.yaml` | Het script achter *Stop Diesel*: om te plakken / als package. |
 | `script_vaarmodus_kiezen.yaml`, `automation_vaarmodus_haven.yaml` / `vaarmodus.yaml` | Vaarmodus Haven, Anker en Zeilen: script en automation om te plakken / alles als package met de helper. |
+| `script_vaarmodus_elektrisch.yaml` | Elektrisch kiezen met controle van de DC-bus, klaar om te plakken. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
 
@@ -78,6 +79,12 @@ De PLC kent alleen havenmodus. Anker en Zeilen bestaan alleen in HA: alle drie z
 
 **Installeren:** helper *Keuzelijst* met naam `Vaarmodus haven` en opties `Geen`, `Haven`, `Anker`, `Zeilen` (entiteit `input_select.vaarmodus_haven`); een nieuw script met `script_vaarmodus_kiezen.yaml`; een nieuwe automatisering met `automation_vaarmodus_haven.yaml`.
 
+## Vaarmodus Elektrisch
+
+De knoppen *Elektrisch* (Voortstuwing) en *Electric* (Diesel) starten `script.vaarmodus_elektrisch`. Staat de DC-bus onder 700 V, dan toont het venster *Start DC-bus* (het keuzevenster en de stappen van Energy Inverters opstarten). Zodra de bus aan is, gaat de PLC vanzelf in elektrische modus. *Afbreken* laat de vaarmodus zoals hij was.
+
+**Installeren:** helper *Tekst* met naam `Vaarmodus elektrisch status`, maximale lengte **255**, entiteit `input_text.vaarmodus_elektrisch_status`; daarna een nieuw script met `script_vaarmodus_elektrisch.yaml` (entiteit `script.vaarmodus_elektrisch`).
+
 ## Start Diesel
 
 Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op de pagina Diesel (vak *Propulsion mode*). Zolang het script loopt is er geen *Sluiten*.
@@ -97,7 +104,7 @@ Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op 
 Knop *Stop Diesel* onder *Start Diesel*, op Voortstuwing en Diesel. Zelfde helper als Start Diesel.
 
 1. **Motor stoppen** met de Start/Stop-knop: foto `VolvoAanUit.jpeg`. Het script wacht tot `…diesel_running` uit is en de motor onder 50 rpm draait, dan 2 s.
-2. **Vaarmodus kiezen**: *Elektrisch*, *Haven*, *Anker* of *Zeilen*.
+2. **Vaarmodus kiezen**: *Elektrisch*, *Haven*, *Anker* of *Zeilen*. Bij *Elektrisch* wordt eerst de DC-bus gecontroleerd (≥ 700 V); staat die uit, dan biedt het venster *Start DC-bus* en gaat het daarna vanzelf verder.
 3. **Contact uit**, alleen bij Haven of Anker: zelfde foto, de bediener tikt *Gedaan* (hiervoor is geen sensor). Bij Elektrisch en Zeilen blijft het contact aan en vervalt deze stap.
 4. Het venster blijft open met *Diesel gestopt*. Na Haven of Anker is er de knop *Inlaat en uitlaat dicht*, na Elektrisch of Zeilen niet. De bediener sluit het venster zelf.
 

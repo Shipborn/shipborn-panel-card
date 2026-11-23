@@ -187,3 +187,4 @@ Energie / Energy Inverters;Status opstarten/afsluiten (voortgangsvenster);status
 Energie / Energy Inverters;Accu online (opstarten/afsluiten);status;;binary_sensor.wago_energy_controls_wago_energy_controls_bms_is_on;zeker;opgegeven door gebruiker 18-11-2026
 Voortstuwing en Diesel;Stop Diesel;knop;script.diesel_stoppen;script.diesel_stoppen;zeker;begeleid stoppen (23-11)
 Voortstuwing en Diesel;Vaarmodus Haven / Anker / Zeilen;status;input_select.vaarmodus_haven;input_select.vaarmodus_haven;zeker;alleen in HA; op de PLC alle drie havenmodus (23-11)
+Voortstuwing en Diesel;Elektrisch met DC-buscontrole;knop;script.vaarmodus_elektrisch;script.vaarmodus_elektrisch;zeker;eerst DC-bus, anders Energy Inverters (23-11)

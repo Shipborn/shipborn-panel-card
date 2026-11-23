@@ -86,6 +86,8 @@
         "input_text.diesel_opstarten_status": st(""),
         "script.diesel_opstarten": st("off"),
         "script.diesel_stoppen": st("off"),
+        "script.vaarmodus_elektrisch": st("off"), // ?dc_off=1 = DC-bus staat uit
+        "input_text.vaarmodus_elektrisch_status": st(""),
         "script.vaarmodus_kiezen": st("off"),
         "input_select.vaarmodus_haven": st("Haven"),
         "switch.wago_energy_controls_wago_energy_controls_charge_batteries_2": st("on"),
@@ -338,6 +340,7 @@
               end();
             })();
           }
+          if (new URLSearchParams(location.search).get("dc_off") && !window.__dcOff) { window.__dcOff = true; states["sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage"] = st(0, { unit_of_measurement: "V" }); }
           // Vaarmodus: Haven / Anker / Zeilen are all harbor mode on the PLC (generated automations/vaarmodus.yaml)
           window.__pressMode = (m) => {
             for (const x of ["diesel", "electric", "harbor"]) states[`binary_sensor.wago_hcs_controls_wago_hcs_controls_${x}_mode`] = st(x === m ? "on" : "off");
@@ -348,6 +351,26 @@
           window.__kiesModus = (m) => { states["input_select.vaarmodus_haven"] = st(m); window.__pressMode("harbor"); };
           if (domain === "script" && service === "turn_on" && id === "script.vaarmodus_kiezen") window.__kiesModus(data.variables?.modus || "Haven");
           if (domain === "valve" && service === "close_valve") { for (const v of [].concat(data.entity_id)) states[v] = st("closed"); el.hass = { ...hass, states: { ...states } }; }
+          // Vaarmodus elektrisch: same steps as generated automations/vaarmodus.yaml (shorter waits)
+          if (domain === "script" && service === "turn_on" && id === "script.vaarmodus_elektrisch" && states[id].state !== "on") {
+            const S = "input_text.vaarmodus_elektrisch_status", plan = "dc,modus";
+            const bus = () => +states["sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage"].state || 0;
+            const set = (v) => { states[S] = st(v); el.hass = { ...hass, states: { ...states } }; };
+            const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+            const end = () => { states[id] = st("off"); el.hass = { ...hass, states: { ...states } }; };
+            states[id] = st("on");
+            (async () => {
+              if (bus() < 700) {
+                set(`${plan}:dc:fix`);
+                while (bus() < 700 && states[S].state !== `${plan}:dc:abort`) await wait(200);
+                if (bus() < 700) { set(`${plan}:dc:aborted`); return end(); }
+                set(`${plan}:dc:ok`); await wait(1000);
+              }
+              set(`${plan}:modus:busy`); await wait(800);
+              window.__pressMode("electric");
+              set(`${plan}::complete`); end();
+            })();
+          }
           // Stop Diesel: same steps as generated automations/diesel_stoppen.yaml (shorter waits)
           if (domain === "script" && service === "turn_on" && id === "script.diesel_stoppen" && states[id].state !== "on") {
             const S = "input_text.diesel_opstarten_status";
@@ -374,6 +397,12 @@
               await until(() => ["elektrisch", "haven", "anker", "zeilen", "abort"].some((k) => now() === `${plan}:modus:${k}`));
               const k = now().split(":")[2];
               if (k === "abort") return abort("modus");
+              const bus = () => +states["sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage"].state || 0;
+              if (k === "elektrisch" && bus() < 700) {
+                set(`${plan}:modus:dc`);
+                await until(() => bus() >= 700 || isAb("modus"));
+                if (isAb("modus")) return abort("modus");
+              }
               set(`${plan}:modus:busy`);
               await wait(800);
               if (k === "elektrisch") window.__pressMode("electric");

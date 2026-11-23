@@ -8,6 +8,7 @@
 # Stappen (plan):
 #   stop     bediener drukt op Start/Stop (foto VolvoAanUit.jpeg)  wacht tot diesel_running uit en < 50 rpm (+2 s), onbeperkt
 #   modus    keuze Elektrisch, Haven, Anker of Zeilen              wacht op de terugmelding (+2 s), daarna opnieuw kiezen
+#            bij Elektrisch eerst DC-bus >= 700 V; zo niet: toestand dc, de bediener start de Energy Inverters
 #   contact  alleen na Haven of Anker: contact uit (zelfde foto)   bediener tikt Gedaan
 # Na Elektrisch of Zeilen blijft het contact aan: de stap contact valt dan uit het plan.
 # Daarna is het script klaar. Na Haven of Anker biedt het venster (niet het script) aan om inlaat en uitlaat
@@ -39,6 +40,7 @@ script:
       havenmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
       elektrisch: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
       elektrischknop: button.wago_hcs_controls_wago_controls_electricmode
+      dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
     sequence:
       # ---------- 1. Start/Stop-knop: wacht tot de sensoren zeggen dat de motor uit is ----------
       - if:
@@ -80,18 +82,31 @@ script:
                 - condition: template
                   value_template: "{{ gekozen == 'elektrisch' }}"
               then:
-                - action: input_text.set_value
-                  target: { entity_id: "{{ status }}" }
-                  data: { value: "{{ plan }}:modus:busy" }
+                # eerst de DC-bus (>= 700 V): staat hij uit, dan start de bediener de Energy Inverters vanuit het venster
                 - if:
                     - condition: template
-                      value_template: "{{ not is_state(elektrisch, 'on') }}"
+                      value_template: "{{ states(dc_bus) | float(0) < 700 }}"
                   then:
-                    - action: button.press
-                      target: { entity_id: "{{ elektrischknop }}" }
-                    - wait_template: "{{ is_state(elektrisch, 'on') }}"
-                      timeout: 20
-                      continue_on_timeout: true
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:modus:dc" }
+                    - wait_template: "{{ states(dc_bus) | float(0) >= 700 or states(status) == plan ~ ':modus:abort' }}"
+                - if:
+                    - condition: template
+                      value_template: "{{ states(status) != plan ~ ':modus:abort' }}"
+                  then:
+                    - action: input_text.set_value
+                      target: { entity_id: "{{ status }}" }
+                      data: { value: "{{ plan }}:modus:busy" }
+                    - if:
+                        - condition: template
+                          value_template: "{{ not is_state(elektrisch, 'on') }}"
+                      then:
+                        - action: button.press
+                          target: { entity_id: "{{ elektrischknop }}" }
+                        - wait_template: "{{ is_state(elektrisch, 'on') }}"
+                          timeout: 20
+                          continue_on_timeout: true
             - if:
                 - condition: template
                   value_template: "{{ gekozen in ['haven', 'anker', 'zeilen'] }}"
@@ -105,8 +120,8 @@ script:
             - if:
                 - condition: template
                   value_template: >-
-                    {{ is_state(elektrisch, 'on') if gekozen == 'elektrisch'
-                       else (gekozen != 'abort' and is_state(havenmodus, 'on') and is_state(keuze_haven, gekozen | capitalize)) }}
+                    {{ states(status) != plan ~ ':modus:abort' and (is_state(elektrisch, 'on') if gekozen == 'elektrisch'
+                       else (gekozen != 'abort' and is_state(havenmodus, 'on') and is_state(keuze_haven, gekozen | capitalize))) }}
               then:
                 - action: input_text.set_value
                   target: { entity_id: "{{ status }}" }
