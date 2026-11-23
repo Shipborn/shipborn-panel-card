@@ -4,8 +4,8 @@
 # havenmodus, en input_select.vaarmodus_haven onthoudt welke van de drie gekozen is.
 #   Geen    de PLC staat niet in havenmodus (diesel of elektrisch)
 #   Haven / Anker / Zeilen    de PLC staat in havenmodus, met deze keuze
-# Het script zet de keuze en drukt zo nodig de havenknop van de PLC in. De automation houdt de helper gelijk aan
-# de PLC: gaat de havenmodus uit, dan wordt het Geen; gaat hij aan zonder keuze (bijv. via de PLC), dan Haven.
+# Het script zet de keuze en drukt zo nodig de havenknop van de PLC in. De automation volgt de PLC: gaat diesel of
+# elektrisch aan, dan wordt het Geen; gaat havenmodus aan zonder keuze (bijv. via de PLC), dan Haven.
 # Zonder packages: de helper in de UI maken en script_vaarmodus_kiezen.yaml en automation_vaarmodus_haven.yaml
 # plakken (zie README.md). Houd die bestanden gelijk met dit bestand.
 
@@ -67,21 +67,33 @@ script:
 automation:
   - id: vaarmodus_haven_volgt_plc
     alias: Vaarmodus haven volgt PLC
-    description: Houdt input_select.vaarmodus_haven gelijk aan de havenmodus van de PLC.
+    description: >-
+      Diesel of elektrisch aan: Haven, Anker en Zeilen uit (Geen). Havenmodus aan zonder keuze: Haven.
     mode: queued
     triggers:
       - trigger: state
+        entity_id:
+          - binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode
+          - binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
+        to: "on"
+        id: aandrijving
+      - trigger: state
         entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
-        to: ["on", "off"]
-        not_from: [unavailable, unknown]   # een korte storing mag de keuze Anker / Zeilen niet wissen
+        to: "on"
+        id: haven
       - trigger: homeassistant
         event: start
+        id: start
     actions:
       - choose:
+          # bij het wisselen naar haven kan diesel of elektrisch nog even aan staan: daarom alleen op de trigger wissen
           - conditions:
-              - condition: state
-                entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
-                state: "off"
+              - condition: template
+                value_template: >-
+                  {{ trigger.id == 'aandrijving' or (trigger.id == 'start'
+                     and is_state('binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode', 'off')
+                     and (is_state('binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode', 'on')
+                          or is_state('binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode', 'on'))) }}
             sequence:
               - action: input_select.select_option
                 target: { entity_id: input_select.vaarmodus_haven }

@@ -1,24 +1,37 @@
 # Plakken in HA: Instellingen → Automatiseringen en scènes → + Automatisering maken → Nieuwe automatisering →
 # ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
+# Bestaat de automation al: openen → ⋮ → Bewerken in YAML → alles vervangen.
 # Bron: vaarmodus.yaml (package). Pas beide aan.
 
 id: vaarmodus_haven_volgt_plc
 alias: Vaarmodus haven volgt PLC
-description: Houdt input_select.vaarmodus_haven gelijk aan de havenmodus van de PLC.
+description: >-
+  Diesel of elektrisch aan: Haven, Anker en Zeilen uit (Geen). Havenmodus aan zonder keuze: Haven.
 mode: queued
 triggers:
   - trigger: state
+    entity_id:
+      - binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode
+      - binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
+    to: "on"
+    id: aandrijving
+  - trigger: state
     entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
-    to: ["on", "off"]
-    not_from: [unavailable, unknown]   # een korte storing mag de keuze Anker / Zeilen niet wissen
+    to: "on"
+    id: haven
   - trigger: homeassistant
     event: start
+    id: start
 actions:
   - choose:
+      # bij het wisselen naar haven kan diesel of elektrisch nog even aan staan: daarom alleen op de trigger wissen
       - conditions:
-          - condition: state
-            entity_id: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode
-            state: "off"
+          - condition: template
+            value_template: >-
+              {{ trigger.id == 'aandrijving' or (trigger.id == 'start'
+                 and is_state('binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode', 'off')
+                 and (is_state('binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode', 'on')
+                      or is_state('binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode', 'on'))) }}
         sequence:
           - action: input_select.select_option
             target: { entity_id: input_select.vaarmodus_haven }
