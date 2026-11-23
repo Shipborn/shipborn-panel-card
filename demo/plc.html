@@ -77,6 +77,7 @@
         "input_text.generator_opstarten_status": st(""),
         "script.generator_opstarten": st("off"),
         "script.generator_afsluiten": st("off"),
+        "valve.er_ventielblok_1tm4_l1": st("closed"),
         "switch.wago_energy_controls_wago_energy_controls_charge_batteries_2": st("on"),
         "switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2": st("off"),
         "switch.wago_energy_controls_wago_energy_controls_shore_supply_2": st("on"),
@@ -215,7 +216,7 @@
             const E = "wago_energy_controls_wago_energy_controls_";
             const S = "input_text.generator_opstarten_status";
             const q = new URLSearchParams(location.search);
-            const plan = "main,dc,lad_uit,omv,start,wal_uit,gen,laden";
+            const plan = "main,wierpot,dc,lad_uit,omv,start,wal_uit,gen,laden";
             const sw = { start: `switch.${E}manual_start_aux_generator_2`, wal_uit: `switch.${E}shore_supply_2`, gen: `switch.${E}generator_2`, laden: `switch.${E}charge_batteries_2` };
             const fb = { start: `binary_sensor.${E}generator_is_on`, wal_uit: `binary_sensor.${E}shore_supply_is_connected`, gen: `binary_sensor.${E}generator_is_connected`, laden: `binary_sensor.${E}bms_charging_mode` };
             const aan = { start: true, wal_uit: false, gen: true, laden: true };
@@ -234,6 +235,7 @@
               const check = async (k, ok) => { if (ok()) return true; set(`${plan}:${k}:fix`); await until(() => ok() || now() === `${plan}:${k}:abort`); return ok(); };
               const abort = (k) => { set(`${plan}:${k}:aborted`); end(); };
               if ((await ask("main", ["done", "abort"])) === "abort") return abort("main");
+              if (!(await check("wierpot", () => is("valve.er_ventielblok_1tm4_l1", "open")))) return abort("wierpot");
               if (!(await check("dc", () => +states[`sensor.${E}dc_bus_voltage`]?.state >= 700))) return abort("dc");
               if (!(await check("lad_uit", () => is(sw.laden, "off")))) return abort("lad_uit");
               if ((await ask("omv", ["done", "abort"])) === "abort") return abort("omv");
@@ -326,6 +328,7 @@
               end();
             })();
           }
+          if (domain === "valve" && service === "open_valve" && states[id]) { states[id] = st("open"); push(); }
           if (domain === "input_text" && service === "set_value" && states[id]) { states[id] = st(data.value); push(); }
           // select: option set at once, a "<select>_feedback" sensor follows after 1 s (like the Webasto compressor mode)
           if (domain === "select" && service === "select_option" && states[id]) {

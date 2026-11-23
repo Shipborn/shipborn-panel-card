@@ -1040,11 +1040,20 @@ views:
               entity: input_text.generator_opstarten_status
               script: script.generator_opstarten
               title: Generator opstarten
+              closable: false        # geen Sluiten zolang het script loopt; stoppen kan met Afbreken / Terugdraaien
               done: Generator online
               aborted: "Afgebroken. Het script heeft niets geschakeld."
               rolled_back: "Teruggedraaid: wat bij dit opstarten is geschakeld, staat weer zoals het was."
+              # na afbreken of terugdraaien met de DC-bus nog aan: meteen uitzetten (zelfde script en venster als op Energie)
+              ended:
+                entity: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+                active_above: 699.9
+                text: "De DC-bus staat nog aan. Ook uitzetten?"
+                buttons:
+                  - { label: DC-bus uitzetten, style: danger, close: true, tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.energy_inverters_afsluiten } }, progress: *ei_progress_off }
               steps:
                 main: { label: "Mainswitch: direct van wal", image: /local/Pictures/Instructions/DirectvanWal.png, confirm: "Controleer de mainswitch: hij moet staan zoals op de foto (direct van wal). Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
+                wierpot: { label: Wierpot front open, fix: "Wierpot front staat dicht en moet open. Open hem; daarna gaat het opstarten verder.", caption: { fix: DICHT }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Openen, tap_action: { action: perform-action, perform_action: valve.open_valve, data: { entity_id: valve.er_ventielblok_1tm4_l1 } } }] }
                 dc: { label: DC-bus aan, fix: "De DC-bus staat nog uit. Start de DC-bus; daarna gaat het opstarten vanzelf verder.", caption: { fix: UIT }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Start DC-bus, choice: *ei_start, progress: *ei_progress_on }] }
                 lad_uit: { label: Charge batteries uit, fix: "Charge batteries staat aan en moet uit. Zet hem uit; daarna gaat het opstarten verder.", caption: { fix: AAN }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Uitzetten, tap_action: { action: perform-action, perform_action: switch.turn_off, data: { entity_id: switch.wago_energy_controls_wago_energy_controls_charge_batteries_2 } } }] }
                 omv: { label: Switches naar de omvormers, image: /local/Pictures/Instructions/VanafOmvormerPLC.png, confirm: "Zet de switches naar de omvormers, zoals op de foto. Tik daarna op Gedaan.", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }

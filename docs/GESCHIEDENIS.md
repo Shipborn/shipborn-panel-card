@@ -198,6 +198,10 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - **Laadcontrole in de Energy Inverters-scripts**: opstarten en afsluiten controleren eerst dat Charge batteries uit staat (stap `lad_uit`, zelfde knoppen als bij de generator), alleen tijdens die procedures. Uit *Generator opstarten* zijn de zeewaterpomp-stap en de vaste zeewaterpomp-regel gehaald; die pomp hoort bij het opstarten van de Energy Inverters. Foto's bleken in HA niet te laden doordat ze in de `/config` van de add-on stonden in plaats van in `/homeassistant/www`.
 - **Generator afsluiten**: tegenhanger van Generator opstarten (zelfde statushelper, zelfde opzet): eerst controles (walstroom aanwezig, laden uit, accu gekoppeld), dan generator-drive uit, generator uit en walstroom-drive aan, met terugdraaien. Knoppen op Generator en Voortstuwing.
 
+## 23-11-2026 – Generator opstarten bijgesteld
+
+- Dagmap `261123`. Kaart v0.5.47: `progress` kreeg `closable: false` (geen *Sluiten* zolang het script loopt) en `ended` (extra tekst en knoppen na afbreken of terugdraaien). *Generator opstarten* heeft een nieuwe stap *Wierpot front open* tussen mainswitch en DC-bus, en biedt na afbreken of terugdraaien *DC-bus uitzetten* als de bus nog aan staat.
+
 ## Lessen en keuzes die je moet kennen
 
 - **Geen build-stap**: `dist/shipborn-panel-card.js` is de bron. Dat houdt HACS-updates simpel (push = update) en maakt bewerken op elke pc mogelijk zonder Node.

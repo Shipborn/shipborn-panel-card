@@ -37,15 +37,16 @@ Het groene bolletje in de knop *Energy Inverters opstarten* staat los van het sc
 Knop *Generator opstarten* op Voortstuwing (vak Generator, in plaats van *Prepair Generator Start*) en op de pagina Generator (naast *Prepare generator start*). Het script loopt de stappen door en het venster toont ze. De zeewaterpomp glycol zit er niet meer in: die regelt het opstarten van de Energy Inverters.
 
 1. **Mainswitch op direct van wal**: foto `DirectvanWal.png`, de bediener tikt *Gedaan*.
-2. **DC-bus aan** (≥ 700 V): staat hij uit, dan opent *Start DC-bus* het gewone Energy Inverters-venster; daarna gaat het vanzelf verder. **Charge batteries uit**: staat hij aan, dan zet *Uitzetten* hem uit.
-3. **Switches naar de omvormers**: foto `VanafOmvormerPLC.png`, *Gedaan*.
-4. **Generator starten**: keuze *Via HA* (`switch.…manual_start_aux_generator_2` aan, blijft aan; 60 s) of *Handmatig* (aan het lokale paneel; geen tijdslimiet). Wacht op `…generator_is_on`, dan 2 s.
-5. **Walstroom-drive uit** (`switch.…shore_supply_2` uit), wacht tot `…shore_supply_is_connected` uit is, dan 2 s. De boot draait nu op de accu.
-6. **Generator-drive aan** (`switch.…generator_2` aan), wacht op `…generator_is_connected`, dan 2 s.
-7. **Accu laden aan** (`switch.…charge_batteries_2` aan), wacht op `…bms_charging_mode`, dan 2 s.
-8. 1 s *Generator online*, daarna sluit het venster.
+2. **Wierpot front open** (`valve.er_ventielblok_1tm4_l1`): staat hij dicht, dan opent *Openen* hem.
+3. **DC-bus aan** (≥ 700 V): staat hij uit, dan opent *Start DC-bus* het gewone Energy Inverters-venster; daarna gaat het vanzelf verder. **Charge batteries uit**: staat hij aan, dan zet *Uitzetten* hem uit.
+4. **Switches naar de omvormers**: foto `VanafOmvormerPLC.png`, *Gedaan*.
+5. **Generator starten**: keuze *Via HA* (`switch.…manual_start_aux_generator_2` aan, blijft aan; 60 s) of *Handmatig* (aan het lokale paneel; geen tijdslimiet). Wacht op `…generator_is_on`, dan 2 s.
+6. **Walstroom-drive uit** (`switch.…shore_supply_2` uit), wacht tot `…shore_supply_is_connected` uit is, dan 2 s. De boot draait nu op de accu.
+7. **Generator-drive aan** (`switch.…generator_2` aan), wacht op `…generator_is_connected`, dan 2 s.
+8. **Accu laden aan** (`switch.…charge_batteries_2` aan), wacht op `…bms_charging_mode`, dan 2 s.
+9. 1 s *Generator online*, daarna sluit het venster.
 
-In stap 1–4 kan de bediener *Afbreken* (het script heeft dan nog niets geschakeld). Bij 5–7 (en de start via HA) volgt na 20 s (60 s) zonder terugmelding de keuze *Terugdraaien* of *Blijven wachten*; terugdraaien zet terug wat het script in deze run schakelde, laatste eerst. Stappen die al goed staan worden overgeslagen; draait de generator al, dan vervalt de keuze in stap 4.
+Zolang het script loopt is er geen *Sluiten*. In stap 1–5 kan de bediener *Afbreken* (het script heeft dan nog niets geschakeld; alleen wat de bediener zelf met de knoppen in het venster deed, blijft zo). Bij 6–8 (en de start via HA) volgt na 20 s (60 s) zonder terugmelding de keuze *Terugdraaien* of *Blijven wachten*; terugdraaien zet terug wat het script in deze run schakelde, laatste eerst. Stappen die al goed staan worden overgeslagen; draait de generator al, dan vervalt de keuze in stap 5. Staat de DC-bus na afbreken of terugdraaien nog aan (≥ 700 V), dan biedt het venster *DC-bus uitzetten*: dat start het gewone script *Energy Inverters afsluiten* met zijn eigen venster.
 
 **Foto's:** in HA in `www/Pictures/Instructions/` naast `configuration.yaml`. In de add-ons (File editor, Samba, Studio Code Server, SSH) is dat `/homeassistant/www/…`; een map `/config` in de root hoort bij de add-on zelf en wordt door HA niet gezien. Maak je `www` voor het eerst aan, herstart HA dan één keer (adres `/local/Pictures/Instructions/…`; hoofdlettergevoelig). Zet kopieën in `www/Pictures/Instructions/` in de dagmap: de demo (`demo/edit_server.py`) serveert `/local/` uit die map, zoals HA.
 

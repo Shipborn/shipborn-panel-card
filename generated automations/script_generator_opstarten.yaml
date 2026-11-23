@@ -7,7 +7,7 @@
 
 alias: Generator opstarten
 description: >-
-  Loopt met de bediener de opstart van de generator door: mainswitch, DC-bus, laden uit, switches naar de
+  Loopt met de bediener de opstart van de generator door: mainswitch, wierpot front, DC-bus, laden uit, switches naar de
   omvormers, generator starten (via HA of handmatig), walstroom-drive uit,
   generator-drive aan en accu laden aan. Status in input_text.generator_opstarten_status.
 icon: mdi:engine
@@ -15,7 +15,8 @@ mode: single
 max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
 variables:
   status: input_text.generator_opstarten_status
-  plan: "main,dc,lad_uit,omv,start,wal_uit,gen,laden"
+  plan: "main,wierpot,dc,lad_uit,omv,start,wal_uit,gen,laden"
+  wierpot: valve.er_ventielblok_1tm4_l1
   dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
   generator_aan: binary_sensor.wago_energy_controls_wago_energy_controls_generator_is_on
   schakelaar:
@@ -52,6 +53,24 @@ sequence:
         target: { entity_id: "{{ status }}" }
         data: { value: "{{ plan }}:main:aborted" }
       - stop: Afgebroken door de bediener
+
+  # ---------- 1b. wierpot front moet open staan ----------
+  - if:
+      - condition: template
+        value_template: "{{ not is_state(wierpot, 'open') }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:wierpot:fix" }
+      - wait_template: "{{ is_state(wierpot, 'open') or states(status) == plan ~ ':wierpot:abort' }}"
+      - if:
+          - condition: template
+            value_template: "{{ states(status) == plan ~ ':wierpot:abort' }}"
+        then:
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:wierpot:aborted" }
+          - stop: Afgebroken door de bediener
 
   # ---------- 2a. DC-bus aan (≥ 700 V); anders start de bediener hem via het Energy Inverters-venster ----------
   - if:

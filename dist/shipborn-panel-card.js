@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.46";
+const VERSION = "0.5.47";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2271,6 +2271,8 @@ class ShipbornPanelCard extends HTMLElement {
   // script waits for it), `choice` / `tap_action` work as on a pushbutton (e.g. open another start window);
   // `when` = the states in which the button shows (default confirm, fix). `watch` = lines that stay visible
   // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
+  // `closable: false` = no Sluiten while the script runs. `ended` = extra text and buttons after aborted / rolled_back
+  // while its `entity` is active (e.g. offer to switch the DC-bus off); a button with `close: true` closes this window.
   _progress(b, prev) {
     const p = b.progress;
     const steps = p.steps || {};
@@ -2307,6 +2309,7 @@ class ShipbornPanelCard extends HTMLElement {
     let shownActs = null;
     let closing = null;
     let choosing = false;
+    let locked = false; // closable: false and the script is still running
     let cur_ = {};
     const waited = new Set(); // "plan:step" for which the user chose to keep waiting
     const BUILTIN = ["busy", "ok", "timeout", "unavailable", "complete", "aborted", "rollback", "rolling_back", "rolled_back"];
@@ -2322,6 +2325,8 @@ class ShipbornPanelCard extends HTMLElement {
         const late = Date.now() - t0 > (p.start_timeout ?? 4) * 1000;
         note.textContent = late ? p.no_start || "Het script reageert niet. Bestaat het in Home Assistant?" : p.starting || "Wordt gestart …";
         note.className = "body tc-choice-note" + (late ? " is-bad" : "");
+        locked = p.closable === false && !late;
+        close.hidden = locked;
         return;
       }
       const [plan = "", cur = "", st = ""] = String(so?.state ?? "").split(":");
@@ -2361,17 +2366,19 @@ class ShipbornPanelCard extends HTMLElement {
         aborted: p.aborted || "Afgebroken.",
         complete: p.done || "Gereed",
       }[st] ?? (user ? step[st] || "" : keys.length ? "" : p.idle || "Geen lopende opdracht.");
-      note.textContent = msg;
+      const endCfg = p.ended;
+      const ended = !!endCfg && [].concat(endCfg.when || ["aborted", "rolled_back"]).includes(st) && activeOf(hass, endCfg.entity, endCfg);
+      note.textContent = ended && endCfg.text ? `${msg} ${endCfg.text}` : msg;
       note.className = "body tc-choice-note" + (st === "complete" || st === "ok" ? " is-ok" : (st === "timeout" && !late) || st === "unavailable" || st === "aborted" ? " is-bad" : late || back || user ? " is-warn" : "");
       // photo of the current step (not after the end)
       const src = st !== "complete" && st !== "aborted" && !back ? step.image : null;
       if (src) { if (img.getAttribute("src") !== src) img.src = src; img.hidden = false; }
       else img.hidden = true;
       // step buttons for this state; rebuilt only when plan, step or state changes
-      const actKey = plan + ":" + cur + ":" + st;
+      const actKey = plan + ":" + cur + ":" + st + ":" + ended;
       if (actKey !== shownActs) {
         shownActs = actKey;
-        const btns = (step.buttons || []).filter((x) => [].concat(x.when || ["confirm", "fix"]).includes(st));
+        const btns = ended ? endCfg.buttons || [] : (step.buttons || []).filter((x) => [].concat(x.when || ["confirm", "fix"]).includes(st));
         acts.replaceChildren(...btns.map((x) => {
           const el = h("button", "tc-btn label" + (x.style === "danger" ? " tc-btn-danger" : x.style === "plain" ? "" : " tc-btn-primary"));
           el.type = "button";
@@ -2386,7 +2393,9 @@ class ShipbornPanelCard extends HTMLElement {
             } else if (x.choice) this._progressBusy(x) ? this._progress(x, null) : this._choice(x);
             else if (x.tap_action) {
               const prev2 = x.progress && this._hass.states[x.progress.entity];
-              if ((await this._handleAction(x, x.tap_action, el)) !== false && x.progress) this._progress(x, prev2);
+              if ((await this._handleAction(x, x.tap_action, el)) === false) return;
+              if (x.close) done();
+              if (x.progress) this._progress(x, prev2);
             }
           });
           return el;
@@ -2396,7 +2405,8 @@ class ShipbornPanelCard extends HTMLElement {
       }
       // timeout: first a choice (no Sluiten), after "Blijven wachten" Sluiten + Terugdraaien
       choosing = st === "timeout" && !late;
-      close.hidden = choosing;
+      locked = p.closable === false && !["complete", "aborted", "rolled_back", "unavailable"].includes(st) && isOn(hass.states[p.script]);
+      close.hidden = choosing || locked;
       rollback.hidden = st !== "timeout";
       wait.hidden = !choosing;
       rollback.disabled = false;
@@ -2430,7 +2440,7 @@ class ShipbornPanelCard extends HTMLElement {
       rollback.disabled = true;
       this._hass.callService("input_text", "set_value", { entity_id: p.entity, value: `${cur_.plan}:${cur_.cur}:rollback` });
     });
-    dlg.addEventListener("click", (ev) => ev.target === dlg && !choosing && done(ev));
+    dlg.addEventListener("click", (ev) => ev.target === dlg && !choosing && !locked && done(ev));
     dlg.appendChild(box);
     this.shadowRoot.appendChild(dlg);
   }
