@@ -1,8 +1,9 @@
 # Plakken in HA: Instellingen → Automatiseringen en scènes → + Automatisering maken → Nieuwe automatisering →
 # ⋮ (rechtsboven) → Bewerken in YAML → alles vervangen door dit bestand → Opslaan.
 # Bron: vaarmodus.yaml (package). Pas beide aan.
+# Bewust zonder id: de editor van HA maakt zelf een id; een eigen id geeft na opslaan
+# de melding "Only automations in automations.yaml are editable".
 
-id: vaarmodus_haven_volgt_plc
 alias: Vaarmodus haven volgt PLC
 description: Houdt input_select.vaarmodus_haven gelijk aan de havenmodus van de PLC.
 mode: queued
