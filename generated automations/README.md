@@ -74,7 +74,7 @@ In stap 1–3 kan de bediener afbreken (er is dan niets geschakeld). Bij 4–6 v
 
 ## Vaarmodus Haven, Anker en Zeilen
 
-De PLC kent alleen havenmodus. Anker en Zeilen bestaan alleen in HA: alle drie zetten de PLC in havenmodus, en `input_select.vaarmodus_haven` onthoudt de keuze (`Geen` = de PLC staat niet in havenmodus). `script.vaarmodus_kiezen` zet de keuze en drukt zo nodig de havenknop in; de automation *Vaarmodus haven volgt PLC* zet de keuze op `Geen` zodra diesel- of elektrische modus aangaat, en op `Haven` als havenmodus aangaat zonder keuze. Alleen havenmodus die uitgaat wist de keuze niet.
+De PLC kent alleen havenmodus. Anker en Zeilen bestaan alleen in HA: alle drie zetten de PLC in havenmodus, en `input_select.vaarmodus_haven` onthoudt de keuze (`Geen` = de PLC staat niet in havenmodus). `script.vaarmodus_kiezen` zet de keuze en drukt zo nodig de havenknop in; de automation *Vaarmodus haven volgt PLC* houdt de helper gelijk aan de PLC.
 
 **Installeren:** helper *Keuzelijst* met naam `Vaarmodus haven` en opties `Geen`, `Haven`, `Anker`, `Zeilen` (entiteit `input_select.vaarmodus_haven`); een nieuw script met `script_vaarmodus_kiezen.yaml`; een nieuwe automatisering met `automation_vaarmodus_haven.yaml`.
 
