@@ -78,6 +78,13 @@
         "script.generator_opstarten": st("off"),
         "script.generator_afsluiten": st("off"),
         "valve.er_ventielblok_1tm4_l1": st("closed"),
+        "valve.er_ventielblok_1tm4_l2": st("closed"),
+        "valve.er_ventielblok_1tm4_l3": st("closed"),
+        "valve.er_ventielblok_1tm4_l4": st("closed"),
+        "switch.0x781c9dfffea18853": st("off"),
+        // Diesel opstarten: script + status (gesimuleerd in callService); ?diesel_off=1 = motor staat nog uit, ?diesel_fail=vaar = geen reactie
+        "input_text.diesel_opstarten_status": st(""),
+        "script.diesel_opstarten": st("off"),
         "switch.wago_energy_controls_wago_energy_controls_charge_batteries_2": st("on"),
         "switch.wago_energy_controls_wago_energy_controls_manual_start_aux_generator_2": st("off"),
         "switch.wago_energy_controls_wago_energy_controls_shore_supply_2": st("on"),
@@ -323,6 +330,67 @@
                 }
                 set(`${plan}:${k}:ok`);
                 await wait(2000);
+              }
+              set(`${plan}::complete`);
+              end();
+            })();
+          }
+          // Diesel opstarten: same steps as generated automations/diesel_opstarten.yaml (shorter waits)
+          if (domain === "script" && service === "turn_on" && id === "script.diesel_opstarten" && states[id].state !== "on") {
+            const H = "wago_hcs_controls_wago_hcs_controls_";
+            const S = "input_text.diesel_opstarten_status";
+            const q = new URLSearchParams(location.search);
+            const plan = "prep,motor,handle,vaar";
+            const V = [1, 2, 3, 4].map((n) => `valve.er_ventielblok_1tm4_l${n}`);
+            const P = ["switch.er_zeewaterpomp_cooling", "switch.0x781c9dfffea18853"];
+            const run = `binary_sensor.${H}diesel_running`, mode = `binary_sensor.${H}diesel_mode`;
+            const is = (e, v) => states[e]?.state === v;
+            const now = () => states[S].state;
+            const set = (v) => { states[S] = st(v); push(); };
+            const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+            const until = async (fn, ms = Infinity) => { const t = Date.now(); while (!fn()) { if (Date.now() - t > ms) return false; await wait(200); } return true; };
+            const end = () => { states[id] = st("off"); push(); };
+            const abort = (k) => { set(`${plan}:${k}:aborted`); end(); };
+            const isAb = (k) => now() === `${plan}:${k}:abort`;
+            const ready = () => V.every((v) => is(v, "open")) && P.every((x) => is(x, "on")) && +states["sensor.al1590_er_prop_shaft_cooling_water_flow"].state >= 2.5 && +states["sensor.al1590_er_compressor_manifold_pressure"].state >= 3;
+            if (q.get("diesel_off") && !window.__dieselOff) { window.__dieselOff = true; states[run] = st("off"); }
+            states[id] = st("on");
+            (async () => {
+              if (!ready()) {
+                set(`${plan}:prep:fix`);
+                await until(() => ready() || isAb("prep") || now() === `${plan}:prep:start`);
+                if (isAb("prep")) return abort("prep");
+                if (now() === `${plan}:prep:start`) {
+                  set(`${plan}:prep:wacht`);
+                  [...V, ...P].forEach((e, i) => setTimeout(() => { states[e] = st(e.startsWith("valve") ? "open" : "on"); push(); }, 300 * (i + 1)));
+                  await until(() => ready() || isAb("prep"));
+                  if (isAb("prep")) return abort("prep");
+                }
+                set(`${plan}:prep:ok`); await wait(2000);
+              }
+              if (!is(run, "on")) {
+                set(`${plan}:motor:manual`);
+                setTimeout(() => { if (!isAb("motor")) { states[run] = st("on"); push(); } }, q.get("diesel_slow") ? 60000 : 3000);
+                await until(() => is(run, "on") || isAb("motor"));
+                if (isAb("motor")) return abort("motor");
+                set(`${plan}:motor:ok`); await wait(2000);
+              }
+              set(`${plan}:handle:confirm`);
+              await until(() => now() === `${plan}:handle:done` || isAb("handle"));
+              if (isAb("handle")) return abort("handle");
+              if (!is(mode, "on")) {
+                let first = true;
+                while (!is(mode, "on") && !isAb("vaar")) {
+                  set(`${plan}:vaar:${first ? "confirm" : "opnieuw"}`); first = false;
+                  await until(() => is(mode, "on") || isAb("vaar") || now() === `${plan}:vaar:select`);
+                  if (now() === `${plan}:vaar:select`) {
+                    set(`${plan}:vaar:busy`);
+                    if (q.get("diesel_fail") !== "vaar") setTimeout(() => { states[mode] = st("on"); push(); }, 1000);
+                    await until(() => is(mode, "on"), 20000 / (+q.get("gen_speed") || 1));
+                  }
+                }
+                if (isAb("vaar")) return abort("vaar");
+                set(`${plan}:vaar:ok`); await wait(2000);
               }
               set(`${plan}::complete`);
               end();

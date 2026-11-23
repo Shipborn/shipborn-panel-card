@@ -176,7 +176,7 @@ Systemen / Boegschroef;Jet pump 3 output;meetwaarde;;sensor.er_thruster_status_j
 Systemen / Boegschroef;Jet pump 3 speed;meetwaarde;;sensor.er_thruster_status_jet_pump_3_speed;zeker;ER_Thruster_Status
 DC-bus;PLC lifebeat (interne communicatie PLC's);status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat;zeker;door de gebruiker opgegeven
 Diesel;Diesel clutch neutraal;status;;binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr;zeker;door de gebruiker opgegeven
-Voortstuwing;Prepair Volvo Start;knop;automation.prepvolvostart;automation.prepvolvostart;zeker;uit het HA-dashboard van de gebruiker (09-11)
+Voortstuwing en Diesel;Start Volvo (was Prepair Volvo Start);knop;script.diesel_opstarten;script.diesel_opstarten;zeker;begeleid opstarten (23-11); stap Voorbereiden start automation.prepvolvostart
 Generator;Prepare generator start;knop;automation.prepgenstart;automation.prepgenstart;zeker;uit het HA-dashboard van de gebruiker (09-11); op Voortstuwing sinds 20-11 vervangen door Generator opstarten
 Voortstuwing + Generator;Generator opstarten;knop;script.generator_opstarten;script.generator_opstarten;zeker;generated automations/generator_opstarten.yaml (20-11); status input_text.generator_opstarten_status
 Voortstuwing;Prepair Energy Inverters;knop;automation.plc_prep_inverters;;vervallen;11-11: vervangen door Energy Inverters opstarten (zelfde als op het Energie-overzicht)

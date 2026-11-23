@@ -11,6 +11,8 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 | `generator_opstarten.yaml` | Package: `input_text.generator_opstarten_status` + `script.generator_opstarten`, met bovenaan de uitleg van stappen en status. |
 | `script_generator_afsluiten.yaml` | Het script *Generator afsluiten*, klaar om te plakken (geen eigen helper). |
 | `generator_afsluiten.yaml` | Package: `script.generator_afsluiten` (gebruikt `input_text.generator_opstarten_status`), met bovenaan de uitleg. |
+| `script_diesel_opstarten.yaml` | Het script achter *Start Volvo*, klaar om te plakken. |
+| `diesel_opstarten.yaml` | Package: `input_text.diesel_opstarten_status` + `script.diesel_opstarten`, met bovenaan de uitleg. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
 
@@ -67,6 +69,22 @@ Knop *Generator afsluiten* op de pagina Generator (onder *Generator opstarten*) 
 In stap 1–3 kan de bediener afbreken (er is dan niets geschakeld). Bij 4–6 volgt na 20 s (60 s) zonder terugmelding *Terugdraaien* of *Blijven wachten*; terugdraaien zet terug wat het script schakelde, laatste eerst. Stappen die al goed staan worden overgeslagen.
 
 **Installeren:** alleen een nieuw script met de inhoud van `script_generator_afsluiten.yaml` (entiteit `script.generator_afsluiten`). Het gebruikt de helper van Generator opstarten.
+
+## Start Volvo (diesel opstarten)
+
+Knop *Start Volvo* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op de pagina Diesel (vak *Propulsion mode*). Zolang het script loopt is er geen *Sluiten*.
+
+1. **Systemen voorbereiden**: het venster toont inlaat, uitlaat, wierpot aft en front, zeewaterpomp glycol, koelwaterflow (≥ 2,5), compressor en compressordruk (≥ 3 bar). Staat niet alles goed, dan start *Voorbereiden* `automation.prepvolvostart`; het script gaat verder zodra alles groen is.
+2. **Motor starten**: foto `VolvoAanUit.jpeg`. Het script wacht onbeperkt op `…diesel_running`, dan 2 s.
+3. **Noodstop en handle**: foto `Volvohandle.jpeg`, de bediener tikt *Gedaan*.
+4. **Vaarmodus diesel**: alleen via de knop *Diesel selecteren* (verplicht). Wacht op `…diesel_mode`, na 20 s *Opnieuw* of *Afbreken*.
+5. 1 s *Volvo online*, daarna sluit het venster.
+
+*Afbreken* kan in elke stap en zet niets terug: open kleppen, pompen en een draaiende motor blijven zoals ze zijn.
+
+**Foto's:** `VolvoAanUit.jpeg` en `Volvohandle.jpeg` in `/homeassistant/www/Pictures/Instructions/` (hoofdlettergevoelig).
+
+**Installeren:** helper *Tekst* met naam `Diesel opstarten status`, maximale lengte **255**, entiteit `input_text.diesel_opstarten_status`; daarna een nieuw script met de inhoud van `script_diesel_opstarten.yaml` (entiteit `script.diesel_opstarten`).
 
 ## Installeren in Home Assistant
 

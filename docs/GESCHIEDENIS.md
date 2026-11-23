@@ -201,6 +201,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 ## 23-11-2026 – Generator opstarten bijgesteld
 
 - Dagmap `261123`. Kaart v0.5.47: `progress` kreeg `closable: false` (geen *Sluiten* zolang het script loopt) en `ended` (extra tekst en knoppen na afbreken of terugdraaien). *Generator opstarten* heeft een nieuwe stap *Wierpot front open* tussen mainswitch en DC-bus, en biedt na afbreken of terugdraaien *DC-bus uitzetten* als de bus nog aan staat.
+- **Start Volvo** (v0.5.48): begeleid opstarten van de diesel via `script.diesel_opstarten`: voorbereiden met de bestaande automation, motor starten en noodstop/handle met foto's, en als laatste de vaarmodus diesel via een knop. Vervangt *Prepair Volvo Start* op Voortstuwing. De kaart kreeg `watch` per stap.
 
 ## Lessen en keuzes die je moet kennen
 

@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.47";
+const VERSION = "0.5.48";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -667,7 +667,7 @@ const TC_STYLE =
   .tc-progress-watch { margin-bottom: var(--space-2); }
   .tc-pw, .tc-pw-l, .tc-pw-r { display: flex; flex-direction: column; gap: var(--space-3); width: 100%; align-items: center; }
   .tc-pw-l { gap: 0; }
-  .tc-progress-acts[hidden], .tc-progress-img[hidden] { display: none; }
+  .tc-progress-acts[hidden], .tc-progress-img[hidden], .tc-progress-watch[hidden] { display: none; }
   .tc-progress-img { max-width: 100%; max-height: 38vh; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface); }
   .tc-dialog.tc-progress-wide { width: 900px; max-width: calc(100% - 32px); max-height: calc(100% - 32px); overflow: auto; }
   .tc-progress-wide .tc-pw { display: grid; grid-template-columns: 320px 1fr; align-items: start; gap: var(--space-4); }
@@ -2271,6 +2271,7 @@ class ShipbornPanelCard extends HTMLElement {
   // script waits for it), `choice` / `tap_action` work as on a pushbutton (e.g. open another start window);
   // `when` = the states in which the button shows (default confirm, fix). `watch` = lines that stay visible
   // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
+  // `watch` on a step = lines shown only while that step is current (instead of the window's `watch`).
   // `closable: false` = no Sluiten while the script runs. `ended` = extra text and buttons after aborted / rolled_back
   // while its `entity` is active (e.g. offer to switch the DC-bus off); a button with `close: true` closes this window.
   _progress(b, prev) {
@@ -2295,14 +2296,27 @@ class ShipbornPanelCard extends HTMLElement {
     close.textContent = p.close || "Sluiten";
     rollback.textContent = p.rollback || "Terugdraaien";
     wait.textContent = p.keep_waiting || "Blijven wachten";
-    const watch = (p.watch || []).map((w) => {
-      const li = h("li");
-      li.innerHTML = '<span class="d-led on"></span><span class="label"></span><span class="caption tc-check-st"></span>';
-      li.children[1].textContent = w.label || w.entity;
-      watchList.appendChild(li);
-      return [li, w];
-    });
-    if (!watch.length) watchList.remove();
+    let watch = [];
+    let shownWatch;
+    // Show these watch lines (rebuilt only when the list changes) and paint their state.
+    const paintWatch = (hass, src) => {
+      if (src !== shownWatch) {
+        shownWatch = src;
+        watch = (src || []).map((w) => {
+          const li = h("li");
+          li.innerHTML = '<span class="d-led on"></span><span class="label"></span><span class="caption tc-check-st"></span>';
+          li.children[1].textContent = w.label || w.entity;
+          return [li, w];
+        });
+        watchList.replaceChildren(...watch.map(([li]) => li));
+        watchList.hidden = !watch.length;
+      }
+      for (const [li, w] of watch) {
+        const on = activeOf(hass, w.entity, w);
+        li.className = on ? "is-ok" : "is-fail";
+        li.children[2].textContent = on ? w.text_on || "AAN" : w.text_off || "UIT";
+      }
+    };
     const t0 = Date.now();
     let started = !prev;
     let shownPlan = null;
@@ -2314,11 +2328,6 @@ class ShipbornPanelCard extends HTMLElement {
     const waited = new Set(); // "plan:step" for which the user chose to keep waiting
     const BUILTIN = ["busy", "ok", "timeout", "unavailable", "complete", "aborted", "rollback", "rolling_back", "rolled_back"];
     const paint = (hass) => {
-      for (const [li, w] of watch) {
-        const on = activeOf(hass, w.entity, w);
-        li.className = on ? "is-ok" : "is-fail";
-        li.children[2].textContent = on ? w.text_on || "AAN" : w.text_off || "UIT";
-      }
       const so = hass.states[p.entity];
       if (!started && so && (so.state !== prev?.state || so.last_changed !== prev?.last_changed)) started = true;
       if (!started) {
@@ -2327,6 +2336,7 @@ class ShipbornPanelCard extends HTMLElement {
         note.className = "body tc-choice-note" + (late ? " is-bad" : "");
         locked = p.closable === false && !late;
         close.hidden = locked;
+        paintWatch(hass, p.watch);
         return;
       }
       const [plan = "", cur = "", st = ""] = String(so?.state ?? "").split(":");
@@ -2345,6 +2355,7 @@ class ShipbornPanelCard extends HTMLElement {
       const late = st === "timeout" && waited.has(plan + ":" + cur);
       const user = !!st && !BUILTIN.includes(st); // waits for the user: confirm, fix, manual, …
       const step = steps[cur] || {};
+      paintWatch(hass, step.watch || p.watch);
       [...list.children].forEach((li, i) => {
         const s = back ? (i <= at ? "back" : "wait") : i < at || (i === at && st === "ok") ? "ok" : i > at ? "wait"
           : st === "busy" ? "busy" : user ? "act" : st === "timeout" ? (late ? "late" : "fail") : "fail";

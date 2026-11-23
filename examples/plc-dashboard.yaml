@@ -865,6 +865,48 @@ views:
           - { type: pushbutton, x: 990, y: 723, width: 252, height: 56, label: Diesel, align: left, entity: button.wago_hcs_controls_wago_controls_dieselmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
           - { type: pushbutton, x: 990, y: 789, width: 252, height: 56, label: Electric, align: left, entity: button.wago_hcs_controls_wago_controls_electricmode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
           - { type: pushbutton, x: 990, y: 855, width: 252, height: 56, label: Harbor, align: left, entity: button.wago_hcs_controls_wago_controls_harbormode, led: green, led_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode, active_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_harbor_mode }
+          # Start Volvo: script.diesel_opstarten (generated automations/diesel_opstarten.yaml) met een stappenvenster
+          # (status in input_text.diesel_opstarten_status); foto's in HA in /homeassistant/www/Pictures/Instructions.
+          # Het venster (&diesel_progress) wordt ook gebruikt door de knop op Voortstuwing. Bolletje groen = diesel draait.
+          - type: pushbutton
+            x: 990
+            y: 965
+            width: 252
+            height: 48
+            label: Start Volvo
+            font_size: 15
+            status_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
+            tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.diesel_opstarten } }
+            progress: &diesel_progress
+              entity: input_text.diesel_opstarten_status
+              script: script.diesel_opstarten
+              title: Start Volvo
+              wide: true
+              closable: false        # geen Sluiten zolang het script loopt; stoppen kan met Afbreken
+              done: Volvo online
+              aborted: "Afgebroken. Er is niets teruggezet: kleppen, pompen en een draaiende motor blijven zoals ze zijn."
+              steps:
+                prep:
+                  label: Systemen voorbereiden
+                  fix: "Nog niet alles staat goed. Voorbereiden opent de kleppen en zet de zeewaterpomp glycol en de compressor aan."
+                  wacht: "Wacht tot alle punten groen zijn …"
+                  ok: "Alle systemen staan goed."
+                  caption: { fix: ACTIE, wacht: BEZIG }
+                  watch:
+                    - { label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, active_state: open, text_on: OPEN, text_off: DICHT }
+                    - { label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, active_state: open, text_on: OPEN, text_off: DICHT }
+                    - { label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, active_state: open, text_on: OPEN, text_off: DICHT }
+                    - { label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, active_state: open, text_on: OPEN, text_off: DICHT }
+                    - { label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling }
+                    - { label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, active_above: 2.499, text_on: OK, text_off: LAAG }
+                    - { label: Compressor, entity: switch.0x781c9dfffea18853 }
+                    - { label: Compressordruk ≥ 3 bar, entity: sensor.al1590_er_compressor_manifold_pressure, active_above: 2.999, text_on: OK, text_off: LAAG }
+                  buttons:
+                    - { label: Afbreken, value: abort, style: plain, when: [fix, wacht] }
+                    - { label: Voorbereiden, value: start, when: fix }
+                motor: { label: Motor starten, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Achter kan nu de motor worden aangezet. Eerst Ignition, dan hoor je een piep, en dan op Aan/Uit.", ok: "Motor draait.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
+                handle: { label: Noodstop en handle, image: /local/Pictures/Instructions/Volvohandle.jpeg, confirm: "Staat de noodstopknop weer in? Staat de handle in de rechte stand?", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
+                vaar: { label: Vaarmodus diesel, confirm: "Selecteer de vaarmodus diesel.", opnieuw: "De vaarmodus reageert niet: na 20 s staat diesel nog niet aan. Opnieuw proberen of afbreken?", busy: "Wacht tot de vaarmodus diesel actief is …", ok: "Vaarmodus diesel actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }, { label: Diesel selecteren, value: select, when: confirm }, { label: Opnieuw, value: select, when: opnieuw }] }
           - { type: panel, x: 20, y: 1047, width: 620, height: 330, title: Wago HCS controls }
           - { type: gauge, x: 38, y: 1099, width: 280, label: Lever, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%" }
           - { type: gauge, x: 342, y: 1099, width: 280, label: Shaft speed, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, warn_above: 500, warn_below: -500 }
@@ -1964,28 +2006,17 @@ views:
           - { type: warnlight, x: 192, y: 546, size: 48, icon: koelwater, label: Koelwatertemperatuur, entity: sensor.engine_room_main_engine_me_coolant_temp, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 78, alarm_above: 100, tap_action: { action: navigate, navigation_path: sys-diesel } }
           - { type: warnlight, x: 248, y: 546, size: 48, icon: uitlaat, label: Uitlaattemperatuur, entity: sensor.al1590_er_volvo_exhaust_temperature, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 59, alarm_above: 89, tap_action: { action: navigate, navigation_path: sys-diesel } }
 
-          # ---- Prepair Volvo Start (onder de diesellampjes): tik = venster met de stappen en hun huidige stand (Uitvoeren start
-          #      de automation); bolletje groen als alle stappen goed staan (zelfde lijst als de checklist op Diesel) ----
+          # ---- Start Volvo, vervangt Prepair Volvo Start (onder de diesellampjes): venster &diesel_progress, op Diesel; bolletje groen = diesel draait ----
           - type: pushbutton
             x: 24
             y: 610
             width: 272
             height: 56
-            label: Prepair Volvo Start
+            label: Start Volvo
             font_size: 16
-            tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.prepvolvostart } }
-            checklist:
-              title: Prepair Volvo Start
-              text: "Uitvoeren opent de zeewaterafsluiters en wierpotten, zet de compressor en de zeewaterpomp glycol aan."
-              items:
-                - { label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, state: open }
-                - { label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, state: open }
-                - { label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, state: open }
-                - { label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, state: open }
-                - { label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling }
-                - { label: "Schroefas koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, above: 2.49, unit: L/min, decimals: 1 }
-                - { label: Compressor, entity: switch.0x781c9dfffea18853 }
-                - { label: "Compressordruk ≥ 3 bar", entity: sensor.al1590_er_compressor_manifold_pressure, above: 3, unit: bar, decimals: 2 }
+            status_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running
+            tap_action: { action: perform-action, perform_action: script.turn_on, data: { entity_id: script.diesel_opstarten } }
+            progress: *diesel_progress
 
           # ---- waarschuwingslampjes schroefas (grijs als de as stilstaat; tik = Diesel) ----
           - { type: warnlight, x: 368, y: 490, size: 48, icon: flow, label: Schroefas koelwaterflow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_below: 3.5, alarm_below: 2.5, tap_action: { action: navigate, navigation_path: sys-diesel } }
