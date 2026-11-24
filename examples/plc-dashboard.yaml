@@ -995,18 +995,20 @@ views:
                 motor: { label: Motor starten, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, watch: [{ label: Contact (motordata), entity: binary_sensor.diesel_contact }, { label: Motor draait, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running }], manual: "Achter kan nu de motor worden aangezet. Eerst Ignition, dan hoor je een piep, en dan op Aan/Uit.", ok: "Motor draait.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
                 # alleen als alarm 001 Emergency Stop actief is; gaat vanzelf verder zodra het alarm weg is
                 nood: { label: Noodstop, image: /local/Pictures/Instructions/Volvohandle.jpeg, confirm: "Alarm 001 Emergency Stop is actief. Zet de noodstopknop weer in en reset de alarmen. Het opstarten gaat vanzelf verder zodra het alarm weg is.", ok: "Noodstop is in.", caption: { confirm: NOODSTOP }, buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Alarmen resetten, tap_action: { action: perform-action, perform_action: button.press, data: { entity_id: button.wago_energy_controls_wago_energy_controls_reset_main_2 } } }] }
-                # eerst neutraal zetten; Doorgaan controleert ±5 %. Daarbuiten: live klok rechts in het venster, Doorgaan of Kalibreren (placeholder)
+                # eerst neutraal zetten (Doorgaan). Afwijking ≤ 4 %: meteen verder. Anders de hendel door het volle bereik halen,
+                # met een live klok en een groen/rood vak (< 5 % = veilig verder); lukt het niet, nogmaals en dan ook Kalibreren
                 hendel:
                   label: Gashendel neutraal
                   confirm: "Zet de gashendel in de neutrale stand en tik op Doorgaan."
-                  buiten: "De gashendel staat meer dan 5 % van neutraal. Zet hem recht (zie de klok) en tik op Doorgaan, of kalibreer de hendel."
+                  cyclus: "De gashendel wijkt meer dan 4 % af. Haal de hendel door het volle bereik: helemaal naar achter, helemaal naar voor en terug naar neutraal. Tik daarna op Doorgaan."
+                  cyclus2: "Nog steeds 5 % of meer. Haal de hendel nogmaals door het volle bereik (achter, voor, neutraal) en tik op Doorgaan. Lukt het niet, kalibreer de hendel."
                   ok: "Gashendel staat neutraal."
-                  caption: { confirm: NEUTRAAL, buiten: "BUITEN ±5 %" }
-                  dial: { label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%", decimals: 0, width: 240, when: buiten }
+                  caption: { confirm: NEUTRAAL, cyclus: BEREIK, cyclus2: "NOGMAALS" }
+                  dial: { label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%", decimals: 0, width: 240, when: [cyclus, cyclus2], ok_within: 5, ok_text: "Binnen ±5 % – veilig door naar de volgende stap", bad_text: "5 % of meer – nog niet verder" }
                   buttons:
-                    - { label: Afbreken, value: abort, style: plain, when: [confirm, buiten] }
-                    - { label: Kalibreren, placeholder: "Kalibratie van de gashendel is nog niet gekoppeld.", when: buiten }
-                    - { label: Doorgaan, value: door, when: [confirm, buiten] }
+                    - { label: Afbreken, value: abort, style: plain, when: [confirm, cyclus, cyclus2] }
+                    - { label: Kalibreren, placeholder: &kalibratie_tekst "Gashendel kalibreren: deze procedure wordt nog gebouwd. Hier komen straks de stappen om de gashendel te kalibreren.", when: cyclus2 }
+                    - { label: Doorgaan, value: door, when: [confirm, cyclus, cyclus2] }
                 vaar: { label: Vaarmodus kiezen, confirm: "Kies de vaarmodus.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Diesel, value: diesel, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
           # Stop Diesel: script.diesel_stoppen (generated automations/diesel_stoppen.yaml), zelfde statushelper als Start Diesel.
           # Het venster (&diesel_stop_progress) wordt ook gebruikt door de knop op Voortstuwing.
@@ -1047,6 +1049,8 @@ views:
           - { type: dial, x: 44, y: 1089, width: 190, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%", decimals: 0 }
           - { type: value, x: 268, y: 1105, width: 320, height: 36, label: Speed setpoint, entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, font_size: 15, decimals: 0 }
           - { type: value, x: 268, y: 1153, width: 320, height: 36, label: True speed, entity: sensor.engine_room_main_engine_me_rpm, font_size: 15, decimals: 0 }
+          # kalibratie van de gashendel: losse procedure (nog een placeholder); ook op te roepen vanuit Start Diesel (Kalibreren)
+          - { type: pushbutton, x: 268, y: 1207, width: 320, height: 48, label: Gashendel kalibreren, font_size: 15, placeholder: *kalibratie_tekst }
           - { type: indicator, x: 640, y: 1105, label: Diesel running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, font_size: 17 }
           - { type: indicator, x: 940, y: 1105, label: Diesel clutch neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 17 }
           - { type: indicator, x: 640, y: 1153, label: Diesel clutch FWD, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, font_size: 17 }

@@ -475,13 +475,18 @@
                 if (isAb("nood")) return abort("nood");
                 set(`${plan}:nood:ok`); await wait(2000);
               }
-              const recht = () => Math.abs(+states[LEV].state) <= 5;
+              const afw = () => Math.abs(+states[LEV].state);
               set(`${plan}:hendel:confirm`);
-              for (;;) {
-                await until(() => now() === `${plan}:hendel:door` || isAb("hendel"));
-                if (isAb("hendel")) return abort("hendel");
-                if (recht()) break;
-                set(`${plan}:hendel:buiten`);
+              await until(() => now() === `${plan}:hendel:door` || isAb("hendel"));
+              if (isAb("hendel")) return abort("hendel");
+              if (afw() > 4) {
+                let first = true;
+                for (;;) {
+                  set(`${plan}:hendel:${first ? "cyclus" : "cyclus2"}`); first = false;
+                  await until(() => now() === `${plan}:hendel:door` || isAb("hendel"));
+                  if (isAb("hendel")) return abort("hendel");
+                  if (afw() < 5) break;
+                }
               }
               set(`${plan}:hendel:ok`); await wait(1000);
               if (!is(mode, "on")) {

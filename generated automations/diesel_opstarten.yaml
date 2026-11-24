@@ -14,9 +14,10 @@
 #   nood    alleen als alarm "001 Emergency Stop" actief is (lijst alarms van sensor.er_alarm_status_active_alarms):
 #           noodstop weer in (foto Volvohandle.jpeg) en alarmen resetten (knop in het venster);
 #           gaat vanzelf verder zodra het alarm weg is
-#   hendel  eerst de opdracht de hendel neutraal te zetten (Doorgaan). Binnen +/- 5 % (…lever_position): meteen
-#           verder. Anders toestand buiten: het venster toont de hendel live als klok, Doorgaan controleert
-#           opnieuw. Kalibreren is nog een placeholder.
+#   hendel  eerst de opdracht de hendel neutraal te zetten (confirm, Doorgaan). Afwijking (…lever_position)
+#           <= 4 %: meteen verder. Anders cyclus: hendel helemaal naar achter, naar voor en terug naar neutraal,
+#           met een live klok en groen/rood vak in het venster; Doorgaan met < 5 %: verder. Anders cyclus2:
+#           nogmaals, nu ook met Kalibreren (losse procedure, nu een placeholder); herhaalt tot < 5 % of abort.
 #   vaar    vaarmodus Diesel, Zeilen of Anker: alleen via een knop; wacht op de terugmelding (+2 s), 20 s, daarna
 #           opnieuw kiezen. Zeilen en Anker lopen via script.vaarmodus_kiezen (zie vaarmodus.yaml).
 # In elke stap kan de bediener afbreken. Het script zet dan niets terug: open kleppen, pompen en een draaiende
@@ -28,7 +29,7 @@
 #             manual    (motor) wacht tot de motor draait of op abort
 #             confirm   wacht op de bediener; de kaart schrijft "<plan>:<stap>:<antwoord>" terug: start (prep),
 #                       door (hendel), diesel / zeilen / anker (vaar) of abort
-#             buiten    (hendel) Doorgaan getikt, maar de hendel staat nog niet binnen +/- 5 %
+#             cyclus / cyclus2   (hendel) bereik doorlopen; wacht op door of abort
 #             opnieuw   (vaar) geen terugmelding binnen 20 s; opnieuw proberen of afbreken
 #             busy / ok / aborted / complete   zoals bij Generator opstarten
 
@@ -154,25 +155,27 @@ script:
             data: { value: "{{ plan }}:nood:ok" }
           - delay: 2
 
-      # ---------- 4. gashendel: eerst neutraal zetten en Doorgaan; binnen +/- 5 % gaat het meteen verder, anders
-      #            toestand buiten (live klok in het venster) tot Doorgaan met de hendel binnen +/- 5 % ----------
+      # ---------- 4. gashendel: eerst neutraal zetten en Doorgaan. Afwijking <= 4 %: meteen verder. Anders de hendel door
+      #            het volle bereik halen (cyclus, live klok in het venster); daarna < 5 %: verder. Nog niet: cyclus
+      #            herhalen (cyclus2, nu met Kalibreren) tot Doorgaan met de hendel < 5 % ----------
       - action: input_text.set_value
         target: { entity_id: "{{ status }}" }
         data: { value: "{{ plan }}:hendel:confirm" }
-      - repeat:
-          until: >-
-            {{ states(status) == plan ~ ':hendel:abort'
-               or (states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs <= 5) }}
-          sequence:
-            - wait_template: "{{ states(status) in [plan ~ ':hendel:door', plan ~ ':hendel:abort'] }}"
-            - if:
-                - condition: template
-                  value_template: >-
-                    {{ states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs > 5 }}
-              then:
+      - wait_template: "{{ states(status) in [plan ~ ':hendel:door', plan ~ ':hendel:abort'] }}"
+      - if:
+          - condition: template
+            value_template: >-
+              {{ states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs > 4 }}
+        then:
+          - repeat:
+              until: >-
+                {{ states(status) == plan ~ ':hendel:abort'
+                   or (states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs < 5) }}
+              sequence:
                 - action: input_text.set_value
                   target: { entity_id: "{{ status }}" }
-                  data: { value: "{{ plan }}:hendel:buiten" }
+                  data: { value: "{{ plan }}:hendel:{{ 'cyclus' if repeat.first else 'cyclus2' }}" }
+                - wait_template: "{{ states(status) in [plan ~ ':hendel:door', plan ~ ':hendel:abort'] }}"
       - if:
           - condition: template
             value_template: "{{ states(status) == plan ~ ':hendel:abort' }}"

@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.53";
+const VERSION = "0.5.54";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -619,6 +619,11 @@ const TC_STYLE =
   .tc-g-zone { stroke: var(--warn); stroke-width: 4; }
   .tc-g-val { stroke: var(--accent); stroke-width: 14; transition: d .4s; }
   .tc-g-in { stroke-width: 7; }
+  .tc-gauge.tc-dial-good .tc-g-val { stroke: var(--ok); }
+  .tc-gauge.tc-dial-bad .tc-g-val { stroke: var(--alarm); }
+  .tc-dial-ok { padding: 10px 16px; border: 2px solid; border-radius: var(--radius-md); font-weight: 600; text-align: center; }
+  .tc-dial-ok.is-ok { color: var(--ok); border-color: var(--ok); background: color-mix(in srgb, var(--ok) 15%, transparent); }
+  .tc-dial-ok.is-bad { color: var(--alarm); border-color: var(--alarm); background: color-mix(in srgb, var(--alarm) 12%, transparent); }
   .tc-g-inval { stroke: var(--ink-muted); }
   .tc-gauge.tc-tone-warn .tc-g-val { stroke: var(--warn); }
   .tc-gauge-center { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: baseline; }
@@ -2276,7 +2281,8 @@ class ShipbornPanelCard extends HTMLElement {
   // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
   // `watch` on a step = lines shown only while that step is current (instead of the window's `watch`); `value: true` on a
   // watch line shows the live value. A step button with `placeholder` only says it is not connected yet.
-  // `dial` on a step = a live dial (options as the dial item) on the right, in the states listed in its `when`.
+  // `dial` on a step = a live dial (options as the dial item) on the right, in the states listed in its `when`;
+  // `ok_within: 5` adds a green / red box (|value| < 5 or not, texts `ok_text` / `bad_text`) and colours the arc.
   // `closable: false` = no Sluiten while the script runs. `ended` = extra text and buttons after aborted / rolled_back
   // while its `entity` is active, or while all conditions in `if` ({ entity, active_state / _above / _below }) hold;
   // `when` sets the end states (e.g. complete). A button with `close: true` closes this window. `stay: true` = the
@@ -2341,6 +2347,8 @@ class ShipbornPanelCard extends HTMLElement {
     let dialKey = null;
     let dialNode = null;
     let dialUpd = null;
+    let dialCfg = null;
+    let dialBadge = null;
     const waited = new Set(); // "plan:step" for which the user chose to keep waiting
     const BUILTIN = ["busy", "ok", "timeout", "unavailable", "complete", "aborted", "rollback", "rolling_back", "rolled_back"];
     const paint = (hass) => {
@@ -2407,7 +2415,9 @@ class ShipbornPanelCard extends HTMLElement {
       if (dk !== dialKey) {
         dialKey = dk;
         dialNode?.remove();
-        dialNode = dialUpd = null;
+        dialBadge?.remove();
+        dialNode = dialUpd = dialBadge = null;
+        dialCfg = dcfg;
         if (dcfg) {
           const n0 = this._updaters.length;
           dialNode = this._tDial({ width: 220, ...dcfg, x: 0, y: 0 });
@@ -2415,9 +2425,21 @@ class ShipbornPanelCard extends HTMLElement {
           dialNode.style.position = "relative";
           dialNode.style.left = dialNode.style.top = "auto";
           note.before(dialNode);
+          if (dcfg.ok_within != null) {
+            dialBadge = h("div", "tc-dial-ok label");
+            note.before(dialBadge);
+          }
         }
       }
       if (dialUpd) dialUpd(hass);
+      if (dialBadge) {
+        const v = num(hass.states[dialCfg.entity], dialCfg.factor);
+        const good = v != null && Math.abs(v) < dialCfg.ok_within;
+        dialBadge.className = "tc-dial-ok label " + (good ? "is-ok" : "is-bad");
+        dialBadge.textContent = good ? dialCfg.ok_text || "Binnen de grens – veilig verder" : dialCfg.bad_text || "Buiten de grens";
+        dialNode.classList.toggle("tc-dial-good", good);
+        dialNode.classList.toggle("tc-dial-bad", !good);
+      }
       // step buttons for this state; rebuilt only when plan, step or state changes
       const actKey = plan + ":" + cur + ":" + st + ":" + ended;
       if (actKey !== shownActs) {
