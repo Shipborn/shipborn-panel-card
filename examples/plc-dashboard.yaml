@@ -988,14 +988,17 @@ views:
                 modus: { label: Vaarmodus kiezen, confirm: "Kies de nieuwe vaarmodus. Bij Elektrisch en Zeilen blijft het contact aan; bij Haven en Anker gaat het contact uit.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", dc: "Voor Elektrisch moet de DC-bus aan. Start de DC-bus; daarna gaat het vanzelf verder.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE, dc: DC-BUS UIT }, buttons: [{ label: Elektrisch, value: elektrisch, when: [confirm, opnieuw] }, { label: Haven, value: haven, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw, dc] }, { label: Start DC-bus, when: dc, choice: *ei_start, progress: *ei_progress_on }] }
                 contact: { label: Contact uit, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, confirm: "Zet nu het contact (Ignition) uit. Het stoppen gaat vanzelf verder zodra er geen motordata meer binnenkomt; Gedaan kan ook.", watch: [{ label: Contact (motordata), entity: binary_sensor.diesel_contact }], buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
           - { type: dial, x: 1043, y: 707, width: 140, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%", decimals: 0 }
-          - { type: value, x: 984, y: 857, width: 258, height: 32, label: Speed setpoint, entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, font_size: 14, decimals: 0 }
-          - { type: value, x: 984, y: 895, width: 258, height: 32, label: True speed, entity: sensor.engine_room_main_engine_me_rpm, font_size: 14, decimals: 0 }
+          - { type: text, x: 984, y: 857, width: 120, text: Speed setpoint, font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 1130, y: 856, width: 112, entity: sensor.wago_hcs_controls_wago_hcs_controls_speed_setpoint, mono: true, font_size: 14, decimals: 0, unit: rpm }
+          - { type: text, x: 984, y: 879, width: 120, text: True speed, font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 1130, y: 878, width: 112, entity: sensor.engine_room_main_engine_me_rpm, mono: true, font_size: 14, decimals: 0, unit: rpm }
           # kalibratie van de gashendel: losse procedure (nog een placeholder); ook op te roepen vanuit Start Diesel (Kalibreren)
           - { type: pushbutton, x: 984, y: 1051, width: 258, height: 40, label: Gashendel kalibreren, font_size: 14, placeholder: *kalibratie_tekst }
-          - { type: indicator, x: 984, y: 937, label: Running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, font_size: 14 }
-          - { type: indicator, x: 1117, y: 937, label: Neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 14 }
-          - { type: indicator, x: 984, y: 965, label: Clutch FWD, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, font_size: 14 }
-          - { type: indicator, x: 1117, y: 965, label: Clutch AFT, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, font_size: 14 }
+          - { type: indicator, x: 984, y: 911, label: Contact, entity: binary_sensor.diesel_contact, font_size: 14 }   # contact van de Volvo (generated automations/diesel_contact.yaml)
+          - { type: indicator, x: 1117, y: 911, label: Running, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, font_size: 14 }
+          - { type: indicator, x: 984, y: 939, label: Neutraal, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_ntr, font_size: 14 }
+          - { type: indicator, x: 1117, y: 939, label: Clutch FWD, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_fwd, font_size: 14 }
+          - { type: indicator, x: 984, y: 967, label: Clutch AFT, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_clutch_aft, font_size: 14 }
 
   - title: Brandstof
     path: sys-fuel
