@@ -423,7 +423,7 @@
             const H = "wago_hcs_controls_wago_hcs_controls_";
             const S = "input_text.diesel_opstarten_status";
             const q = new URLSearchParams(location.search);
-            const plan = "prep,motor,handle,vaar";
+            const plan = "prep,motor,nood,hendel,vaar";
             const V = [1, 2, 3, 4].map((n) => `valve.er_ventielblok_1tm4_l${n}`);
             const P = ["switch.er_zeewaterpomp_cooling", "switch.0x781c9dfffea18853"];
             const run = `binary_sensor.${H}diesel_running`, mode = `binary_sensor.${H}diesel_mode`;
@@ -458,9 +458,31 @@
                 if (isAb("motor")) return abort("motor");
                 set(`${plan}:motor:ok`); await wait(2000);
               }
-              set(`${plan}:handle:confirm`);
-              await until(() => now() === `${plan}:handle:done` || isAb("handle"));
-              if (isAb("handle")) return abort("handle");
+              // ?estop=1: alarm 001 Emergency Stop is active (gone after 4 s); window.__lever(v) moves the lever
+              const AL = "sensor.er_alarm_status_active_alarms", LEV = `sensor.${H}lever_position`;
+              const setAlarms = (list) => { states[AL] = st(list.length, { alarms: list }); push(); };
+              const alarms = () => [].concat(states[AL].attributes.alarms || []);
+              const nood = () => alarms().join(" | ").toLowerCase().includes("001 emergency stop");
+              window.__lever = (v) => { states[LEV] = st(v, { unit_of_measurement: "%" }); push(); };
+              if (q.get("estop") && !nood()) setAlarms([...alarms(), "001 Emergency Stop"]);
+              if (nood()) {
+                set(`${plan}:nood:confirm`);
+                setTimeout(() => setAlarms(alarms().filter((a) => !/001 emergency stop/i.test(a))), 4000);
+                await until(() => !nood() || isAb("nood"));
+                if (isAb("nood")) return abort("nood");
+                set(`${plan}:nood:ok`); await wait(2000);
+              }
+              const recht = () => Math.abs(+states[LEV].state) <= 5;
+              if (!recht()) {
+                let first = true;
+                for (;;) {
+                  set(`${plan}:hendel:${first ? "confirm" : "buiten"}`); first = false;
+                  await until(() => now() === `${plan}:hendel:door` || isAb("hendel"));
+                  if (isAb("hendel")) return abort("hendel");
+                  if (recht()) break;
+                }
+              }
+              set(`${plan}:hendel:ok`); await wait(1000);
               if (!is(mode, "on")) {
                 let first = true, klaar = false;
                 while (!klaar && !isAb("vaar")) {

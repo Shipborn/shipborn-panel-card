@@ -91,9 +91,10 @@ Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op 
 
 1. **Systemen voorbereiden**: het venster toont inlaat, uitlaat, wierpot aft en front, zeewaterpomp glycol, koelwaterflow (≥ 2,5), compressor en compressordruk (≥ 3 bar). Staat niet alles goed, dan start *Voorbereiden* `automation.prepvolvostart`; het script gaat verder zodra alles groen is.
 2. **Motor starten**: foto `VolvoAanUit.jpeg`. Het script wacht onbeperkt op `…diesel_running`, dan 2 s.
-3. **Noodstop en handle**: foto `Volvohandle.jpeg`, de bediener tikt *Gedaan*.
-4. **Vaarmodus kiezen**: *Diesel*, *Zeilen* of *Anker* (verplicht). Na 20 s zonder terugmelding opnieuw kiezen of afbreken.
-5. 1 s *Diesel online*, daarna sluit het venster.
+3. **Noodstop**, alleen als het alarm *001 Emergency Stop* actief is (lijst `alarms` van `sensor.er_alarm_status_active_alarms`): foto `Volvohandle.jpeg`. Het script gaat vanzelf verder zodra het alarm weg is.
+4. **Gashendel recht**: staat `…lever_position` binnen ±5 %, dan is de stap vanzelf goed. Anders vraagt het venster of de hendel rechtop staat en toont het de positie live. *Doorgaan* controleert opnieuw (nog buiten ±5 %: de vraag blijft staan); *Kalibreren* is nog een placeholder.
+5. **Vaarmodus kiezen**: *Diesel*, *Zeilen* of *Anker* (verplicht). Na 20 s zonder terugmelding opnieuw kiezen of afbreken.
+6. 1 s *Diesel online*, daarna sluit het venster.
 
 *Afbreken* kan in elke stap en zet niets terug. Staat de motor dan zeker stil (`diesel_running` uit en < 50 rpm) en is inlaat of uitlaat open, dan biedt het venster *Inlaat en uitlaat dicht* (alleen `…_l4` en `…_l3`).
 
@@ -106,7 +107,7 @@ Knop *Stop Diesel* onder *Start Diesel*, op Voortstuwing en Diesel. Zelfde helpe
 1. **Motor stoppen** met de Start/Stop-knop: foto `VolvoAanUit.jpeg`. Het script wacht tot `…diesel_running` uit is en de motor onder 50 rpm draait, dan 2 s.
 2. **Vaarmodus kiezen**: *Elektrisch*, *Haven*, *Anker* of *Zeilen*. Bij *Elektrisch* wordt eerst de DC-bus gecontroleerd (≥ 700 V); staat die uit, dan biedt het venster *Start DC-bus* en gaat het daarna vanzelf verder.
 3. **Contact uit**, alleen bij Haven of Anker: zelfde foto, de bediener tikt *Gedaan* (hiervoor is geen sensor). Bij Elektrisch en Zeilen blijft het contact aan en vervalt deze stap.
-4. Het venster blijft open met *Diesel gestopt*. Na Haven of Anker is er de knop *Inlaat en uitlaat dicht*, na Elektrisch of Zeilen niet. De bediener sluit het venster zelf.
+4. Het venster blijft open met *Diesel gestopt*. Alleen na Haven is er de knop *Inlaat en uitlaat dicht*; na Elektrisch, Anker of Zeilen niet. De bediener sluit het venster zelf.
 
 **Installeren:** een nieuw script met `script_diesel_stoppen.yaml` (entiteit `script.diesel_stoppen`).
 

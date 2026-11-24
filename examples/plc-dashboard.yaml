@@ -940,7 +940,21 @@ views:
                     - { label: Afbreken, value: abort, style: plain, when: [fix, wacht] }
                     - { label: Voorbereiden, value: start, when: fix }
                 motor: { label: Motor starten, image: /local/Pictures/Instructions/VolvoAanUit.jpeg, manual: "Achter kan nu de motor worden aangezet. Eerst Ignition, dan hoor je een piep, en dan op Aan/Uit.", ok: "Motor draait.", caption: { manual: HANDMATIG }, buttons: [{ label: Afbreken, value: abort, style: plain, when: manual }] }
-                handle: { label: Noodstop en handle, image: /local/Pictures/Instructions/Volvohandle.jpeg, confirm: "Staat de noodstopknop weer in? Staat de handle in de rechte stand?", buttons: [{ label: Afbreken, value: abort, style: plain }, { label: Gedaan, value: done }] }
+                # alleen als alarm 001 Emergency Stop actief is; gaat vanzelf verder zodra het alarm weg is
+                nood: { label: Noodstop, image: /local/Pictures/Instructions/Volvohandle.jpeg, confirm: "Alarm 001 Emergency Stop is actief. Zet de noodstopknop weer in. Het opstarten gaat vanzelf verder zodra het alarm weg is.", ok: "Noodstop is in.", caption: { confirm: NOODSTOP }, buttons: [{ label: Afbreken, value: abort, style: plain }] }
+                # binnen ±5 % gaat het vanzelf; anders live positie, Doorgaan (controleert opnieuw) of Kalibreren (placeholder)
+                hendel:
+                  label: Gashendel recht
+                  confirm: "De gashendel staat niet binnen ±5 %. Staat de hendel rechtop? Zet hem recht en tik op Doorgaan."
+                  buiten: "De gashendel staat nog steeds niet binnen ±5 %. Zet hem recht en tik op Doorgaan, of kalibreer de hendel."
+                  ok: "Gashendel staat recht."
+                  caption: { confirm: CONTROLE, buiten: "BUITEN ±5 %" }
+                  watch:
+                    - { label: Positie gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, value: true, unit: "%", decimals: 0, active_abs: true, active_below: 5.001 }
+                  buttons:
+                    - { label: Afbreken, value: abort, style: plain, when: [confirm, buiten] }
+                    - { label: Kalibreren, placeholder: "Kalibratie van de gashendel is nog niet gekoppeld.", when: [confirm, buiten] }
+                    - { label: Doorgaan, value: door, when: [confirm, buiten] }
                 vaar: { label: Vaarmodus kiezen, confirm: "Kies de vaarmodus.", opnieuw: "De vaarmodus reageert niet: na 20 s geen terugmelding. Kies opnieuw of breek af.", busy: "Wacht tot de vaarmodus actief is …", ok: "Vaarmodus actief.", caption: { confirm: KEUZE, opnieuw: GEEN REACTIE }, buttons: [{ label: Diesel, value: diesel, when: [confirm, opnieuw] }, { label: Zeilen, value: zeilen, when: [confirm, opnieuw] }, { label: Anker, value: anker, when: [confirm, opnieuw] }, { label: Afbreken, value: abort, style: plain, when: [confirm, opnieuw] }] }
           # Stop Diesel: script.diesel_stoppen (generated automations/diesel_stoppen.yaml), zelfde statushelper als Start Diesel.
           # Het venster (&diesel_stop_progress) wordt ook gebruikt door de knop op Voortstuwing.
@@ -961,11 +975,11 @@ views:
               stay: true             # blijft na afloop open: de bediener sluit zelf
               done: Diesel gestopt.
               aborted: "Afgebroken. Wat al gedaan is, blijft zo."
-              # na Haven of Anker (niet na Elektrisch of Zeilen): inlaat en uitlaat dicht, alleen als de motor zeker stilstaat
+              # alleen na Haven (niet na Elektrisch, Anker of Zeilen): inlaat en uitlaat dicht, alleen als de motor zeker stilstaat
               ended:
                 when: complete
                 if:
-                  - { entity: input_select.vaarmodus_haven, active_state: [Haven, Anker] }
+                  - { entity: input_select.vaarmodus_haven, active_state: Haven }
                   - { entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode, active_state: "off" }
                   - { entity: [valve.er_ventielblok_1tm4_l4, valve.er_ventielblok_1tm4_l3], active_state: open }
                   - { entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, active_state: "off" }

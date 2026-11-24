@@ -11,8 +11,8 @@
 #            bij Elektrisch eerst DC-bus >= 700 V; zo niet: toestand dc, de bediener start de Energy Inverters
 #   contact  alleen na Haven of Anker: contact uit (zelfde foto)   bediener tikt Gedaan
 # Na Elektrisch of Zeilen blijft het contact aan: de stap contact valt dan uit het plan.
-# Daarna is het script klaar. Na Haven of Anker biedt het venster (niet het script) aan om inlaat en uitlaat
-# dicht te zetten; na Elektrisch of Zeilen niet. De bediener sluit het venster zelf.
+# Daarna is het script klaar. Alleen na Haven biedt het venster (niet het script) aan om inlaat en uitlaat
+# dicht te zetten; na Elektrisch, Anker of Zeilen niet. De bediener sluit het venster zelf.
 # In elke stap kan de bediener afbreken; wat al gedaan is (motor uit, gekozen vaarmodus) blijft zo.
 #
 # Status (input_text.diesel_opstarten_status) = "<plan>:<stap>:<toestand>"

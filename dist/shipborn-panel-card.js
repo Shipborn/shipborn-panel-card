@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.50";
+const VERSION = "0.5.51";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2272,7 +2272,8 @@ class ShipbornPanelCard extends HTMLElement {
   // script waits for it), `choice` / `tap_action` work as on a pushbutton (e.g. open another start window);
   // `when` = the states in which the button shows (default confirm, fix). `watch` = lines that stay visible
   // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
-  // `watch` on a step = lines shown only while that step is current (instead of the window's `watch`).
+  // `watch` on a step = lines shown only while that step is current (instead of the window's `watch`); `value: true` on a
+  // watch line shows the live value. A step button with `placeholder` only says it is not connected yet.
   // `closable: false` = no Sluiten while the script runs. `ended` = extra text and buttons after aborted / rolled_back
   // while its `entity` is active, or while all conditions in `if` ({ entity, active_state / _above / _below }) hold;
   // `when` sets the end states (e.g. complete). A button with `close: true` closes this window. `stay: true` = the
@@ -2317,7 +2318,13 @@ class ShipbornPanelCard extends HTMLElement {
       for (const [li, w] of watch) {
         const on = activeOf(hass, w.entity, w);
         li.className = on ? "is-ok" : "is-fail";
-        li.children[2].textContent = on ? w.text_on || "AAN" : w.text_off || "UIT";
+        // value: true = the live value (e.g. lever position) instead of AAN / UIT
+        if (w.value) {
+          const so = hass.states[w.entity];
+          const v = num(so, w.factor);
+          const u = unitOf(w, so);
+          li.children[2].textContent = v == null ? "—" : fmt(v, w.decimals ?? 0, hass) + (u ? " " + u : "");
+        } else li.children[2].textContent = on ? w.text_on || "AAN" : w.text_off || "UIT";
       }
     };
     const t0 = Date.now();
@@ -2397,6 +2404,7 @@ class ShipbornPanelCard extends HTMLElement {
           const el = h("button", "tc-btn label" + (x.style === "danger" ? " tc-btn-danger" : x.style === "plain" ? "" : " tc-btn-primary"));
           el.type = "button";
           el.textContent = x.label || x.value || "";
+          if (x.placeholder) el.style.color = el.style.borderColor = "var(--warn, #e0a030)"; // not connected yet
           el.addEventListener("click", async (ev) => {
             ev.stopPropagation();
             if (!this._hass) return;
@@ -2404,7 +2412,9 @@ class ShipbornPanelCard extends HTMLElement {
             if (x.value) {
               [...acts.children].forEach((c) => (c.disabled = true));
               this._hass.callService("input_text", "set_value", { entity_id: p.entity, value: `${plan}:${cur}:${x.value}` });
-            } else if (x.choice) this._progressBusy(x) ? this._progress(x, null) : this._choice(x);
+            } else if (x.placeholder)
+              this._checklist({ label: x.label, checklist: { title: x.label, text: typeof x.placeholder === "string" ? x.placeholder : "Nog niet gekoppeld: deze knop schakelt nog niets.", items: [], close: "Sluiten" }, tap_action: { action: "none" } });
+            else if (x.choice) this._progressBusy(x) ? this._progress(x, null) : this._choice(x);
             else if (x.tap_action) {
               const prev2 = x.progress && this._hass.states[x.progress.entity];
               if ((await this._handleAction(x, x.tap_action, el)) === false) return;

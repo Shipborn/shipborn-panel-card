@@ -11,7 +11,10 @@
 #           aan, koelwaterflow >= 2,5 en compressordruk >= 3 bar. Staat alles al goed, dan vervalt de stap.
 #           Anders start de knop Voorbereiden automation.prepvolvostart; het script wacht tot alles goed staat.
 #   motor   bediener start de motor (foto VolvoAanUit.jpeg)  wacht op diesel_running (+2 s), onbeperkt
-#   handle  noodstop in, handle recht (foto Volvohandle.jpeg) bediener tikt Gedaan
+#   nood    alleen als alarm "001 Emergency Stop" actief is (lijst alarms van sensor.er_alarm_status_active_alarms):
+#           noodstop weer in (foto Volvohandle.jpeg); gaat vanzelf verder zodra het alarm weg is
+#   hendel  gashendel (…lever_position) binnen +/- 5 %: vanzelf goed. Anders vraagt het venster of de hendel recht
+#           staat (live positie); Doorgaan controleert opnieuw. Kalibreren is nog een placeholder.
 #   vaar    vaarmodus Diesel, Zeilen of Anker: alleen via een knop; wacht op de terugmelding (+2 s), 20 s, daarna
 #           opnieuw kiezen. Zeilen en Anker lopen via script.vaarmodus_kiezen (zie vaarmodus.yaml).
 # In elke stap kan de bediener afbreken. Het script zet dan niets terug: open kleppen, pompen en een draaiende
@@ -22,7 +25,8 @@
 #             wacht     (prep) automation gestart; wacht tot alles goed staat of op abort
 #             manual    (motor) wacht tot de motor draait of op abort
 #             confirm   wacht op de bediener; de kaart schrijft "<plan>:<stap>:<antwoord>" terug: start (prep),
-#                       done (handle), diesel / zeilen / anker (vaar) of abort
+#                       door (hendel), diesel / zeilen / anker (vaar) of abort
+#             buiten    (hendel) Doorgaan getikt, maar de hendel staat nog niet binnen +/- 5 %
 #             opnieuw   (vaar) geen terugmelding binnen 20 s; opnieuw proberen of afbreken
 #             busy / ok / aborted / complete   zoals bij Generator opstarten
 
@@ -37,13 +41,13 @@ script:
     alias: Diesel opstarten
     description: >-
       Loopt met de bediener de opstart van de Volvo door: systemen rond de diesel voorbereiden, motor starten,
-      noodstop en handle controleren en de vaarmodus kiezen (Diesel, Zeilen of Anker). Status in input_text.diesel_opstarten_status.
+      noodstop (bij alarm 001 Emergency Stop) en gashendel controleren en de vaarmodus kiezen (Diesel, Zeilen of Anker). Status in input_text.diesel_opstarten_status.
     icon: mdi:engine
     mode: single
     max_exceeded: silent   # tweede start tijdens een lopende run wordt genegeerd
     variables:
       status: input_text.diesel_opstarten_status
-      plan: "prep,motor,handle,vaar"
+      plan: "prep,motor,nood,hendel,vaar"
       inlaat: valve.er_ventielblok_1tm4_l4
       uitlaat: valve.er_ventielblok_1tm4_l3
       wierpot_aft: valve.er_ventielblok_1tm4_l2
@@ -56,6 +60,7 @@ script:
       dieselmodus: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode
       dieselknop: button.wago_hcs_controls_wago_controls_dieselmode
       keuze_haven: input_select.vaarmodus_haven
+      hendel: sensor.wago_hcs_controls_wago_hcs_controls_lever_position
     sequence:
       # ---------- 1. systemen rond de diesel; de knop Voorbereiden start de bestaande automation ----------
       - if:
@@ -123,19 +128,56 @@ script:
             data: { value: "{{ plan }}:motor:ok" }
           - delay: 2
 
-      # ---------- 3. noodstop in en handle recht (foto) ----------
-      - action: input_text.set_value
-        target: { entity_id: "{{ status }}" }
-        data: { value: "{{ plan }}:handle:confirm" }
-      - wait_template: "{{ states(status) in [plan ~ ':handle:done', plan ~ ':handle:abort'] }}"
+      # ---------- 3. noodstop (foto): alleen als het alarm "001 Emergency Stop" actief is; verder zodra het weg is ----------
       - if:
           - condition: template
-            value_template: "{{ states(status) == plan ~ ':handle:abort' }}"
+            value_template: "{% set a = state_attr('sensor.er_alarm_status_active_alarms', 'alarms') or [] %}{{ '001 emergency stop' in ((a if a is string else a | join(' | ')) | lower) }}"
         then:
           - action: input_text.set_value
             target: { entity_id: "{{ status }}" }
-            data: { value: "{{ plan }}:handle:aborted" }
-          - stop: Afgebroken door de bediener
+            data: { value: "{{ plan }}:nood:confirm" }
+          - wait_template: >-
+              {% set a = state_attr('sensor.er_alarm_status_active_alarms', 'alarms') or [] %}{{ not ('001 emergency stop' in ((a if a is string else a | join(' | ')) | lower))
+                 or states(status) == plan ~ ':nood:abort' }}
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':nood:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:nood:aborted" }
+              - stop: Afgebroken door de bediener
+          - action: input_text.set_value
+            target: { entity_id: "{{ status }}" }
+            data: { value: "{{ plan }}:nood:ok" }
+          - delay: 2
+
+      # ---------- 4. gashendel recht: binnen +/- 5 % gaat het vanzelf; anders Doorgaan (opnieuw gecontroleerd) ----------
+      - if:
+          - condition: template
+            value_template: "{{ states(hendel) | float(999) | abs > 5 }}"
+        then:
+          - repeat:
+              until: >-
+                {{ states(status) == plan ~ ':hendel:abort'
+                   or (states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs <= 5) }}
+              sequence:
+                - action: input_text.set_value
+                  target: { entity_id: "{{ status }}" }
+                  data: { value: "{{ plan }}:hendel:{{ 'confirm' if repeat.first else 'buiten' }}" }
+                - wait_template: "{{ states(status) in [plan ~ ':hendel:door', plan ~ ':hendel:abort'] }}"
+          - if:
+              - condition: template
+                value_template: "{{ states(status) == plan ~ ':hendel:abort' }}"
+            then:
+              - action: input_text.set_value
+                target: { entity_id: "{{ status }}" }
+                data: { value: "{{ plan }}:hendel:aborted" }
+              - stop: Afgebroken door de bediener
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:hendel:ok" }
+      - delay: 1
 
       # ---------- 4. vaarmodus: Diesel, Zeilen of Anker, alleen na een tik op een knop in het venster ----------
       - if:
