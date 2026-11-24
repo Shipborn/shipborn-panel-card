@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.52";
+const VERSION = "0.5.53";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -2276,6 +2276,7 @@ class ShipbornPanelCard extends HTMLElement {
   // (e.g. a pump that must keep running); `image` on a step = photo shown while that step is current.
   // `watch` on a step = lines shown only while that step is current (instead of the window's `watch`); `value: true` on a
   // watch line shows the live value. A step button with `placeholder` only says it is not connected yet.
+  // `dial` on a step = a live dial (options as the dial item) on the right, in the states listed in its `when`.
   // `closable: false` = no Sluiten while the script runs. `ended` = extra text and buttons after aborted / rolled_back
   // while its `entity` is active, or while all conditions in `if` ({ entity, active_state / _above / _below }) hold;
   // `when` sets the end states (e.g. complete). A button with `close: true` closes this window. `stay: true` = the
@@ -2337,6 +2338,9 @@ class ShipbornPanelCard extends HTMLElement {
     let choosing = false;
     let locked = false; // closable: false and the script is still running
     let cur_ = {};
+    let dialKey = null;
+    let dialNode = null;
+    let dialUpd = null;
     const waited = new Set(); // "plan:step" for which the user chose to keep waiting
     const BUILTIN = ["busy", "ok", "timeout", "unavailable", "complete", "aborted", "rollback", "rolling_back", "rolled_back"];
     const paint = (hass) => {
@@ -2397,13 +2401,30 @@ class ShipbornPanelCard extends HTMLElement {
       const src = st !== "complete" && st !== "aborted" && !back ? step.image : null;
       if (src) { if (img.getAttribute("src") !== src) img.src = src; img.hidden = false; }
       else img.hidden = true;
+      // live dial of the current step (e.g. the lever position), above the text
+      const dcfg = step.dial && [].concat(step.dial.when || ["confirm", "fix"]).includes(st) ? step.dial : null;
+      const dk = dcfg ? plan + ":" + cur : null;
+      if (dk !== dialKey) {
+        dialKey = dk;
+        dialNode?.remove();
+        dialNode = dialUpd = null;
+        if (dcfg) {
+          const n0 = this._updaters.length;
+          dialNode = this._tDial({ width: 220, ...dcfg, x: 0, y: 0 });
+          dialUpd = this._updaters.splice(n0)[0] || null; // painted from here, removed with the window
+          dialNode.style.position = "relative";
+          dialNode.style.left = dialNode.style.top = "auto";
+          note.before(dialNode);
+        }
+      }
+      if (dialUpd) dialUpd(hass);
       // step buttons for this state; rebuilt only when plan, step or state changes
       const actKey = plan + ":" + cur + ":" + st + ":" + ended;
       if (actKey !== shownActs) {
         shownActs = actKey;
         const btns = ended ? endCfg.buttons || [] : (step.buttons || []).filter((x) => [].concat(x.when || ["confirm", "fix"]).includes(st));
         acts.replaceChildren(...btns.map((x) => {
-          const el = h("button", "tc-btn label" + (x.style === "danger" ? " tc-btn-danger" : x.style === "plain" ? "" : " tc-btn-primary"));
+          const el = h("button", "tc-btn label" + (x.style === "danger" ? " tc-btn-danger" : x.style === "plain" || x.placeholder ? "" : " tc-btn-primary"));
           el.type = "button";
           el.textContent = x.label || x.value || "";
           if (x.placeholder) el.style.color = el.style.borderColor = "var(--warn, #e0a030)"; // not connected yet

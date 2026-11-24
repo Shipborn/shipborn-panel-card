@@ -461,7 +461,7 @@
                 if (isAb("motor")) return abort("motor");
                 set(`${plan}:motor:ok`); await wait(2000);
               }
-              // ?estop=1: alarm 001 Emergency Stop is active (gone after 4 s); window.__lever(v) moves the lever
+              // ?estop=1: alarm 001 Emergency Stop is active (gone after Alarmen resetten); window.__lever(v) moves the lever
               const AL = "sensor.er_alarm_status_active_alarms", LEV = `sensor.${H}lever_position`;
               const setAlarms = (list) => { states[AL] = st(list.length, { alarms: list }); push(); };
               const alarms = () => [].concat(states[AL].attributes.alarms || []);
@@ -470,20 +470,18 @@
               if (q.get("estop") && !nood()) setAlarms([...alarms(), "001 Emergency Stop"]);
               if (nood()) {
                 set(`${plan}:nood:confirm`);
-                setTimeout(() => setAlarms(alarms().filter((a) => !/001 emergency stop/i.test(a))), 4000);
+                window.__resetAlarms = () => setAlarms(alarms().filter((a) => !/001 emergency stop/i.test(a)));
                 await until(() => !nood() || isAb("nood"));
                 if (isAb("nood")) return abort("nood");
                 set(`${plan}:nood:ok`); await wait(2000);
               }
               const recht = () => Math.abs(+states[LEV].state) <= 5;
-              if (!recht()) {
-                let first = true;
-                for (;;) {
-                  set(`${plan}:hendel:${first ? "confirm" : "buiten"}`); first = false;
-                  await until(() => now() === `${plan}:hendel:door` || isAb("hendel"));
-                  if (isAb("hendel")) return abort("hendel");
-                  if (recht()) break;
-                }
+              set(`${plan}:hendel:confirm`);
+              for (;;) {
+                await until(() => now() === `${plan}:hendel:door` || isAb("hendel"));
+                if (isAb("hendel")) return abort("hendel");
+                if (recht()) break;
+                set(`${plan}:hendel:buiten`);
               }
               set(`${plan}:hendel:ok`); await wait(1000);
               if (!is(mode, "on")) {
@@ -520,6 +518,7 @@
             setTimeout(() => { if (states[fb]) states[fb] = st(data.option); push(); }, 1000);
             push();
           }
+          if (domain === "button" && data.entity_id === "button.wago_energy_controls_wago_energy_controls_reset_main_2") window.__resetAlarms?.();
           const mode = /^button\.wago_hcs_controls_wago_controls_(diesel|electric|harbor)mode$/.exec(data.entity_id || "");
           if (mode) {
             window.__pressMode(mode[1]);

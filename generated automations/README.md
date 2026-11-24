@@ -108,8 +108,8 @@ Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op 
 
 1. **Systemen voorbereiden**: het venster toont inlaat, uitlaat, wierpot aft en front, zeewaterpomp glycol, koelwaterflow (≥ 2,5), compressor en compressordruk (≥ 3 bar). Staat niet alles goed, dan start *Voorbereiden* `automation.prepvolvostart`; het script gaat verder zodra alles groen is.
 2. **Motor starten**: foto `VolvoAanUit.jpeg`. Het script wacht onbeperkt op `…diesel_running`, dan 2 s.
-3. **Noodstop**, alleen als het alarm *001 Emergency Stop* actief is (lijst `alarms` van `sensor.er_alarm_status_active_alarms`): foto `Volvohandle.jpeg`. Het script gaat vanzelf verder zodra het alarm weg is.
-4. **Gashendel recht**: staat `…lever_position` binnen ±5 %, dan is de stap vanzelf goed. Anders vraagt het venster of de hendel rechtop staat en toont het de positie live. *Doorgaan* controleert opnieuw (nog buiten ±5 %: de vraag blijft staan); *Kalibreren* is nog een placeholder.
+3. **Noodstop**, alleen als het alarm *001 Emergency Stop* actief is (lijst `alarms` van `sensor.er_alarm_status_active_alarms`): foto `Volvohandle.jpeg` en de knop *Alarmen resetten* (`button.…reset_main_2`, zoals op het alarmscherm). Het script gaat vanzelf verder zodra het alarm weg is.
+4. **Gashendel neutraal**: eerst de opdracht de hendel neutraal te zetten, met *Doorgaan*. Staat `…lever_position` dan binnen ±5 %, dan gaat het meteen verder. Anders toont het venster rechts een live klok van de hendel, met *Doorgaan* (controleert opnieuw) en *Kalibreren* (nog een placeholder).
 5. **Vaarmodus kiezen**: *Diesel*, *Zeilen* of *Anker* (verplicht). Na 20 s zonder terugmelding opnieuw kiezen of afbreken.
 6. 1 s *Diesel online*, daarna sluit het venster.
 

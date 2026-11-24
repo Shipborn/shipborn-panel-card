@@ -119,28 +119,33 @@ sequence:
         data: { value: "{{ plan }}:nood:ok" }
       - delay: 2
 
-  # ---------- 4. gashendel recht: binnen +/- 5 % gaat het vanzelf; anders Doorgaan (opnieuw gecontroleerd) ----------
-  - if:
-      - condition: template
-        value_template: "{{ states(hendel) | float(999) | abs > 5 }}"
-    then:
-      - repeat:
-          until: >-
-            {{ states(status) == plan ~ ':hendel:abort'
-               or (states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs <= 5) }}
-          sequence:
+  # ---------- 4. gashendel: eerst neutraal zetten en Doorgaan; binnen +/- 5 % gaat het meteen verder, anders
+  #            toestand buiten (live klok in het venster) tot Doorgaan met de hendel binnen +/- 5 % ----------
+  - action: input_text.set_value
+    target: { entity_id: "{{ status }}" }
+    data: { value: "{{ plan }}:hendel:confirm" }
+  - repeat:
+      until: >-
+        {{ states(status) == plan ~ ':hendel:abort'
+           or (states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs <= 5) }}
+      sequence:
+        - wait_template: "{{ states(status) in [plan ~ ':hendel:door', plan ~ ':hendel:abort'] }}"
+        - if:
+            - condition: template
+              value_template: >-
+                {{ states(status) == plan ~ ':hendel:door' and states(hendel) | float(999) | abs > 5 }}
+          then:
             - action: input_text.set_value
               target: { entity_id: "{{ status }}" }
-              data: { value: "{{ plan }}:hendel:{{ 'confirm' if repeat.first else 'buiten' }}" }
-            - wait_template: "{{ states(status) in [plan ~ ':hendel:door', plan ~ ':hendel:abort'] }}"
-      - if:
-          - condition: template
-            value_template: "{{ states(status) == plan ~ ':hendel:abort' }}"
-        then:
-          - action: input_text.set_value
-            target: { entity_id: "{{ status }}" }
-            data: { value: "{{ plan }}:hendel:aborted" }
-          - stop: Afgebroken door de bediener
+              data: { value: "{{ plan }}:hendel:buiten" }
+  - if:
+      - condition: template
+        value_template: "{{ states(status) == plan ~ ':hendel:abort' }}"
+    then:
+      - action: input_text.set_value
+        target: { entity_id: "{{ status }}" }
+        data: { value: "{{ plan }}:hendel:aborted" }
+      - stop: Afgebroken door de bediener
   - action: input_text.set_value
     target: { entity_id: "{{ status }}" }
     data: { value: "{{ plan }}:hendel:ok" }
