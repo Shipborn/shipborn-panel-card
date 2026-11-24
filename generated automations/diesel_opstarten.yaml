@@ -7,7 +7,7 @@
 # Houd dat bestand gelijk met dit bestand.
 #
 # Stappen (plan, vaste volgorde):
-#   prep    systemen rond de diesel: inlaat, uitlaat, wierpot aft en front open, zeewaterpomp glycol en compressor
+#   prep    systemen rond de diesel: inlaat, uitlaat en wierpot aft open (wierpot front niet: die is voor de generator), zeewaterpomp glycol en compressor
 #           aan, koelwaterflow >= 2,5 en compressordruk >= 3 bar. Staat alles al goed, dan vervalt de stap.
 #           Anders start de knop Voorbereiden automation.prepvolvostart; het script wacht tot alles goed staat.
 #   motor   bediener start de motor (foto VolvoAanUit.jpeg)  wacht op diesel_running (+2 s), onbeperkt
@@ -54,7 +54,6 @@ script:
       inlaat: valve.er_ventielblok_1tm4_l4
       uitlaat: valve.er_ventielblok_1tm4_l3
       wierpot_aft: valve.er_ventielblok_1tm4_l2
-      wierpot_front: valve.er_ventielblok_1tm4_l1
       pomp: switch.er_zeewaterpomp_cooling
       compressor: switch.0x781c9dfffea18853
       flow: sensor.al1590_er_prop_shaft_cooling_water_flow
@@ -68,13 +67,13 @@ script:
       # ---------- 1. systemen rond de diesel; de knop Voorbereiden start de bestaande automation ----------
       - if:
           - condition: template
-            value_template: "{{ not (is_state(inlaat, 'open') and is_state(uitlaat, 'open') and is_state(wierpot_aft, 'open') and is_state(wierpot_front, 'open') and is_state(pomp, 'on') and is_state(compressor, 'on') and states(flow) | float(0) >= 2.5 and states(druk) | float(0) >= 3) }}"
+            value_template: "{{ not (is_state(inlaat, 'open') and is_state(uitlaat, 'open') and is_state(wierpot_aft, 'open') and is_state(pomp, 'on') and is_state(compressor, 'on') and states(flow) | float(0) >= 2.5 and states(druk) | float(0) >= 3) }}"
         then:
           - action: input_text.set_value
             target: { entity_id: "{{ status }}" }
             data: { value: "{{ plan }}:prep:fix" }
           - wait_template: >-
-              {{ (is_state(inlaat, 'open') and is_state(uitlaat, 'open') and is_state(wierpot_aft, 'open') and is_state(wierpot_front, 'open') and is_state(pomp, 'on') and is_state(compressor, 'on') and states(flow) | float(0) >= 2.5 and states(druk) | float(0) >= 3)
+              {{ (is_state(inlaat, 'open') and is_state(uitlaat, 'open') and is_state(wierpot_aft, 'open') and is_state(pomp, 'on') and is_state(compressor, 'on') and states(flow) | float(0) >= 2.5 and states(druk) | float(0) >= 3)
                  or states(status) in [plan ~ ':prep:start', plan ~ ':prep:abort'] }}
           - if:
               - condition: template
@@ -94,7 +93,7 @@ script:
                 target: { entity_id: "{{ status }}" }
                 data: { value: "{{ plan }}:prep:wacht" }
               - wait_template: >-
-                  {{ (is_state(inlaat, 'open') and is_state(uitlaat, 'open') and is_state(wierpot_aft, 'open') and is_state(wierpot_front, 'open') and is_state(pomp, 'on') and is_state(compressor, 'on') and states(flow) | float(0) >= 2.5 and states(druk) | float(0) >= 3)
+                  {{ (is_state(inlaat, 'open') and is_state(uitlaat, 'open') and is_state(wierpot_aft, 'open') and is_state(pomp, 'on') and is_state(compressor, 'on') and states(flow) | float(0) >= 2.5 and states(druk) | float(0) >= 3)
                      or states(status) == plan ~ ':prep:abort' }}
               - if:
                   - condition: template

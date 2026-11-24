@@ -427,7 +427,7 @@
             const S = "input_text.diesel_opstarten_status";
             const q = new URLSearchParams(location.search);
             const plan = "prep,motor,nood,hendel,vaar";
-            const V = [1, 2, 3, 4].map((n) => `valve.er_ventielblok_1tm4_l${n}`);
+            const V = [2, 3, 4].map((n) => `valve.er_ventielblok_1tm4_l${n}`); // inlaat, uitlaat, wierpot aft (front is voor de generator)
             const P = ["switch.er_zeewaterpomp_cooling", "switch.0x781c9dfffea18853"];
             const run = `binary_sensor.${H}diesel_running`, mode = `binary_sensor.${H}diesel_mode`;
             const is = (e, v) => states[e]?.state === v;

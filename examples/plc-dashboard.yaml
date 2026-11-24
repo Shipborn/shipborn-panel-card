@@ -881,40 +881,10 @@ views:
           - { type: indicator, x: 674, y: 723, label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, font_size: 15, off_color: red, state_on: open }
           - { type: indicator, x: 674, y: 751, label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, font_size: 15, off_color: red, state_on: open }
           - { type: indicator, x: 674, y: 779, label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 807, label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, font_size: 15, off_color: red, state_on: open }
-          - { type: indicator, x: 674, y: 835, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
-          - { type: indicator, x: 674, y: 863, label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
-          - { type: indicator, x: 674, y: 891, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
-          - { type: indicator, x: 674, y: 919, label: Compressordruk ≥ 3 bar, entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
-          - {
-              type: pushbutton,
-              x: 674,
-              y: 1045,
-              width: 125,
-              height: 48,
-              label: Prepare start,
-              font_size: 14,
-              tap_action:
-                {
-                  action: perform-action,
-                  perform_action: automation.trigger,
-                  data: { entity_id: automation.prepvolvostart },
-                  confirmation:
-                    {
-                      text: "Deze functie bedient de volgende aansturingen:
-
-
-                        - OPEN Volvo zeewatervalves, IN & OUT
-
-                        - OPEN wierpot valves, front & aft
-
-                        - Compressor AAN
-
-                        - Zeewaterpomp glycolsysteem AAN"
-                    }
-                }
-            }
-          - { type: pushbutton, x: 807, y: 1045, width: 125, height: 48, label: Close valves, font_size: 14, tap_action: { action: perform-action, perform_action: automation.trigger, data: { entity_id: automation.closevolvovalves }, confirmation: { text: "Deze functie bedient de volgende aansturingen: close Volvo zeewatervalves, IN & OUT" } }, variant: stop }
+          - { type: indicator, x: 674, y: 807, label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling, font_size: 15, off_color: red }
+          - { type: indicator, x: 674, y: 835, label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, font_size: 15, off_color: red, active_above: 2.49 }
+          - { type: indicator, x: 674, y: 863, label: Compressor, entity: switch.0x781c9dfffea18853, font_size: 15, off_color: red }
+          - { type: indicator, x: 674, y: 891, label: Compressordruk ≥ 3 bar, entity: sensor.al1590_er_compressor_manifold_pressure, font_size: 15, off_color: red, active_above: 3 }
           # ---- status aandrijving (1/4 breed): gashendel, setpoint en toerental, diesel-indicatoren, Start / Stop Diesel, kalibreren ----
           - { type: panel, x: 966, y: 671, width: 294, height: 430, title: Status aandrijving }
           # Start Diesel: script.diesel_opstarten (generated automations/diesel_opstarten.yaml) met een stappenvenster
@@ -958,7 +928,6 @@ views:
                     - { label: Dieselmotor inlaat, entity: valve.er_ventielblok_1tm4_l4, active_state: open, text_on: OPEN, text_off: DICHT }
                     - { label: Dieselmotor uitlaat, entity: valve.er_ventielblok_1tm4_l3, active_state: open, text_on: OPEN, text_off: DICHT }
                     - { label: Wierpot aft, entity: valve.er_ventielblok_1tm4_l2, active_state: open, text_on: OPEN, text_off: DICHT }
-                    - { label: Wierpot front, entity: valve.er_ventielblok_1tm4_l1, active_state: open, text_on: OPEN, text_off: DICHT }
                     - { label: Zeewaterpomp glycol, entity: switch.er_zeewaterpomp_cooling }
                     - { label: "Propshaft koelwaterflow ≥ 2,5", entity: sensor.al1590_er_prop_shaft_cooling_water_flow, active_above: 2.499, text_on: OK, text_off: LAAG }
                     - { label: Compressor, entity: switch.0x781c9dfffea18853 }
