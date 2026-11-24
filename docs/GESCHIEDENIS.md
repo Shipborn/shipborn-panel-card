@@ -206,6 +206,7 @@ Op deze dag verschoof het zwaartepunt van het fysieke paneel naar volledige PLC-
 - **Stop Diesel, nieuwe volgorde**: eerst motor stoppen, dan de vaarmodus (Elektrisch, Haven, Anker, Zeilen). Alleen bij Haven en Anker gaat het contact uit en wordt voorgesteld om inlaat en uitlaat te sluiten; bij Elektrisch en Zeilen blijft het contact aan.
 - **Elektrisch met DC-buscontrole** (v0.5.50): Elektrisch kiezen, ook in Stop Diesel, controleert eerst of de DC-bus aan is en gaat anders via Energy Inverters opstarten.
 - **Noodstop en gashendel in Start Diesel** (v0.5.51, 24-11): de noodstopstap verschijnt alleen bij alarm 001 Emergency Stop; de gashendel wordt binnen ±5 % vanzelf goedgekeurd, anders live positie met Doorgaan of Kalibreren (placeholder). Inlaat en uitlaat dicht na Stop Diesel alleen nog bij Haven, niet bij Anker.
+- **Gashendel in de schroefasklok** (v0.5.52, 24-11): nieuwe optie `inner_entity` op `dial`; de losse gashendelklok op Voortstuwing is weg.
 
 ## Lessen en keuzes die je moet kennen
 

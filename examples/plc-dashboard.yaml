@@ -2078,7 +2078,7 @@ views:
 
           # ---- toerentellers (kolommen van 272 breed op x 24 / 312 / 600); groen kader = aandrijving gekozen met de vaarmodus ----
           - { type: dial, x: 30, y: 232, width: 260, label: Diesel, entity: sensor.engine_room_main_engine_me_rpm, min: 0, max: 4000, unit: rpm, selected_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_mode }
-          - { type: dial, x: 318, y: 232, width: 260, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, unit: rpm, warn_above: 500 }
+          - { type: dial, x: 318, y: 232, width: 260, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, min: -550, max: 550, unit: rpm, warn_above: 500, inner_entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, inner_min: -100, inner_max: 100, inner_unit: "%", inner_label: Gashendel }
           - { type: dial, x: 606, y: 232, width: 260, label: E-motor, entity: sensor.wago_hcs_controls_wago_hcs_controls_emotor_speed, min: -3000, max: 3000, unit: rpm, selected_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode }
 
           # ---- waarschuwingslampjes diesel (48 groot; grijs als de diesel niet draait; grenzen uit het HA-dashboard; tik = Diesel) ----
@@ -2114,9 +2114,6 @@ views:
           - { type: warnlight, x: 368, y: 490, size: 48, icon: flow, label: Schroefas koelwaterflow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_below: 3.5, alarm_below: 2.5, tap_action: { action: navigate, navigation_path: sys-diesel } }
           - { type: warnlight, x: 424, y: 490, size: 48, icon: klimaat, label: Schroefas vettemperatuur, entity: sensor.al1590_er_prop_shaft_grease_temperature, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_above: 50, alarm_above: 80, tap_action: { action: navigate, navigation_path: sys-diesel } }
           - { type: warnlight, x: 480, y: 490, size: 48, icon: druk, label: Schroefas vetdruk, entity: sensor.al1590_er_prop_shaft_grease_pressure, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, alarm_above: 2, alarm_below: 0.1, tap_action: { action: navigate, navigation_path: sys-diesel } }
-
-          # ---- gashendel (−100 … +100 %, zoals op Diesel) onder de schroefas ----
-          - { type: dial, x: 363, y: 548, width: 170, label: Gashendel, entity: sensor.wago_hcs_controls_wago_hcs_controls_lever_position, min: -100, max: 100, unit: "%", decimals: 0, tap_action: { action: navigate, navigation_path: sys-diesel } }
 
           # ---- E-motor: gekoppeld (groen) of niet (grijs); tik = HA-venster met geschiedenis ----
           - { type: warnlight, x: 712, y: 490, size: 48, icon: koppeling, icon_off: ontkoppeld, label: E-motor gekoppeld, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_emotor_clutch_in }

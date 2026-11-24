@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.51";
+const VERSION = "0.5.52";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -618,6 +618,8 @@ const TC_STYLE =
   .tc-g-track { stroke: var(--line); stroke-width: 14; }
   .tc-g-zone { stroke: var(--warn); stroke-width: 4; }
   .tc-g-val { stroke: var(--accent); stroke-width: 14; transition: d .4s; }
+  .tc-g-in { stroke-width: 7; }
+  .tc-g-inval { stroke: var(--ink-muted); }
   .tc-gauge.tc-tone-warn .tc-g-val { stroke: var(--warn); }
   .tc-gauge-center { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: baseline; }
   .tc-gauge-label { display: flex; justify-content: center; align-items: center; gap: var(--space-1); }
@@ -2816,6 +2818,8 @@ class ShipbornPanelCard extends HTMLElement {
   }
 
   // 270° dial for rpm or temperature; from zero when min < 0; thin warn zone above warn_above.
+  // inner_entity: a second, smaller arc inside (e.g. the lever position in the shaft dial); its value sits in the
+  // middle and the main value moves down (inner_min / _max / _unit / _decimals / _label / _factor).
   _tDial(g) {
     const W = g.width || 220;
     const n = this._place(h("div", "tc-gauge"), g, W, null);
@@ -2825,23 +2829,35 @@ class ShipbornPanelCard extends HTMLElement {
     const A0 = Math.PI * 0.75;
     const span = Math.PI * 1.5;
     const ang = (v) => A0 + span * clamp((v - min) / (max - min || 1), 0, 1);
-    const arc = (a0, a1) => {
-      const p = (a) => `${(100 + 80 * Math.cos(a)).toFixed(2)} ${(100 + 80 * Math.sin(a)).toFixed(2)}`;
-      return `M${p(a0)}A80 80 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${p(a1)}`;
+    const arc = (a0, a1, r = 80) => {
+      const p = (a) => `${(100 + r * Math.cos(a)).toFixed(2)} ${(100 + r * Math.sin(a)).toFixed(2)}`;
+      return `M${p(a0)}A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${p(a1)}`;
     };
     const k = W / 220;
+    const inner = !!g.inner_entity;
+    const iMin = g.inner_min ?? -100;
+    const iMax = g.inner_max ?? 100;
+    const iAng = (v) => A0 + span * clamp((v - iMin) / (iMax - iMin || 1), 0, 1);
+    const IR = 48;
     n.innerHTML =
       `<svg viewBox="0 0 200 170"><path class="tc-g-track" d="${arc(A0, A0 + span)}"/>` +
       (g.warn_above != null ? `<path class="tc-g-zone" d="${arc(ang(g.warn_above), A0 + span)}"/>` : "") +
-      `<path class="tc-g-val" d=""/><path class="tc-g-set" d=""/></svg>` +
-      `<div class="tc-gauge-center" style="top:${74 * k}px"><span class="value-lg" style="font-size:${36 * k}px"></span><span class="caption tc-unit"></span></div>` +
+      `<path class="tc-g-val" d=""/><path class="tc-g-set" d=""/>` +
+      (inner ? `<path class="tc-g-track tc-g-in" d="${arc(A0, A0 + span, IR)}"/><path class="tc-g-val tc-g-in tc-g-inval" d=""/>` : "") +
+      `</svg>` +
+      `<div class="tc-gauge-center tc-g-main" style="top:${(inner ? 126 : 74) * k}px"><span class="value-lg" style="font-size:${(inner ? 26 : 36) * k}px"></span><span class="caption tc-unit"></span></div>` +
+      (inner ? `<div class="tc-gauge-center tc-g-inner" style="top:${80 * k}px"><span class="value-lg" style="font-size:${20 * k}px"></span><span class="caption tc-unit"></span></div>` +
+        `<div class="tc-gauge-sub caption tc-g-inlabel" style="top:${104 * k}px"></div>` : "") +
       `<div class="tc-gauge-label label" style="margin-top:${-12 * k}px"><span class="fl"></span><span></span></div>` +
       `<div class="tc-gauge-range caption" style="top:${158 * k}px;left:${30 * k}px;right:${30 * k}px"><span>${min}</span><span>${max}</span></div>` +
-      (g.setpoint_entity ? `<div class="tc-gauge-sub caption" style="top:${118 * k}px"></div>` : "");
+      (g.setpoint_entity ? `<div class="tc-gauge-sub caption tc-g-setp" style="top:${118 * k}px"></div>` : "");
     const setMark = n.querySelector(".tc-g-set");
-    const setText = n.querySelector(".tc-gauge-sub");
+    const setText = n.querySelector(".tc-g-setp");
     const valArc = n.querySelector(".tc-g-val");
-    const [big, unit] = n.querySelector(".tc-gauge-center").children;
+    const [big, unit] = n.querySelector(".tc-g-main").children;
+    const inArc = n.querySelector(".tc-g-inval");
+    const [iBig, iUnit] = inner ? n.querySelector(".tc-g-inner").children : [];
+    if (inner) n.querySelector(".tc-g-inlabel").textContent = g.inner_label ?? "";
     const [flag, lbl] = n.querySelector(".tc-gauge-label").children;
     lbl.textContent = g.label ?? "";
     this._updaters.push((hass) => {
@@ -2852,6 +2868,15 @@ class ShipbornPanelCard extends HTMLElement {
       valArc.setAttribute("d", Math.abs(a - zero) < 0.001 ? "" : a > zero ? arc(zero, a) : arc(a, zero));
       big.textContent = fmt(v, g.decimals ?? 0, hass);
       unit.textContent = unitOf(g, so);
+      if (inner) {
+        const s2 = hass.states[g.inner_entity];
+        const v2 = num(s2, g.inner_factor);
+        const z2 = iMin < 0 ? iAng(0) : A0;
+        const a2 = v2 == null ? z2 : iAng(v2);
+        inArc.setAttribute("d", Math.abs(a2 - z2) < 0.001 ? "" : a2 > z2 ? arc(z2, a2, IR) : arc(a2, z2, IR));
+        iBig.textContent = fmt(v2, g.inner_decimals ?? 0, hass);
+        iUnit.textContent = g.inner_unit ?? s2?.attributes?.unit_of_measurement ?? "";
+      }
       if (setText) {
         // setpoint_entity: a tick across the track and "Setpoint 18 °C" under the value.
         const ss = hass.states[g.setpoint_entity];
