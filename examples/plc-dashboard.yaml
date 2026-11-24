@@ -810,64 +810,64 @@ views:
           - { type: hotspot, x: 245, y: 293, side: left, icon: ventilator, label: Schroefas, entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, unit: rpm, active_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, active_above: 5, active_abs: true }
 
           # ---- bediening (uit het oude dashboard) ----
-          # ---- sensoren als tabel: icoon (zoals op Voortstuwing; grijs als het systeem stilstaat), naam, waarde en de grenzen ----
+          # ---- sensoren als tabel: icoon (zoals op Voortstuwing; grijs zolang het contact uit is (binary_sensor.diesel_contact)), naam, waarde en de grenzen ----
           # de grenzen zijn dezelfde als die van de kleuren van de lampjes op Voortstuwing; pas ze samen aan
           - { type: panel, x: 20, y: 671, width: 620, height: 430, title: "Sensoren – bij Volvo aan alles groen" }
           - { type: text, x: 74, y: 713, text: Sensor, font_size: 12, color: "var(--ink-muted, #a3a29c)", uppercase: true }
           - { type: text, x: 236, y: 713, text: Waarde, font_size: 12, color: "var(--ink-muted, #a3a29c)", uppercase: true }
           - { type: text, x: 360, y: 713, text: Waarschuwing, font_size: 12, color: "var(--ink-muted, #a3a29c)", uppercase: true }
           - { type: text, x: 486, y: 713, text: Alarm, font_size: 12, color: "var(--ink-muted, #a3a29c)", uppercase: true }
-          - { type: warnlight, x: 38, y: 733, size: 26, icon: motor, label: Engine speed, entity: sensor.engine_room_main_engine_me_rpm, warn_above: 4000, alarm_above: 6000 }
+          - { type: warnlight, x: 38, y: 733, size: 26, icon: motor, label: Engine speed, entity: sensor.engine_room_main_engine_me_rpm, tone_entity: binary_sensor.diesel_contact, warn_above: 4000, alarm_above: 6000 }
           - { type: text, x: 74, y: 735, width: 156, text: Engine speed, font_size: 15 }
           - { type: text, x: 236, y: 735, width: 118, entity: sensor.engine_room_main_engine_me_rpm, mono: true, font_size: 15, decimals: 0, unit: rpm, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 735, width: 120, text: "> 4000 rpm", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 735, width: 140, text: "> 6000 rpm", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 761, size: 26, icon: oliedruk, label: Oil pressure, entity: sensor.engine_room_me_oil_press, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 1.8, alarm_below: 1.5 }
+          - { type: warnlight, x: 38, y: 761, size: 26, icon: oliedruk, label: Oil pressure, entity: sensor.engine_room_me_oil_press, tone_entity: binary_sensor.diesel_contact, warn_below: 1.8, alarm_below: 1.5 }
           - { type: text, x: 74, y: 763, width: 156, text: Oil pressure, font_size: 15 }
           - { type: text, x: 236, y: 763, width: 118, entity: sensor.engine_room_me_oil_press, mono: true, font_size: 15, decimals: 2, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 763, width: 120, text: "< 1,8 bar", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 763, width: 140, text: "< 1,5 bar", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 789, size: 26, icon: olietemp, label: Oil temp, entity: sensor.main_engine_oil_temp, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 104, alarm_above: 110 }
+          - { type: warnlight, x: 38, y: 789, size: 26, icon: olietemp, label: Oil temp, entity: sensor.main_engine_oil_temp, tone_entity: binary_sensor.diesel_contact, warn_above: 104, alarm_above: 110 }
           - { type: text, x: 74, y: 791, width: 156, text: Oil temp, font_size: 15 }
           - { type: text, x: 236, y: 791, width: 118, entity: sensor.main_engine_oil_temp, mono: true, font_size: 15, decimals: 0, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 791, width: 120, text: "> 104 °C", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 791, width: 140, text: "> 110 °C", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 817, size: 26, icon: koelwater, label: Coolant temp, entity: sensor.engine_room_main_engine_me_coolant_temp, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 78, alarm_above: 100 }
+          - { type: warnlight, x: 38, y: 817, size: 26, icon: koelwater, label: Coolant temp, entity: sensor.engine_room_main_engine_me_coolant_temp, tone_entity: binary_sensor.diesel_contact, warn_above: 78, alarm_above: 100 }
           - { type: text, x: 74, y: 819, width: 156, text: Coolant temp, font_size: 15 }
           - { type: text, x: 236, y: 819, width: 118, entity: sensor.engine_room_main_engine_me_coolant_temp, mono: true, font_size: 15, decimals: 0, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 819, width: 120, text: "> 78 °C", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 819, width: 140, text: "> 100 °C", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 845, size: 26, icon: uitlaat, label: Exhaust temp, entity: sensor.al1590_er_volvo_exhaust_temperature, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_above: 59, alarm_above: 89 }
+          - { type: warnlight, x: 38, y: 845, size: 26, icon: uitlaat, label: Exhaust temp, entity: sensor.al1590_er_volvo_exhaust_temperature, tone_entity: binary_sensor.diesel_contact, warn_above: 59, alarm_above: 89 }
           - { type: text, x: 74, y: 847, width: 156, text: Exhaust temp, font_size: 15 }
           - { type: text, x: 236, y: 847, width: 118, entity: sensor.al1590_er_volvo_exhaust_temperature, mono: true, font_size: 15, decimals: 0, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 847, width: 120, text: "> 59 °C", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 847, width: 140, text: "> 89 °C", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 873, size: 26, icon: flow, label: Seawater flow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 49.01, alarm_below: 40 }
+          - { type: warnlight, x: 38, y: 873, size: 26, icon: flow, label: Seawater flow, entity: sensor.al1590_er_volvo_seawater_cooling_flow, tone_entity: binary_sensor.diesel_contact, warn_below: 49.01, alarm_below: 40 }
           - { type: text, x: 74, y: 875, width: 156, text: Seawater flow, font_size: 15 }
           - { type: text, x: 236, y: 875, width: 118, entity: sensor.al1590_er_volvo_seawater_cooling_flow, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 875, width: 120, text: "< 49 L/min", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 875, width: 140, text: "< 40 L/min", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 901, size: 26, icon: accu, label: Alternator, entity: sensor.engine_room_main_engine_me_alt_v, tone_entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_diesel_running, warn_below: 13.6, alarm_below: 12, alarm_above: 15 }
+          - { type: warnlight, x: 38, y: 901, size: 26, icon: accu, label: Alternator, entity: sensor.engine_room_main_engine_me_alt_v, tone_entity: binary_sensor.diesel_contact, warn_below: 13.6, alarm_below: 12, alarm_above: 15 }
           - { type: text, x: 74, y: 903, width: 156, text: Alternator, font_size: 15 }
           - { type: text, x: 236, y: 903, width: 118, entity: sensor.engine_room_main_engine_me_alt_v, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 903, width: 120, text: "< 13,6 V", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 903, width: 140, text: "< 12 V of > 15 V", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 929, size: 26, icon: flow, label: PropSft flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_below: 3.5, alarm_below: 2.5 }
+          - { type: warnlight, x: 38, y: 929, size: 26, icon: flow, label: PropSft flow, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, tone_entity: binary_sensor.diesel_contact, warn_below: 3.5, alarm_below: 2.5 }
           - { type: text, x: 74, y: 931, width: 156, text: PropSft flow, font_size: 15 }
           - { type: text, x: 236, y: 931, width: 118, entity: sensor.al1590_er_prop_shaft_cooling_water_flow, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 931, width: 120, text: "< 3,5 L/min", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 931, width: 140, text: "< 2,5 L/min", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 957, size: 26, icon: klimaat, label: PropSft temp, entity: sensor.al1590_er_prop_shaft_grease_temperature, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, warn_above: 50, alarm_above: 80 }
+          - { type: warnlight, x: 38, y: 957, size: 26, icon: klimaat, label: PropSft temp, entity: sensor.al1590_er_prop_shaft_grease_temperature, tone_entity: binary_sensor.diesel_contact, warn_above: 50, alarm_above: 80 }
           - { type: text, x: 74, y: 959, width: 156, text: PropSft temp, font_size: 15 }
           - { type: text, x: 236, y: 959, width: 118, entity: sensor.al1590_er_prop_shaft_grease_temperature, mono: true, font_size: 15, decimals: 0, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 959, width: 120, text: "> 50 °C", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 959, width: 140, text: "> 80 °C", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 985, size: 26, icon: druk, label: PropSft press, entity: sensor.al1590_er_prop_shaft_grease_pressure, tone_entity: sensor.wago_hcs_controls_wago_hcs_controls_shaft_speed, tone_above: 5, tone_abs: true, alarm_above: 2, alarm_below: 0.1 }
+          - { type: warnlight, x: 38, y: 985, size: 26, icon: druk, label: PropSft press, entity: sensor.al1590_er_prop_shaft_grease_pressure, tone_entity: binary_sensor.diesel_contact, alarm_above: 2, alarm_below: 0.1 }
           - { type: text, x: 74, y: 987, width: 156, text: PropSft press, font_size: 15 }
           - { type: text, x: 236, y: 987, width: 118, entity: sensor.al1590_er_prop_shaft_grease_pressure, mono: true, font_size: 15, decimals: 2, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 987, width: 120, text: "–", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 987, width: 140, text: "< 0,1 of > 2 bar", font_size: 14, color: "var(--alarm, #e05040)" }
-          - { type: warnlight, x: 38, y: 1013, size: 26, icon: druk, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, alarm_below: 3, alarm_above: 10 }
+          - { type: warnlight, x: 38, y: 1013, size: 26, icon: druk, label: Manifold press, entity: sensor.al1590_er_compressor_manifold_pressure, tone_entity: binary_sensor.diesel_contact, alarm_below: 3, alarm_above: 10 }
           - { type: text, x: 74, y: 1015, width: 156, text: Manifold press, font_size: 15 }
           - { type: text, x: 236, y: 1015, width: 118, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 15, decimals: 2, unit: bar, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 1015, width: 120, text: "–", font_size: 14, color: "var(--warn, #e0a030)" }
