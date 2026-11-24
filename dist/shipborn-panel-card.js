@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.54";
+const VERSION = "0.5.55";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -436,6 +436,7 @@ const TC_ICONS = {
   tank: "M6 3h12v18H6zM6 13h12M9 16h6",
   // warning lights (Voortstuwing)
   oliedruk: "M2 12h3l2-2h6l7-3v1.5L14 15H5zM7 10V8h4v2M20 15c0 1-.5 1.6-1 1.6s-1-.6-1-1.6.5-1.6 1-2.6c.5 1 1 1.6 1 2.6z",
+  klok: "M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM12 7v5l3.5 2",
   olietemp: "M8 14V4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0zM10 10v7M19 10c0 1.2-.7 2-1.5 2s-1.5-.8-1.5-2 .8-2 1.5-3.5c.7 1.5 1.5 2.3 1.5 3.5z",
   koelwater: "M12 3v9M12 4h3M12 7h3M12 10h3M10 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0M3 20c1.5-1 3-1 4.5 0s3 1 4.5 0 3-1 4.5 0 3 1 4.5 0",
   flow: "M3 8h13M13 4.5 16.5 8 13 11.5M3 15c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0M3 19.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0",
@@ -2968,6 +2969,7 @@ class ShipbornPanelCard extends HTMLElement {
         const t = v == null ? null : toneOf(hass, { ...w, tone_entity: null }, v);
         st = v == null ? (isOn(so) ? "ok" : "off") : t || "ok";
       }
+      if (w.static) st = "off"; // static: always the same neutral colour (e.g. engine hours)
       for (const k of ["ok", "warn", "alarm", "nodata"]) n.classList.toggle("is-" + k, st === k);
       draw(st === "off" && w.icon_off ? w.icon_off : w.icon || "alarm");
     });

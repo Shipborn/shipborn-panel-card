@@ -872,6 +872,7 @@ views:
           - { type: text, x: 236, y: 1015, width: 118, entity: sensor.al1590_er_compressor_manifold_pressure, mono: true, font_size: 15, decimals: 2, unit: bar, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 1015, width: 120, text: "–", font_size: 14, color: "var(--warn, #e0a030)" }
           - { type: text, x: 486, y: 1015, width: 140, text: "< 3 of > 10 bar", font_size: 14, color: "var(--alarm, #e05040)" }
+          - { type: warnlight, x: 38, y: 1041, size: 26, icon: klok, label: Engine hours, entity: sensor.engine_room_main_engine_me_hours, static: true }
           - { type: text, x: 74, y: 1043, width: 156, text: Engine hours, font_size: 15 }
           - { type: text, x: 236, y: 1043, width: 118, entity: sensor.engine_room_main_engine_me_hours, mono: true, font_size: 15, decimals: 0, unit: h, tap_action: { action: more-info } }
           - { type: text, x: 360, y: 1043, width: 120, text: "–", font_size: 14, color: "var(--warn, #e0a030)" }
