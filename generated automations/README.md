@@ -15,6 +15,7 @@ HA-code die bij het dashboard hoort. Deze map gaat mee in git; Home Assistant le
 | `diesel_opstarten.yaml` | Package: `input_text.diesel_opstarten_status` + `script.diesel_opstarten`, met bovenaan de uitleg. |
 | `script_diesel_stoppen.yaml` / `diesel_stoppen.yaml` | Het script achter *Stop Diesel*: om te plakken / als package. |
 | `script_vaarmodus_kiezen.yaml`, `automation_vaarmodus_haven.yaml` / `vaarmodus.yaml` | Vaarmodus Haven, Anker en Zeilen: script en automation om te plakken / alles als package met de helper. |
+| `diesel_contact.yaml` | Sensor `binary_sensor.diesel_contact`: contact van de Volvo aan zolang er motordata binnenkomt. Voor `configuration.yaml`. |
 | `script_vaarmodus_elektrisch.yaml` | Elektrisch kiezen met controle van de DC-bus, klaar om te plakken. |
 
 ## Energy Inverters (DC-bus) opstarten en afsluiten
@@ -85,6 +86,22 @@ De knoppen *Elektrisch* (Voortstuwing) en *Electric* (Diesel) starten `script.va
 
 **Installeren:** helper *Tekst* met naam `Vaarmodus elektrisch status`, maximale lengte **255**, entiteit `input_text.vaarmodus_elektrisch_status`; daarna een nieuw script met `script_vaarmodus_elektrisch.yaml` (entiteit `script.vaarmodus_elektrisch`).
 
+## Diesel contact
+
+Er is geen signaal van het contact (Ignition) zelf. Met het contact aan stuurt de Volvo boost, koelwatertemperatuur, oliedruk en toerental continu door, ook als de waarde gelijk blijft. HA noteert elke ontvangen waarde in `last_reported`, ook zonder verandering. `binary_sensor.diesel_contact` kijkt elke seconde of een van die vier in de laatste 2 s binnenkwam. Hij gaat aan na 2 s live data en uit na 2 s zonder.
+
+**Installeren:** de inhoud van `diesel_contact.yaml` onderaan `/homeassistant/configuration.yaml` zetten (staat er al `template:`, dan alleen het deel vanaf `- trigger:` daaronder), dan *Ontwikkelhulpmiddelen → YAML → Sjabloonentiteiten* herladen. Testen: contact aan en uit en kijken of de sensor meegaat.
+
+**Vooraf testen** of de waarden echt live binnenkomen (Ontwikkelhulpmiddelen → Sjabloon):
+
+```jinja
+{% for s in expand(['sensor.engine_room_main_engine_me_boost', 'sensor.engine_room_main_engine_me_coolant_temp', 'sensor.engine_room_me_oil_press', 'sensor.engine_room_main_engine_me_rpm']) %}
+{{ s.entity_id }}: {{ (now() - s.last_reported).total_seconds() | round(1) }} s geleden
+{% endfor %}
+```
+
+Het sjabloon rekent opnieuw bij elke wijziging in het vak; typ een spatie om te verversen. Met het contact aan horen de getallen onder 2 s te blijven, met het contact uit horen ze op te lopen.
+
 ## Start Diesel
 
 Knop *Start Diesel* op Voortstuwing (in plaats van *Prepair Volvo Start*) en op de pagina Diesel (vak *Propulsion mode*). Zolang het script loopt is er geen *Sluiten*.
@@ -106,7 +123,7 @@ Knop *Stop Diesel* onder *Start Diesel*, op Voortstuwing en Diesel. Zelfde helpe
 
 1. **Motor stoppen** met de Start/Stop-knop: foto `VolvoAanUit.jpeg`. Het script wacht tot `…diesel_running` uit is en de motor onder 50 rpm draait, dan 2 s.
 2. **Vaarmodus kiezen**: *Elektrisch*, *Haven*, *Anker* of *Zeilen*. Bij *Elektrisch* wordt eerst de DC-bus gecontroleerd (≥ 700 V); staat die uit, dan biedt het venster *Start DC-bus* en gaat het daarna vanzelf verder.
-3. **Contact uit**, alleen bij Haven of Anker: zelfde foto, de bediener tikt *Gedaan* (hiervoor is geen sensor). Bij Elektrisch en Zeilen blijft het contact aan en vervalt deze stap.
+3. **Contact uit**, alleen bij Haven of Anker: zelfde foto. Het script gaat vanzelf verder zodra `binary_sensor.diesel_contact` uit gaat (zie *Diesel contact*); *Gedaan* kan ook. Bij Elektrisch en Zeilen blijft het contact aan en vervalt deze stap.
 4. Het venster blijft open met *Diesel gestopt*. Alleen na Haven is er de knop *Inlaat en uitlaat dicht*; na Elektrisch, Anker of Zeilen niet. De bediener sluit het venster zelf.
 
 **Installeren:** een nieuw script met `script_diesel_stoppen.yaml` (entiteit `script.diesel_stoppen`).

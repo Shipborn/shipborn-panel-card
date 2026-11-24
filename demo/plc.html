@@ -86,7 +86,8 @@
         "input_text.diesel_opstarten_status": st(""),
         "script.diesel_opstarten": st("off"),
         "script.diesel_stoppen": st("off"),
-        "script.vaarmodus_elektrisch": st("off"), // ?dc_off=1 = DC-bus staat uit
+        "script.vaarmodus_elektrisch": st("off"),
+        "binary_sensor.diesel_contact": st("on"), // contact van de Volvo (generated automations/diesel_contact.yaml) // ?dc_off=1 = DC-bus staat uit
         "input_text.vaarmodus_elektrisch_status": st(""),
         "script.vaarmodus_kiezen": st("off"),
         "input_select.vaarmodus_haven": st("Haven"),
@@ -411,7 +412,9 @@
               const contactUit = k === "haven" || k === "anker";
               if (contactUit) {
                 set(`${plan}:contact:confirm`);
-                await until(() => now() === `${plan}:contact:done` || isAb("contact"));
+                // contact goes off after 3 s (no engine data any more)
+                setTimeout(() => { if (!isAb("contact")) { states["binary_sensor.diesel_contact"] = st("off"); el.hass = { ...hass, states: { ...states } }; } }, 3000);
+                await until(() => states["binary_sensor.diesel_contact"].state === "off" || now() === `${plan}:contact:done` || isAb("contact"));
                 if (isAb("contact")) return abort("contact");
               }
               set(`${contactUit ? plan : "stop,modus"}::complete`);
@@ -436,7 +439,7 @@
             const abort = (k) => { set(`${plan}:${k}:aborted`); end(); };
             const isAb = (k) => now() === `${plan}:${k}:abort`;
             const ready = () => V.every((v) => is(v, "open")) && P.every((x) => is(x, "on")) && +states["sensor.al1590_er_prop_shaft_cooling_water_flow"].state >= 2.5 && +states["sensor.al1590_er_compressor_manifold_pressure"].state >= 3;
-            if (q.get("diesel_off") && !window.__dieselOff) { window.__dieselOff = true; states[run] = st("off"); states["sensor.engine_room_main_engine_me_rpm"] = st(0); }
+            if (q.get("diesel_off") && !window.__dieselOff) { window.__dieselOff = true; states[run] = st("off"); states["binary_sensor.diesel_contact"] = st("off"); states["sensor.engine_room_main_engine_me_rpm"] = st(0); }
             states[id] = st("on");
             (async () => {
               if (!ready()) {
@@ -453,7 +456,7 @@
               }
               if (!is(run, "on")) {
                 set(`${plan}:motor:manual`);
-                setTimeout(() => { if (!isAb("motor")) { states[run] = st("on"); states["sensor.engine_room_main_engine_me_rpm"] = st(1450); push(); } }, q.get("diesel_slow") ? 60000 : 3000);
+                setTimeout(() => { if (!isAb("motor")) { states[run] = st("on"); states["binary_sensor.diesel_contact"] = st("on"); states["sensor.engine_room_main_engine_me_rpm"] = st(1450); push(); } }, q.get("diesel_slow") ? 60000 : 3000);
                 await until(() => is(run, "on") || isAb("motor"));
                 if (isAb("motor")) return abort("motor");
                 set(`${plan}:motor:ok`); await wait(2000);

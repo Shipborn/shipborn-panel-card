@@ -1,0 +1,40 @@
+# Diesel contact – TC90
+#
+# binary_sensor.diesel_contact is aan zolang het contact (Ignition) van de Volvo aan staat. Er is geen signaal van
+# het contact zelf; daarom kijkt deze sensor of er nog motordata binnenkomt. Met het contact aan stuurt de motor
+# boost, koelwatertemperatuur, oliedruk en toerental continu door, ook als de waarde gelijk blijft.
+# Home Assistant noteert elke ontvangen waarde in last_reported (ook zonder verandering; last_changed niet).
+# Elke seconde kijkt de sensor of een van de vier waarden in de laatste 2 s binnenkwam (0,5 Hz = elke 2 s).
+#   aan  na 2 s achter elkaar live data (een losse melding zet hem niet aan)
+#   uit  als 2 s lang geen van de vier een waarde meldt
+# Gebruikt door Stop Diesel (stap Contact uit gaat vanzelf verder) en getoond in Start Diesel.
+#
+# Installeren: dit blok onderaan configuration.yaml zetten (in /homeassistant/), daarna
+# Ontwikkelhulpmiddelen → YAML → Sjabloonentiteiten herladen (of HA herstarten).
+# Staat er al een regel "template:" in configuration.yaml, zet dan alleen het deel vanaf "- trigger:" eronder.
+# Controleer: binary_sensor.diesel_contact springt binnen enkele seconden op Aan als het contact aangaat, en
+# op Uit als het uitgaat. Blijft hij aan terwijl het contact uit is, dan blijven de sensoren melden (bijv. een
+# gateway die de laatste waarde herhaalt) en werkt deze methode niet.
+
+template:
+  - trigger:
+      - trigger: time_pattern
+        seconds: "/1"
+    binary_sensor:
+      - name: Diesel contact
+        unique_id: tc90_diesel_contact
+        icon: mdi:key-variant
+        delay_on: "00:00:02"
+        state: >-
+          {% set ids = ['sensor.engine_room_main_engine_me_boost', 'sensor.engine_room_main_engine_me_coolant_temp',
+                        'sensor.engine_room_me_oil_press', 'sensor.engine_room_main_engine_me_rpm'] %}
+          {% set ns = namespace(live = false) %}
+          {% for s in expand(ids) %}
+            {% if s.state not in ['unavailable', 'unknown'] and s.last_reported is defined
+                  and (now() - s.last_reported).total_seconds() <= 2 %}
+              {% set ns.live = true %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.live }}
+# Bewust geen attribuut met "seconden sinds de laatste melding": dat verandert elke seconde en zou elke seconde
+# een nieuwe status in de database schrijven. De status zelf verandert alleen bij aan/uit.

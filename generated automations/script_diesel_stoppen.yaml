@@ -21,6 +21,7 @@ variables:
   elektrisch: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
   elektrischknop: button.wago_hcs_controls_wago_controls_electricmode
   dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+  contact: binary_sensor.diesel_contact   # zie diesel_contact.yaml
 sequence:
   # ---------- 1. Start/Stop-knop: wacht tot de sensoren zeggen dat de motor uit is ----------
   - if:
@@ -116,7 +117,8 @@ sequence:
       - stop: Afgebroken door de bediener
   - delay: 2
 
-  # ---------- 3. contact uit: alleen bij Haven of Anker (geen sensor: de bediener bevestigt) ----------
+  # ---------- 3. contact uit: alleen bij Haven of Anker. Gaat vanzelf verder als binary_sensor.diesel_contact uit
+  #            gaat (geen motordata meer, zie diesel_contact.yaml); Gedaan blijft als terugval ----------
   - variables:
       contact_uit: "{{ not is_state(elektrisch, 'on') and states(keuze_haven) in ['Haven', 'Anker'] }}"
   - if:
@@ -126,7 +128,8 @@ sequence:
       - action: input_text.set_value
         target: { entity_id: "{{ status }}" }
         data: { value: "{{ plan }}:contact:confirm" }
-      - wait_template: "{{ states(status) in [plan ~ ':contact:done', plan ~ ':contact:abort'] }}"
+      - wait_template: >-
+          {{ is_state(contact, 'off') or states(status) in [plan ~ ':contact:done', plan ~ ':contact:abort'] }}
       - if:
           - condition: template
             value_template: "{{ states(status) == plan ~ ':contact:abort' }}"

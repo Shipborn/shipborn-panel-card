@@ -9,7 +9,8 @@
 #   stop     bediener drukt op Start/Stop (foto VolvoAanUit.jpeg)  wacht tot diesel_running uit en < 50 rpm (+2 s), onbeperkt
 #   modus    keuze Elektrisch, Haven, Anker of Zeilen              wacht op de terugmelding (+2 s), daarna opnieuw kiezen
 #            bij Elektrisch eerst DC-bus >= 700 V; zo niet: toestand dc, de bediener start de Energy Inverters
-#   contact  alleen na Haven of Anker: contact uit (zelfde foto)   bediener tikt Gedaan
+#   contact  alleen na Haven of Anker: contact uit (zelfde foto)   vanzelf als binary_sensor.diesel_contact uit gaat,
+#                                                                   of de bediener tikt Gedaan
 # Na Elektrisch of Zeilen blijft het contact aan: de stap contact valt dan uit het plan.
 # Daarna is het script klaar. Alleen na Haven biedt het venster (niet het script) aan om inlaat en uitlaat
 # dicht te zetten; na Elektrisch, Anker of Zeilen niet. De bediener sluit het venster zelf.
@@ -41,6 +42,7 @@ script:
       elektrisch: binary_sensor.wago_hcs_controls_wago_hcs_controls_electric_mode
       elektrischknop: button.wago_hcs_controls_wago_controls_electricmode
       dc_bus: sensor.wago_energy_controls_wago_energy_controls_dc_bus_voltage
+      contact: binary_sensor.diesel_contact   # zie diesel_contact.yaml
     sequence:
       # ---------- 1. Start/Stop-knop: wacht tot de sensoren zeggen dat de motor uit is ----------
       - if:
@@ -136,7 +138,8 @@ script:
           - stop: Afgebroken door de bediener
       - delay: 2
 
-      # ---------- 3. contact uit: alleen bij Haven of Anker (geen sensor: de bediener bevestigt) ----------
+      # ---------- 3. contact uit: alleen bij Haven of Anker. Gaat vanzelf verder als binary_sensor.diesel_contact uit
+      #            gaat (geen motordata meer, zie diesel_contact.yaml); Gedaan blijft als terugval ----------
       - variables:
           contact_uit: "{{ not is_state(elektrisch, 'on') and states(keuze_haven) in ['Haven', 'Anker'] }}"
       - if:
@@ -146,7 +149,8 @@ script:
           - action: input_text.set_value
             target: { entity_id: "{{ status }}" }
             data: { value: "{{ plan }}:contact:confirm" }
-          - wait_template: "{{ states(status) in [plan ~ ':contact:done', plan ~ ':contact:abort'] }}"
+          - wait_template: >-
+              {{ is_state(contact, 'off') or states(status) in [plan ~ ':contact:done', plan ~ ':contact:abort'] }}
           - if:
               - condition: template
                 value_template: "{{ states(status) == plan ~ ':contact:abort' }}"
