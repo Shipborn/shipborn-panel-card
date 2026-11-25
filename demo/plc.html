@@ -140,7 +140,7 @@
       syncGroups();
       // Webasto: airco-status, koudwatertemperatuur en foutcode per unit (Klimaat › Instellingen)
       for (const [k, ac, cw, err] of [["compressor_engine_room", "on", 7.4, "OK"], ["crew_cabin", "off", 7.9, "OK"], ["deck_lounge", "on", 8.1, "OK"], ["galley", "off", 8.0, "OK"],
-        ["guest_cabin", "on", 7.6, "OK"], ["main_cabin", "on", 7.7, "E05 Low water flow"], ["owners_cabin", "on", 7.5, "OK"], ["owners_cabin_bad", "off", 7.8, "OK"]]) {
+        ["guest_cabin", "on", 7.6, "OK"], ["main_cabin", "on", 7.7, "A02"], ["owners_cabin", "on", 7.5, "OK"], ["owners_cabin_bad", "off", 7.8, "bA11"]]) {
         states[`binary_sensor.webasto_bluecool_noder_${k}_ac_status`] = st(ac);
         states[`sensor.webasto_bluecool_connect_${k}_cold_water_temperature`] = st(cw, { unit_of_measurement: "°C" });
         states[`sensor.webasto_bluecool_connect_${k}_error_code`] = st(err);

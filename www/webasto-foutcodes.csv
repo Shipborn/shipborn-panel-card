@@ -1,0 +1,80 @@
+code;description;cause;solution
+AAA;Low Voltage;"Low voltage cut-out. Power supply was over 5 sec. lower than controller setting. Probably caused by long length power supply cable or overload.";"Check setting, default 195V. Don't set below 195V to avoid damages to the compressor or to expire warranty but improve power supply."
+A01;"Low pressure cut-out compr.1
+(At CPAC starting at 20.000 BTU)";"Defective pressure sensor or open/short circuit.
+COOLING MODE:
+- Insufficient evaporator water-flow (Chiller) or air-flow (CPAC).
+- Airlock (Chiller) in water circuit or broken circulation pump.
+HEATING MODE:
+- Insufficient sea-water flow or sea-water to cold.
+- Blocked sea-water strainer or not primed.
+Lack of refrigerant.";"Check wiring or replace pressure sensor on Schrader valve.
+Check water or air-flow.
+ΔT evaporator in/out minimum 4K.
+Bleed chiller water system or check pomp operation.
+Check discharge water volume.
+V= 8 l/min or > 30000 BTU V= 18 l/min.
+ΔT in/out minimum 4K.
+T seawater < 4°C, pre-heating necessary.
+Clean strainer and bleed sea-water circuit.
+Refrigerant leak check."
+A02;High pressure cut-out compr.1;"- Defective pressure sensor or open/short circuit.
+COOLING MODE:
+- Insufficient sea-water cooling or defective circulation pump.
+- Blocked sea-water strainer or not primed.
+HEATING MODE:
+- Insufficient evaporator water-flow (Chiller) or air-flow (CPAC).
+- Airlock (Chiller) in water circuit or broken circulation pump.";"Check sensor and wiring.
+Replace sensor on Schrader if necessary.
+Check discharge water volume.
+V= 8 l/min.> 30000 BTU V= 18 l/min.
+Clean strainer and bleed sea-water circuit.
+Check water or air-flow.
+ΔT evaporator in/out minimum 4K.
+Bleed chiller water system or check pomp operation."
+A03;"Low pressure cut-out compr.2
+(Chiller only)";See A01.;See A01.
+A04;"High pressure cut-out compr.2
+(Chiller only)";See A02.;See A02.
+A05;"Low pressure cut-out compr.3
+(Chiller only)";See A01.;See A01.
+A06;"High pressure cut-out compr.3
+(Chiller only)";See A02.;See A02.
+A07;"Low pressure cut-out compr.4
+(Chiller only)";See A01.;See A01.
+A08;"High pressure cut-out compr.4
+(Chiller only)";See A02.;See A02.
+A09;"Cabin temperature sensor failure.
+(internal and external)";"Broken Internal or External temperature sensor, open/short circuit, not present or programmed wrong.";"Replace sensor or controller, in case of external sensor try to reprogram to internal sensor first to determine failure."
+A10;Evaporator temperature sensor failure.;"Defective water temperature sensor (Chiller), evaporator sensor (CPAC) or open/short circuit.";"Check wiring or replace sensor.
+Water infiltration (condense) can cause a read-out derivation or erratic functioning before a error code occurred."
+CA11;All compressors manually off.;Compressor(s) programmed not active in controller setting.;"Check settings, at least one compressor should be programmed active. C01=ON  C00=OFF"
+bA11;Fan standby.;"Blower operation from TECC card or cabin controller impossible.
+Discharge temperature higher than setpoint on cooling or lower on heating.";"Run compressor/ unit for a certain time to reach required discharge temperature. Blower fan will start and blinking error code bA11 will disappear automatically."
+EA11;De-icing cut-out.;Compressor stopped to defrost.;"Check controller settings to be set default.
+Compressor will start again automatically."
+init;Initialization procedure or system block.;"Setting dipswitches not according to the no.compressors.
+Defective wiring, open/short circuit.";"Check setting dipswitches.
+Check control panel controller cable and connections. Replace defective cable, panel or controller card."
+n/a;No output on printboard.;"Defective fuse or open/short circuit on specific circuit.
+Printboard damaged by high voltage. (For chiller RT1 burnt)
+Broken electronic relay (TRIAC)";"Repair or replace fuse, open/short circuit or replace printboard.
+Replace printboard.
+Replace defective TRIAC or printboard. (Operation of TRIAC can be easily tested with a 40W light bulb.)"
+n/a;Compressor not running.;"Broken compressor or open/short circuit compressor wiring.
+Compressor overload or broken OLP on top of the compressor (OLP = Overload Protector).
+Compressor settings incorrect.";"Repair wiring or replace defective compressor.
+Wait a certain time to cool down or replace a defective OLP.
+Check settings, at least one compressor should be programmed active. C01=ON  C00=OFF"
+n/a;"Sea-water pump(s) running directly after power up controller.";Wiring pump 1 (Sea water) mixed-up with pump 2 (Chilled water).;Check wiring.
+n/a;Compressor starts / stops continuously.;Lack of chilled water.;Check for leaks in water system.
+n/a;No or insufficient cooling or heating performance.;"Bad airflow or water flow, filthy or blocked circulation.
+Lack of refrigerant.
+Oil lock.
+Blocked refrigerant circuit. (Drier, capillary or expansion valve).
+Bad compressor.";"Ensure air- or waterflow. (See A01 and/or A02.)
+Lack of refrigerant mostly recognized by a low static pressure before start-up and non-fluctuating LP associated with a low HP pressure reading. Check for refrigerant leaks, repair if necessary and charge required amount of refrigerant.
+Operate the unit in heat cycle. Intervention by a refrigerant specialist might be necessary. Technical memo available.
+To be determine by a refrigerant specialist. Technical Memo available.
+To be determine by a refrigerant specialist."
+n/a;Pumps running continuously.;"When additional relays are used to operate pumps a small leaking current from the printboard may operate the relay continuously.";"Remove R56 + C24 and/or R57 + C27 from the printboard."

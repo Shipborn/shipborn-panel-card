@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.55";
+const VERSION = "0.5.56";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -620,6 +620,15 @@ const TC_STYLE =
   .tc-g-zone { stroke: var(--warn); stroke-width: 4; }
   .tc-g-val { stroke: var(--accent); stroke-width: 14; transition: d .4s; }
   .tc-g-in { stroke-width: 7; }
+  .tc-codes { display: flex; flex-direction: column; gap: var(--space-3); overflow: auto; text-align: left; }
+  .tc-codes .tc-code { border-left: 3px solid var(--alarm); padding: 6px 10px; background: var(--surface); border-radius: var(--radius-sm); }
+  .tc-codes .tc-code.is-unknown { border-left-color: var(--warn); }
+  .tc-codes .tc-code-head { font: 600 16px/20px var(--font-sans); color: var(--ink); }
+  .tc-codes .tc-code-head b { color: var(--alarm); margin-right: 6px; }
+  .tc-codes .tc-code-desc { font: 500 14px/18px var(--font-sans); color: var(--ink); white-space: pre-line; margin-top: 2px; }
+  .tc-codes .tc-code-k { font: 600 11px/14px var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted); margin-top: 6px; }
+  .tc-codes .tc-code-v { font: 400 13px/17px var(--font-sans); color: var(--ink-muted); white-space: pre-line; }
+  .tc-codes .tc-codes-empty { color: var(--ink-muted); font: 500 15px/20px var(--font-sans); }
   .tc-gauge.tc-dial-good .tc-g-val { stroke: var(--ok); }
   .tc-gauge.tc-dial-bad .tc-g-val { stroke: var(--alarm); }
   .tc-dial-ok { padding: 10px 16px; border: 2px solid; border-radius: var(--radius-md); font-weight: 600; text-align: center; }
@@ -1541,6 +1550,7 @@ class ShipbornPanelCard extends HTMLElement {
       case "hotspot": return this._tHotspot(item);
       case "dial": return this._tDial(item);
       case "warnlight": return this._tWarnlight(item);
+      case "codes": return this._tCodes(item);
       case "gear": return this._tGear(item);
       case "webpage": return this._tWebpage(item);
       case "toggle": return this._tToggle(item);
@@ -2973,6 +2983,80 @@ class ShipbornPanelCard extends HTMLElement {
       for (const k of ["ok", "warn", "alarm", "nodata"]) n.classList.toggle("is-" + k, st === k);
       draw(st === "off" && w.icon_off ? w.icon_off : w.icon || "alarm");
     });
+    return n;
+  }
+
+  // Active error codes: for every entity in `entities` ({ entity, label }) whose state is not `ok_state` (OK) or
+  // unavailable, show the matching row of a code table (CSV with ; and a header: code;description;cause;solution),
+  // loaded from `source` (e.g. /local/webasto-foutcodes.csv). The state matches a code exactly or starts with it
+  // ("A02 …"). A code that is not in the table is still listed, with `unknown_text`.
+  _tCodes(c) {
+    const n = this._place(h("div", "tc-codes"), c, 320, 400);
+    let table = null;
+    let err = null;
+    const parse = (txt) => {
+      const rows = [];
+      let row = [], cell = "", q = false;
+      for (let i = 0; i < txt.length; i++) {
+        const ch = txt[i];
+        if (q) {
+          if (ch === '"' && txt[i + 1] === '"') { cell += '"'; i++; }
+          else if (ch === '"') q = false;
+          else cell += ch;
+        } else if (ch === '"') q = true;
+        else if (ch === ";") { row.push(cell); cell = ""; }
+        else if (ch === "\n") { row.push(cell.replace(/\r$/, "")); rows.push(row); row = []; cell = ""; }
+        else cell += ch;
+      }
+      if (cell || row.length) { row.push(cell); rows.push(row); }
+      const [head, ...body] = rows.filter((r) => r.some((x) => x.trim()));
+      const keys = (head || []).map((k) => k.trim().toLowerCase());
+      return body.map((r) => Object.fromEntries(keys.map((k, i) => [k, (r[i] || "").trim()])));
+    };
+    if (c.source)
+      fetch(c.source, { cache: "no-cache" })
+        .then((r) => (r.ok ? r.text() : Promise.reject(new Error("HTTP " + r.status))))
+        .then((txt) => { table = parse(txt); if (this._hass) paint(this._hass); })
+        .catch((e) => { err = e.message; if (this._hass) paint(this._hass); });
+    const okState = String(c.ok_state ?? "OK").toLowerCase();
+    let drawn = null;
+    const paint = (hass) => {
+      const act = (c.entities || []).map((e) => (typeof e === "string" ? { entity: e } : e)).map((e) => ({ ...e, so: hass.states[e.entity] }))
+        .filter((e) => e.so && !unavailable(e.so) && !["unknown", "", okState].includes(String(e.so.state).trim().toLowerCase()));
+      const key = JSON.stringify([act.map((e) => e.entity + "=" + e.so.state), !!table, err]);
+      if (key === drawn) return;
+      drawn = key;
+      n.replaceChildren();
+      if (!act.length) {
+        n.appendChild(h("div", "tc-codes-empty")).textContent = c.empty_text || "Geen actieve foutcodes.";
+        return;
+      }
+      for (const e of act) {
+        const st = String(e.so.state).trim();
+        const row = (table || []).find((r) => r.code && r.code !== "n/a" && (st.toLowerCase() === r.code.toLowerCase() || st.toLowerCase().startsWith(r.code.toLowerCase() + " ") || st.toLowerCase().startsWith(r.code.toLowerCase() + ":")));
+        const box = h("div", "tc-code" + (row ? "" : " is-unknown"));
+        const head = h("div", "tc-code-head");
+        head.appendChild(h("b")).textContent = st;
+        head.append(e.label || e.so.attributes?.friendly_name || e.entity);
+        box.appendChild(head);
+        if (row) {
+          box.appendChild(h("div", "tc-code-desc")).textContent = row.description || "";
+          for (const [k, lbl] of [["cause", c.cause_label || "Possible cause"], ["solution", c.solution_label || "Solution"]]) {
+            if (!row[k]) continue;
+            box.appendChild(h("div", "tc-code-k")).textContent = lbl;
+            box.appendChild(h("div", "tc-code-v")).textContent = row[k];
+          }
+        } else {
+          box.appendChild(h("div", "tc-code-v")).textContent = err ? `Foutcodetabel niet geladen (${c.source}: ${err}).` : table ? c.unknown_text || "Deze code staat niet in de foutcodetabel." : "Foutcodetabel wordt geladen …";
+        }
+        if (e.entity) {
+          box.style.cursor = "pointer";
+          box.addEventListener("click", () => this._handleAction({ entity: e.entity }, { action: "more-info" }, box));
+        }
+        n.appendChild(box);
+      }
+    };
+    this._updaters.push(paint);
     return n;
   }
 

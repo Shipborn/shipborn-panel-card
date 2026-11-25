@@ -1985,6 +1985,25 @@ views:
           - { type: text, x: 540, y: 432, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 435, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, state_on: OK, off_color: red, font_size: 13 }
           - { type: text, x: 686, y: 432, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
+          # ---- actieve foutcodes: omschrijving, oorzaak en oplossing uit de foutcodetabel (www/webasto-foutcodes.csv → /homeassistant/www/) ----
+          - { type: panel, x: 892, y: 76, width: 368, height: 624, title: Actieve foutcodes }
+          - type: codes
+            x: 908
+            y: 118
+            width: 336
+            height: 568
+            source: /local/webasto-foutcodes.csv
+            ok_state: OK
+            empty_text: Geen actieve foutcodes.
+            entities:
+              - { entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, label: Compressor ER }
+              - { entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, label: Crew cabin }
+              - { entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, label: Deck lounge }
+              - { entity: sensor.webasto_bluecool_connect_galley_error_code, label: Galley }
+              - { entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, label: Guest cabin }
+              - { entity: sensor.webasto_bluecool_connect_main_cabin_error_code, label: Main cabin }
+              - { entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, label: Owners cabin }
+              - { entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, label: Owners cabin bad }
 
   # ===== Instellingen (tandwiel rechtsboven in de statusbalk): algemeen (nog leeg) en lokale webpagina's =====
   - title: Instellingen
