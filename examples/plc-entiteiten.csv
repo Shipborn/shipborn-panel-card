@@ -189,3 +189,7 @@ Voortstuwing en Diesel;Stop Diesel;knop;script.diesel_stoppen;script.diesel_stop
 Voortstuwing en Diesel;Vaarmodus Haven / Anker / Zeilen;status;input_select.vaarmodus_haven;input_select.vaarmodus_haven;zeker;alleen in HA; op de PLC alle drie havenmodus (23-11)
 Voortstuwing en Diesel;Elektrisch met DC-buscontrole;knop;script.vaarmodus_elektrisch;script.vaarmodus_elektrisch;zeker;eerst DC-bus, anders Energy Inverters (23-11)
 Voortstuwing en Diesel;Contact Volvo (Ignition);status;binary_sensor.diesel_contact;binary_sensor.diesel_contact;zeker;afgeleid: motordata live binnen 2 s (generated automations/diesel_contact.yaml, 24-11)
+Klimaat › Instellingen;Airco-status per unit;status;binary_sensor.webasto_bluecool_noder_<unit>_ac_status;binary_sensor.webasto_bluecool_noder_<unit>_ac_status;zeker;8 units (25-11)
+Klimaat › Instellingen;Koudwatertemperatuur per unit;meetwaarde;sensor.webasto_bluecool_connect_<unit>_cold_water_temperature;sensor.webasto_bluecool_connect_<unit>_cold_water_temperature;zeker;nieuw (25-11)
+Klimaat › Instellingen;Foutcode per unit;tekst;sensor.webasto_bluecool_connect_<unit>_error_code;sensor.webasto_bluecool_connect_<unit>_error_code;zeker;OK = geen fout (25-11)
+Klimaat › Instellingen;Compressor ER modus F5 / F7;knop;select.webasto_bluecool_connect_compressor_engine_room_operation_mode;select.webasto_bluecool_connect_compressor_engine_room_operation_mode;zeker;F5 Heating with ext. heater, F7 Dehumidification (25-11)

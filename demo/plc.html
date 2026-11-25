@@ -68,7 +68,7 @@
         "binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on": st("on"),
         // Energy Inverters: scripts + status (gesimuleerd in callService; ?ei_fail=shore laat die stap niet reageren (&ei_speed=10 = timeout na 2 s; window.eiRespond() = toch reactie))
         "input_text.energy_inverters_status": st(""),
-        "select.webasto_bluecool_connect_compressor_engine_room_operation_mode": st("F2 Heating", { options: ["F1 Cooling", "F2 Heating"] }),
+        "select.webasto_bluecool_connect_compressor_engine_room_operation_mode": st("F2 Heating", { options: ["F1 Cooling", "F2 Heating", "F5 Heating with ext. heater", "F7 Dehumidification"] }),
         "sensor.webasto_bluecool_connect_compressor_engine_room_operation_mode_feedback": st("F2 Heating"),
         "script.energy_inverters_opstarten": st("off"),
         "script.energy_inverters_afsluiten": st("off"),
@@ -138,6 +138,13 @@
         }
       };
       syncGroups();
+      // Webasto: airco-status, koudwatertemperatuur en foutcode per unit (Klimaat › Instellingen)
+      for (const [k, ac, cw, err] of [["compressor_engine_room", "on", 7.4, "OK"], ["crew_cabin", "off", 7.9, "OK"], ["deck_lounge", "on", 8.1, "OK"], ["galley", "off", 8.0, "OK"],
+        ["guest_cabin", "on", 7.6, "OK"], ["main_cabin", "on", 7.7, "E05 Low water flow"], ["owners_cabin", "on", 7.5, "OK"], ["owners_cabin_bad", "off", 7.8, "OK"]]) {
+        states[`binary_sensor.webasto_bluecool_noder_${k}_ac_status`] = st(ac);
+        states[`sensor.webasto_bluecool_connect_${k}_cold_water_temperature`] = st(cw, { unit_of_measurement: "°C" });
+        states[`sensor.webasto_bluecool_connect_${k}_error_code`] = st(err);
+      }
       for (const id of ["switch.oc_e1_2_l1", "switch.oc_w_e3", "switch.oc_w_e4", "switch.oc_w_e5", "switch.oc_k1", "switch.0xa4c138b105c39a71"]) states[id] = st("on");
       for (const [k, t, sp, fan, ac] of [["owners_cabin", 17.7, 18, 3, "on"], ["owners_cabin_bad", 18.9, 22, 6, "off"]]) {
         const b = `webasto_bluecool_noder_${k}`;
