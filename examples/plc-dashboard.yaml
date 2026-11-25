@@ -1954,37 +1954,37 @@ views:
           - { type: text, x: 540, y: 122, text: Koudwater, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
           - { type: text, x: 660, y: 122, text: Foutcode, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
           - { type: text, x: 340, y: 152, width: 190, text: Compressor ER, font_size: 15 }
-          - { type: text, x: 540, y: 152, width: 110, entity: sensor.webasto_bluecool_connect_compressor_engine_room_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 152, width: 110, entity: sensor.webasto_bluecool_connect_compressor_engine_room_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 155, label: "", entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 152, width: 180, entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 152, width: 180, entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 192, width: 190, text: Crew cabin, font_size: 15 }
-          - { type: text, x: 540, y: 192, width: 110, entity: sensor.webasto_bluecool_connect_crew_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 192, width: 110, entity: sensor.webasto_bluecool_connect_crew_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 195, label: "", entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 192, width: 180, entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 192, width: 180, entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 232, width: 190, text: Deck lounge, font_size: 15 }
-          - { type: text, x: 540, y: 232, width: 110, entity: sensor.webasto_bluecool_connect_deck_lounge_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 232, width: 110, entity: sensor.webasto_bluecool_connect_deck_lounge_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 235, label: "", entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 232, width: 180, entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 232, width: 180, entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 272, width: 190, text: Galley, font_size: 15 }
-          - { type: text, x: 540, y: 272, width: 110, entity: sensor.webasto_bluecool_connect_galley_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 272, width: 110, entity: sensor.webasto_bluecool_connect_galley_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 275, label: "", entity: sensor.webasto_bluecool_connect_galley_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 272, width: 180, entity: sensor.webasto_bluecool_connect_galley_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 272, width: 180, entity: sensor.webasto_bluecool_connect_galley_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 312, width: 190, text: Guest cabin, font_size: 15 }
-          - { type: text, x: 540, y: 312, width: 110, entity: sensor.webasto_bluecool_connect_guest_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 312, width: 110, entity: sensor.webasto_bluecool_connect_guest_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 315, label: "", entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 312, width: 180, entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 312, width: 180, entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 352, width: 190, text: Main cabin, font_size: 15 }
-          - { type: text, x: 540, y: 352, width: 110, entity: sensor.webasto_bluecool_connect_main_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 352, width: 110, entity: sensor.webasto_bluecool_connect_main_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 355, label: "", entity: sensor.webasto_bluecool_connect_main_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 352, width: 180, entity: sensor.webasto_bluecool_connect_main_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 352, width: 180, entity: sensor.webasto_bluecool_connect_main_cabin_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 392, width: 190, text: Owners cabin, font_size: 15 }
-          - { type: text, x: 540, y: 392, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 392, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 395, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 392, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 392, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
           - { type: text, x: 340, y: 432, width: 190, text: Owners cabin bad, font_size: 15 }
-          - { type: text, x: 540, y: 432, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: text, x: 540, y: 432, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 435, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, state_on: OK, off_color: red, font_size: 13 }
-          - { type: text, x: 686, y: 432, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 686, y: 432, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
 
   # ===== Instellingen (tandwiel rechtsboven in de statusbalk): algemeen (nog leeg) en lokale webpagina's =====
   - title: Instellingen
