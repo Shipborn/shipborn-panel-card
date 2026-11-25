@@ -1985,14 +1985,17 @@ views:
           - { type: text, x: 540, y: 432, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_cold_water_temperature, mono: true, font_size: 15, decimals: 1, tap_action: { action: more-info } }
           - { type: indicator, x: 660, y: 435, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, state_on: OK, off_color: red, font_size: 13 }
           - { type: text, x: 686, y: 432, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, mono: true, font_size: 15, tap_action: { action: more-info } }
-          # ---- actieve foutcodes: omschrijving, oorzaak en oplossing uit de foutcodetabel (www/webasto-foutcodes.csv → /homeassistant/www/) ----
+          # ---- actieve foutcodes: omschrijving, oorzaak en oplossing uit de foutcodetabel (www/Manuals/Webasto/webasto-foutcodes.csv → /homeassistant/www/Manuals/Webasto/) ----
+          # ---- handleidingen: openen schermvullend in de kaart (tap_action document), met Terug ----
+          - { type: panel, x: 20, y: 512, width: 856, height: 188, title: Handleidingen }
+          - { type: pushbutton, x: 38, y: 556, width: 300, height: 52, label: "Blue Cool troubleshooting (PDF)", font_size: 15, tap_action: { action: document, url_path: "/local/Manuals/Webasto/Blue%20Cool%20Troubleshooting-WPNA.pdf", title: Blue Cool Troubleshooting } }
           - { type: panel, x: 892, y: 76, width: 368, height: 624, title: Actieve foutcodes }
           - type: codes
             x: 908
             y: 118
             width: 336
             height: 568
-            source: /local/webasto-foutcodes.csv
+            source: /local/Manuals/Webasto/webasto-foutcodes.csv
             ok_state: OK
             empty_text: Geen actieve foutcodes.
             entities:

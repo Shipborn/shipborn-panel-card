@@ -1,2 +1,4 @@
 .DS_Store
 .claude/
+# handleidingen van leveranciers: alleen lokaal en in HA, niet in git
+www/Manuals/**/*.pdf

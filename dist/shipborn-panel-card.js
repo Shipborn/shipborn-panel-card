@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.56";
+const VERSION = "0.5.57";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -771,6 +771,12 @@ const TC_STYLE =
 
   /* confirm dialog */
   .tc-dlg { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: var(--scrim); }
+  .tc-dlg.tc-viewer { display: flex; flex-direction: column; place-items: stretch; gap: var(--space-2); padding: var(--space-3); background: var(--bg); }
+  .tc-viewer-bar { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-2) var(--space-3); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); color: var(--ink); }
+  .tc-viewer-bar .tc-btn { width: auto; min-width: 140px; }
+  .tc-viewer-bar .title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tc-viewer-bar a { color: var(--accent); text-decoration: none; }
+  .tc-viewer-frame { flex: 1; width: 100%; border: 1px solid var(--line); border-radius: var(--radius-md); background: #fff; }
   .tc-dialog { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); width: 420px; max-width: calc(100% - 48px); padding: var(--space-6); box-sizing: border-box; background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-dialog); text-align: center; color: var(--ink); }
   .tc-dialog > .tc-icon { color: var(--accent); }
   .tc-dialog-text { margin: 0; color: var(--ink-muted); white-space: pre-line; }
@@ -4236,6 +4242,9 @@ class ShipbornPanelCard extends HTMLElement {
       case "url":
         window.open(a.url_path, "_blank");
         return;
+      case "document": // e.g. a PDF manual in /local/…: full screen in the card, with Terug
+        this._viewer(a.url_path || a.url, a.title || cfg.label);
+        return;
       case "call-service":
       case "perform-action": {
         const [domain, service] = (a.perform_action || a.service || "").split(".");
@@ -4248,6 +4257,25 @@ class ShipbornPanelCard extends HTMLElement {
       default:
         if (entity) this._toggle(entity);
     }
+  }
+
+  // Document viewer: a page or PDF (e.g. a manual in /local/…) full screen over the dashboard, with Terug and a
+  // link to open it in a new window (some tablets cannot show a PDF inside a page).
+  _viewer(url, title) {
+    if (!url) return;
+    const dlg = h("div", "tc-dlg tc-viewer");
+    dlg.dataset.tcTheme = this._theme || "nacht";
+    dlg.innerHTML = '<div class="tc-viewer-bar"><button type="button" class="tc-btn tc-btn-primary label">← Terug</button>' +
+      '<span class="title"></span><a class="label" target="_blank" rel="noopener">Openen in nieuw venster</a></div><iframe class="tc-viewer-frame"></iframe>';
+    const [back, ttl, open] = dlg.querySelector(".tc-viewer-bar").children;
+    ttl.textContent = title || decodeURIComponent(url.split("/").pop() || "");
+    open.href = url;
+    dlg.querySelector("iframe").src = url;
+    const close = () => { dlg.remove(); removeEventListener("keydown", esc); };
+    const esc = (ev) => ev.key === "Escape" && close();
+    back.addEventListener("click", close);
+    addEventListener("keydown", esc);
+    this.shadowRoot.appendChild(dlg);
   }
 
   // Dark yes/no dialog in the style of the screen pages; resolves true on "Ja".
