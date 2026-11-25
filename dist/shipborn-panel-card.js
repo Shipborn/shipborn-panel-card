@@ -3,7 +3,7 @@
  * Console-style control panels (buttons with status LEDs, emergency stops,
  * throttle levers, knobs, embedded screens) for Home Assistant dashboards.
  */
-const VERSION = "0.5.57";
+const VERSION = "0.5.58";
 
 const LED_COLORS = {
   green: "#35d07f",
@@ -1186,6 +1186,15 @@ class ShipbornPanelCard extends HTMLElement {
       if (!node) return;
       node.dataset.i = i; // lets the layout editor (demo/editor.html) find an item's node
       this._panel.appendChild(node);
+      // show_entity / hide_entity: the item is only visible while (not) any of these entities is active
+      // (show_state / show_above / show_below, hide_… likewise), e.g. a warning that another light is on.
+      if (item.show_entity || item.hide_entity) {
+        const disp = node.style.display;
+        this._updaters.push((hass) => {
+          const show = (!item.show_entity || activeOf(hass, item.show_entity, item, "show")) && !(item.hide_entity && activeOf(hass, item.hide_entity, item, "hide"));
+          node.style.display = show ? disp : "none";
+        });
+      }
     });
     // Phone held upright: the same nodes, rearranged into a narrow page (needs the page in the document to measure).
     if (this._phone && this.isConnected) this._phoneLayout();

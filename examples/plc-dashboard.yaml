@@ -29,6 +29,7 @@ views:
             tabs: &ship_tabs
               - { label: Dek en interieur, path: ship-deck }
               - { label: Zijaanzicht, path: ship-side }
+              - { label: Ankeren, path: ship-anchor }
             status: &tc_status
               - { icon: lifebeat, label: PLC lifebeat, entity: binary_sensor.wago_hcs_controls_wago_hcs_controls_lifebeat }
               - { icon: walstroom, label: Walstroom, entity: binary_sensor.wago_energy_controls_wago_energy_controls_shore_supply_is_on, tone: accent }
@@ -36,7 +37,7 @@ views:
               - { icon: instellingen, label: Instellingen, path: instellingen, match: [inst-klimaat, inst-navlight, inst-nodered-plc2, inst-nodered-ha] }
           - type: navbar
             items: &tc_nav
-              - { icon: schip, label: Schip, path: ship-deck, match: [ship-side] }
+              - { icon: schip, label: Schip, path: ship-deck, match: [ship-side, ship-anchor] }
               - { icon: energie, label: Energie, path: energie, match: [sys-power, sys-dcbus] }
               - { icon: motor, label: Voortstuwing, path: voortstuwing, match: [sys-diesel, sys-generator, sys-bowthruster, sys-fuel, sys-hydraulics] }
               - { icon: water, label: Water, path: water, match: [sys-seawater, sys-freshwater, sys-wastewater] }
@@ -2345,6 +2346,59 @@ views:
           - { type: pushbutton, x: 1088, y: 376, width: 154, height: 52, label: "360 top red", entity: switch.lopolight_navigation_lights_navlight_360_top_red, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 918, y: 438, width: 154, height: 52, label: Aft towing, entity: switch.lopolight_navigation_lights_navlight_aft_towing, led: green, align: left, font_size: 15 }
           - { type: pushbutton, x: 1088, y: 438, width: 154, height: 52, label: Deck light, entity: switch.lopolight_navigation_lights_navlight_deck_light, led: green, align: left, font_size: 15 }
+
+  # ===== Ankeren: overzicht tijdens het voor anker liggen (derde tab onder Schip) =====
+  - title: Ankeren
+    path: ship-anchor
+    panel: true
+    cards:
+      - type: custom:shipborn-panel-card
+        design: tc90
+        kiosk: true            # HA-balken verbergen; even op de boven- of linkerrand blijven = tonen
+        width: 1280
+        height: 800
+        items:
+          - type: statusbar
+            title: Schip
+            tabs: *ship_tabs
+            status: *tc_status
+          - { type: navbar, items: *tc_nav }
+
+          # ---- links: ankeralarm (placeholder: tekening en knoppen schakelen nog niets) ----
+          - { type: panel, x: 20, y: 76, width: 400, height: 624, title: Ankeralarm }
+          - { type: image, x: 40, y: 116, width: 360, height: 340, image: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20360%20340%22%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22170%22%20r%3D%22150%22%20fill%3D%22%234aa3ff%22%20fill-opacity%3D%220.08%22%20stroke%3D%22%234aa3ff%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%2210%208%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22170%22%20r%3D%2290%22%20fill%3D%22none%22%20stroke%3D%22%234aa3ff%22%20stroke-opacity%3D%220.35%22%20stroke-width%3D%221.5%22%2F%3E%3Cline%20x1%3D%22180%22%20y1%3D%22170%22%20x2%3D%22286%22%20y2%3D%2264%22%20stroke%3D%22%23a3a29c%22%20stroke-width%3D%221.5%22%20stroke-dasharray%3D%224%205%22%2F%3E%3Ctext%20x%3D%22248%22%20y%3D%22104%22%20fill%3D%22%23a3a29c%22%20font-family%3D%22sans-serif%22%20font-size%3D%2215%22%3Er%20%3D%2050%20m%3C%2Ftext%3E%3Cg%20transform%3D%22translate%28156%20146%29%20scale%282%29%22%20fill%3D%22none%22%20stroke%3D%22%23ecebe6%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206a2%202%200%201%200%200-4%202%202%200%200%200%200%204zM12%206v15M8%2010h8M4%2014a8%208%200%200%200%2016%200M2.5%2014H5M19%2014h2.5%22%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%22translate%28232%20214%29%20rotate%2835%29%22%3E%3Cpath%20d%3D%22M0%20-16%20L8%206%20L0%2012%20L-8%206%20Z%22%20fill%3D%22%233ccf7e%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" }
+          - { type: text, x: 38, y: 462, width: 364, text: Ankeralarm nog niet gekoppeld, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: pushbutton, x: 38, y: 492, width: 364, height: 48, label: Anker zetten (positie), font_size: 15, placeholder: "Ankeralarm: de huidige positie als ankerpositie vastleggen. Nog niet gekoppeld." }
+          - { type: pushbutton, x: 38, y: 552, width: 64, height: 48, label: "−", font_size: 22, placeholder: "Ankeralarm: alarmstraal kleiner. Nog niet gekoppeld." }
+          - { type: text, x: 112, y: 564, width: 216, text: Straal 50 m, font_size: 17 }
+          - { type: pushbutton, x: 338, y: 552, width: 64, height: 48, label: "+", font_size: 22, placeholder: "Ankeralarm: alarmstraal groter. Nog niet gekoppeld." }
+          - { type: pushbutton, x: 38, y: 612, width: 176, height: 48, label: Alarm aan/uit, font_size: 14, placeholder: "Ankeralarm in- of uitschakelen. Nog niet gekoppeld." }
+          - { type: pushbutton, x: 226, y: 612, width: 176, height: 48, label: Alarm wissen, font_size: 15, placeholder: "Een afgegaan ankeralarm bevestigen. Nog niet gekoppeld." }
+
+          # ---- midden: energie (accu, generator, automatisch laden) en boordnet ----
+          - { type: panel, x: 436, y: 76, width: 400, height: 340, title: Energie }
+          - { type: dial, x: 546, y: 110, width: 180, label: Accu (SoC), entity: sensor.wago_energy_controls_wago_energy_controls_bms_state_of_charge, min: 0, max: 100, unit: "%", decimals: 0, setpoint_entity: sensor.er_pms_status2_bms_max_soc, setpoint_label: Max SoC, setpoint_unit: "%" }
+          - { type: warnlight, x: 456, y: 302, size: 40, icon: generator, label: Generator draait, entity: binary_sensor.generatoron, tap_action: { action: navigate, navigation_path: sys-generator } }
+          - { type: text, x: 506, y: 312, width: 150, text: Generator, font_size: 16 }
+          - { type: indicator, x: 660, y: 314, label: Draait, entity: binary_sensor.generatoron, font_size: 15 }
+          - { type: pushbutton, x: 454, y: 356, width: 364, height: 44, label: Automatisch laden, font_size: 15, placeholder: "Automatisch laden van de accu (bijv. generator starten bij lage SoC). Nog niet gekoppeld." }
+          - { type: panel, x: 436, y: 432, width: 400, height: 268, title: Boordnet }
+          - { type: dial, x: 546, y: 466, width: 180, label: Vermogen inverter, entity: sensor.wago_values_drivepower_maingrit, min: 0, max: 5, unit: kW, decimals: 1, warn_above: 4.5 }
+          - { type: text, x: 454, y: 664, width: 364, text: "Maximaal 5 kW (oranje boven 4,5 kW)", font_size: 13, color: "var(--ink-muted, #a3a29c)" }
+
+          # ---- rechts: zoetwater en watermaker, navigatieverlichting, brandstof ----
+          - { type: panel, x: 852, y: 76, width: 408, height: 232, title: Water }
+          - { type: tank, x: 872, y: 112, width: 120, height: 180, frame: false, label: Zoetwater, entity: sensor.wago_values_lr_fresh_water_level, capacity: 400, color: "var(--media-freshwater, #4aa3ff)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-freshwater } }
+          - { type: pushbutton, x: 1016, y: 176, width: 226, height: 52, label: Watermaker, font_size: 16, placeholder: "Watermaker aan / uit. Nog niet gekoppeld." }
+          - { type: panel, x: 852, y: 324, width: 408, height: 136, title: Navigatieverlichting }
+          - { type: pushbutton, x: 870, y: 366, width: 372, height: 48, label: Toplicht (anker), font_size: 16, entity: switch.lopolight_navigation_lights_navlight_anchor, led: green, active_entity: switch.lopolight_navigation_lights_navlight_anchor }
+          - { type: text, x: 870, y: 426, width: 372, text: "⚠ Er staat ook andere navigatieverlichting aan", font_size: 14, color: "var(--warn, #e0a030)", show_entity: [switch.lopolight_navigation_lights_navlight_360_top_red, switch.lopolight_navigation_lights_navlight_aft_towing, switch.lopolight_navigation_lights_navlight_front_ps, switch.lopolight_navigation_lights_navlight_front_sb, switch.lopolight_navigation_lights_navlight_green_nav_ps, switch.lopolight_navigation_lights_navlight_green_nav_sb, switch.lopolight_navigation_lights_navlight_mast_head, switch.lopolight_navigation_lights_navlight_red_nav_ps, switch.lopolight_navigation_lights_navlight_red_nav_sb, switch.lopolight_navigation_lights_navlight_stern], tap_action: { action: navigate, navigation_path: ship-side } }
+          - { type: text, x: 870, y: 426, width: 372, text: Geen andere navigatieverlichting aan, font_size: 14, color: "var(--ink-muted, #a3a29c)", hide_entity: [switch.lopolight_navigation_lights_navlight_360_top_red, switch.lopolight_navigation_lights_navlight_aft_towing, switch.lopolight_navigation_lights_navlight_front_ps, switch.lopolight_navigation_lights_navlight_front_sb, switch.lopolight_navigation_lights_navlight_green_nav_ps, switch.lopolight_navigation_lights_navlight_green_nav_sb, switch.lopolight_navigation_lights_navlight_mast_head, switch.lopolight_navigation_lights_navlight_red_nav_ps, switch.lopolight_navigation_lights_navlight_red_nav_sb, switch.lopolight_navigation_lights_navlight_stern] }
+          - { type: panel, x: 852, y: 476, width: 408, height: 224, title: Brandstof }
+          - { type: tank, x: 870, y: 512, width: 84, height: 176, frame: false, label: Daytank, entity: sensor.wago_values_er_diesel_daytank_level, color: "var(--media-fuel, #c9a227)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-fuel } }
+          - { type: tank, x: 966, y: 512, width: 84, height: 176, frame: false, label: PS, entity: sensor.wago_values_er_diesel_ps_level, color: "var(--media-fuel, #c9a227)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-fuel } }
+          - { type: tank, x: 1062, y: 512, width: 84, height: 176, frame: false, label: SB, entity: sensor.wago_plc_er_diesel_sb_level, color: "var(--media-fuel, #c9a227)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-fuel } }
+          - { type: tank, x: 1158, y: 512, width: 84, height: 176, frame: false, label: Webasto, entity: sensor.wago_values_aft_diesel_webasto_level, color: "var(--media-fuel, #c9a227)", colors: [{ below: 10, color: red }, { below: 25, color: amber }], tap_action: { action: navigate, navigation_path: sys-fuel } }
 
   - title: Alarmen
     path: alarms

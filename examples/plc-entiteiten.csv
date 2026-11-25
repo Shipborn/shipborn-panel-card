@@ -193,3 +193,6 @@ Klimaat › Instellingen;Airco-status per unit;status;binary_sensor.webasto_blue
 Klimaat › Instellingen;Koudwatertemperatuur per unit;meetwaarde;sensor.webasto_bluecool_connect_<unit>_cold_water_temperature;sensor.webasto_bluecool_connect_<unit>_cold_water_temperature;zeker;nieuw (25-11)
 Klimaat › Instellingen;Foutcode per unit;tekst;sensor.webasto_bluecool_connect_<unit>_error_code;sensor.webasto_bluecool_connect_<unit>_error_code;zeker;OK = geen fout (25-11)
 Klimaat › Instellingen;Compressor ER modus F5 / F7;knop;select.webasto_bluecool_connect_compressor_engine_room_operation_mode;select.webasto_bluecool_connect_compressor_engine_room_operation_mode;zeker;F5 Heating with ext. heater, F7 Dehumidification (25-11)
+Schip › Ankeren;Boordnet vermogen;meetwaarde;sensor.wago_values_drivepower_maingrit;sensor.wago_values_drivepower_maingrit;waarschijnlijk;kW, max 5 kW voorlopig (25-11)
+Schip › Ankeren;Toplicht (anker);schakelaar;switch.lopolight_navigation_lights_navlight_anchor;switch.lopolight_navigation_lights_navlight_anchor;zeker;keuze gebruiker (25-11)
+Schip › Ankeren;Ankeralarm, automatisch laden, watermaker;knop;;;geen gevonden;placeholderknoppen (25-11)

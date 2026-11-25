@@ -138,6 +138,11 @@
         }
       };
       syncGroups();
+      // Ankeren (ship-anchor): waarden die nog niet in de demo stonden
+      for (const [id, s] of [["sensor.wago_values_drivepower_maingrit", st(2.3, { unit_of_measurement: "kW" })], ["sensor.er_pms_status2_bms_max_soc", st(90, { unit_of_measurement: "%" })],
+        ["binary_sensor.generatoron", st("off")], ["switch.lopolight_navigation_lights_navlight_anchor", st("on")], ["switch.lopolight_navigation_lights_navlight_stern", st("off")],
+        ["sensor.wago_values_er_diesel_daytank_level", st(64, { unit_of_measurement: "%" })], ["sensor.wago_values_aft_diesel_webasto_level", st(18, { unit_of_measurement: "%" })]])
+        if (!states[id]) states[id] = s;
       // Webasto: airco-status, koudwatertemperatuur en foutcode per unit (Klimaat › Instellingen)
       for (const [k, ac, cw, err] of [["compressor_engine_room", "on", 7.4, "OK"], ["crew_cabin", "off", 7.9, "OK"], ["deck_lounge", "on", 8.1, "OK"], ["galley", "off", 8.0, "OK"],
         ["guest_cabin", "on", 7.6, "OK"], ["main_cabin", "on", 7.7, "A02"], ["owners_cabin", "on", 7.5, "OK"], ["owners_cabin_bad", "off", 7.8, "bA11"]]) {
