@@ -1948,52 +1948,43 @@ views:
           - { type: pushbutton, x: 38, y: 350, width: 244, height: 40, label: "Cooling only", status_entity: sensor.webasto_bluecool_connect_compressor_engine_room_operation_mode_feedback, status_state: "F1 Cooling", font_size: 14, tap_action: { action: perform-action, perform_action: select.select_option, data: { entity_id: select.webasto_bluecool_connect_compressor_engine_room_operation_mode, option: "F1 Cooling" } } }
           - { type: pushbutton, x: 38, y: 398, width: 244, height: 40, label: "Heating with external power", status_entity: sensor.webasto_bluecool_connect_compressor_engine_room_operation_mode_feedback, status_state: "F5 Heating with ext. heater", font_size: 14, tap_action: { action: perform-action, perform_action: select.select_option, data: { entity_id: select.webasto_bluecool_connect_compressor_engine_room_operation_mode, option: "F5 Heating with ext. heater" } } }
           - { type: pushbutton, x: 38, y: 446, width: 244, height: 40, label: "Dehumidification", status_entity: sensor.webasto_bluecool_connect_compressor_engine_room_operation_mode_feedback, status_state: "F7 Dehumidification", font_size: 14, tap_action: { action: perform-action, perform_action: select.select_option, data: { entity_id: select.webasto_bluecool_connect_compressor_engine_room_operation_mode, option: "F7 Dehumidification" } } }
-          # ---- alle units: airco aan/uit (ac_status), koudwatertemperatuur en foutcode (OK = geen fout, anders rood) ----
-          - { type: panel, x: 316, y: 76, width: 944, height: 624, title: Webasto units }
-          - { type: text, x: 340, y: 124, text: Unit, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 600, y: 124, text: Airco, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 760, y: 124, text: Koudwater, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 960, y: 124, text: Foutcode, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
-          - { type: text, x: 340, y: 160, width: 240, text: Compressor ER, font_size: 17 }
-          - { type: indicator, x: 600, y: 165, label: "", entity: binary_sensor.webasto_bluecool_noder_compressor_engine_room_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 160, width: 160, entity: sensor.webasto_bluecool_connect_compressor_engine_room_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 165, label: "", entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 160, width: 250, entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 224, width: 240, text: Crew cabin, font_size: 17 }
-          - { type: indicator, x: 600, y: 229, label: "", entity: binary_sensor.webasto_bluecool_noder_crew_cabin_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 224, width: 160, entity: sensor.webasto_bluecool_connect_crew_cabin_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 229, label: "", entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 224, width: 250, entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 288, width: 240, text: Deck lounge, font_size: 17 }
-          - { type: indicator, x: 600, y: 293, label: "", entity: binary_sensor.webasto_bluecool_noder_deck_lounge_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 288, width: 160, entity: sensor.webasto_bluecool_connect_deck_lounge_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 293, label: "", entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 288, width: 250, entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 352, width: 240, text: Galley, font_size: 17 }
-          - { type: indicator, x: 600, y: 357, label: "", entity: binary_sensor.webasto_bluecool_noder_galley_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 352, width: 160, entity: sensor.webasto_bluecool_connect_galley_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 357, label: "", entity: sensor.webasto_bluecool_connect_galley_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 352, width: 250, entity: sensor.webasto_bluecool_connect_galley_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 416, width: 240, text: Guest cabin, font_size: 17 }
-          - { type: indicator, x: 600, y: 421, label: "", entity: binary_sensor.webasto_bluecool_noder_guest_cabin_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 416, width: 160, entity: sensor.webasto_bluecool_connect_guest_cabin_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 421, label: "", entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 416, width: 250, entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 480, width: 240, text: Main cabin, font_size: 17 }
-          - { type: indicator, x: 600, y: 485, label: "", entity: binary_sensor.webasto_bluecool_noder_main_cabin_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 480, width: 160, entity: sensor.webasto_bluecool_connect_main_cabin_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 485, label: "", entity: sensor.webasto_bluecool_connect_main_cabin_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 480, width: 250, entity: sensor.webasto_bluecool_connect_main_cabin_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 544, width: 240, text: Owners cabin, font_size: 17 }
-          - { type: indicator, x: 600, y: 549, label: "", entity: binary_sensor.webasto_bluecool_noder_owners_cabin_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 544, width: 160, entity: sensor.webasto_bluecool_connect_owners_cabin_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 549, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 544, width: 250, entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, mono: true, font_size: 17 }
-          - { type: text, x: 340, y: 608, width: 240, text: Owners cabin bad, font_size: 17 }
-          - { type: indicator, x: 600, y: 613, label: "", entity: binary_sensor.webasto_bluecool_noder_owners_cabin_bad_ac_status, font_size: 15 }
-          - { type: text, x: 760, y: 608, width: 160, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_cold_water_temperature, mono: true, font_size: 17, decimals: 1 }
-          - { type: indicator, x: 960, y: 613, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, state_on: OK, off_color: red, font_size: 15 }
-          - { type: text, x: 990, y: 608, width: 250, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, mono: true, font_size: 17 }
+          # ---- alle units: koudwatertemperatuur en foutcode (OK = geen fout, anders rood) ----
+          - { type: panel, x: 316, y: 76, width: 560, height: 420, title: Webasto units }
+          - { type: text, x: 340, y: 122, text: Unit, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 540, y: 122, text: Koudwater, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 660, y: 122, text: Foutcode, font_size: 13, uppercase: true, color: "var(--ink-muted, #a3a29c)" }
+          - { type: text, x: 340, y: 152, width: 190, text: Compressor ER, font_size: 15 }
+          - { type: text, x: 540, y: 152, width: 110, entity: sensor.webasto_bluecool_connect_compressor_engine_room_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 155, label: "", entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 152, width: 180, entity: sensor.webasto_bluecool_connect_compressor_engine_room_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 192, width: 190, text: Crew cabin, font_size: 15 }
+          - { type: text, x: 540, y: 192, width: 110, entity: sensor.webasto_bluecool_connect_crew_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 195, label: "", entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 192, width: 180, entity: sensor.webasto_bluecool_connect_crew_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 232, width: 190, text: Deck lounge, font_size: 15 }
+          - { type: text, x: 540, y: 232, width: 110, entity: sensor.webasto_bluecool_connect_deck_lounge_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 235, label: "", entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 232, width: 180, entity: sensor.webasto_bluecool_connect_deck_lounge_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 272, width: 190, text: Galley, font_size: 15 }
+          - { type: text, x: 540, y: 272, width: 110, entity: sensor.webasto_bluecool_connect_galley_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 275, label: "", entity: sensor.webasto_bluecool_connect_galley_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 272, width: 180, entity: sensor.webasto_bluecool_connect_galley_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 312, width: 190, text: Guest cabin, font_size: 15 }
+          - { type: text, x: 540, y: 312, width: 110, entity: sensor.webasto_bluecool_connect_guest_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 315, label: "", entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 312, width: 180, entity: sensor.webasto_bluecool_connect_guest_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 352, width: 190, text: Main cabin, font_size: 15 }
+          - { type: text, x: 540, y: 352, width: 110, entity: sensor.webasto_bluecool_connect_main_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 355, label: "", entity: sensor.webasto_bluecool_connect_main_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 352, width: 180, entity: sensor.webasto_bluecool_connect_main_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 392, width: 190, text: Owners cabin, font_size: 15 }
+          - { type: text, x: 540, y: 392, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 395, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 392, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_error_code, mono: true, font_size: 15 }
+          - { type: text, x: 340, y: 432, width: 190, text: Owners cabin bad, font_size: 15 }
+          - { type: text, x: 540, y: 432, width: 110, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_cold_water_temperature, mono: true, font_size: 15, decimals: 1 }
+          - { type: indicator, x: 660, y: 435, label: "", entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, state_on: OK, off_color: red, font_size: 13 }
+          - { type: text, x: 686, y: 432, width: 180, entity: sensor.webasto_bluecool_connect_owners_cabin_bad_error_code, mono: true, font_size: 15 }
 
   # ===== Instellingen (tandwiel rechtsboven in de statusbalk): algemeen (nog leeg) en lokale webpagina's =====
   - title: Instellingen
